@@ -13,3 +13,4 @@
 # eclipse files
 .project
 .settings/
+.metadata/
