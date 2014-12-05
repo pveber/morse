@@ -9,3 +9,8 @@
 
 # RStudio files
 .Rproj.user/
+
+# eclipse files
+.project
+.settings/
+.metadata/
