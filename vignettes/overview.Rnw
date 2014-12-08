@@ -1,4 +1,6 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
 \usepackage{Sweave}
 \usepackage{amsmath}
 
@@ -16,12 +18,33 @@
 
 
 \title{Library overview}
-\author{Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller}
+\author{Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller, Sandrine
+Charles}
 \date{}
 
 \begin{document}
 
 \maketitle
+
+\section{Inroduction}
+
+\section{Species Sensitivity Distribution - SSD}
+
+\subsection{Theory}
+
+\subsection{Examples}
+
+\section{Reproduction data analyses}
+
+\subsection{Theory}
+
+\subsection{Examples}
+
+\section{Survival data analyses}
+
+\subsection{Theory}
+
+\subsection{Examples}
 
 
 \end{document}
