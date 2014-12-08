@@ -1,0 +1,27 @@
+\documentclass[a4paper]{article}
+\usepackage{Sweave}
+\usepackage{amsmath}
+
+
+\SweaveOpts{keep.source=TRUE, fig=FALSE}
+\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=2em}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+
+\SweaveOpts{width=6,height=4}
+\setkeys{Gin}{width=\textwidth}
+%\VignetteIndexEntry{Library overview}
+
+
+\title{Library overview}
+\author{Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+
+\end{document}
