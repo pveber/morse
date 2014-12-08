@@ -25,6 +25,7 @@ Charles}
 \begin{document}
 
 \maketitle
+\tableofcontents
 
 \section{Inroduction}
 
