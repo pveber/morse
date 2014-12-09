@@ -1,0 +1,51 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{Sweave}
+\usepackage{amsmath}
+
+
+\SweaveOpts{keep.source=TRUE, fig=FALSE}
+\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=2em}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+
+\SweaveOpts{width=6,height=4}
+\setkeys{Gin}{width=\textwidth}
+%\VignetteIndexEntry{Library overview}
+
+
+\title{Library overview}
+\author{Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller, Sandrine
+Charles}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Inroduction}
+
+\section{Species Sensitivity Distribution - SSD}
+
+\subsection{Theory}
+
+\subsection{Examples}
+
+\section{Reproduction data analyses}
+
+\subsection{Theory}
+
+\subsection{Examples}
+
+\section{Survival data analyses}
+
+\subsection{Theory}
+
+\subsection{Examples}
+
+
+\end{document}
