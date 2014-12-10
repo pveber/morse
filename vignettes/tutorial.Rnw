@@ -40,13 +40,7 @@ options(prompt = " ", continue = " ")
 
 \section{Species Sensitivity Distribution - SSD}
 
-\subsection{Theory}
-
-\subsection{Examples}
-
 \section{Reproduction data analyses}
-
-\subsection{Theory}
   
     Before analyse bioassay reproduction data some stages are required. The
   following example shows all these stages to pass from a raw bioassay dataset
@@ -54,8 +48,6 @@ options(prompt = " ", continue = " ")
   \texttt{cadmium1} dataset, a reproduction and survival dataset of chronic
   laboratory bioassays with \emph{Daphnia magna} freshwater invertebrate
   exposed to five concentrations of one metal contaminant (cadmium) during 21 days.
-
-\subsection{Examples}
 
 \begin{itemize}
   
@@ -184,13 +176,11 @@ repro.tt.fit.comp(list(out1, out2), log.scale = TRUE, ci = TRUE)
   
 \section{Survival data analyses}
 
-\subsection{Theory}
-
 In this two examples we fit an exposure-response curve on survival data at final
 time. In the first one we use a dataset with survival data at final time. In the
 second one we use dataset comes from reproduction data.
 
-\subsection{Examples from survival data at final time}
+\subsection{From survival data at final time}
 
 \begin{itemize}
 
@@ -261,7 +251,7 @@ convergence(out, trace = FALSE, autocorr = FALSE)
   
 \end{itemize}
 
-\subsection{Examples from reproduction data}
+\subsection{From reproduction data}
 
   The two first parts are the sames as the reproduction analysis.
 
