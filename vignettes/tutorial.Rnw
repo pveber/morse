@@ -68,14 +68,14 @@ repro.fullsurvplot(cadmium1)
 @
 
     The function \texttt{repro.check.data} performs several tests on the integrity
-  of the dataset and return explicit error messages (if necessary).
-  If no error was detected in the dataset an object of class repro.data can be
-  created. \texttt{repro.fullsurvplot} plots the number of survivors as a
+  of the dataset and returns explicit error messages (if necessary).
+  If no error was detected in the dataset an object of class \texttt{repro.data}
+  can be created. \texttt{repro.fullsurvplot} plots the number of survivors as a
   function of time for each concentration and replicate. If the
-  \texttt{repro.check.data} find an increase of alive individuals with time the 
-  \textt{repro.fullsurvplot} can be called.
+  \texttt{repro.check.data} function finds an increase of alive individuals with
+  time the \texttt{repro.fullsurvplot} function can be called.
   
-  \item Step two, create a repro.data object
+  \item Step two, create a \texttt{repro.data} object
   
 <<>>=
 dat <- repro.data(cadmium1)
@@ -103,8 +103,8 @@ repro.survplot(dat)
   \item Step four, create a dataset with reproduction data at final time
   
     By default, the last time point of mesure is chosen. \texttt{repro2reprott}
-  give a subset of the bioessay dataset at target time and calculate
-  \textt{Ninit} the number of individuals at the beginning of the bioassay,
+  gives a subset of the bioessay dataset at target time and calculate
+  \texttt{Ninit} the number of individuals at the beginning of the bioassay,
   \texttt{Nreprocumul}, the cumulative number of offspring at the target time
   and \texttt{Nindtime} the number of inidividual-days at target time for each
   concentration and each replicate.
@@ -126,8 +126,8 @@ summary(dat2)
     \texttt{JAGS} program to estimate the model parameters using the bayesian
     inference.
     
-      By choosing the \textt{bestfit} option for the \texttt{stoc.part} argument
-    we let the function choose the best stochastic part of the model.
+      By choosing the \texttt{bestfit} option for the \texttt{stoc.part}
+      argument we let the function choose the best stochastic part of the model.
     
 <<results = hide>>=
 out <- repro.tt.fit(dat2, stoc.part = "bestfit",
@@ -147,8 +147,8 @@ plot(out, log.scale = TRUE, ci = TRUE)
 
   \item Step six, check the the convergence of the MCMC chains
   
-      The function \texttt{convergence} can be use to check the convergence of the
-    MCMC chains from the \texttt{JAGS} estimate with the Gelman and Rubin
+      The function \texttt{convergence} can be used to check the convergence of
+      the MCMC chains from the \texttt{JAGS} estimate with the Gelman and Rubin
     convergence diagnostic \cite{Gelman}, to draw the MCMC value, the density
     of posteriors or the autocorrelation for each parameter in each chain.
     
@@ -156,25 +156,25 @@ plot(out, log.scale = TRUE, ci = TRUE)
 convergence(out, trace = FALSE, autocorr = FALSE)
 @
 
-  \item Compare the curves gives by the two stochastic part of the model
+  \item Compare the curves given by the two stochastic parts of the model
   
-      It is possible to compare the exposure-response curve give by the two
-    stochastic part of the log-logistic model on the same data. The
-    \texttt{repro.tt.fit.comp} is used to plot two or more curve in one plot.
+      It is possible to compare the exposure-response curves given by the two
+    stochastic parts of the log-logistic model on the same data. The
+    \texttt{repro.tt.fit.comp} is used to plot two or more curves in one plot.
     
-      In this exemple we compare the exposure-response curve given by the
+      In this example we compare the exposure-response curve given by the
     log-logistic model with a poisson stochastic part to the
     exposure-response curve given by the log-logistic model with a
     gamma-poisson stochastic part.
     
-      Like in the step five, we fit the two model with \texttt{repro.tt.fit}.
+      Like in the step five, we fit the two models with \texttt{repro.tt.fit}.
       
 <<results = hide>>=
 out1 <- repro.tt.fit(dat2, stoc.part = "poisson")
 out2 <- repro.tt.fit(dat2, stoc.part = "gammapoisson")
 @
 
-    We can know draw the two curves on a same graph.
+    We can now draw the two curves on a same graph.
 
 <<fig = TRUE>>=
 repro.tt.fit.comp(list(out1, out2), log.scale = TRUE, ci = TRUE)
@@ -186,20 +186,21 @@ repro.tt.fit.comp(list(out1, out2), log.scale = TRUE, ci = TRUE)
 
 \subsection{Theory}
 
-In this example we fit an exposure-response curve on survival data at final
-time.
+In this two examples we fit an exposure-response curve on survival data at final
+time. In the first one we use a dataset with survival data at final time. In the
+second one we use dataset comes from reproduction data.
 
-\subsection{Examples}
+\subsection{Examples from survival data at final time}
 
 \begin{itemize}
 
   \item Step one, check the structure and the dataset integrity
 
-  The dataset of survival data at final time must contain at least three column
+  The dataset of survival data at final time must contain at least three columns
   with the mesured concentrations, the initial number of individuals at the
-  beginning of the bioassais and the number of survivals at the mesured time.
+  beginning of the bioassai and the number of survivals at the mesured time.
    
-  We start be create a dataset of five mesured concentration plus the control
+  We start be create a dataset of five mesured concentrations plus the control
   and check is integrity.
   
 <<>>=
@@ -210,11 +211,11 @@ dat <- data.frame(conc = c(0, 0.18, 0.73, 1.82, 2.9, 7),
 surv.tt.check.data(dat)
 @
 
-  \item Step two, create an object surv.tt.data object
+  \item Step two, create an object \texttt{surv.tt.data} object
   
-  To analyse this dataset it is necessary to transform it in an object of class
-  surv.tt.data. The \texttt{summary} provides informations on the experimental
-  design.
+  To analyse this dataset it is necessary to transform it to an object of class
+  \texttt{surv.tt.data}. The \texttt{summary} provides informations on the
+  experimental design.
   
 <<>>=
 dat2 <- surv.tt.data(dat)
@@ -222,10 +223,10 @@ dat2
 summary(dat2)
 @
 
-  \item Step three, fit an exposure-response model to the reproduction data
+  \item Step three, fit an exposure-response model to the survival data
   at final time
   
-      Now the dataset with reproduction data at final time is created it is
+      Now the dataset with survival data at final time is created it is
     possible to estimate the parameters of the log-logistic exposure-response
     model with the \texttt{surv.tt.fit} function. This function calls the
     \texttt{JAGS} program to estimate the model parameters using the bayesian
@@ -240,7 +241,7 @@ out <- surv.tt.fit(dat2, det.part = "loglogisticbinom_2",
     parameter distributions and on $LC_{x}$ estimates are given by the
     \texttt{summary}. The function \texttt{plot} draws the exposure-response
     curve with the credible limits superimposed to experimental data at
-    target-time.
+    final time.
     
 <<fig = TRUE>>=
 summary(out)
@@ -249,8 +250,8 @@ plot(out, log.scale = TRUE, ci = TRUE)
 
   \item Step four, check the the convergence of the MCMC chains
   
-      The function \texttt{convergence} can be use to check the convergence of the
-    MCMC chains from the \texttt{JAGS} estimate with the Gelman and Rubin
+      The function \texttt{convergence} can be used to check the convergence of
+      the MCMC chains from the \texttt{JAGS} estimate with the Gelman and Rubin
     convergence diagnostic \cite{Gelman}, to draw the MCMC value, the density
     of posteriors or the autocorrelation for each parameter in each chain.
     
@@ -258,6 +259,57 @@ plot(out, log.scale = TRUE, ci = TRUE)
 convergence(out, trace = FALSE, autocorr = FALSE)
 @
   
+\end{itemize}
+
+\subsection{Examples from reproduction data}
+
+  The two first parts are the sames as the reproduction analysis.
+
+\begin{itemize}
+
+  \item Step one, check the structure and the dataset integrity
+   
+<<fig = TRUE>>=
+data(cadmium1)
+repro.check.data(cadmium1, diagnos.plot = TRUE)
+repro.fullsurvplot(cadmium1)
+@
+  
+  \item Step two, create a \texttt{repro.data} object
+  
+<<>>=
+dat <- repro.data(cadmium1)
+@
+    
+  \item Step three, create a \texttt{surv.tt.data} object from a
+  \texttt{repro.data} object
+
+  The function \texttt{repro2survtt} transform an object of class
+  \texttt{repro.data} to an object of class \texttt{surv.tt.data}.
+  
+<<>>=
+dat2 <- repro2survtt(dat)
+dat2
+summary(dat2)
+@
+  
+  \item Step four, fit an exposure-response model to the survival data
+  at final time
+       
+<<results = hide>>=
+out <- surv.tt.fit(dat2, det.part = "loglogisticbinom_3",
+		lcx = c(10, 20, 30, 40, 50))
+summary(out)
+plot(out, log.scale = TRUE, ci = TRUE)
+@
+  
+  \item Step five, check the the convergence of the MCMC chains
+     
+<<fig = TRUE>>=
+convergence(out, trace = FALSE, autocorr = FALSE)
+@
+
+
 \end{itemize}
 
 \end{document}
