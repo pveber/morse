@@ -1,0 +1,263 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{Sweave}
+\usepackage{amsmath}
+
+
+\SweaveOpts{keep.source=TRUE, fig=FALSE}
+\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=2em}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+
+\SweaveOpts{width=6,height=4}
+\setkeys{Gin}{width=\textwidth}
+%\VignetteIndexEntry{Library tutorial}
+
+
+\title{Library tutorial}
+\author{Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller,
+Sandrine Charles}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\pagebreak
+
+\section{Introduction}
+
+<<echo = FALSE>>=
+library(morse)
+@
+
+<<options, echo = FALSE>>=
+options(prompt = " ", continue = " ")
+@
+
+\section{Species Sensitivity Distribution - SSD}
+
+\subsection{Theory}
+
+\subsection{Examples}
+
+\section{Reproduction data analyses}
+
+\subsection{Theory}
+  
+    Before analyse bioassay reproduction data some stages are required. The
+  following example shows all these stages to pass from a raw bioassay dataset
+  to the estimate values of $EC_x$ and parameters. The example is based on the
+  \texttt{cadmium1} dataset, a reproduction and survival dataset of chronic
+  laboratory bioassays with \emph{Daphnia magna} freshwater invertebrate
+  exposed to five concentrations of one metal contaminant (cadmium) during 21 days.
+
+\subsection{Examples}
+
+\begin{itemize}
+  
+  \item Step one, check the structure and the dataset integrity
+  
+<<fig = TRUE>>=
+data(cadmium1)
+repro.check.data(cadmium1, diagnos.plot = TRUE)
+repro.fullsurvplot(cadmium1)
+@
+
+    The function \texttt{repro.check.data} performs several tests on the integrity
+  of the dataset and return explicit error messages (if necessary).
+  If no error was detected in the dataset an object of class repro.data can be
+  created. \texttt{repro.fullsurvplot} plots the number of survivors as a
+  function of time for each concentration and replicate. If the
+  \texttt{repro.check.data} find an increase of alive individuals with time the 
+  \textt{repro.fullsurvplot} can be called.
+  
+  \item Step two, create a repro.data object
+  
+<<>>=
+dat <- repro.data(cadmium1)
+@
+
+    The new object contains all the required informations to execute all the
+  reproduction analyses: graphical analyses of raw data, analyses of
+  reproduction data at the final time.
+    
+  \item Step three, analyse the raw dataset
+  
+    Three functions can be used to analyse the raw data.
+  \texttt{repro.cumulplot} plots the cumulative number of offspring at the end
+  of the bioassay depending on the concentration. \texttt{repro.survplot}
+  plots the number of initially present animals still alive at the end of the
+  bioassay depending on the concentration.
+  
+<<fig = TRUE>>=
+repro.cumulplot(dat)
+@
+<<fig = TRUE>>=
+repro.survplot(dat)
+@
+
+  \item Step four, create a dataset with reproduction data at final time
+  
+    By default, the last time point of mesure is chosen. \texttt{repro2reprott}
+  give a subset of the bioessay dataset at target time and calculate
+  \textt{Ninit} the number of individuals at the beginning of the bioassay,
+  \texttt{Nreprocumul}, the cumulative number of offspring at the target time
+  and \texttt{Nindtime} the number of inidividual-days at target time for each
+  concentration and each replicate.
+  
+    The \texttt{summary} provides informations on the experimental design.
+  
+<<>>=
+dat2 <- repro2reprott(dat)
+dat2
+summary(dat2)
+@
+
+  \item Step five, fit an exposure-response model to the reproduction data at
+  final time
+  
+      Now the dataset with reproduction data at final time is created it is
+    possible to estimate the parameters of the log-logistic exposure-response
+    model with the \texttt{repro.tt.fit} function. This function calls the
+    \texttt{JAGS} program to estimate the model parameters using the bayesian
+    inference.
+    
+      By choosing the \textt{bestfit} option for the \texttt{stoc.part} argument
+    we let the function choose the best stochastic part of the model.
+    
+<<results = hide>>=
+out <- repro.tt.fit(dat2, stoc.part = "bestfit",
+		ecx = c(10, 20, 30, 40, 50))
+@   
+
+      The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated
+    parameter distributions and on $EC_{x}$ estimates are given by the
+    \texttt{summary}. The function \texttt{plot} draws the exposure-response
+    curve with the credible limits superimposed to experimental data at
+    target-time.
+    
+<<fig = TRUE>>=
+summary(out)
+plot(out, log.scale = TRUE, ci = TRUE)
+@
+
+  \item Step six, check the the convergence of the MCMC chains
+  
+      The function \texttt{convergence} can be use to check the convergence of the
+    MCMC chains from the \texttt{JAGS} estimate with the Gelman and Rubin
+    convergence diagnostic \cite{Gelman}, to draw the MCMC value, the density
+    of posteriors or the autocorrelation for each parameter in each chain.
+    
+<<fig = TRUE>>=
+convergence(out, trace = FALSE, autocorr = FALSE)
+@
+
+  \item Compare the curves gives by the two stochastic part of the model
+  
+      It is possible to compare the exposure-response curve give by the two
+    stochastic part of the log-logistic model on the same data. The
+    \texttt{repro.tt.fit.comp} is used to plot two or more curve in one plot.
+    
+      In this exemple we compare the exposure-response curve given by the
+    log-logistic model with a poisson stochastic part to the
+    exposure-response curve given by the log-logistic model with a
+    gamma-poisson stochastic part.
+    
+      Like in the step five, we fit the two model with \texttt{repro.tt.fit}.
+      
+<<results = hide>>=
+out1 <- repro.tt.fit(dat2, stoc.part = "poisson")
+out2 <- repro.tt.fit(dat2, stoc.part = "gammapoisson")
+@
+
+    We can know draw the two curves on a same graph.
+
+<<fig = TRUE>>=
+repro.tt.fit.comp(list(out1, out2), log.scale = TRUE, ci = TRUE)
+@
+
+\end{itemize}
+  
+\section{Survival data analyses}
+
+\subsection{Theory}
+
+In this example we fit an exposure-response curve on survival data at final
+time.
+
+\subsection{Examples}
+
+\begin{itemize}
+
+  \item Step one, check the structure and the dataset integrity
+
+  The dataset of survival data at final time must contain at least three column
+  with the mesured concentrations, the initial number of individuals at the
+  beginning of the bioassais and the number of survivals at the mesured time.
+   
+  We start be create a dataset of five mesured concentration plus the control
+  and check is integrity.
+  
+<<>>=
+rm(list=ls())
+dat <- data.frame(conc = c(0, 0.18, 0.73, 1.82, 2.9, 7),
+		Ninit = as.integer(c(10, 10, 10, 10, 10, 10)),
+		Nsurv = as.integer(c(10, 9, 9, 9, 3, 2)))
+surv.tt.check.data(dat)
+@
+
+  \item Step two, create an object surv.tt.data object
+  
+  To analyse this dataset it is necessary to transform it in an object of class
+  surv.tt.data. The \texttt{summary} provides informations on the experimental
+  design.
+  
+<<>>=
+dat2 <- surv.tt.data(dat)
+dat2
+summary(dat2)
+@
+
+  \item Step three, fit an exposure-response model to the reproduction data
+  at final time
+  
+      Now the dataset with reproduction data at final time is created it is
+    possible to estimate the parameters of the log-logistic exposure-response
+    model with the \texttt{surv.tt.fit} function. This function calls the
+    \texttt{JAGS} program to estimate the model parameters using the bayesian
+    inference.
+       
+<<results = hide>>=
+out <- surv.tt.fit(dat2, det.part = "loglogisticbinom_2",
+		lcx = c(10, 20, 30, 40, 50))
+@   
+
+      The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated
+    parameter distributions and on $LC_{x}$ estimates are given by the
+    \texttt{summary}. The function \texttt{plot} draws the exposure-response
+    curve with the credible limits superimposed to experimental data at
+    target-time.
+    
+<<fig = TRUE>>=
+summary(out)
+plot(out, log.scale = TRUE, ci = TRUE)
+@
+
+  \item Step four, check the the convergence of the MCMC chains
+  
+      The function \texttt{convergence} can be use to check the convergence of the
+    MCMC chains from the \texttt{JAGS} estimate with the Gelman and Rubin
+    convergence diagnostic \cite{Gelman}, to draw the MCMC value, the density
+    of posteriors or the autocorrelation for each parameter in each chain.
+    
+<<fig = TRUE>>=
+convergence(out, trace = FALSE, autocorr = FALSE)
+@
+  
+\end{itemize}
+
+\end{document}
