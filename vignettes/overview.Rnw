@@ -1,18 +1,15 @@
 \documentclass[a4paper, 12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-\usepackage{Sweave}
+
 \usepackage{amsmath}
 
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+tidy=FALSE, fig.keep='none')
+@
 
-\SweaveOpts{keep.source=TRUE, fig=FALSE}
-\DefineVerbatimEnvironment{Sinput}{Verbatim} {xleftmargin=2em}
-\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
-\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
-\fvset{listparameters={\setlength{\topsep}{0pt}}}
-\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
-
-\SweaveOpts{width=6,height=4}
 \setkeys{Gin}{width=\textwidth}
 %\VignetteIndexEntry{Library overview}
 
@@ -29,31 +26,29 @@ Sandrine Charles}
 \pagebreak
 
 \section{Introduction}
-  This \texttt{R} compagnon provides several tools for ecotoxicologists and regulators based on advanced and innovative methods for a valuable
-quantitative environmental risk assessment.
+This \texttt{R} compagnon provides several tools for ecotoxicologists and regulators based on advanced and innovative methods for a valuable quantitative environmental risk assessment.
+
 It allows the analysis of bioassay reproduction data accounting for mortality
 all along the bioassay.
+
 Such data are commonly used to estimate Effective Concentration ($EC_{x}$) values from chronic toxicity tests.
+
 The aim is to fit an exposure-response curve to reproduction data by Bayesian
 inference while taking into account mortality among parents without loosing
 valuable data \cite{Delignette-Muller}.
+
 Models are characterized by a deterministic log-logistic part associated with a stochastic part.
+
 Two different stochastic parts can be chosen: Poisson or Gamma-Poisson.
-This \texttt{R} compagnon also allows the analysis of bioassay survival data at the final time. Such data are commonly used to estimate
-Lethal Concentration ($LC_{x}$) values from chronic toxicity tests. The aim is to fit an exposure-response curve to survival
-data by Bayesian inference.
+This \texttt{R} compagnon also allows the analysis of bioassay survival data at the final time. Such data are commonly used to estimate Lethal Concentration ($LC_{x}$) values from chronic toxicity tests. The aim is to fit an exposure-response curve to survival data by Bayesian inference.
 Models are characterized by a deterministic log-logistic  part with 2 or 3 parameters associated with a binomial stochastic part.
+
 The number of parameters depending on the mortality in the control at the final time.
 
-The aim of this document is to provide examples showing how to use these tools
-that help to analyse ecotoxicological bioassay data by a bayesien approach.
+The aim of this document is to provide examples showing how to use these tools that help to analyse ecotoxicological bioassay data by a bayesien approach.
 
-<<echo = FALSE>>=
+<<echo = FALSE,include=FALSE>>=
 library(morse)
-@
-
-<<options, echo = FALSE>>=
-options(prompt = " ", continue = " ")
 @
 
 \section{Species Sensitivity Distribution - SSD}
