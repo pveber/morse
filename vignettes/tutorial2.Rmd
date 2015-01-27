@@ -4,6 +4,7 @@ author: "Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller,
 Sandrine Charles"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+self_contained: no
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
