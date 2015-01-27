@@ -53,9 +53,9 @@ The aim of this document is to provide examples showing how to use these tools t
 
 ## Theory
 
-    To fit an exposure-response curve an reproduction data, it is necessary to
-  choose the best model corresponding to the data. Here only the log-logistic
-  model is proposed, but with the choice beetween two stochastic parts (...).
+To fit an exposure-response curve an reproduction data, it is necessary to
+choose the best model corresponding to the data. Here only the log-logistic
+model is proposed, but with the choice beetween two stochastic parts (...).
  
 ## Examples
   

@@ -51,7 +51,7 @@ dat1 <- repro.data(cadmium1)
 
 The new object contains all the required informations to execute all the reproduction analyses: graphical analyses of data, analyses of reproduction data at the final time.
     
-* Step three, analyse the `repro.data`object
+* Step three, analyse the `repro.data` object
   
 `repro.cumulplot()` plots the cumulative number of offspring at the target time depending on the concentration.
   
