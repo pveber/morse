@@ -27,7 +27,7 @@
 #' \item{10)}{the number of alive individuals never increases with time,}
 #' }
 #' 
-#' @aliases survDataCheck printsurvDataCheck
+#' @aliases survDataCheck print.survDataCheck
 #' 
 #' @param data Raw dataframe with four columns. See \code{\link{survData}}
 #' function for details on the required data format.
