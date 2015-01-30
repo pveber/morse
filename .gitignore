@@ -9,8 +9,11 @@
 
 # RStudio files
 .Rproj.user/
+.Rbuildignore
+r-mosaic.Rproj
 
 # eclipse files
 .project
 .settings/
 .metadata/
+.Rproj.user
