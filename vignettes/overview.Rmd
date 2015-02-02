@@ -1,0 +1,67 @@
+---
+title: "Library overview"
+author: "Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller,
+Sandrine Charles"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+self_contained: no
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+  
+---
+
+```{r,include=FALSE, echo=FALSE}
+
+knitr::opts_chunk$set(fig.width = 5, 
+                      fig.height = 4, 
+                      cache = TRUE)
+
+```
+
+# Introduction
+
+This `R` compagnon provides several tools for ecotoxicologists and regulators based on advanced and innovative methods for a valuable quantitative environmental risk assessment.
+
+It allows the analysis of bioassay reproduction data accounting for mortality
+all along the bioassay.
+
+Such data are commonly used to estimate Effective Concentration ($EC_{x}$) values from chronic toxicity tests.
+
+The aim is to fit an exposure-response curve to reproduction data by Bayesian
+inference while taking into account mortality among parents without loosing
+valuable data.
+
+Models are characterized by a deterministic log-logistic part associated with a stochastic part.
+
+Two different stochastic parts can be chosen: Poisson or Gamma-Poisson.
+This `R` compagnon also allows the analysis of bioassay survival data at the final time. Such data are commonly used to estimate Lethal Concentration ($LC_{x}$) values from chronic toxicity tests. The aim is to fit an exposure-response curve to survival data by Bayesian inference.
+Models are characterized by a deterministic log-logistic  part with 2 or 3 parameters associated with a binomial stochastic part.
+
+The number of parameters depending on the mortality in the control at the final time.
+
+The aim of this document is to provide examples showing how to use these tools that help to analyse ecotoxicological bioassay data by a bayesien approach.
+
+# Species Sensitivity Distribution - SSD
+
+## Theory
+
+## Examples
+
+# Reproduction data analyses
+
+## Theory
+
+To fit an exposure-response curve an reproduction data, it is necessary to
+choose the best model corresponding to the data. Here only the log-logistic
+model is proposed, but with the choice beetween two stochastic parts (...).
+ 
+## Examples
+  
+# Survival data analyses
+
+## Theory
+
+## Examples
+

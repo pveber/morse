@@ -1,0 +1,219 @@
+---
+title: "Library tutorial"
+author: "Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller,
+Sandrine Charles"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+self_contained: no
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+  
+---
+
+```{r,include=FALSE, echo=FALSE}
+
+knitr::opts_chunk$set(fig.width = 5, 
+                      fig.height = 4, 
+                      cache = TRUE)
+
+```
+
+
+```{r, echo=FALSE, cache=TRUE, results='hide'}
+library(morse)
+```
+
+# Introduction
+
+# Species Sensitivity Distribution - SSD
+
+# Reproduction data analyses
+  
+Before analyse bioassay reproduction data some stages are required. The following example shows all these stages to pass from a raw bioassay dataset to the estimate values of $EC_x$ and parameters. The example is based on the `cadmium1` dataset, a reproduction and survival dataset of chronic laboratory bioassays with \emph{Daphnia magna} freshwater invertebrate exposed to five concentrations of one metal contaminant (cadmium) during 21 days.
+  
+* Step one, check the structure and the dataset integrity
+  
+```{r,cache=TRUE}
+data(cadmium1)
+repro.check.data(cadmium1, diagnos.plot = TRUE)
+repro.fullsurvplot(cadmium1)
+```
+
+The function `repro.check.data()` performs several tests on the integrity of the dataset and returns explicit error messages (if necessary). If no error was detected in the dataset an object of class `repro.data` can be created. `repro.fullsurvplot()` plots the number of survivors as a function of time for each concentration and replicate. If the `repro.check.data()` function finds an increase of alive individuals with time the `repro.fullsurvplot()` function can be called.
+  
+* Step two, create a `repro.data` object
+  
+```{r,cache=TRUE}
+dat1 <- repro.data(cadmium1)
+```
+
+The new object contains all the required informations to execute all the reproduction analyses: graphical analyses of data, analyses of reproduction data at the final time.
+    
+* Step three, analyse the `repro.data` object
+  
+`repro.cumulplot()` plots the cumulative number of offspring at the target time depending on the concentration.
+  
+```{r,cache=TRUE}
+repro.cumulplot(dat1)
+```
+
+* Step four, create a dataset with reproduction data at final time
+  
+By default, the last time point of mesure is chosen. `repro2reprott()` gives a subset of the bioessay dataset at target time and calculate `Ninit` the number of individuals at the beginning of the bioassay, `Nreprocumul`, the cumulative number of offspring at the target time and `Nindtime` the number of inidividual-days at target time for each concentration and each replicate.
+  
+The `summary()` provides informations on the experimental design.
+  
+```{r,cache=TRUE}
+dat2 <- repro2reprott(dat1)
+dat2
+summary(dat2)
+```
+
+The function `repro.survplot()` plots the number of initially present animals still alive at the target time of the bioassay depending on the concentration.
+    
+```{r,cache=TRUE}
+repro.survplot(dat2)
+```
+
+* Step five, fit an exposure-response model to the reproduction data at final time
+  
+Now the dataset with reproduction data at final time is created it ispossible to estimate the parameters of the log-logistic exposure-response model with the `repro.tt.fit()` function. This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
+    
+By choosing the `bestfit` option for the `stoc.part` argument we let the function choose the best stochastic part of the model.
+    
+```{r, results = "hide",cache=TRUE}
+out <- repro.tt.fit(dat2, stoc.part = "bestfit",
+  	ecx = c(10, 20, 30, 40, 50))
+```   
+
+The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $EC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the credible limits superimposed to experimental data at target-time.
+    
+```{r,cache=TRUE}
+summary(out)
+plot(out, log.scale = TRUE, ci = TRUE)
+```
+
+* Step six, check the the convergence of the MCMC chains
+  
+The function `convergence()` can be used to check the convergence of the MCMC chains from the `JAGS` estimate with the Gelman and Rubin convergence diagnostic, to draw the MCMC value, the density
+    of posteriors or the autocorrelation for each parameter in each chain.
+    
+```{r,cache=TRUE}
+convergence(out, trace = FALSE, autocorr = FALSE)
+```
+
+* Compare the curves given by the two stochastic parts of the model
+  
+It is possible to compare the exposure-response curves given by the two stochastic parts of the log-logistic model on the same data. The `repro.tt.fit.comp` is used to plot two or more curves in one plot.
+In this example we compare the exposure-response curve given by the log-logistic model with a poisson stochastic part to the exposure-response curve given by the log-logistic model with a gamma-poisson stochastic part.
+    
+Like in the step five, we fit the two models with `repro.tt.fit()`.
+      
+```{r, results = "hide",cache=TRUE}
+out1 <- repro.tt.fit(dat2, stoc.part = "poisson")
+out2 <- repro.tt.fit(dat2, stoc.part = "gammapoisson")
+```
+
+We can now draw the two curves on a same graph.
+
+```{r,cache=TRUE}
+repro.tt.fit.comp(list(out1, out2), log.scale = TRUE, ci = TRUE)
+```
+  
+# Survival data analyses
+
+In this two examples we fit an exposure-response curve on survival data at final time. In the first one we use a dataset with survival data at final time. In the second one we use dataset comes from reproduction data.
+
+## From survival data at final time
+
+* Step one, check the structure and the dataset integrity
+
+The dataset of survival data at final time must contain at least three columns with the mesured concentrations, the initial number of individuals at the beginning of the bioassai and the number of survivals at the mesured time.
+   
+We start be create a dataset of five mesured concentrations plus the control and check is integrity.
+  
+```{r,cache=TRUE}
+dat3 <- data.frame(conc = c(0, 0.18, 0.73, 1.82, 2.9, 7),
+		Ninit = as.integer(c(10, 10, 10, 10, 10, 10)),
+		Nsurv = as.integer(c(10, 9, 9, 9, 3, 2)))
+surv.tt.check.data(dat3)
+```
+
+* Step two, create an object `surv.tt.data()` object
+  
+To analyse this dataset it is necessary to transform it to an object of class `surv.tt.data`. The `summary()` provides informations on the experimental design.
+  
+```{r,cache=TRUE}
+dat4 <- surv.tt.data(dat3)
+dat4
+summary(dat4)
+```
+
+* Step three, fit an exposure-response model to the survival data at final time
+  
+Now the dataset with survival data at final time is created it is possible to estimate the parameters of the log-logistic exposure-response model with the `surv.tt.fit()` function. This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
+       
+```{r, results = "hide",cache=TRUE}
+out3 <- surv.tt.fit(dat4, det.part = "loglogisticbinom_2",
+		lcx = c(10, 20, 30, 40, 50))
+```  
+
+The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $LC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the credible limits superimposed to experimental data at final time.
+    
+```{r,cache=TRUE}
+summary(out3)
+plot(out3, log.scale = TRUE, ci = TRUE)
+```
+
+* Step four, check the the convergence of the MCMC chains
+  
+The function `convergence()` can be used to check the convergence of the MCMC chains from the `JAGS` estimate with the Gelman and Rubin convergence diagnostic, to draw the MCMC value, the density of posteriors or the autocorrelation for each parameter in each chain.
+    
+```{r,cache=TRUE}
+convergence(out3, trace = FALSE, autocorr = FALSE)
+```
+
+## From reproduction data
+
+The two first parts are the sames as the reproduction analysis.
+
+* Step one, check the structure and the dataset integrity
+   
+```{r,cache=TRUE}
+data(cadmium1)
+repro.check.data(cadmium1, diagnos.plot = TRUE)
+repro.fullsurvplot(cadmium1)
+```
+  
+* Step two, create a `repro.data` object
+  
+```{r,cache=TRUE}
+dat5 <- repro.data(cadmium1)
+```
+    
+* Step three, create a `surv.tt.data` object from a `repro.data` object
+
+The function `repro2survtt()` transforms an object of class `repro.data` to an object of class `surv.tt.data`.
+  
+```{r,cache=TRUE}
+dat6 <- repro2survtt(dat5)
+dat6
+summary(dat6)
+```
+  
+* Step four, fit an exposure-response model to the survival data at final time
+       
+```{r, results = "hide",cache=TRUE}
+out4 <- surv.tt.fit(dat6, det.part = "loglogisticbinom_3",
+		lcx = c(10, 20, 30, 40, 50))
+summary(out4)
+plot(out4, log.scale = TRUE, ci = TRUE)
+```
+  
+* Step five, check the the convergence of the MCMC chains
+     
+```{r,cache=TRUE}
+convergence(out4, trace = FALSE, autocorr = FALSE)
+```
