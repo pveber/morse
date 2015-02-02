@@ -64,7 +64,7 @@
 #' }}
 #' \item{msg}{One or more user friendly error messages are generated.}
 #' 
-#' @note If an error of type \code{missingcolumn} is detected, the function
+#' @note If an error of type \code{missingColumn} is detected, the function
 #' \code{suvDataCheck} is stopped. When no error is detected the \code{survDataCheck}
 #' function returns an empty dataframe.
 #' 
@@ -87,7 +87,7 @@
 #' 
 #' # (2) Insert an error (increase the number of survivors at a certain time
 #' # point compared to its value at the previous time point within the same
-#' # remplicate)
+#' # replicate)
 #' zinc[25,"Nsurv"] <- 20
 #' zinc$Nsurv <- as.integer(zinc$Nsurv)
 #' check <- survDataCheck(zinc, diagnosis.plot = TRUE)
@@ -110,19 +110,19 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   
   # 1 test if the column names are correct
   ref.names <- c("replicate","conc","time","Nsurv")
-  missing.names <- ref.names[which(is.na(match(ref.names,names(data))))]
+  missing.names <- ref.names[which(is.na(match(ref.names, names(data))))]
   
   if (length(missing.names) != 0) {
     errors <- error("missingColumn",
-                    paste("The column",missing.names,"is missing or have a wrong name.",
-                          sep=" "))
+                    paste("The column", missing.names,
+                          "is missing or have a wrong name.", sep=" "))
     class(errors) <- "survDataCheck"
     return(errors)
   }
   
   # 2 test if the first time point is zero
   subdata <- split(data, list(data$replicate, data$conc), drop = TRUE)
-  if(any(unlist(lapply(subdata,function(x) x$time[1] != 0)))) {
+  if(any(unlist(lapply(subdata, function(x) x$time[1] != 0)))) {
     err <- error("firstTime0",
                  "Data are required at time 0 for each concentration and each replicate.")
     errors <- rbind(errors, err)
@@ -163,7 +163,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   # 7 test unique triplet Replicat - conc - time
   if(any(duplicated(data$ID))) {
     err <- error("duplicateID",
-                 paste("The triplet Replicate - conc - time",
+                 paste("The triplet Replicate - conc - time:",
                        data[which(duplicated(data$ID)), "ID"], "is duplicated."))
     errors <- rbind(error, err)
   }
@@ -206,7 +206,8 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
       err2 <- error("NsurvMonotone",
                     paste("For replicate ", unique(subdata$replicate),
                     " and concentration ", unique(subdata$conc),
-                    ", Nsurv increases at some time points compared to the previous one.", sep=""))
+                    ", Nsurv increases at some time points compared to the previous one.",
+                    sep=""))
       consistency.errors <- rbind(consistency.errors, err2)
     }
     return(consistency.errors)
