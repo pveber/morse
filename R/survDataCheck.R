@@ -88,7 +88,7 @@
 #' # (2) Insert an error (increase the number of survivors at a certain time
 #' # point compared to its value at the previous time point within the same
 #' # replicate)
-#' zinc[25,"Nsurv"] <- 20
+#' zinc[25, "Nsurv"] <- 20
 #' zinc$Nsurv <- as.integer(zinc$Nsurv)
 #' check <- survDataCheck(zinc, diagnosis.plot = TRUE)
 #' 
@@ -152,7 +152,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
   
   # 6 test Nsurv != 0 at time 0
-  datatime0 <- data[data$time == 0,]  # select data for initial time points
+  datatime0 <- data[data$time == 0, ]  # select data for initial time points
   if (any(datatime0$Nsurv == 0)) { # test if Nsurv != 0 at time 0
     err <- error("Nsurv0T0",
                  "Nsurv should be different to 0 at time 0 for each concentration and each replicate.")
@@ -168,13 +168,13 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     errors <- rbind(error, err)
   }
   
-  consistency <- function(subdata)
+  consistency <- function(subdata) {
     # Function to be used on a subdataset corresponding to one replicate at one
     # concentration.
     # This function checks:
     #   - if each replicate appears once and only once at each time
     #   - if Nsurv is never increasing with time
-  {
+
     # errors consistency dataframe 
     consistency.errors <- data.frame(stringsAsFactors = FALSE)
     
@@ -220,7 +220,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
   
   # call function survFullPlot
-  if (length(err)!= 0 && diagnosis.plot && "NsurvMonotone" %in% err) {
+  if (length(err) != 0 && diagnosis.plot && "NsurvMonotone" %in% err) {
     survFullPlot(data)
   }
   

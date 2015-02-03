@@ -102,7 +102,7 @@
 #' # (2) Insert an error (increase the number of survivors at a certain time
 #' #point compared to its value at the previous time point within the same
 #' replicate)
-#' zinc[25,"Nsurv"] <- 20
+#' zinc[25, "Nsurv"] <- 20
 #' zinc$Nsurv <- as.integer(zinc$Nsurv)
 #' check <- reproDataCheck(zinc, diagnosis.plot = TRUE)
 #' 
@@ -142,7 +142,7 @@ reproDataCheck <-  function(data, diagnosis.plot = TRUE) {
   }
   
   # 3'test Nrepro = 0 at time 0
-  datatime0 <- data[data$time == 0,] # select data for initial time points
+  datatime0 <- data[data$time == 0, ] # select data for initial time points
   if (any(datatime0$Nrepro > 0)) { # test if Nrepro > 0 at time 0
     
     err <- error("Nrepro0T0",
@@ -152,20 +152,19 @@ reproDataCheck <-  function(data, diagnosis.plot = TRUE) {
   
   subdata <- split(data, list(data$replicate, data$conc), drop = TRUE)
   
-  .consistency <- function(subdata)
+  .consistency <- function(subdata) {
     # Function to be used on a subdataset corresponding to one replicate at one
     # concentration.
     # This function checks:
     #   - if at each time T for which Nsurv = 0, Nrepro = 0 at time T+1
-  {
+
     # errors consitency dataframe
     errors2 <- data.frame(stringsAsFactors = FALSE)
     
     # 4' test Nsurv = 0 at time t => Nrepro > 0 at time t-1
     NsurvT <- subdata$Nsurv[-length(subdata$Nsurv)]
     NreproTplus1 <- subdata$Nrepro[-1]
-    if (any(NreproTplus1[NsurvT == 0] > 0))
-    {
+    if (any(NreproTplus1[NsurvT == 0] > 0)) {
       err2 <- error("Nsurvt0Nreprotp1P",
                     paste("For replicate ", 
                           unique(subdata$replicate),
