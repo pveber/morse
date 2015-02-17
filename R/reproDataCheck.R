@@ -62,8 +62,8 @@
 #' and each replicate.}
 #' \item{\code{Nsurv0T0}}{if \code{Nsurv} is 0 at time 0 for one or more
 #' concentration and replicate.}
-#' \item{\code{duplicateID}{if there are two or more triplet \code{replicate} -
-#' \code{conc} - \code{time}}}
+#' \item{\code{duplicateID}}{if there are two or more triplet \code{replicate} -
+#' \code{conc} - \code{time}}
 #' \item{\code{onlyReplicate}}{if a replicate is duplicated on different lines
 #' for the same time points and the same concentration.}
 #' \item{\code{missingReplicate}}{if a replicate is missing for at least one time
@@ -86,7 +86,7 @@
 #' 
 #' @seealso \code{\link{survFullPlot}}, \code{\link{reproData}}
 #' 
-#' @keywords Check
+#' @keywords check
 #' 
 #' @examples
 #' 
@@ -100,8 +100,8 @@
 #' data(zinc)
 #' 
 #' # (2) Insert an error (increase the number of survivors at a certain time
-#' #point compared to its value at the previous time point within the same
-#' replicate)
+#' # point compared to its value at the previous time point within the same
+#' # replicate)
 #' zinc[25, "Nsurv"] <- 20
 #' zinc$Nsurv <- as.integer(zinc$Nsurv)
 #' check <- reproDataCheck(zinc, diagnosis.plot = TRUE)
@@ -124,7 +124,9 @@ reproDataCheck <-  function(data, diagnosis.plot = TRUE) {
   
   # 1 run the tests of the survDataCheck
   errors <- survDataCheck(data, diagnosis.plot = FALSE)
-  if ("missingColumn" %in% errors$id) return(errors)
+  if ("missingColumn" %in% errors$id){
+    return(errors)
+  }
   
   # 1' test if the column names "Nrepro" exist  
   if (!"Nrepro" %in% colnames(data)) {

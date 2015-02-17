@@ -53,8 +53,8 @@
 #' \item{\code{tablePositive}}{if there are negative values within the data.}
 #' \item{\code{Nsurv0T0}}{if \code{Nsurv} is 0 at time 0 for one or more
 #' concentration and replicate.}
-#' \item{\code{duplicateID}{if there are two or more triplet \code{replicate} -
-#' \code{conc} - \code{time}}}
+#' \item{\code{duplicateID}}{if there are two or more triplet \code{replicate} -
+#' \code{conc} - \code{time}}
 #' \item{\code{uniqueReplicateNumberPerCondition}}{if a replicate is duplicated
 #' on different lines for the same time points and the same concentration.}
 #' \item{\code{missingReplicate}}{if a replicate is missing for at least one time
@@ -74,7 +74,7 @@
 #' 
 #' @seealso \code{\link{survFullPlot}}, \code{\link{survData}}
 #' 
-#' @keywords Check
+#' @keywords check
 #' 
 #' @examples
 #' # Run the check data function
