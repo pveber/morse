@@ -124,7 +124,7 @@ reproDataCheck <-  function(data, diagnosis.plot = TRUE) {
   
   # 1 run the tests of the survDataCheck
   errors <- survDataCheck(data, diagnosis.plot = FALSE)
-  if ("missingColumn" %in% errors$id){
+  if ("missingColumn" %in% errors$id) {
     return(errors)
   }
   
