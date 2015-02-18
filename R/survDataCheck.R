@@ -20,10 +20,11 @@
 #' \item{4)}{the classes of columns \code{Nsurv} is \code{integer},}
 #' \item{5)}{values of the dataframe are all positive,}
 #' \item{6)}{the number of survivor is not 0 at \eqn{t = 0},}
-#' \item{7)}{each replicate appears only once per concentration and per time point,}
-#' \item{8)}{the number of replicates is the same at any concentration and any
+#' \item{7)}{there is only one triplet \code{replicate} - \code{conc} - \code{time},}
+#' \item{8)}{each replicate appears only once per concentration and per time point,}
+#' \item{9)}{the number of replicates is the same at any concentration and any
 #' time point,}
-#' \item{9)}{the number of alive individuals never increases with time,}
+#' \item{10)}{the number of alive individuals never increases with time,}
 #' }
 #' 
 #' @aliases survDataCheck print.survDataCheck
@@ -52,6 +53,8 @@
 #' \item{\code{tablePositive}}{if there are negative values within the data.}
 #' \item{\code{Nsurv0T0}}{if \code{Nsurv} is 0 at time 0 for one or more
 #' concentration and replicate.}
+#' \item{\code{duplicateID}}{if there are two or more triplet \code{replicate} -
+#' \code{conc} - \code{time}}
 #' \item{\code{uniqueReplicateNumberPerCondition}}{if a replicate is duplicated
 #' on different lines for the same time points and the same concentration.}
 #' \item{\code{missingReplicate}}{if a replicate is missing for at least one time
@@ -93,6 +96,7 @@
 #' check
 #' 
 #' @export
+#' @importFrom stringr str_c
 #' 
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
   # make a singleton error dataframe (taking care of string/factor conversion
@@ -145,6 +149,28 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                  "Nsurv should be different to 0 at time 0 for each concentration and each replicate.")
     errors <- rbind(errors, err)
   }
+  # 7 test unique triplet Replicat - conc - time only if survDataCheck is called
+  # by survData or reproData
+  if ("ID" %in% colnames(data)) {
+    if (any(duplicated(data$ID))) {
+      err <- error("duplicatedID",
+                   paste("The triplet Replicate - conc - time: ",
+                         data[duplicated(data$ID), "ID"], " is duplicated.",
+                         sep = ""))
+      errors <- rbind(error, err)
+    }
+      
+  } else {
+    ID <- str_c(data[, "replicate"], data[, "conc"], data[, "time"],
+                sep = "_")
+    if (any(duplicated(ID))) {
+      err <- error("duplicatedID",
+                   paste("The triplet Replicate - conc - time: ",
+                         ID[duplicated(ID)], " is duplicated.",
+                         sep = ""))
+      errors <- rbind(error, err)
+    }
+  }
   consistency <- function(subdata) {
     # Function to be used on a subdataset corresponding to one replicate at one
     # concentration.
@@ -152,9 +178,9 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     #   - if each replicate appears once and only once at each time
     #   - if Nsurv is never increasing with time
 
-    # errors consistency dataframe 
-    consistency.errors <- data.frame(stringsAsFactors = FALSE)
-    # 7 test if each replicate appears once and only once at each conc and time
+    # errors consistency dataframe
+    consistency.errors <- data.frame(stringsAsFactors = FALSE) 
+    # 8 test if each replicate appears once and only once at each conc and time
     if (nrow(subdata) != length(unique(subdata$time))) {
       err2 <- error("uniqueReplicateNumberPerCondition",
                     paste("Replicate ",
@@ -163,7 +189,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                           unique(subdata$conc), ".", sep = ""))
       consistency.errors <- rbind(consistency.errors, err2)
     }
-    # 8 test if there is no lack of replicate at each conc and time
+    # 9 test if there is no lack of replicate at each conc and time
     if (length(subdata$replicate) != length(unique(data$time))) {
       err2 <- error("missingReplicate",
                     paste("Replicate ", unique(subdata$replicate),
@@ -171,7 +197,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                     unique(subdata$conc), ".", sep = ""))
       consistency.errors <- rbind(consistency.errors, err2)
     }
-    # 9 test Nsurv monotony
+    # 10 test Nsurv monotony
     nonmonotonous <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
     if (any(nonmonotonous)) {
       err2 <- error("NsurvMonotone",
