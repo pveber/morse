@@ -157,7 +157,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                    paste("The triplet Replicate - conc - time: ",
                          data[duplicated(data$ID), "ID"], " is duplicated.",
                          sep = ""))
-      errors <- rbind(error, err)
+      errors <- rbind(errors, err)
     }
       
   } else {
@@ -168,7 +168,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                    paste("The triplet Replicate - conc - time: ",
                          ID[duplicated(ID)], " is duplicated.",
                          sep = ""))
-      errors <- rbind(error, err)
+      errors <- rbind(errors, err)
     }
   }
   consistency <- function(subdata) {
