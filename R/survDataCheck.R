@@ -150,12 +150,11 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
   # 7 test unique triplet Replicat - conc - time only if survDataCheck is called
   # by survData or reproData
-  if (any(duplicated(idCreate(data, notime = FALSE)))) {
+  ID <- idCreate(data, notime = FALSE) # ID vector
+  if (any(duplicated(ID))) {
     err <- error("duplicatedID",
                  paste("The triplet Replicate - conc - time: ",
-                       idCreate(data,
-                                notime = FALSE)[duplicated(idCreate(data,
-                                                                    notime = FALSE))],
+                       ID[duplicated(ID)],
                        " is duplicated.", sep = ""))
     errors <- rbind(errors, err)
   }
