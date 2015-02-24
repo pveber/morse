@@ -96,7 +96,6 @@
 #' check
 #' 
 #' @export
-#' @importFrom stringr str_c
 #' 
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
   # make a singleton error dataframe (taking care of string/factor conversion
@@ -151,14 +150,12 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
   # 7 test unique triplet Replicat - conc - time only if survDataCheck is called
   # by survData or reproData
-  # FIXME: replace ID creation by function call
-  ID <- str_c(data[, "replicate"], data[, "conc"], data[, "time"],
-              sep = "_")
+  ID <- idCreate(data, notime = FALSE) # ID vector
   if (any(duplicated(ID))) {
     err <- error("duplicatedID",
                  paste("The triplet Replicate - conc - time: ",
-                       ID[duplicated(ID)], " is duplicated.",
-                       sep = ""))
+                       ID[duplicated(ID)],
+                       " is duplicated.", sep = ""))
     errors <- rbind(errors, err)
   }
   consistency <- function(subdata) {
