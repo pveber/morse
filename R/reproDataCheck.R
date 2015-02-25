@@ -22,12 +22,13 @@
 #' \item{5)}{values of the dataframe are all positive,}
 #' \item{6)}{the number of collected offspring is 0 at \eqn{t = 0},}
 #' \item{7)}{the number of survivor is not 0 at \eqn{t = 0},}
-#' \item{8)}{each replicate appears only once per concentration and per time
+#' \item{8)}{there is only one triplet \code{replicate} - \code{conc} - \code{time},}
+#' \item{9)}{each replicate appears only once per concentration and per time
 #' point,}
-#' \item{9)}{the number of replicates is the same at any concentration and any
+#' \item{10)}{the number of replicates is the same at any concentration and any
 #' time point,}
-#' \item{10)}{the number of alive individuals never increases with time,}
-#' \item{11)}{at each time \eqn{T}, if the number of alive individuals is null,
+#' \item{11)}{the number of alive individuals never increases with time,}
+#' \item{12)}{at each time \eqn{T}, if the number of alive individuals is null,
 #' the number of collected offspring is also null at time \eqn{T+1}.} }
 #' 
 #' @aliases reproDataCheck print.reproDataCheck
@@ -61,8 +62,10 @@
 #' and each replicate.}
 #' \item{\code{Nsurv0T0}}{if \code{Nsurv} is 0 at time 0 for one or more
 #' concentration and replicate.}
-#' \item{\code{onlyReplicate}}{if a replicate is duplicated on different lines
-#' for the same time points and the same concentration.}
+#' \item{\code{duplicateID}}{if there are two or more triplet \code{replicate} -
+#' \code{conc} - \code{time}}
+#' \item{\code{uniqueReplicateNumberPerCondition}}{if a replicate is duplicated
+#' on different lines for the same time points and the same concentration.}
 #' \item{\code{missingReplicate}}{if a replicate is missing for at least one time
 #' points at one concentration.}
 #' \item{\code{NsurvMonotone}}{if \code{Nsurv} increases at some time points
