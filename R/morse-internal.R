@@ -59,25 +59,8 @@ survTransformData <- function(data) {
                "Nsurv.x", "Ninit")] %>% rename(., time = time.x) %>% rename(.,
                Nsurv = Nsurv.x) %>% rename(., ID = ID.x)
   }
-
+  
   res <- lapply(temp, function(x) survCalculNinit(x, tabletime0)) # Ninit
-
-  # if one or more replicate is missing since a time != from 0
-  if (length(which((sapply(temp, dim)[1, ]) < sapply(temp, dim)[1, 1])) !=  0) {
-
-    # replace NA time by correct time value and Ninit value by NA
-    namenatime <- names(lapply(res, function(x) {
-      match(NA, as.matrix(x))})[lapply(res, function(x) {
-        match(NA, as.matrix(x))}) != "NA"])
-    
-    for (i in 1:length(namenatime)) {
-      res[namenatime][[namenatime[i]]]$time[which(is.na(res[namenatime][[namenatime[i]]]$time))] <- namenatime[i]
-
-    # replace Ninit value by NA
-    res[namenatime][[namenatime[i]]]$Ninit[which(is.na(res[namenatime][[namenatime[i]]]$Nsurv))] <- NA
-    }
-  }
-
   res2 <- do.call(rbind, res) # return a dataframe
   rownames(res2) <- 1:dim(res2)[1]
   res2$time <- as.numeric(res2$time) # change type of time
