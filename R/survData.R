@@ -84,12 +84,12 @@ survData <- function(data) {
   
   # check the data class 
   if (!is.data.frame(data))
-    stop("data.frame expected !")
+    stop("data.frame expected!")
   
   # test the integrity of the data with survDataCheck
   if (!is.null(survDataCheck(data)$id))
-    stop("There is one or more error in the data ! Please use the survDataCheck function before the survData function !")
-  
+    stop("There is one or more error in the data! Please use the survDataCheck function before the survData function!")
+
   # raw data
   raw.data <- data
   
