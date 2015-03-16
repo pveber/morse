@@ -1,9 +1,14 @@
 Package: morse
 Type: Package
-Title: 
-Version: 1.0
-Date: 2014-12-03
-Author: 
-Maintainer: 
-Description: 
-License: 
+Title: MOdelling tools for Reproduction and Survival data in Ecotoxicology
+Version: 2.0.0
+Date: 2015-01-14
+Author: Marie Laure Delignette-Muller [aut, cre], Philippe Ruiz [aut, cre], Sandrine Charles [aut], Wandrille Duchemin [ctb], Christelle Lopes [ctb], Guillaume Kon-Kam-king [ctb], Philippe Veber [ctb]
+Maintainer: Philippe Ruiz <philippe.ruiz@univ-lyon1.fr>
+Description: A package for ecotoxicologists and regulators dedicated to the mathematical and statistical modelling of bioassay data. The package uses advanced and innovative methods for a valuable quantitative environmental risk assessment.
+Depends: R (>= 3.0.0), rjags, dclone, ggplot2
+SystemRequirements: jags (>= 3.0.0)
+Imports: coda, dplyr, ggmcmc, graphics, grDevices, grid, gridExtra, lattice, parallel, stringr
+License: GPL (>=2)
+Suggests: knitr, rmarkdown, testthat, snow
+VignetteBuilder: knitr
