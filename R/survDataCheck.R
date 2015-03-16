@@ -1,5 +1,5 @@
 #' Check the consistency of a survival dataset
-#' 
+#'
 #' The \code{survDataCheck} function performs several tests on the integrity of
 #' the dataset (column headings, type of data\dots) and returns an object of
 #' class \code{survDataCheck}, which is basically a dataframe of error
@@ -8,7 +8,7 @@
 #' before using function \code{\link{survData}}. This function highlights
 #' possible errors in the data structure that would disturb or prevent the
 #' execution of the function \code{\link{survFitTt}}.
-#' 
+#'
 #' For a given dataframe, the function checks if:
 #' \describe{
 #' \item{1)}{column headings are correct: \code{replicate} for the column of
@@ -26,16 +26,16 @@
 #' time point,}
 #' \item{10)}{the number of alive individuals never increases with time,}
 #' }
-#' 
+#'
 #' @aliases survDataCheck print.survDataCheck
-#' 
+#'
 #' @param data Raw dataframe with four columns. See \code{\link{survData}}
 #' function for details on the required data format.
 #' @param diagnosis.plot If \code{TRUE}, calls the default \code{\link{survFullPlot}}
 #' function if the number of survivors increases at some time points.
 #' @param x An object of class survDataCheck.
 #' @param \dots Further arguments to be passed to generic methods.
-#' 
+#'
 #' @return The function returns an object of class \code{survDataCheck}. A
 #' dataframe with two columns of character string, \code{id} and \code{msg}.
 #' The \code{id} is invisible when displaying the function. Print only shows
@@ -63,40 +63,40 @@
 #' compared to the previous one.}
 #' }}
 #' \item{msg}{One or more user friendly error messages are generated.}
-#' 
+#'
 #' @note If an error of type \code{missingColumn} is detected, the function
 #' \code{suvDataCheck} is stopped. When no error is detected the \code{survDataCheck}
 #' function returns an empty dataframe.
-#' 
+#'
 #' @author Marie Laure Delignette-Muller <marielaure.delignettemuller@@vetagro-sup.fr>,
 #' Philippe Veber <philippe.veber@@univ-lyon1.fr>,
 #' Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
-#' 
+#'
 #' @seealso \code{\link{survFullPlot}}, \code{\link{survData}}
-#' 
+#'
 #' @keywords check
-#' 
+#'
 #' @examples
 #' # Run the check data function
 #' data(zinc)
 #' survDataCheck(zinc)
-#' 
+#'
 #' # Example with an error in the dataframe
 #' # (1) Load the data
 #' data(zinc)
-#' 
+#'
 #' # (2) Insert an error (increase the number of survivors at a certain time
 #' # point compared to its value at the previous time point within the same
 #' # replicate)
 #' zinc[25, "Nsurv"] <- 20
 #' zinc$Nsurv <- as.integer(zinc$Nsurv)
 #' check <- survDataCheck(zinc, diagnosis.plot = TRUE)
-#' 
+#'
 #' # (3) Check for potential errors in the dataframe
 #' check
-#' 
+#'
 #' @export
-#' 
+#'
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
   # make a singleton error dataframe (taking care of string/factor conversion
   # issues)
@@ -105,7 +105,10 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
   # return value: errors will be stored there once found
   errors <- data.frame(stringsAsFactors = FALSE)
-  # 1 test if the column names are correct
+
+  ##
+  ## 1. assert column names are correct
+  ##
   ref.names <- c("replicate","conc","time","Nsurv")
   missing.names <- ref.names[which(is.na(match(ref.names, names(data))))]
   if (length(missing.names) != 0) {
@@ -115,41 +118,58 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     class(errors) <- c("survDataCheck", "data.frame")
     return(errors)
   }
-  # 2 test if the first time point is zero
+
+  ##
+  ## 2. assert the first time point is zero for each (replicate, concentration)
+  ##
   subdata <- split(data, list(data$replicate, data$conc), drop = TRUE)
   if (any(unlist(lapply(subdata, function(x) x$time[1] != 0)))) {
     err <- error("firstTime0",
                  "Data are required at time 0 for each concentration and each replicate.")
     errors <- rbind(errors, err)
   }
-  # 3 test if concentrations are numeric
+
+  ##
+  ## 3. assert concentrations are numeric
+  ##
   if (!is.numeric(data$conc)) {
     err <- error("concNumeric",
                  "Column 'conc' must contain only numerical values.")
     errors <- rbind(errors, err)
   }
-  # 4 test if Nsurv are integer
+
+  ##
+  ## 4. assert Nsurv contains integer
+  ##
   if (!is.integer(data$Nsurv)) {
     err <- error("NsurvInteger",
                  "Column 'Nsurv' must contain only integer values.")
     errors <- rbind(errors, err)
   }
-  # 5 positivity test table
+
+  ##
+  ## 5. assert all data are positive
+  ##
   table <- subset(data, select = -c(replicate)) # remove replicate column
   if (any(table < 0.0)) {
     err <- error("tablePositive",
                  "Data must contain only positive values.")
     errors <- rbind(errors, err)
   }
-  # 6 test Nsurv != 0 at time 0
+
+  ##
+  ## 6. assert Nsurv != 0 at time 0
+  ##
   datatime0 <- data[data$time == 0, ]  # select data for initial time points
   if (any(datatime0$Nsurv == 0)) { # test if Nsurv != 0 at time 0
     err <- error("Nsurv0T0",
                  "Nsurv should be different to 0 at time 0 for each concentration and each replicate.")
     errors <- rbind(errors, err)
   }
-  # 7 test unique triplet Replicat - conc - time only if survDataCheck is called
-  # by survData or reproData
+
+  ##
+  ## 7 assert each (replicate, concentration, time) is unique
+  ##
   ID <- idCreate(data, notime = FALSE) # ID vector
   if (any(duplicated(ID))) {
     err <- error("duplicatedID",
@@ -164,33 +184,42 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     # This function checks:
     #   - if each replicate appears once and only once at each time
     #   - if Nsurv is never increasing with time
-    
+
     # errors consistency dataframe
-    consistency.errors <- data.frame(stringsAsFactors = FALSE) 
-    # 8 test if each replicate appears once and only once at each conc and time
+    consistency.errors <- data.frame(stringsAsFactors = FALSE)
+
+    ##
+    ## 8. assert each replicate name appears once and only once for each concentration and time
+    ##
     if (nrow(subdata) != length(unique(subdata$time))) {
       err2 <- error("uniqueReplicateNumberPerCondition",
                     paste("Replicate ",
                           unique(subdata$replicate),
-                          " appears on different lines for the same time point and the same concentration ", 
+                          " appears on different lines for the same time point and the same concentration ",
                           unique(subdata$conc), ".", sep = ""))
       consistency.errors <- rbind(consistency.errors, err2)
     }
-    # 9 test if there is no lack of replicate at each conc and time
+
+    ##
+    ## 9. assert there is the same number of replicates for each conc and time
+    ## FIXME: this is not enough: we should check that the same IDs are used
     if (length(subdata$replicate) != length(unique(data$time))) {
       err2 <- error("missingReplicate",
                     paste("Replicate ", unique(subdata$replicate),
-                          " is missing for at least one time points at concentration ", 
+                          " is missing for at least one time points at concentration ",
                           unique(subdata$conc), ".", sep = ""))
       consistency.errors <- rbind(consistency.errors, err2)
     }
-    # 10 test Nsurv monotony
-    nonmonotonous <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
-    if (any(nonmonotonous)) {
-      err2 <- error("NsurvMonotone",
+
+    ##
+    ## 10. assert Nsurv never increases with time
+    ##
+    nsurv.increase <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
+    if (any(nsurv.increase)) {
+      err2 <- error("NsurvIncrease",
                     paste("For replicate ", unique(subdata$replicate),
                           " and concentration ", unique(subdata$conc),
-                          ", Nsurv increases at some time points compared to the previous one.",
+                          ", Nsurv increases at some time points.",
                           sep = ""))
       consistency.errors <- rbind(consistency.errors, err2)
     }
