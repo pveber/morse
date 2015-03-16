@@ -9,7 +9,7 @@ How to :
 ## Check the package :
 
 ### cmd :
-  * 1) build the source : `R CMD build morse` (it create the vignette and the
+  * 1) build the source : `R CMD build mosaic-r` (it create the vignette and the
        tar.gz)
   * 2) check the package :`R CMD check --as-cran morse_X.X.X.tar.gz`
   
