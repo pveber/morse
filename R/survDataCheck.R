@@ -59,7 +59,7 @@
 #' on different lines for the same time points and the same concentration.}
 #' \item{\code{missingReplicate}}{if a replicate is missing for at least one time
 #' points at one concentration.}
-#' \item{\code{NsurvMonotone}}{if \code{Nsurv} increases at some time points
+#' \item{\code{NsurvIncrease}}{if \code{Nsurv} increases at some time points
 #' compared to the previous one.}
 #' }}
 #' \item{msg}{One or more user friendly error messages are generated.}
