@@ -6,7 +6,17 @@ Companion R package for MOSAIC website
 How to :
 ========
 
-## Check the package :
+## Generate documentation : (this action can be run without build or check the package) 
+  (with the library roxygen2)
+
+### update or create Rd file and NAMESPACE :
+  * R : (in the package directory) `roxygen2::roxygenise(".")`
+  * RStudio : Build & Reload or Build > More > Document (Ctrl + Shift + D)
+
+### pdf :
+  * cmd (in the parent directory) : `R CMD Rd2pdf mosaic-r`
+
+## Check the package (only when the package was complete because of the tests and vignettes) :
 
 ### cmd :
   * 1) build the source : `R CMD build mosaic-r` (it create the vignette and the
@@ -27,13 +37,3 @@ How to :
 
 ### RStudio :
   * Build > More > Test package (Ctrl + Shift + T)
-
-## Generate documentation :
-  (with the library roxygen2)
-
-### Rd file and NAMESPACE :
-  * R : `roxygen2::roxygenise(".")`
-  * RStudio : Build & Reload or Build > More > Document (Ctrl + Shift + D)
-
-### pdf :
-  * cmd : `R CMD Rd2pdf morse`
