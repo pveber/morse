@@ -93,6 +93,9 @@ survData <- function(data) {
   # raw data
   raw.data <- data
   
+  # reorder dataset by replicate concentration and time
+  data <- data[order(data$replicate, data$conc, data$time), ]
+  
   # create an ID column of triplet replicate_conc_time
   data[, "ID"] <- idCreate(data, notime = FALSE)
   
