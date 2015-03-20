@@ -13,7 +13,7 @@ Companion R package for MOSAIC website
   - for a PDF pversion: `R CMD Rd2pdf morse`
 - Check the package
   `R CMD check --as-cran morse_X.X.X.tar.gz`
-- 
+
 ### Compilation (with RStudio)
 
 - Build from sources: `Build & Reload`
