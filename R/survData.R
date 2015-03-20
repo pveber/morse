@@ -1,7 +1,8 @@
 #' Transformed dataset for the \code{survFitTt} function from survival dataset
 #' 
 #' The \code{survData} function creates a \code{survData} object needed
-#' to run the \code{\link{survFitTt}} function. A new dataframe called
+# FIXME to run the \code{\link{survFitTt}} function. A new dataframe called
+#' to run the survFitTt function. A new dataframe called
 #' \code{transformed.data} with six columns is created (see the section
 #' \bold{Value}). The generic methods are \code{print} and \code{summary}.
 #' 
@@ -28,8 +29,8 @@
 #' of the number of alive individuals (positive values) at each time point for
 #' each concentration and each replicate.}
 #' }
-#' @param x An object of class survData.
-#' @param object An object of class survData.
+# FIXME @param x An object of class survData.
+# FIXME @param object An object of class survData.
 #' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @return A dataframe of class \code{survData}. A list of two objects:
@@ -61,23 +62,23 @@
 #' 
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #' 
-#' @seealso \code{\link{survDataCheck}}, \code{\link{survFitTt}}
+# FIXME @seealso \code{\link{survDataCheck}}, \code{\link{survFitTt}}
 #' 
 #' @keywords transformation
 #' 
-#' @examples
-#' 
-#' # (1) Load the survival dataset 
-#' data(zinc)
-#' 
-#' # (2) Create an objet of class 'survData'
-#' dat <- survData(zinc)
-#' class(dat)
-#' 
-#' # (3) Print and summarize object dat
-#' print(dat)
-#' summary(dat)
-#' 
+# @examples
+# 
+# # (1) Load the survival dataset 
+# data(zinc)
+# 
+# # (2) Create an objet of class 'survData'
+# dat <- survData(zinc)
+# class(dat)
+# 
+# # (3) Print and summarize object dat
+# print(dat)
+# summary(dat)
+# 
 #' @export
 #' 
 survData <- function(data) {

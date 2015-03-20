@@ -5,9 +5,11 @@
 #' of class \code{reproDataCheck}, which is basically a dataframe of error
 #' messages. This dataframe is non-empty if the dataset is not in the correct
 #' format. The aim of this function is to check the consistency of the
-#' dataframe before using function \code{\link{reproData}}. This function
+#' dataframe before using function reproData. This function
+# FIXME dataframe before using function \code{\link{reproData}}. This function
 #' highlights possible errors in the data structure that would disturb or
-#' prevent the execution of the function \code{\link{reproFitTt}}.
+#' prevent the execution of the function reproFitTt.
+# FIXME prevent the execution of the function \code{\link{reproFitTt}}.
 #' 
 #' For a given dataframe, the function checks if: \describe{
 #' \item{1)}{column headings are correct: \code{replicate} for the column of
@@ -33,11 +35,13 @@
 #' 
 #' @aliases reproDataCheck print.reproDataCheck
 #' 
-#' @param data Raw dataframe with five columns. See \code{\link{reproData}}
+# FIXME @param data Raw dataframe with five columns. See \code{\link{reproData}}
+#' @param data Raw dataframe with five columns. See reproData
 #' function for details on the required data format.
-#' @param diagnosis.plot If \code{TRUE}, calls the default \code{\link{survFullPlot}}
+#' @param diagnosis.plot If \code{TRUE}, calls the default survFullPlot
+#  FIXME: \code{\link{survFullPlot}}
 #' function if the number of survivors increases at some time points.
-#' @param x An object of class repro.check.data.
+# FIXME @param x An object of class repro.check.data.
 #' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @return The function returns an object of class \code{reproDatacheck}. A
@@ -84,31 +88,31 @@
 #' Philippe Veber <philippe.veber@@univ-lyon1.fr>,
 #' Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #' 
-#' @seealso \code{\link{survFullPlot}}, \code{\link{reproData}}
+# FIXME: @seealso \code{\link{survFullPlot}}, \code{\link{reproData}}
 #' 
 #' @keywords check
 #' 
-#' @examples
-#' 
-#' # Run the check data function
-#' data(zinc)
-#' reproDataCheck(zinc)
-#' 
-#' # Example with an error in the dataframe
-#' 
-#' # (1) Load the data
-#' data(zinc)
-#' 
-#' # (2) Insert an error (increase the number of survivors at a certain time
-#' # point compared to its value at the previous time point within the same
-#' # replicate)
-#' zinc[25, "Nsurv"] <- 20
-#' zinc$Nsurv <- as.integer(zinc$Nsurv)
-#' check <- reproDataCheck(zinc, diagnosis.plot = TRUE)
-#' 
-#' # (3) Check for potential errors in the dataframe
-#' check
-#' 
+# @examples
+# 
+# # Run the check data function
+# data(zinc)
+# reproDataCheck(zinc)
+# 
+# # Example with an error in the dataframe
+# 
+# # (1) Load the data
+# data(zinc)
+# 
+# # (2) Insert an error (increase the number of survivors at a certain time
+# # point compared to its value at the previous time point within the same
+# # replicate)
+# zinc[25, "Nsurv"] <- 20
+# zinc$Nsurv <- as.integer(zinc$Nsurv)
+# check <- reproDataCheck(zinc, diagnosis.plot = TRUE)
+# 
+# # (3) Check for potential errors in the dataframe
+# check
+# 
 #' @export
 #' 
 reproDataCheck <- function(data, diagnosis.plot = TRUE) {
@@ -175,10 +179,10 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   if (length(err)!= 0) {
     errors <- rbind(errors, err)
   }
-  # call function survFullPlot
-  if (length(err)!= 0 && diagnosis.plot && "NsurvMonotone" %in% err) {
-      survFullPlot(data)
-  }
+  # call function survFullPlot FIXME: restore when fn available
+  #if (length(err)!= 0 && diagnosis.plot && "NsurvMonotone" %in% err) {
+  #    survFullPlot(data)
+  #}
   class(errors) <- c("reproDataCheck", "data.frame")
   return(errors)
 }

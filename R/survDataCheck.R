@@ -7,7 +7,8 @@
 #' format. The aim of this function is to check the consistency of the dataframe
 #' before using function \code{\link{survData}}. This function highlights
 #' possible errors in the data structure that would disturb or prevent the
-#' execution of the function \code{\link{survFitTt}}.
+#' execution of the function survFitTt.
+# FIXME execution of the function \code{\link{survFitTt}}.
 #'
 #' For a given dataframe, the function checks if:
 #' \describe{
@@ -33,9 +34,10 @@
 #'
 #' @param data Raw dataframe with four columns. See \code{\link{survData}}
 #' function for details on the required data format.
-#' @param diagnosis.plot If \code{TRUE}, calls the default \code{\link{survFullPlot}}
+# FIXME @param diagnosis.plot If \code{TRUE}, calls the default \code{\link{survFullPlot}}
+#' @param diagnosis.plot If \code{TRUE}, calls the default survFullPlot
 #' function if the number of survivors increases at some time points.
-#' @param x An object of class survDataCheck.
+# FIXME @param x An object of class survDataCheck.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @return The function returns an object of class \code{survDataCheck}. A
@@ -76,28 +78,28 @@
 #' Philippe Veber <philippe.veber@@univ-lyon1.fr>,
 #' Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #'
-#' @seealso \code{\link{survFullPlot}}, \code{\link{survData}}
+# FIXME @seealso \code{\link{survFullPlot}}, \code{\link{survData}}
 #'
 #' @keywords check
 #'
-#' @examples
-#' # Run the check data function
-#' data(zinc)
-#' survDataCheck(zinc)
-#'
-#' # Example with an error in the dataframe
-#' # (1) Load the data
-#' data(zinc)
-#'
-#' # (2) Insert an error (increase the number of survivors at a certain time
-#' # point compared to its value at the previous time point within the same
-#' # replicate)
-#' zinc[25, "Nsurv"] <- 20
-#' zinc$Nsurv <- as.integer(zinc$Nsurv)
-#' check <- survDataCheck(zinc, diagnosis.plot = TRUE)
-#'
-#' # (3) Check for potential errors in the dataframe
-#' check
+# FIXME @examples
+# # Run the check data function
+# data(zinc)
+# survDataCheck(zinc)
+#
+# # Example with an error in the dataframe
+# # (1) Load the data
+# data(zinc)
+#
+# # (2) Insert an error (increase the number of survivors at a certain time
+# # point compared to its value at the previous time point within the same
+# # replicate)
+# zinc[25, "Nsurv"] <- 20
+# zinc$Nsurv <- as.integer(zinc$Nsurv)
+# check <- survDataCheck(zinc, diagnosis.plot = TRUE)
+#
+# # (3) Check for potential errors in the dataframe
+# check
 #'
 #' @importFrom stringr str_c
 #' @export
@@ -250,9 +252,10 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
   
   # call function survFullPlot
-  if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
-    survFullPlot(data)
-  }
+# FIXME when fn available  
+#   if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
+#     survFullPlot(data)
+#   }
   class(errors) <- c("survDataCheck", "data.frame")
   return(errors)
 }

@@ -27,12 +27,3 @@ Marie Laure Delignette-Muller
 
 Maintainer: Philippe Ruiz <philippe.ruiz@univ-lyon1.fr>
 }
-\references{
-}
-\keyword{ package }
-\seealso{
-
-}
-\examples{
-
-}
