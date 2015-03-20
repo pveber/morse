@@ -25,6 +25,8 @@
 #' \item{9)}{the number of replicates is the same at any concentration and any
 #' time point,}
 #' \item{10)}{the number of alive individuals never increases with time,}
+#' \item{11)}{for each time and concentration the replicate labels are the same as
+#' the control.}
 #' }
 #'
 #' @aliases survDataCheck print.survDataCheck
@@ -61,6 +63,8 @@
 #' points at one concentration.}
 #' \item{\code{NsurvIncrease}}{if \code{Nsurv} increases at some time points
 #' compared to the previous one.}
+#' \item{\code{ReplicateLabel}}{if for each concentration and time point the label
+#' of replicates are the same as the control.}
 #' }}
 #' \item{msg}{One or more user friendly error messages are generated.}
 #'
@@ -95,6 +99,7 @@
 #' # (3) Check for potential errors in the dataframe
 #' check
 #'
+#' @importFrom stringr str_c
 #' @export
 #'
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
@@ -202,7 +207,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
 
     ##
     ## 9. assert there is the same number of replicates for each conc and time
-    ## FIXME: this is not enough: we should check that the same IDs are used
+    ## 
     if (length(subdata$replicate) != length(unique(data$time))) {
       err2 <- error("missingReplicate",
                     paste("Replicate ", unique(subdata$replicate),
@@ -230,8 +235,22 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   if (length(err) != 0) {
     errors <- rbind(errors, err)
   }
+  
+  ##
+  ## 11. assert the label of replicate for each time and concentration
+  ##
+  reslab <- by(data,
+               list(data$conc, data$time),
+               function(x) {str_c(sort(x$replicate), collapse = "")})
+
+  if (any(reslab != reslab[[1]])) {
+    err <- error("ReplicateLabel",
+                 "For at least one time and one concentration a replicate label is different from the control.")
+    errors <- rbind(errors, err)
+  }
+  
   # call function survFullPlot
-  if (length(err) != 0 && diagnosis.plot && "NsurvMonotone" %in% err) {
+  if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
     survFullPlot(data)
   }
   class(errors) <- c("survDataCheck", "data.frame")
