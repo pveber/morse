@@ -18,6 +18,7 @@
 #' function returns an empty dataframe.
 #' Here is the list of possible error \code{id}s and their signification:
 #' \tabular{rl}{
+#' \code{dataframeExpected} \tab an object of class \code{data.frame} is expected \cr
 #' \code{missingColumn} \tab at least one expected column heading is missing \cr
 #' \code{firstTime0} \tab the first time point for some (concentration, replicate) is not 0 \cr
 #' \code{concNumeric} \tab column \code{conc} contains a value of class other than \code{numeric} \cr
@@ -60,6 +61,15 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
   # return value: errors will be stored there once found
   errors <- data.frame(stringsAsFactors = FALSE)
+
+  ##
+  ## 0. check we have a data.frame
+  ##
+  if (class(data) != "data.frame") {
+    errors <- error("dataframeExpected", "A dataframe is expected")
+    class(errors) <- c("survDataCheck", "data.frame")
+    return(errors)
+  }
 
   ##
   ## 1. assert column names are correct
