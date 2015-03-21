@@ -8,7 +8,6 @@
 #' @aliases survDataCheck print.survDataCheck
 #'
 #' @param data any object
-# FIXME @param diagnosis.plot If \code{TRUE}, calls the default \code{\link{survFullPlot}}
 #' @param diagnosis.plot if \code{TRUE}, the function may produce diagnosis plots
 # FIXME @param x An object of class survDataCheck.
 # FIXME @param \dots Further arguments to be passed to generic methods.

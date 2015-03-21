@@ -6,6 +6,8 @@
 
 # R data files from past sessions
 .Rdata
+.RData
+..pdf
 
 # RStudio files
 .Rproj.user/
@@ -17,3 +19,6 @@ r-mosaic.Rproj
 .settings/
 .metadata/
 .Rproj.user
+
+# some generated files
+man/*.Rd
