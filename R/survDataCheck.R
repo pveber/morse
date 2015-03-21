@@ -1,82 +1,39 @@
-#' Check the consistency of a survival dataset
+#' Checks if an object can be used to perform survival analysis
 #'
-#' The \code{survDataCheck} function performs several tests on the integrity of
-#' the dataset (column headings, type of data\dots) and returns an object of
-#' class \code{survDataCheck}, which is basically a dataframe of error
-#' messages. This dataframe is non-empty if the dataset is not in the correct
-#' format. The aim of this function is to check the consistency of the dataframe
-#' before using function \code{\link{survData}}. This function highlights
-#' possible errors in the data structure that would disturb or prevent the
-#' execution of the function survFitTt.
-# FIXME execution of the function \code{\link{survFitTt}}.
+#' The \code{survDataCheck} function can be used to check if an object
+#' containing survival data is formatted according to the expectations of the
+#' \code{survData} function.
 #'
-#' For a given dataframe, the function checks if:
-#' \describe{
-#' \item{1)}{column headings are correct: \code{replicate} for the column of
-#' replicates, \code{conc} for the column of concentrations, \code{time}
-#' for the column of time points and \code{Nsurv} for the column of the number
-#' of alive individuals,}
-#' \item{2)}{the first time point of the dataset is 0,}
-#' \item{3)}{the class of column \code{conc} is \code{numeric},}
-#' \item{4)}{the classes of columns \code{Nsurv} is \code{integer},}
-#' \item{5)}{values of the dataframe are all positive,}
-#' \item{6)}{the number of survivor is not 0 at \eqn{t = 0},}
-#' \item{7)}{there is only one triplet \code{replicate} - \code{conc} - \code{time},}
-#' \item{8)}{each replicate appears only once per concentration and per time point,}
-#' \item{9)}{the number of replicates is the same at any concentration and any
-#' time point,}
-#' \item{10)}{the number of alive individuals never increases with time,}
-#' \item{11)}{for each time and concentration the replicate labels are the same as
-#' the control.}
-#' }
 #'
 #' @aliases survDataCheck print.survDataCheck
 #'
-#' @param data Raw dataframe with four columns. See \code{\link{survData}}
-#' function for details on the required data format.
+#' @param data any object
 # FIXME @param diagnosis.plot If \code{TRUE}, calls the default \code{\link{survFullPlot}}
-#' @param diagnosis.plot If \code{TRUE}, calls the default survFullPlot
-#' function if the number of survivors increases at some time points.
+#' @param diagnosis.plot if \code{TRUE}, the function may produce diagnosis plots
 # FIXME @param x An object of class survDataCheck.
-#' @param \dots Further arguments to be passed to generic methods.
+# FIXME @param \dots Further arguments to be passed to generic methods.
 #'
-#' @return The function returns an object of class \code{survDataCheck}. A
-#' dataframe with two columns of character string, \code{id} and \code{msg}.
-#' The \code{id} is invisible when displaying the function. Print only shows
-#' error messages \code{msg}.
-#' \item{id}{The identifier of the test, equals to:
-#' \describe{
-#' \item{\code{missingColumn}}{if one or more columns are missing or if the column
-#' headings are not \code{replicate}, \code{conc},\code{time} and \code{Nsurv}.}
-#' \item{\code{firstTime0}}{if the first time point is not 0 at each concentration
-#' and each replicate.}
-#' \item{\code{concNumeric}}{if column \code{conc} does not contain values of
-#' class \code{numeric} only.}
-#' \item{\code{NsurvInteger}}{if column \code{Nsurv} does not contain values of
-#' class \code{integer} only.}
-#' \item{\code{tablePositive}}{if there are negative values within the data.}
-#' \item{\code{Nsurv0T0}}{if \code{Nsurv} is 0 at time 0 for one or more
-#' concentration and replicate.}
-#' \item{\code{duplicateID}}{if there are two or more triplet \code{replicate} -
-#' \code{conc} - \code{time}}
-#' \item{\code{uniqueReplicateNumberPerCondition}}{if a replicate is duplicated
-#' on different lines for the same time points and the same concentration.}
-#' \item{\code{missingReplicate}}{if a replicate is missing for at least one time
-#' points at one concentration.}
-#' \item{\code{NsurvIncrease}}{if \code{Nsurv} increases at some time points
-#' compared to the previous one.}
-#' \item{\code{ReplicateLabel}}{if for each concentration and time point the label
-#' of replicates are the same as the control.}
-#' }}
-#' \item{msg}{One or more user friendly error messages are generated.}
+#' @return The function returns an object of class \code{survDataCheck}, which
+#' basically is a dataframe with two columns \code{id} and \code{msg} of
+#' character strings. When no error is detected the \code{survDataCheck}
+#' function returns an empty dataframe.
+#' Here is the list of possible error \code{id}s and their signification:
+#' \tabular{rl}{
+#' \code{missingColumn} \tab at least one expected column heading is missing \cr
+#' \code{firstTime0} \tab the first time point for some (concentration, replicate) is not 0 \cr
+#' \code{concNumeric} \tab column \code{conc} contains a value of class other than \code{numeric} \cr
+#' \code{NsurvInteger} \tab column \code{Nsurv} contains a value of class other than \code{integer} \cr
+#' \code{tablePositive} \tab some data are negative \cr
+#' \code{Nsurv0T0} \tab \code{Nsurv} is 0 at time 0 for some (concentration, replicate) \cr
+#' \code{duplicateID} \tab there are two identical (\code{replicate}, \code{conc}, \code{time}) triplets \cr
+#' \code{missingReplicate} \tab a replicate is missing at some (time point, concentration) \cr
+#' \code{NsurvIncrease} \tab \code{Nsurv} increases at some time point of some (concentration, replicate) \cr
+#' \code{ReplicateLabel} \tab replicate labels differ between two time points at some concentration \cr
+#' }
 #'
 #' @note If an error of type \code{missingColumn} is detected, the function
-#' \code{suvDataCheck} is stopped. When no error is detected the \code{survDataCheck}
-#' function returns an empty dataframe.
+#' \code{suvDataCheck} is stopped.
 #'
-#' @author Marie Laure Delignette-Muller <marielaure.delignettemuller@@vetagro-sup.fr>,
-#' Philippe Veber <philippe.veber@@univ-lyon1.fr>,
-#' Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #'
 # FIXME @seealso \code{\link{survFullPlot}}, \code{\link{survData}}
 #'
@@ -175,7 +132,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 7 assert each (replicate, concentration, time) is unique
+  ## 7 assert each (replicate, concentration, time) triplet is unique
   ##
   ID <- idCreate(data, notime = FALSE) # ID vector
   if (any(duplicated(ID))) {
@@ -209,7 +166,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
 
     ##
     ## 9. assert there is the same number of replicates for each conc and time
-    ## 
+    ##
     if (length(subdata$replicate) != length(unique(data$time))) {
       err2 <- error("missingReplicate",
                     paste("Replicate ", unique(subdata$replicate),
@@ -237,7 +194,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   if (length(err) != 0) {
     errors <- rbind(errors, err)
   }
-  
+
   ##
   ## 11. assert the label of replicate for each time and concentration
   ##
@@ -250,9 +207,9 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                  "For at least one time and one concentration a replicate label is different from the control.")
     errors <- rbind(errors, err)
   }
-  
+
   # call function survFullPlot
-# FIXME when fn available  
+# FIXME when fn available
 #   if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
 #     survFullPlot(data)
 #   }
