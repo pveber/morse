@@ -153,19 +153,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     consistency.errors <- data.frame(stringsAsFactors = FALSE)
 
     ##
-    ## 8. assert each replicate name appears once and only once for each concentration and time
-    ##
-    if (nrow(subdata) != length(unique(subdata$time))) {
-      err2 <- error("uniqueReplicateNumberPerCondition",
-                    paste("Replicate ",
-                          unique(subdata$replicate),
-                          " appears on different lines for the same time point and the same concentration ",
-                          unique(subdata$conc), ".", sep = ""))
-      consistency.errors <- rbind(consistency.errors, err2)
-    }
-
-    ##
-    ## 9. assert there is the same number of replicates for each conc and time
+    ## 8. assert there is the same number of replicates for each conc and time
     ##
     if (length(subdata$replicate) != length(unique(data$time))) {
       err2 <- error("missingReplicate",
@@ -176,7 +164,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     }
 
     ##
-    ## 10. assert Nsurv never increases with time
+    ## 9. assert Nsurv never increases with time
     ##
     nsurv.increase <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
     if (any(nsurv.increase)) {
@@ -196,7 +184,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 11. assert the label of replicate for each time and concentration
+  ## 10. assert the label of replicate for each time and concentration
   ##
   reslab <- by(data,
                list(data$conc, data$time),
