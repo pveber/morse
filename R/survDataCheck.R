@@ -38,24 +38,16 @@
 #'
 #' @keywords check
 #'
-# FIXME @examples
-# # Run the check data function
-# data(zinc)
-# survDataCheck(zinc)
-#
-# # Example with an error in the dataframe
-# # (1) Load the data
-# data(zinc)
-#
-# # (2) Insert an error (increase the number of survivors at a certain time
-# # point compared to its value at the previous time point within the same
-# # replicate)
-# zinc[25, "Nsurv"] <- 20
-# zinc$Nsurv <- as.integer(zinc$Nsurv)
-# check <- survDataCheck(zinc, diagnosis.plot = TRUE)
-#
-# # (3) Check for potential errors in the dataframe
-# check
+#' @examples
+#' # Run the check data function
+#' data(zinc)
+#' survDataCheck(zinc)
+#'
+#' # Now we insert an error in the dataset, by artificially increasing the
+#' # number of survivors at some time point, in such a way that the number
+#' # of indivuals increases in some replicate
+#' zinc[25, "Nsurv"] <- as.integer(20)
+#' survDataCheck(zinc, diagnosis.plot = TRUE)
 #'
 #' @importFrom stringr str_c
 #' @export
