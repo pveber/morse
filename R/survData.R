@@ -60,7 +60,8 @@
 # summary(dat)
 #
 #' @export
-#' @importFrom dplyr right_join %>% rename
+#' @importFrom dplyr left_join
+#' @importFrom plyr rename
 survData <- function(data) {
   ### INPUT
   # [data]: a [data.frame] with above mentionned requirements
@@ -82,7 +83,8 @@ survData <- function(data) {
   data[, "ID"] <- idCreate(data, notime = FALSE)
 
   # create an Ninit column (number of initial )
-  data.t0 <- data[data$time == 0,c("replicate","conc","Nsurv")] %>% rename(., Ninit = Nsurv)
+  data.t0 <- data[data$time == 0,c("replicate","conc","Nsurv")]
+  plyr::rename(data.t0,c('Nsurv' = 'Ninit'))
   out <- left_join(data,data.t0,by=c("replicate","conc"))
 
   class(out) <- "survData"
