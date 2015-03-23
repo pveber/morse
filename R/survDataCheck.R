@@ -176,10 +176,9 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     errors <- errorTableAdd(errors, "ReplicateLabel", msg)
   }
 
-  # call function survFullPlot
-# FIXME when fn available
-#   if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
-#     survFullPlot(data)
-#   }
+  ## call function survFullPlot
+  if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
+    survFullPlot(data)
+  }
   return(errors)
 }
