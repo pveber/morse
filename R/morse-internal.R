@@ -64,34 +64,6 @@ survTransformData <- function(data) {
   res2 <- do.call(rbind, res) # return a dataframe
   rownames(res2) <- 1:dim(res2)[1]
   res2$time <- as.numeric(res2$time) # change type of time
-  data <- res2[order(res2$replicate, res2$conc, res2$time), ]  # reorder dataset
 
-  T <- unique(data$time) # times of obs without repetitions
-  finalnbr <- match(max(data$time), T) # index of the time at which we want the
-  #  results in vector T
-  if (finalnbr == 1)
-    stop("!!!! It isn't possible to use the first observation time as the last observation time !!!!")
-  
-  tableTi = list()
-  
-  for(i in 2:finalnbr) {
-    # original dataset at T[i-1]
-    dataTim1 <- subset(data, data$time==T[i-1])
-    # original dataset at T[i]
-    dataTi <- subset(data, data$time==T[i])
-    
-    # check if data have been properly captured if replicate exists
-    if (any(dataTim1$replicate!=dataTi$replicate) || any(dataTim1$conc!=dataTi$conc))
-      warning("!!!! BE CAREFUL concentrations and/or replicates are not identical at each time !!!!")
-    
-    tableTi[[i]] <- data.frame(ID = dataTi$ID,
-                               replicate = dataTi$replicate,
-                               conc = dataTi$conc,
-                               time = dataTi$time,
-                               Ninit = dataTi$Ninit,
-                               Nsurv = dataTi$Nsurv)
-  }
-  
-  tablefinale <- do.call("rbind", tableTi)
-  return(tablefinale)
+  return(res2)
 }
