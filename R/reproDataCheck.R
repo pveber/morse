@@ -1,87 +1,35 @@
-#' Check the consistency of a reproduction dataset
+#' Checks if an object can be used to perform reproduction toxicity data analysis
 #'
-#' The \code{reproDataCheck} function performs several tests on the integrity
-#' of the dataset (column headings, type of data\dots) and returns an object
-#' of class \code{reproDataCheck}, which is basically a dataframe of error
-#' messages. This dataframe is non-empty if the dataset is not in the correct
-#' format. The aim of this function is to check the consistency of the
-#' dataframe before using function reproData. This function
-# FIXME dataframe before using function \code{\link{reproData}}. This function
-#' highlights possible errors in the data structure that would disturb or
-#' prevent the execution of the function reproFitTt.
-# FIXME prevent the execution of the function \code{\link{reproFitTt}}.
+#' The \code{reproDataCheck} function can be used to check if an object
+#' containing data from a reproduction toxicity assay meets the expectations
+#FIXME link
+#' of the function \code{reproData}.
 #'
-#' For a given dataframe, the function checks if: \describe{
-#' \item{1)}{column headings are correct: \code{replicate} for the column of
-#' replicates, \code{conc} for the column of concentrations, \code{time}
-#' for the column of time points, \code{Nsurv} for the column of the number of
-#' alive individuals and \code{Nrepro} for the column of the number of collected
-#' offspring at each time point,}
-#' \item{2)}{the first time point of the dataset is 0,}
-#' \item{3)}{the class of column \code{conc} is \code{numeric},}
-#' \item{4)}{the classes of columns \code{Nsurv} and \code{Nrepro} are
-#' \code{integer},}
-#' \item{5)}{values of the dataframe are all positive,}
-#' \item{6)}{the number of collected offspring is 0 at \eqn{t = 0},}
-#' \item{7)}{the number of survivor is not 0 at \eqn{t = 0},}
-#' \item{8)}{there is only one triplet \code{replicate} - \code{conc} - \code{time},}
-#' \item{9)}{each replicate appears only once per concentration and per time
-#' point,}
-#' \item{10)}{the number of replicates is the same at any concentration and any
-#' time point,}
-#' \item{11)}{the number of alive individuals never increases with time,}
-#' \item{12)}{at each time \eqn{T}, if the number of alive individuals is null,
-#' the number of collected offspring is also null at time \eqn{T+1}.} }
+#' As in MORSE, reproduction datasets are a special case of survival datasets,
+#' \code{reproDataCheck} performs the same verifications than
+#' \code{\link{survDataCheck}} plus additional ones that are specific to
+#' reproduction data.
 #'
 #' @aliases reproDataCheck print.reproDataCheck
 #'
-# FIXME @param data Raw dataframe with five columns. See \code{\link{reproData}}
-#' @param data Raw dataframe with five columns. See reproData
-#' function for details on the required data format.
-#' @param diagnosis.plot If \code{TRUE}, calls the default survFullPlot
-#  FIXME: \code{\link{survFullPlot}}
-#' function if the number of survivors increases at some time points.
-# FIXME @param x An object of class repro.check.data.
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param data any object
+#' @param diagnosis.plot if \code{TRUE}, may produce a diagnosis plot
 #'
-#' @return The function returns an object of class \code{reproDatacheck}. A
-#' dataframe with two columns of character string, \code{id} and \code{msg}.
-#' The \code{id} is invisible when displaying the function. Print only shows
-#' error messages \code{msg}.
-#' \item{id}{The identifier of the test, equals to:
-#' \describe{
-#' \item{\code{missingColumn}}{if one or more columns are missing or if the column
-#' headings are not \code{replicate}, \code{conc}, \code{time}, \code{Nsurv}
-#' and \code{Nrepro}.}
-#' \item{\code{firstTime0}}{if the first time point is not 0 at each concentration
-#' and each replicate.}
-#' \item{\code{concNumeric}}{if column \code{conc} does not contain values of
-#' class \code{numeric} only.}
-#' \item{\code{NsurvInteger}}{if column \code{Nsurv} does not contain values of
-#' class \code{integer} only.}
-#' \item{\code{NreproInteger}}{if column \code{Nrepro} does not contain values
-#' of class \code{integer} only.}
-#' \item{\code{tablePositive}}{if there are negative values within the data.}
-#' \item{\code{Nrepro0T0}}{if \code{Nrepro} is not 0 at time 0 for each concentration
-#' and each replicate.}
-#' \item{\code{Nsurv0T0}}{if \code{Nsurv} is 0 at time 0 for one or more
-#' concentration and replicate.}
-#' \item{\code{duplicateID}}{if there are two or more triplet \code{replicate} -
-#' \code{conc} - \code{time}}
-#' \item{\code{uniqueReplicateNumberPerCondition}}{if a replicate is duplicated
-#' on different lines for the same time points and the same concentration.}
-#' \item{\code{missingReplicate}}{if a replicate is missing for at least one time
-#' points at one concentration.}
-#' \item{\code{NsurvMonotone}}{if \code{Nsurv} increases at some time points
-#' compared to the previous one.}
-#' \item{\code{Nsurvt0Nreprotp1P}}{if at a giving time \eqn{T}, the number of
+#' @return The function returns a \code{data.frame} similar to the one returned
+#' by \code{\link{survDataCheck}}, except that it may contain the following
+#' additional error \code{id}s:
+#' \itemize{
+#' \item \code{NreproInteger}: column \code{Nrepro} contains values of class other than \code{integer}
+#' \item \code{Nrepro0T0}: \code{Nrepro} is not 0 at time 0 for each concentration and each replicate
+#' \item \code{Nsurvt0Nreprotp1P}: at a giving time \eqn{T}, the number of
 #' alive individuals is null and the number of collected offspring is not null
-#' for the same replicate and the same concentration at time \eqn{T+1}.}
-#' }}
-#' \item{msg}{One or more user friendly error messages are generated.}
+#' for the same replicate and the same concentration at time \eqn{T+1}
+#' }
 #'
-#' @note If an error of type \code{missingColumn} is detected, the function
-#' \code{reproDataCheck} is stopped. When no error is detected the \code{reproDataCheck}
+#' @note If an error of type \code{dataframeExpected} or \code{missingColumn}
+#' is detected, the function
+#' \code{reproDataCheck} is stopped. When no error is detected the
+#' \code{reproDataCheck}
 #' function returns an empty dataframe.
 #'
 #' @author Marie Laure Delignette-Muller <marielaure.delignettemuller@@vetagro-sup.fr>,
