@@ -4,8 +4,8 @@ errorTableCreate <- function() {
   t
 }
 
-errorTableAppend <- function(s, t) {
-  u <- rbind(s,t)
+errorTableAppend <- function(...) {
+  u <- rbind(...)
   class(u) <- c("errorTable", "data.frame")
   u
 }
@@ -19,3 +19,12 @@ errorTableSingleton <- function(id, msg) {
   errorTableAdd(errorTableCreate(), id, msg)
 }
 
+#' @export
+print.errorTable <- function(x, ...) {
+  if (is.null(x$id)) {
+    cat("No error detected.\n")
+  } else {
+    cat("Error(s):\n")
+    print(x$msg)
+  }
+}
