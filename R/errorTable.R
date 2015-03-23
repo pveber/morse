@@ -25,6 +25,8 @@ print.errorTable <- function(x, ...) {
     cat("No error detected.\n")
   } else {
     cat("Error(s):\n")
-    print(x$msg)
+    for (m in x$msg) {
+      cat(paste("\t",m,"\n",sep=""))
+    }
   }
 }
