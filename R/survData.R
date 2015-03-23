@@ -1,56 +1,37 @@
-#' Transformed dataset for the \code{survFitTt} function from survival dataset
-#' 
-#' The \code{survData} function creates a \code{survData} object needed
-# FIXME to run the \code{\link{survFitTt}} function. A new dataframe called
-#' to run the survFitTt function. A new dataframe called
-#' \code{transformed.data} with six columns is created (see the section
-#' \bold{Value}). The generic methods are \code{print} and \code{summary}.
-#' 
-#' The \code{survData} function builds a new dataframe called \code{transformed.data}
-#' with six columns: \code{ID}, \code{replicate}, \code{conc}, \code{time},
-#' \code{Ninit} and \code{Nsurv}.
-#' The new dataframe is automatically reordered by \code{time}, \code{concentration}
-#' and \code{replicate}. The \code{Ninit} value is the number of survivors
-#' (\code{Nsurv}) at the beginning of the bioassay for the control concentration
-#' for each replicate.
-#' 
+#' Creates a dataset for survival analysis
+#'
+#' This function creates a \code{survData} object from experimental data
+#' provided as a \code{data.frame}. The resulting object
+#' can then be used for plotting and model fitting. It can also be used
+#' to generate \emph{transformed data} (FIXME reference to definition).
+#'
+#' The \code{data} argument describes experimental results from a survival
+#' assay. Each line of the \code{data.frame}
+#' corresponds to one experimental measurement, that is a number of alive
+#' individuals for a given concentration of pollutant at a certain time
+#' during the assay in a certain replicate. The function fails if
+#' \code{data} does not meet the
+#' expected requirements. Please run \code{\link{survDataCheck}} to ensure
+#' \code{data} is well-formed.
+#'
 #' @aliases survData print.survData summary.survData
-#' 
-#' @param data The raw dataframe with four columns passed to the function in
-#' argument \code{data}:
-#' \describe{
-#' \item{replicate}{A vector of class \code{integer} or factor for replicate
-#' identification.}
-#' \item{conc}{A vector of class \code{numeric} with tested concentrations
-#' (positive values).}
-#' \item{time}{A vector of class \code{integer} with time points (positive values).
-#' The first time must be 0.}
-#' \item{Nsurv}{A vector of class \code{integer} with positive values
-#' of the number of alive individuals (positive values) at each time point for
-#' each concentration and each replicate.}
+#'
+#' @param data a \code{data.frame} containing the following four columns:
+#' \itemize{
+#' \item \code{replicate}: a vector of class \code{integer} or factor for replicate
+#' identification
+#' \item \code{conc}: a vector of class \code{numeric} with tested concentrations
+#' (positive values)
+#' \item \code{time}: a vector of class \code{integer} with time points, min value must be 0
+#' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
+#' alive individuals at each time point for each concentration and each replicate
 #' }
 # FIXME @param x An object of class survData.
 # FIXME @param object An object of class survData.
 #' @param \dots Further arguments to be passed to generic methods.
-#' 
-#' @return A dataframe of class \code{survData}. A list of two objects:
-#' \item{raw.data}{The raw dataframe with four columns corresponding to the
-#' argument passed in the function.}
-#' \item{transformed.data}{A dataframe with six columns:
-#' \describe{
-#' \item{ID}{A vector of class \code{factor}. It is a character string who
-#' identify the triplet \code{replicat_conc_time}.}
-#' \item{replicate}{A vector of class \code{integer} or \code{factor} for
-#' replicate identification.}
-#' \item{conc}{A vector of class \code{numeric} with tested concentrations
-#' (positive values).}
-#' \item{time}{A vector of class \code{integer} with time points (positive values).}
-#' \item{Ninit}{A vector of class \code{integer} with the number of individuals
-#' at the beginning of the bioassay (positive values).}
-#' \item{Nsurv}{A vector of class \code{integer} with positive values of the number
-#' of alive individuals (positive values) for each concentration and each replicate.}
-#' }}
-#' 
+#'
+#' @return A dataframe of class \code{survData}.
+#'
 #' Generic functions:
 #' \describe{
 #' \item{\code{summary}}{The summary provides information about the structure
@@ -59,52 +40,52 @@
 #' raw dataset and the transformed dataset.}
 #' \item{\code{print}}{Print of a \code{survData} object with the transformed
 #' dataframe.}}
-#' 
+#'
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
-#' 
-# FIXME @seealso \code{\link{survDataCheck}}, \code{\link{survFitTt}}
-#' 
-#' @keywords transformation
-#' 
-# @examples
-# 
-# # (1) Load the survival dataset 
-# data(zinc)
-# 
-# # (2) Create an objet of class 'survData'
-# dat <- survData(zinc)
-# class(dat)
-# 
-# # (3) Print and summarize object dat
+#'
+#' @seealso \code{\link{survDataCheck}}
+#'
+#' @examples
+#'
+#' # (1) Load the survival dataset
+#' data(zinc)
+#'
+#' # (2) Create an objet of class 'survData'
+#' dat <- survData(zinc)
+#' class(dat)
+#'
+#' # (3) Print and summarize object dat
+#FIXME
 # print(dat)
 # summary(dat)
-# 
+#
 #' @export
-#' 
+#'
 survData <- function(data) {
-  
-  # check the data class 
-  if (!is.data.frame(data))
-    stop("data.frame expected!")
-  
-  # test the integrity of the data with survDataCheck
-  if (!is.null(survDataCheck(data)$id))
-    stop("There is one or more error in the data! Please use the survDataCheck function before the survData function!")
+  ### INPUT
+  # [data]: a [data.frame] with above mentionned requirements
+  #
+  ### OUTPUT
+  # a [data.frame] with additional class [survData]
+  # containing columns:
+  # - replicate, conc, time, Nsurv as in [data]
+  # - ID: a string identifier built from replicate, conc and time columns
+  # - Ninit: number of initial individuals for the corresponding time series
 
-  # raw data
-  raw.data <- data
-  
+  # test the integrity of the data with survDataCheck
+  if (dim(survDataCheck(data))[1] > 0)
+    stop("The [data] argument is not well-formed, please use [survDataCheck] for details.")
+
+  data <- data[order(data$replicate, data$conc, data$time), ]
+
   # create an ID column of triplet replicate_conc_time
   data[, "ID"] <- idCreate(data, notime = FALSE)
-  
-  # calcul of Ninit create transformed.data
-  transformed.data <- survTransformData(data)
-  
-  # output of class survData
-  out <- list(raw.data = raw.data,
-              transformed.data = transformed.data)
-  
+
+  # create an Ninit column (number of initial )
+  data.t0 <- data[data$time == 0,c("replicate","conc","Nsurv")] %>% rename(., Ninit = Nsurv)
+  out <- left_join(data,data.t0,by=c("replicate","conc"))
+
   class(out) <- "survData"
-  
+
   return(out)
 }
