@@ -40,27 +40,18 @@
 #'
 #' @keywords check
 #'
-# @examples
-#
-# # Run the check data function
-# data(zinc)
-# reproDataCheck(zinc)
-#
-# # Example with an error in the dataframe
-#
-# # (1) Load the data
-# data(zinc)
-#
-# # (2) Insert an error (increase the number of survivors at a certain time
-# # point compared to its value at the previous time point within the same
-# # replicate)
-# zinc[25, "Nsurv"] <- 20
-# zinc$Nsurv <- as.integer(zinc$Nsurv)
-# check <- reproDataCheck(zinc, diagnosis.plot = TRUE)
-#
-# # (3) Check for potential errors in the dataframe
-# check
-#
+#' @examples
+#'
+#' # Run the check data function
+#' data(copper)
+#' reproDataCheck(copper)
+#'
+#' # Now we insert an error in the dataset, by setting a non-zero number of
+#' # offspring at some time, although there is no surviving individual in the
+#' # replicate from the previous time point.
+#' copper$Nrepro[148] <- as.integer(1)
+#' reproDataCheck(copper)
+#'
 #' @export
 #'
 reproDataCheck <- function(data, diagnosis.plot = TRUE) {
@@ -77,7 +68,7 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   if (! "Nrepro" %in% colnames(data)) {
     msg <- "The column Nrepro is missing."
-    errors <- errorTableAppend(errors, "missingColumn", msg)
+    errors <- errorTableAdd(errors, "missingColumn", msg)
     return(errors)
   }
 
@@ -86,7 +77,7 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   if (!is.integer(data$Nrepro)) {
     msg <- "Column 'Nrepro' must contain only integer values."
-    errors <- errorTableAppend(errors, "NreproInteger", msg)
+    errors <- errorTableAdd(errors, "NreproInteger", msg)
   }
 
   ##
@@ -95,7 +86,7 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   datatime0 <- data[data$time == 0, ] # select data for initial time points
   if (any(datatime0$Nrepro > 0)) { # test if Nrepro > 0 at time 0
     msg <- "Nrepro should be 0 at time 0 for each concentration and each replicate."
-    errors <- errorTableAppend(errors, "Nrepro0T0", msg)
+    errors <- errorTableAdd(errors, "Nrepro0T0", msg)
   }
 
   subdata <- split(data, list(data$replicate, data$conc), drop = TRUE)
@@ -119,16 +110,18 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
                    " and concentration ", unique(subdata$conc),
                    ", there are some Nsurv = 0 followed by Nrepro > 0 at the next time point.",
                    sep = "")
-      errors <- errorTableAppend(errors, "Nsurvt0Nreprotp1P", msg)
+      errors <- errorTableAdd(errors, "Nsurvt0Nreprotp1P", msg)
+      print(errors)
     }
     return(errors)
   }
   res <- by(data, list(data$replicate, data$conc), consistency)
-  err <- do.call("errorTableAppend", res)
+  consistency.errors <- do.call("errorTableAppend", res)
+  errors <- errorTableAppend(errors, consistency.errors)
 
   # call function survFullPlot FIXME: restore when fn available
   if (diagnosis.plot &&
-      ("NsurvIncrease" %in% errors$id || "NsurvMonotone" %in% err)) {
+      ("NsurvIncrease" %in% errors$id || "NsurvMonotone" %in% errors$id)) {
         survFullPlot(data)
       }
 
