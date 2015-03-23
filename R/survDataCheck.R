@@ -9,8 +9,6 @@
 #'
 #' @param data any object
 #' @param diagnosis.plot if \code{TRUE}, the function may produce diagnosis plots
-# FIXME @param x An object of class survDataCheck.
-# FIXME @param \dots Further arguments to be passed to generic methods.
 #'
 #' @return The function returns a dataframe with two columns \code{id} and \code{msg} of
 #' character strings. When no error is detected this dataframe is empty.
@@ -32,10 +30,7 @@
 #' @note If an error of type \code{dataframeExpected} or \code{missingColumn} is
 #' detected, the function \code{suvDataCheck} is stopped.
 #'
-#'
-# FIXME @seealso \code{\link{survFullPlot}}, \code{\link{survData}}
-#'
-#' @keywords check
+#' @seealso \code{\link{survData}}
 #'
 #' @examples
 #' # Run the check data function
@@ -177,7 +172,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ## call function survFullPlot
-  if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
+  if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
     survFullPlot(data)
   }
   return(errors)
