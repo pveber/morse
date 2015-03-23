@@ -12,10 +12,8 @@
 # FIXME @param x An object of class survDataCheck.
 # FIXME @param \dots Further arguments to be passed to generic methods.
 #'
-#' @return The function returns an object of class \code{survDataCheck}, which
-#' basically is a dataframe with two columns \code{id} and \code{msg} of
-#' character strings. When no error is detected the \code{survDataCheck}
-#' function returns an empty dataframe.
+#' @return The function returns a dataframe with two columns \code{id} and \code{msg} of
+#' character strings. When no error is detected this dataframe is empty.
 #' Here is the list of possible error \code{id}s and their signification:
 #' \tabular{rl}{
 #' \code{dataframeExpected} \tab an object of class \code{data.frame} is expected \cr
@@ -31,8 +29,8 @@
 #' \code{ReplicateLabel} \tab replicate labels differ between two time points at some concentration \cr
 #' }
 #'
-#' @note If an error of type \code{missingColumn} is detected, the function
-#' \code{suvDataCheck} is stopped.
+#' @note If an error of type \code{dataframeExpected} or \code{missingColumn} is
+#' detected, the function \code{suvDataCheck} is stopped.
 #'
 #'
 # FIXME @seealso \code{\link{survFullPlot}}, \code{\link{survData}}
@@ -54,21 +52,13 @@
 #' @export
 #'
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
-  # make a singleton error dataframe (taking care of string/factor conversion
-  # issues)
-  error <- function(id, msg) {
-    data.frame(id = id, msg = msg, stringsAsFactors = FALSE)
-  }
-  # return value: errors will be stored there once found
-  errors <- data.frame(stringsAsFactors = FALSE)
 
   ##
   ## 0. check we have a data.frame
   ##
   if (class(data) != "data.frame") {
-    errors <- error("dataframeExpected", "A dataframe is expected")
-    class(errors) <- c("survDataCheck", "data.frame")
-    return(errors)
+    return(errorTableSingleteon("dataframeExpected",
+                                "A dataframe is expected"))
   }
 
   ##
@@ -77,39 +67,37 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ref.names <- c("replicate","conc","time","Nsurv")
   missing.names <- ref.names[which(is.na(match(ref.names, names(data))))]
   if (length(missing.names) != 0) {
-    errors <- error("missingColumn",
-                    paste("The column ", missing.names,
-                          " is missing or have a wrong name.", sep = ""))
-    class(errors) <- c("survDataCheck", "data.frame")
-    return(errors)
+    msg <- paste("The column ", missing.names,
+                 " is missing.", sep = "")
+    return(errorTableSingleton("missingColumn",msg))
   }
+
+  # Next errors do not prevent from checking others
+  errors <- errorTableCreate()
 
   ##
   ## 2. assert the first time point is zero for each (replicate, concentration)
   ##
   subdata <- split(data, list(data$replicate, data$conc), drop = TRUE)
   if (any(unlist(lapply(subdata, function(x) x$time[1] != 0)))) {
-    err <- error("firstTime0",
-                 "Data are required at time 0 for each concentration and each replicate.")
-    errors <- rbind(errors, err)
+    msg <- "Data are required at time 0 for each concentration and each replicate."
+    errors <- errorTableAdd(errors, "firstTime0", msg)
   }
 
   ##
   ## 3. assert concentrations are numeric
   ##
   if (!is.numeric(data$conc)) {
-    err <- error("concNumeric",
-                 "Column 'conc' must contain only numerical values.")
-    errors <- rbind(errors, err)
+    msg <- "Column 'conc' must contain only numerical values."
+    errors <- errorTableAdd(errors, "concNumeric", msg)
   }
 
   ##
   ## 4. assert Nsurv contains integer
   ##
   if (!is.integer(data$Nsurv)) {
-    err <- error("NsurvInteger",
-                 "Column 'Nsurv' must contain only integer values.")
-    errors <- rbind(errors, err)
+    msg <- "Column 'Nsurv' must contain only integer values."
+    errors <- errorTableAdd(errors, "NsurvInteger", msg)
   }
 
   ##
@@ -117,9 +105,8 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   table <- subset(data, select = -c(replicate)) # remove replicate column
   if (any(table < 0.0)) {
-    err <- error("tablePositive",
-                 "Data must contain only positive values.")
-    errors <- rbind(errors, err)
+    msg <- "Data must contain only positive values."
+    errors <- errorTableAdd(errors, "tablePositive", msg)
   }
 
   ##
@@ -127,9 +114,8 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   datatime0 <- data[data$time == 0, ]  # select data for initial time points
   if (any(datatime0$Nsurv == 0)) { # test if Nsurv != 0 at time 0
-    err <- error("Nsurv0T0",
-                 "Nsurv should be different to 0 at time 0 for each concentration and each replicate.")
-    errors <- rbind(errors, err)
+    msg <- "Nsurv should be different to 0 at time 0 for each concentration and each replicate."
+    errors <- errorTableAdd(errors, "Nsurv0T0", msg)
   }
 
   ##
@@ -137,11 +123,10 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ID <- idCreate(data, notime = FALSE) # ID vector
   if (any(duplicated(ID))) {
-    err <- error("duplicatedID",
-                 paste("The triplet Replicate - conc - time: ",
-                       ID[duplicated(ID)],
-                       " is duplicated.", sep = ""))
-    errors <- rbind(errors, err)
+    msg <- paste("The (replicate, conc, time) triplet ",
+                 ID[duplicated(ID)],
+                 " is duplicated.", sep = "")
+    errors <- errorTableAdd(errors, "duplicatedID", msg)
   }
   consistency <- function(subdata) {
     # Function to be used on a subdataset corresponding to one replicate at one
@@ -150,18 +135,16 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     #   - if each replicate appears once and only once at each time
     #   - if Nsurv is never increasing with time
 
-    # errors consistency dataframe
-    consistency.errors <- data.frame(stringsAsFactors = FALSE)
+    errors <- errorTableCreate()
 
     ##
     ## 8. assert there is the same number of replicates for each conc and time
     ##
     if (length(subdata$replicate) != length(unique(data$time))) {
-      err2 <- error("missingReplicate",
-                    paste("Replicate ", unique(subdata$replicate),
-                          " is missing for at least one time points at concentration ",
-                          unique(subdata$conc), ".", sep = ""))
-      consistency.errors <- rbind(consistency.errors, err2)
+      msg <- paste("Replicate ", unique(subdata$replicate),
+                   " is missing for at least one time points at concentration ",
+                   unique(subdata$conc), ".", sep = "")
+      errors <- errorTableAdd(errors, "missingReplicate", msg)
     }
 
     ##
@@ -169,32 +152,28 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     ##
     nsurv.increase <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
     if (any(nsurv.increase)) {
-      err2 <- error("NsurvIncrease",
-                    paste("For replicate ", unique(subdata$replicate),
-                          " and concentration ", unique(subdata$conc),
-                          ", Nsurv increases at some time points.",
-                          sep = ""))
-      consistency.errors <- rbind(consistency.errors, err2)
+      msg <- paste("For replicate ", unique(subdata$replicate),
+                   " and concentration ", unique(subdata$conc),
+                   ", Nsurv increases at some time points.",
+                   sep = "")
+      errors <- errorTableAdd(errors, "NsurvIncrease", msg)
     }
-    return(consistency.errors)
+    errors
   }
   res <- by(data, list(data$replicate, data$conc), consistency)
-  err <- do.call("rbind", res)
-  if (length(err) != 0) {
-    errors <- rbind(errors, err)
-  }
+  consistency.errors <- do.call("errorTableAppend", res)
+  errors <- errorTableAppend(errors, consistency.errors)
 
   ##
-  ## 10. assert the label of replicate for each time and concentration
+  ## 10. assert labels of replicates are the same for all (time, concentration)
   ##
-  reslab <- by(data,
-               list(data$conc, data$time),
-               function(x) {str_c(sort(x$replicate), collapse = "")})
+  rep.labels <- by(data,
+                   list(data$conc, data$time),
+                   function(x) { str_c(sort(x$replicate), collapse = "") })
 
-  if (any(reslab != reslab[[1]])) {
-    err <- error("ReplicateLabel",
-                 "For at least one time and one concentration a replicate label is different from the control.")
-    errors <- rbind(errors, err)
+  if (any(rep.labels != rep.labels[[1]])) {
+    msg <- "For at least one time and one concentration a replicate label is different from the control."
+    errors <- errorTableAdd(errors, "ReplicateLabel", msg)
   }
 
   # call function survFullPlot
@@ -202,6 +181,5 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
 #   if (length(err) != 0 && diagnosis.plot && "NsurvIncrease" %in% err) {
 #     survFullPlot(data)
 #   }
-  class(errors) <- c("survDataCheck", "data.frame")
   return(errors)
 }
