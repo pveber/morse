@@ -60,7 +60,7 @@
 # summary(dat)
 #
 #' @export
-#'
+#' @importFrom dplyr right_join %>% rename
 survData <- function(data) {
   ### INPUT
   # [data]: a [data.frame] with above mentionned requirements
