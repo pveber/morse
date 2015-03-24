@@ -1,11 +1,11 @@
 #' Transformed dataset for the \code{reproFitTt} function from reprodution dataset
-#' 
+#'
 #' The \code{reproData} function creates a \code{reproData} object
 #' needed to run the \code{\link{reproFitTt}} function. A new dataframe
 #' called \code{transformed.data} with nine columns is created
 #' (see the section \bold{Value}). The generic methods are \code{print} and
 #' \code{summary}.
-#' 
+#'
 #' The \code{reproData} function builds a new dataframe called
 #' \code{transformed.data}, with nine columns: \code{ID}, \code{replicate},
 #' \code{conc}, \code{time}, \code{Ninit}, \code{Nsurv}, \code{Nrepro},
@@ -17,13 +17,13 @@
 #' The \code{Ninit} value is the number of survivors (\code{Nsurv}) at the beginning
 #' of the bioassay for the control concentration for each replicate. The
 #' \code{Nreprocumul} value is the cumulative number of offsrping calculated by:
-#' 
+#'
 #' \deqn{Nreprocumul_{1} = Nrepro_{1}}{Nreprocumul_{1} = Nrepro_{1}}
-#' 
+#'
 #' \deqn{Nreprocumul_{t} = Nreprocumul_{t-1} + Nrepro_{t}}{Nreprocumul_{t} =
 #' Nreprocumul_{t-1} + Nrepro_{t}} with \eqn{t \in [2, target.time]}{t in [2,
 #' target.time]}.
-#' 
+#'
 #' The \code{Nindtime} value is the number of individual-days at the time point.
 #' Using the survival data, it is thus possible to calculate the period during
 #' which each parent animal has stay alive, or the period during which it may
@@ -32,9 +32,9 @@
 #' experiment to time \eqn{\frac{t_{i+1} + t_{i}}{2}}{(t_{i+1} + t_{i}) / 2}.
 #' For each replicate, the sum of periods of observation of each animal before
 #' its death is calculated (Delignette-Muller et al., 2014).
-#' 
+#'
 #' @aliases reproData print.reproData summary.reproData
-#' 
+#'
 #' @param data A dataframe with five columns:
 #' \describe{
 #' \item{replicate}{A vector of class \code{integer} or \code{factor} for
@@ -52,7 +52,7 @@
 #' @param x An object of class \code{reproData}.
 #' @param object An object of class \code{reproData}.
 #' @param \dots Further arguments to be passed to generic methods.
-#' 
+#'
 #' @return A dataframe of class \code{reproData}. A list of two objects:
 #' \item{raw.data}{The raw dataframe with five columns corresponding to the
 #' argument passed in the function.}
@@ -75,8 +75,8 @@
 #' of offsrping calculated for each time point, concentration and replicat.}
 #' \item{Nindtime}{A vector of class \code{numeric} with the number of
 #' individual-days for each time point, concentration and replicat.}
-#' }} 
-#' 
+#' }}
+#'
 #' Generic functions:
 #' \describe{
 #' \item{\code{summary}}{The summary provides information about the structure
@@ -85,62 +85,48 @@
 #' raw dataset and the transformed dataset.}
 #' \item{\code{print}}{Print of a \code{reproData} object with the transformed
 #' dataframe.}}
-#' 
+#'
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
-#' 
+#'
 #' @keywords transformation
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # (1) Laod reproduction dataset
 #' data(cadmium1)
-#' 
+#'
 #' # (2) Create an object of class "reproData"
 #' dat <- reproData(cadmium1)
 #' dat
 #' class(dat)
-#' 
+#'
 #' # (3) Print and summarize object dat
 #' print(dat)
 #' summary(dat)
-#' 
+#'
 #' @export
-#' 
+#'
 reproData <- function(data) {
-  # check the data class
-  if (!is.data.frame(data))
-    stop("data.frame expected !")
 
-  # create a column ID as a string: "replicate_conc_time"
-  # check if the three columns exist
-  ref.names <- c("replicate", "conc", "time")
-  missing.names <- ref.names[which(is.na(match(ref.names, names(data))))]
+  # test the integrity of the data with reproDataCheck
+  if (dim(reproDataCheck(data))[1] > 0)
+    stop("The [data] argument is not well-formed, please use [reproDataCheck] for details.")
 
-  if (length(missing.names) != 0)
-    stop(paste("The column ", missing.names,
-               " is missing or have a wrong name.", sep = ""))
-  
-  # test the integrity of the data with survDataCheck
-  if (!is.null(reproDataCheck(data)$id))
-    stop("There is one or more error in the data ! Please use the reproDataCheck function before the reproData function !")
+  data <- survData(data)
 
-  # raw data
-  raw.data <- data
-  
-  # reorder dataset by replicate concentration and time
-  data <- data[order(data$replicate, data$conc, data$time), ]
-  
-  # create an ID column of triplet replicate_conc_time
-  data[, "ID"] <- idCreate(data, notime = FALSE)
+  T <- sort(unique(data$time)) # observation times
+  Nindtime <- rep(0,dim(data)[1])
+  Nreprocumul <- data$Nrepro
+  for (i in 2:length(T)) {
+    now <- data$time == T[i]
+    before <- data$time == T[i - 1]
+    Nindtime[now] <- Nindtime[before] +
+                     (data$Nsurv[before] - data$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
+                     data$Nsurv[now] * (T[i] - T[i - 1])
+    Nreprocumul[now] <- Nreprocumul[before] + data$Nrepro[now]
+  }
 
-  # calcul of Ninit and Nreprocumul and Nindtime create transformed.data
-  transformed.data <- reproTransformData(data)
-
-  # output of class survData
-  out <- list(raw.data = raw.data,
-              transformed.data = transformed.data)
-
-  class(out) <- "reproData"
-
-  return(out)
+  data <- cbind(data,Nindtime,Nreprocumul)
+  class(data) <- c("reproData", "survData","data.frame")
+  return(data)
 }
