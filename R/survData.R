@@ -82,12 +82,10 @@ survData <- function(data) {
   # create an ID column of triplet replicate_conc_time
   data[, "ID"] <- idCreate(data, notime = FALSE)
 
-  # create an Ninit column (number of initial )
   data.t0 <- data[data$time == 0,c("replicate","conc","Nsurv")]
-  plyr::rename(data.t0,c('Nsurv' = 'Ninit'))
+  data.t0 <- plyr::rename(data.t0, c("Nsurv" = "Ninit"))
   out <- left_join(data,data.t0,by=c("replicate","conc"))
 
-  class(out) <- "survData"
-
+  class(out) <- c("survData","data.frame")
   return(out)
 }
