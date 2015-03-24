@@ -6,8 +6,10 @@ Companion R package for MOSAIC website
 
 - Build from sources (creates vignette and archive)
   `R CMD build mosaic-r`
-- Test
-  `FIXME`
+- Test (need `Rtools 3.1`, works with `Rtools 3.2` but generate a warning message):
+  - generate the documentation
+  - in the package directory under the R interpreter: `devtools::test()`
+  
 - Generate documentation
   - under the R interpreter: `roxygen2::roxygenise(".")`
   - for a PDF pversion: `R CMD Rd2pdf morse`
