@@ -13,6 +13,129 @@ idCreate <- function(data, notime = FALSE) {
   }
 }
 
+#' @importFrom dplyr right_join %>% rename
+#'
+reproTransformData <- function(data) {
+
+  # calculate Ninit, Nreprocumul and Nindtime
+  # INPUTS
+  # - data: a dataframe of class reproData with:
+  #   - ID: ID replicate - conc - time
+  #   - replicate: replicate indentification
+  #   - conc: tested concentration
+  #   - time: observation time
+  #   - Nsurv: number of alive individuals at concentration "conc" and at time
+  #     "time"
+  #   - Nrepro: number of collected offspring at concentration "conc" and at time
+  #     "time"
+  #  !!!!!! data are supposed to be sorted by replicate, conc and time !!!!!!
+  #   By default, it is the last time of original data.
+  # OUTPUT: a dataframe with 9 columns corresponding to survival, Nindtime and
+  # repro data at the time given in the input of the function
+  #   - ID: ID replicate - conc - time
+  #   - replicate: replicate indentification
+  #   - conc: tested concentration
+  #   - time: observation time
+  #   - Ninit: number of individuals at the beginning of the bioassay
+  #   - Nsurv: number of alive individuals at the time specified in the input of
+  #     the function
+  #   - Nrepro: number of offspring at this time
+  #   - Nreprocumul: cumulative number of offspring at this time
+  #   - Nindtime: number of individual-days from the beginning of the bioassay
+  #     to this time
+
+  # split dataset by time to calculate Ninit
+  temp <- split(data, data$time)
+
+  # add column Ninit
+  tabletime0 <- data[data$time == 0, ] # control dataset
+  tabletime0[, "Ninit"] <- tabletime0[, "Nsurv"]
+
+  reproCalculNinit <- function(t1, t2) {
+    # calcul the correct number Ninit
+    # for each replicate conc and time
+    # INPUTS
+    # - t1: list of splited dataframe
+    # - t2: tabletime0
+    # OUTPUTS
+    # - list of splited dataframe with the news column Ninit
+
+    . = NULL
+    ID.x = NULL
+    time.x = NULL
+    Nsurv.x = NULL
+    Nrepro.x = NULL
+
+    right_join(t1, t2,
+               by = c("replicate", "conc"))[, c("ID.x", "replicate", "conc", "time.x",
+                                                "Nsurv.x", "Nrepro.x", "Ninit")] %>% rename(., time = time.x) %>% rename(.,
+                                                                                                                         Nsurv = Nsurv.x) %>% rename(., Nrepro = Nrepro.x) %>% rename(., ID = ID.x)
+  }
+
+  res <- lapply(temp, function(x) reproCalculNinit(x, tabletime0)) # Ninit
+
+  data <- do.call(rbind, res) # return to a dataframe
+  rownames(data) <- 1:dim(data)[1]
+  data$time <- as.numeric(data$time) # change type of time
+
+  T <- unique(data$time) # times of obs without repetitions
+  finalnbr <- match(max(data$time), T) # index of the time at which we want the
+  #  results in vector T
+  if (finalnbr == 1) {
+    stop("!!!! It isn't possible to use the first observation time as the last observation time !!!!")
+  }
+
+  # calculation of cumulative number of repro and individual-days
+
+  tableTi = list()
+
+  for (i in 2:finalnbr) {
+    # original dataset at T[i-1]
+    dataTim1 <- subset(data, data$time == T[i-1])
+    # original dataset at T[i]
+    dataTi <- subset(data, data$time == T[i])
+    # check if data have been properly captured
+    if (any(dataTim1$replicate != dataTi$replicate) || any(dataTim1$conc != dataTi$conc))
+      warning("!!!! BE CAREFUL concentrations and/or replicates are not identical at each time !!!!")
+
+    # build the output date at time T[i]
+    if (i == 2) {
+      # (number of survivors at T[i]) * T[i]
+      # + (number of dead organisms between T[i] and T[i-1]) * (T[i]+T[i-1])/2
+      NindtimeTi <- (dataTi$Nsurv*dataTi$time +
+                       (dataTim1$Nsurv - dataTi$Nsurv)*(dataTi$time + dataTim1$time)/2)
+      NreprocumulTi <- dataTim1$Nrepro + dataTi$Nrepro
+    } else {
+      # (number of survivors at T[i]) * T[i]
+      # + (number of dead organisms between t and tm1) * (t+tm1)/2
+      # + number of individual-time at T[i-1] (accounting for dead organisms
+      # at time before T[i-1])
+      # - number of individual-time at T[i-1] that are staying alive at T[i-1]
+      NindtimeTi <- ( dataTi$Nsurv*dataTi$time +
+                        (dataTim1$Nsurv - dataTi$Nsurv)*(dataTi$time + dataTim1$time)/2 +
+                        tableTim1$Nindtime - dataTim1$Nsurv * dataTim1$time )
+
+      NreprocumulTi <- tableTim1$Nreprocumul + dataTi$Nrepro
+    }
+
+    tableTi[[i]] <- data.frame(ID = dataTi$ID,
+                               replicate = dataTi$replicate,
+                               conc = dataTi$conc,
+                               time = dataTi$time,
+                               Ninit = dataTi$Ninit,
+                               Nsurv = dataTi$Nsurv,
+                               Nrepro = dataTi$Nrepro,
+                               Nreprocumul = NreprocumulTi, # cumulative number of offspring
+                               Nindtime = NindtimeTi)
+
+    # tabelTi stored as tableTim1 for next iteration
+    tableTim1 <- tableTi[[i]]
+  }
+
+  tablefinale <- do.call("rbind", tableTi)
+  return(tablefinale)
+}
+
 survFullPlotGeneric <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate
