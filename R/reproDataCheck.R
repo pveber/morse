@@ -111,7 +111,6 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
                    ", there are some Nsurv = 0 followed by Nrepro > 0 at the next time point.",
                    sep = "")
       errors <- errorTableAdd(errors, "Nsurvt0Nreprotp1P", msg)
-      print(errors)
     }
     return(errors)
   }
