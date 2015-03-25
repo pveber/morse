@@ -7,17 +7,17 @@ data(copper)
 data(chlordan)
 data(zinc)
 
+# always work dataset
+d <- list(cadmium1 = cadmium1,
+          cadmium2 = cadmium2,
+          copper = copper,
+          chlordan = chlordan,
+          zinc = zinc)
+
 ## tests
 
 test_that("reproDataCheck", {
   skip_on_cran()
-  
-  # always work dataset
-  d <- list(cadmium1 = cadmium1,
-            cadmium2 = cadmium2,
-            copper = copper,
-            chlordan = chlordan,
-            zinc = zinc)
   
   lapply(d, function(x) {
     dat <- reproDataCheck(x)
@@ -65,4 +65,28 @@ test_that("reproDataCheck", {
   expect_equal(reproDataCheck(zinc5, diagnosis.plot = FALSE)$id[3],
                "Nsurvt0Nreprotp1P")
   
+})
+
+test_that("reproData", {
+  skip_on_cran()
+
+  lapply(d, function(x) {
+    dat <- reproData(x)
+    expect_is(dat, c("reproData", "survData", "data.frame"))
+    expect_true(!is.null(dat))
+    expect_true(any(!is.na(dat)))
+    expect_is(dat$Ninit, "integer")
+    expect_is(dat$Nindtime, "numeric")
+    expect_is(dat$Nreprocumul, "integer")
+    expect_true(any(dat$Nindtime >= 0))
+    expect_true(any(dat$Nreprocumul >= 0))
+    
+    T <- sort(unique(dat$time))
+    for (i in 2:length(T)) {
+      now <- dat$time == T[i]
+      before <- dat$time == T[i - 1]
+      expect_true(any(dat$Nindtime[before] <= dat$Nindtime[now]))
+      expect_true(any(dat$Nreprocumul[before] <= dat$Nreprocumul[now]))
+    }
+  })
 })
