@@ -179,9 +179,31 @@ survDataPlotFull <- function(data,
   else stop("Unknown plot style")
 }
 
-#' @export
+#' Plotting method for survData objects
 #'
-#' @name survData
+#' Plots the number of survivors as a
+#' function of either time and concentration, time only (for a fixed
+#' concentration), concentration only (for a given target time). If both
+#' concentration and target time are fixed, the function additionally plots
+#' the experimental values for the minimum available concentration.
+#'
+#' @param data an object of class \code{survData}
+#' @param target.time a numeric value corresponding to some observed time in \code{data}
+#' @param concentration a numeric value corresponding to some concentration in \code{data}
+#' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
+#' @param ylab a label for the \eqn{Y}-axis, by default \code{Number of
+#' survivors}.
+#' @param style graphical backend, can be \code{'generic'}, \code{'lattice'} or
+#' \code{'ggplot'}
+#' @param addlegend if \code{TRUE}, a default legend is added to the plot
+#' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
+#' summed for a same concentration
+#' @note When \code{style = "ggplot"}, the function calls package
+#' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
+#' When \code{style = "lattice"}, the function returns an object of class
+#' \code{trellis}.
+#'
+#' @export
 #'
 #' @import ggplot2
 #' @import grDevices
