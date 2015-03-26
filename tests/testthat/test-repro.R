@@ -78,8 +78,8 @@ test_that("reproData", {
     expect_is(dat$Ninit, "integer")
     expect_is(dat$Nindtime, "numeric")
     expect_is(dat$Nreprocumul, "integer")
-    expect_true(any(dat$Nindtime >= 0))
-    expect_true(any(dat$Nreprocumul >= 0))
+    expect_true(all(dat$Nindtime >= 0))
+    expect_true(all(dat$Nreprocumul >= 0))
     
     T <- sort(unique(dat$time))
     for (i in 2:length(T)) {
