@@ -60,8 +60,8 @@
 # summary(dat)
 #
 #' @export
-#' @importFrom dplyr left_join
-#' @importFrom plyr rename
+#' @importFrom dplyr left_join rename
+# @importFrom plyr rename
 survData <- function(data) {
   ### INPUT
   # [data]: a [data.frame] with above mentionned requirements
@@ -82,9 +82,9 @@ survData <- function(data) {
   # create an ID column of triplet replicate_conc_time
   data[, "ID"] <- idCreate(data, notime = FALSE)
 
-  data.t0 <- data[data$time == 0,c("replicate","conc","Nsurv")]
-  data.t0 <- plyr::rename(data.t0, c("Nsurv" = "Ninit"))
-  out <- left_join(data,data.t0,by=c("replicate","conc"))
+  data.t0 <- data[data$time == 0, c("replicate", "conc", "Nsurv")]
+  data.t0 <- rename(data.t0, Ninit = Nsurv)
+  out <- left_join(data, data.t0, by = c("replicate", "conc"))
 
   T <- sort(unique(data$time)) # observation times
   Nindtime <- rep(0,dim(data)[1])
@@ -96,8 +96,8 @@ survData <- function(data) {
       data$Nsurv[now] * (T[i] - T[i - 1])
   }
 
-  data <- cbind(data,Nindtime)
+  data <- cbind(data, Nindtime)
 
-  class(out) <- c("survData","data.frame")
+  class(out) <- c("survData", "data.frame")
   return(out)
 }
