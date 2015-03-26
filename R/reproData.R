@@ -63,18 +63,14 @@ reproData <- function(data) {
   data <- survData(data)
 
   T <- sort(unique(data$time)) # observation times
-  Nindtime <- rep(0,dim(data)[1])
   Nreprocumul <- data$Nrepro
   for (i in 2:length(T)) {
     now <- data$time == T[i]
     before <- data$time == T[i - 1]
-    Nindtime[now] <- Nindtime[before] +
-                     (data$Nsurv[before] - data$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
-                     data$Nsurv[now] * (T[i] - T[i - 1])
     Nreprocumul[now] <- Nreprocumul[before] + data$Nrepro[now]
   }
 
-  data <- cbind(data,Nindtime,Nreprocumul)
+  data <- cbind(data,Nreprocumul)
   class(data) <- c("reproData", "survData","data.frame")
   return(data)
 }

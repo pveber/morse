@@ -3,7 +3,7 @@
 #' This function creates a \code{survData} object from experimental data
 #' provided as a \code{data.frame}. The resulting object
 #' can then be used for plotting and model fitting. It can also be used
-#' to generate \emph{transformed data} (FIXME reference to definition).
+#' to generate \emph{individual-time} estimates.
 #'
 #' The \code{data} argument describes experimental results from a survival
 #' assay. Each line of the \code{data.frame}
@@ -85,6 +85,18 @@ survData <- function(data) {
   data.t0 <- data[data$time == 0,c("replicate","conc","Nsurv")]
   data.t0 <- plyr::rename(data.t0, c("Nsurv" = "Ninit"))
   out <- left_join(data,data.t0,by=c("replicate","conc"))
+
+  T <- sort(unique(data$time)) # observation times
+  Nindtime <- rep(0,dim(data)[1])
+  for (i in 2:length(T)) {
+    now <- data$time == T[i]
+    before <- data$time == T[i - 1]
+    Nindtime[now] <- Nindtime[before] +
+      (data$Nsurv[before] - data$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
+      data$Nsurv[now] * (T[i] - T[i - 1])
+  }
+
+  data <- cbind(data,Nindtime)
 
   class(out) <- c("survData","data.frame")
   return(out)
