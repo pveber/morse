@@ -85,8 +85,8 @@ test_that("reproData", {
     for (i in 2:length(T)) {
       now <- dat$time == T[i]
       before <- dat$time == T[i - 1]
-      expect_true(any(dat$Nindtime[before] <= dat$Nindtime[now]))
-      expect_true(any(dat$Nreprocumul[before] <= dat$Nreprocumul[now]))
+      expect_true(all(dat$Nindtime[before] <= dat$Nindtime[now]))
+      expect_true(all(dat$Nreprocumul[before] <= dat$Nreprocumul[now]))
     }
   })
 })
