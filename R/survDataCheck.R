@@ -91,7 +91,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 4. assert time contains integer
   ##
-  if (!is.integer(data$time)) {
+  if (!is.numeric(data$time)) {
     msg <- "Column 'time' must contain only numerical values."
     errors <- errorTableAdd(errors, "timeNumeric", msg)
   }
