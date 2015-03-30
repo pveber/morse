@@ -18,7 +18,7 @@
 #' \code{missingColumn} \tab at least one expected column heading is missing \cr
 #' \code{firstTime0} \tab the first time point for some (concentration, replicate) is not 0 \cr
 #' \code{concNumeric} \tab column \code{conc} contains a value of class other than \code{numeric} \cr
-#' \code{timeInteger} \tab column \code{time} contains a value of class other than \code{integer} \cr
+#' \code{timeNumeric} \tab column \code{time} contains a value of class other than \code{numeric} \cr
 #' \code{NsurvInteger} \tab column \code{Nsurv} contains a value of class other than \code{integer} \cr
 #' \code{tablePositive} \tab some data are negative \cr
 #' \code{Nsurv0T0} \tab \code{Nsurv} is 0 at time 0 for some (concentration, replicate) \cr
@@ -92,8 +92,8 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ## 4. assert time contains integer
   ##
   if (!is.integer(data$time)) {
-    msg <- "Column 'time' must contain only integer values."
-    errors <- errorTableAdd(errors, "timeInteger", msg)
+    msg <- "Column 'time' must contain only numerical values."
+    errors <- errorTableAdd(errors, "timeNumeric", msg)
   }
   
   ##
