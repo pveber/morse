@@ -89,11 +89,6 @@ test_that("survDataCheck", {
   expect_equal(survDataCheck(zinc9, diagnosis.plot = FALSE)$id[4],
                "ReplicateLabel")
   
-  zinc10 <- zinc
-  zinc10[46, "time"]
-  expect_equal(survDataCheck(zinc10, diagnosis.plot = FALSE)$id,
-               "timeInteger")
-  
   cadmium19 <- cadmium1
   cadmium19[12, "replicate"] <- 5
   expect_equal(survDataCheck(cadmium19, diagnosis.plot = FALSE)$id[4],
