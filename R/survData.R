@@ -110,8 +110,8 @@ survData <- function(data, firstTimeClutch = NULL) {
       data <- data[data$time >= firstTimeClutch,]
       
     } else { # firstimeclutch is not one of the observed time
-      lstprevioustime <- max(unique(data[data$time < firstTimeClutch, "time"]))
-      data <- data[c(which(data$time == lstprevioustime),
+      lstPreviousTime <- max(unique(data[data$time < firstTimeClutch, "time"]))
+      data <- data[c(which(data$time == lstPreviousTime),
                      which(data$time >= firstTimeClutch)),]
     }
   
@@ -127,15 +127,17 @@ survData <- function(data, firstTimeClutch = NULL) {
 
   T <- sort(unique(out$time)) # observation times
   Nindtime <- rep(0, dim(out)[1])
+  NindtimeNoCumul <- rep(0, dim(out)[1])
   for (i in 2:length(T)) {
     now <- out$time == T[i]
     before <- out$time == T[i - 1]
     Nindtime[now] <- Nindtime[before] +
       (out$Nsurv[before] - out$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
       out$Nsurv[now] * (T[i] - T[i - 1])
+    NindtimeNoCumul[now] <- Nindtime[now] - Nindtime[before]
   }
 
-  out <- cbind(out, Nindtime)
+  out <- cbind(out, Nindtime, NindtimeNoCumul)
 
   class(out) <- c("survData", "data.frame")
   return(out)
