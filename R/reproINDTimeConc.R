@@ -14,7 +14,7 @@
 #' @import ggplot2
 #' @importFrom dplyr %>%
 #' @importFrom plyr ldply
-reproINDTimeConc <- function(data, FirstTimeClutch = NULL,
+reproINDTimeConc <- function(data,
                              cumul = TRUE, type = "generic",
                              addlegend = TRUE,
                              pool.replicate = FALSE) {
