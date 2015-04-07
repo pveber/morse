@@ -3,7 +3,6 @@
 #' This function plots the reproduction rate in function of time per concentration.
 #' 
 #' @param data an object of class \code{reproData}.
-#' @param FirstTimeClutch the first day when individuals are mature.
 #' @param cumul If \code{TRUE}, the response is in cumulative number of offspring
 #' by individuals-day.
 #' @param type Graphical method: \code{generic} or \code{ggplot}.
@@ -16,8 +15,9 @@
 #' @importFrom dplyr %>%
 #' @importFrom plyr ldply
 reproINDTimeConc <- function(data, FirstTimeClutch = NULL,
-                                cumul = TRUE, type = "generic",
-                                pool.replicate = FALSE) {
+                             cumul = TRUE, type = "generic",
+                             addlegend = TRUE,
+                             pool.replicate = FALSE) {
   
   if (cumul) { # response cumulate of Nrepro and NID
     data$response <- data$Nreprocumul / data$Nindtime
@@ -41,10 +41,6 @@ reproINDTimeConc <- function(data, FirstTimeClutch = NULL,
   
   
   responsetable$color <- as.numeric(as.factor(responsetable$conc))
-  
-  if (is.null(FirstTimeClutch)) {
-    FirstTimeClutch <- 0
-  }
   
   if (type == "generic") {
     plot(responsetable$timeOrigine, seq(0, max(sapply(responsetable$response, max)),
@@ -71,10 +67,12 @@ reproINDTimeConc <- function(data, FirstTimeClutch = NULL,
                col = x$color)
       })
     }
-    legend("topright", legend = unique(responsetable$conc) ,
-           col = unique(responsetable$color),
-           pch = 16,
-           lty = 1)
+    if (addlegend) {
+      legend("topleft", legend = unique(responsetable$conc) ,
+             col = unique(responsetable$color),
+             pch = 16,
+             lty = 1)
+    }
   }
   if (type == "ggplot") {
     require("ggplot2")
@@ -87,9 +85,16 @@ reproINDTimeConc <- function(data, FirstTimeClutch = NULL,
                                       group = interaction(conc, replicate)))
     }
     
-    df + geom_line() + geom_point() + theme_minimal() +
-      labs(x = "Time",
-           y = ylab) +
-      scale_color_hue("Concentrations")
+    fd <- df + geom_line() + geom_point() + theme_minimal() +
+          labs(x = "Time",
+               y = ylab) +
+          scale_color_hue("Concentrations")
+    
+    # legend option
+    if (addlegend){
+      fd
+    } else {
+      fd + theme(legend.position = "none") # remove legend
+    }
   }
 }
