@@ -21,10 +21,12 @@ reproINDTimeConc <- function(data, FirstTimeClutch = NULL,
   
   if (cumul) { # response cumulate of Nrepro and NID
     data$response <- data$Nreprocumul / data$Nindtime
+    data[is.na(data)] <- 0
     ylab <- "Cumulated Nb of offspring / NID"
   } else {
     data$response <- data$Nrepro / data$NindtimenoncumulTi
     ylab <- "Nb of offsring / Delta NID"
+    data[is.na(data)] <- 0
   }
   # pool replicate mean of replicate
   if (pool.replicate) {
