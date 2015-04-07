@@ -54,13 +54,13 @@
 #'
 #' @export
 #'
-reproData <- function(data) {
+reproData <- function(data, firstTimeClutch = NULL) {
 
   # test the integrity of the data with reproDataCheck
   if (dim(reproDataCheck(data))[1] > 0)
     stop("The [data] argument is not well-formed, please use [reproDataCheck] for details.")
 
-  data <- survData(data)
+  data <- survData(data, firstTimeClutch)
 
   T <- sort(unique(data$time)) # observation times
   Nreprocumul <- data$Nrepro
@@ -70,7 +70,7 @@ reproData <- function(data) {
     Nreprocumul[now] <- Nreprocumul[before] + data$Nrepro[now]
   }
 
-  data <- cbind(data,Nreprocumul)
+  data <- cbind(data, Nreprocumul)
   class(data) <- c("reproData", "survData","data.frame")
   return(data)
 }

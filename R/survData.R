@@ -26,6 +26,7 @@
 #' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
 #' alive individuals at each time point for each concentration and each replicate
 #' }
+#' @param firstTimeClutch the first day of reproduction activity
 # FIXME @param x An object of class survData.
 # FIXME @param object An object of class survData.
 #' @param \dots Further arguments to be passed to generic methods.
@@ -62,7 +63,7 @@
 #' @export
 #' @importFrom dplyr left_join rename
 # @importFrom plyr rename
-survData <- function(data) {
+survData <- function(data, firstTimeClutch = NULL) {
   ### INPUT
   # [data]: a [data.frame] with above mentionned requirements
   #
@@ -82,21 +83,61 @@ survData <- function(data) {
   # create an ID column of triplet replicate_conc_time
   data[, "ID"] <- idCreate(data, notime = FALSE)
 
+  # select the start time to calculat NID
+  if (is.null(firstTimeClutch)) { # default firstTimeClutch
+    firstTimeClutch <- 0
+  }
+  
+  # estimate first clutch observed time
+  beforeObservedCluthTime <- min(unique(data[!unlist(lapply(split(data, data$time),
+                                 function(x) {all(x$Nrepro == 0)})),
+                                             "time"])) - 1
+  
+  if (beforeObservedCluthTime < 0) {
+    beforeObservedCluthTime <- 0
+  }
+  
+  # save original time for graph
+  data$timeOrigine <- data$time
+  
+  if (firstTimeClutch > beforeObservedCluthTime)
+    stop("The selected time is equal or higger than the first time where clutches are
+         oberved !")
+  
+  if (firstTimeClutch != 0) { # selected firstime clutch
+    if (firstTimeClutch %in% unique(data$time)) { # firstTimeClutch is one of the
+      # oberserved time
+      data <- data[data$time >= firstTimeClutch,]
+      
+    } else { # firstimeclutch is not one of the observed time
+      lstPreviousTime <- max(unique(data[data$time < firstTimeClutch, "time"]))
+      data <- data[c(which(data$time == lstPreviousTime),
+                     which(data$time >= firstTimeClutch)),]
+    }
+  
+    # change first time to 0
+    data[data$time == min(data$time), "time"] <- 0
+    # change other time
+    data[data$time != 0, "time"] <- data[data$time != 0, "time"] - firstTimeClutch
+  }
+  
   data.t0 <- data[data$time == 0, c("replicate", "conc", "Nsurv")]
   data.t0 <- rename(data.t0, Ninit = Nsurv)
   out <- left_join(data, data.t0, by = c("replicate", "conc"))
 
-  T <- sort(unique(data$time)) # observation times
-  Nindtime <- rep(0,dim(data)[1])
+  T <- sort(unique(out$time)) # observation times
+  Nindtime <- rep(0, dim(out)[1])
+  NindtimeNoCumul <- rep(0, dim(out)[1])
   for (i in 2:length(T)) {
-    now <- data$time == T[i]
-    before <- data$time == T[i - 1]
+    now <- out$time == T[i]
+    before <- out$time == T[i - 1]
     Nindtime[now] <- Nindtime[before] +
-      (data$Nsurv[before] - data$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
-      data$Nsurv[now] * (T[i] - T[i - 1])
+      (out$Nsurv[before] - out$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
+      out$Nsurv[now] * (T[i] - T[i - 1])
+    NindtimeNoCumul[now] <- Nindtime[now] - Nindtime[before]
   }
 
-  data <- cbind(data, Nindtime)
+  out <- cbind(out, Nindtime, NindtimeNoCumul)
 
   class(out) <- c("survData", "data.frame")
   return(out)
