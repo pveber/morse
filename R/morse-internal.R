@@ -13,127 +13,248 @@ idCreate <- function(data, notime = FALSE) {
   }
 }
 
-#' @importFrom dplyr right_join %>% rename
-#'
-reproTransformData <- function(data) {
-
-  # calculate Ninit, Nreprocumul and Nindtime
-  # INPUTS
-  # - data: a dataframe of class reproData with:
-  #   - ID: ID replicate - conc - time
-  #   - replicate: replicate indentification
-  #   - conc: tested concentration
-  #   - time: observation time
-  #   - Nsurv: number of alive individuals at concentration "conc" and at time
-  #     "time"
-  #   - Nrepro: number of collected offspring at concentration "conc" and at time
-  #     "time"
-  #  !!!!!! data are supposed to be sorted by replicate, conc and time !!!!!!
-  #   By default, it is the last time of original data.
-  # OUTPUT: a dataframe with 9 columns corresponding to survival, Nindtime and
-  # repro data at the time given in the input of the function
-  #   - ID: ID replicate - conc - time
-  #   - replicate: replicate indentification
-  #   - conc: tested concentration
-  #   - time: observation time
-  #   - Ninit: number of individuals at the beginning of the bioassay
-  #   - Nsurv: number of alive individuals at the time specified in the input of
-  #     the function
-  #   - Nrepro: number of offspring at this time
-  #   - Nreprocumul: cumulative number of offspring at this time
-  #   - Nindtime: number of individual-days from the beginning of the bioassay
-  #     to this time
-
-  # split dataset by time to calculate Ninit
-  temp <- split(data, data$time)
-
-  # add column Ninit
-  tabletime0 <- data[data$time == 0, ] # control dataset
-  tabletime0[, "Ninit"] <- tabletime0[, "Nsurv"]
-
-  reproCalculNinit <- function(t1, t2) {
-    # calcul the correct number Ninit
-    # for each replicate conc and time
-    # INPUTS
-    # - t1: list of splited dataframe
-    # - t2: tabletime0
-    # OUTPUTS
-    # - list of splited dataframe with the news column Ninit
-
-    . = NULL
-    ID.x = NULL
-    time.x = NULL
-    Nsurv.x = NULL
-    Nrepro.x = NULL
-
-    right_join(t1, t2,
-               by = c("replicate", "conc"))[, c("ID.x", "replicate", "conc", "time.x",
-                                                "Nsurv.x", "Nrepro.x", "Ninit")] %>% rename(., time = time.x) %>% rename(.,
-                                                                                                                         Nsurv = Nsurv.x) %>% rename(., Nrepro = Nrepro.x) %>% rename(., ID = ID.x)
-  }
-
-  res <- lapply(temp, function(x) reproCalculNinit(x, tabletime0)) # Ninit
-
-  data <- do.call(rbind, res) # return to a dataframe
-  rownames(data) <- 1:dim(data)[1]
-  data$time <- as.numeric(data$time) # change type of time
-
-  T <- unique(data$time) # times of obs without repetitions
-  finalnbr <- match(max(data$time), T) # index of the time at which we want the
-  #  results in vector T
-  if (finalnbr == 1) {
-    stop("!!!! It isn't possible to use the first observation time as the last observation time !!!!")
-  }
-
-  # calculation of cumulative number of repro and individual-days
-
-  tableTi = list()
-
-  for (i in 2:finalnbr) {
-    # original dataset at T[i-1]
-    dataTim1 <- subset(data, data$time == T[i-1])
-    # original dataset at T[i]
-    dataTi <- subset(data, data$time == T[i])
-    # check if data have been properly captured
-    if (any(dataTim1$replicate != dataTi$replicate) || any(dataTim1$conc != dataTi$conc))
-      warning("!!!! BE CAREFUL concentrations and/or replicates are not identical at each time !!!!")
-
-    # build the output date at time T[i]
-    if (i == 2) {
-      # (number of survivors at T[i]) * T[i]
-      # + (number of dead organisms between T[i] and T[i-1]) * (T[i]+T[i-1])/2
-      NindtimeTi <- (dataTi$Nsurv*dataTi$time +
-                       (dataTim1$Nsurv - dataTi$Nsurv)*(dataTi$time + dataTim1$time)/2)
-      NreprocumulTi <- dataTim1$Nrepro + dataTi$Nrepro
-    } else {
-      # (number of survivors at T[i]) * T[i]
-      # + (number of dead organisms between t and tm1) * (t+tm1)/2
-      # + number of individual-time at T[i-1] (accounting for dead organisms
-      # at time before T[i-1])
-      # - number of individual-time at T[i-1] that are staying alive at T[i-1]
-      NindtimeTi <- ( dataTi$Nsurv*dataTi$time +
-                        (dataTim1$Nsurv - dataTi$Nsurv)*(dataTi$time + dataTim1$time)/2 +
-                        tableTim1$Nindtime - dataTim1$Nsurv * dataTim1$time )
-
-      NreprocumulTi <- tableTim1$Nreprocumul + dataTi$Nrepro
+#' @importFrom dplyr filter
+selectDataTt <- function(data, target.time) {
+  # INPUT
+  # - data: An object of class reproData or survData
+  # - target.time: the time we want to consider as the last time for the analysis.
+  # OUTPUT
+  # - subset the dataframe for target.time used by function with target.time arg
+  
+  # target.time default
+  if ("time" %in% colnames(data)) { # one time dataset check
+    if (is.null(target.time)) {
+      target.time <- max(data$time)
     }
-
-    tableTi[[i]] <- data.frame(ID = dataTi$ID,
-                               replicate = dataTi$replicate,
-                               conc = dataTi$conc,
-                               time = dataTi$time,
-                               Ninit = dataTi$Ninit,
-                               Nsurv = dataTi$Nsurv,
-                               Nrepro = dataTi$Nrepro,
-                               Nreprocumul = NreprocumulTi, # cumulative number of offspring
-                               Nindtime = NindtimeTi)
-
-    # tabelTi stored as tableTim1 for next iteration
-    tableTim1 <- tableTi[[i]]
+    
+    # correct target time
+    if (!any(data$time == target.time))
+      stop("target.time is not one of the possible time !")
+    
+    datatt <- filter(data, time == target.time)
+  } else {
+    datatt <- cbind(data, time = 1)
   }
+  
+  return(datatt)
+}
 
-  tablefinale <- do.call("rbind", tableTi)
-  return(tablefinale)
+survCreateJagsData <- function(det.part, data) {
+  # create the parameters to define the prior of the log-logistic binomial model
+  # INPUTS
+  # det.part: model name
+  # data: object of class survData
+  # OUTPUT
+  # jags.data : list data require for the jags.model function
+  
+  # Parameter calculation of concentration min and max
+  concmin <- min(sort(unique(data$conc))[-1])
+  concmax <- max(data$conc)
+  
+  # create priors parameters for the log logistic model
+  
+  # Params to define e
+  meanlog10e <- (log10(concmin) + log10(concmax)) / 2
+  sdlog10e <- (log10(concmax) - log10(concmin)) / 4
+  taulog10e <- 1 / sdlog10e^2
+  
+  # Params to define b
+  log10bmin <- -2
+  log10bmax <- 2
+  
+  # list of data use by jags
+  jags.data <- list(meanlog10e = meanlog10e,
+                    Ninit = data$Ninit,
+                    Nsurv = data$Nsurv,
+                    taulog10e = taulog10e,
+                    log10bmin = log10bmin,
+                    log10bmax = log10bmax,
+                    n = length(data$conc),
+                    xconc = data$conc)
+  
+  # list of data use by jags
+  if (det.part == "loglogisticbinom_3") {
+    dmin = 0
+    dmax = 1
+    jags.data <- c(jags.data,
+                   dmin = dmin,
+                   dmax = dmax)
+  }
+  return(jags.data)
+}
+
+#' @import rjags
+survLoadModel <- function(model.program,
+                          data,
+                          n.chains,
+                          Nadapt,
+                          quiet = quiet) {
+  # create the JAGS model object
+  # INPUTS:
+  # - model.program: character string containing a jags model description
+  # - data: list of data created by survCreateJagsData
+  # - nchains: Number of chains desired
+  # - Nadapt: length of the adaptation phase
+  # - quiet: silent option
+  # OUTPUT:
+  # - JAGS model
+  
+  # load model text in a temporary file
+  model.file <- tempfile() # temporary file address
+  fileC <- file(model.file) # open connection
+  writeLines(model.program, fileC) # write text in temporary file
+  close(fileC) # close connection to temporary file
+  
+  # creation of the jags model
+  model <- jags.model(file = model.file, data = data, n.chains = n.chains,
+                      n.adapt = Nadapt, quiet = quiet)
+  unlink(model.file)
+  return(model)
+}
+
+#' @import rjags
+#' @importFrom coda raftery.diag
+modelSamplingParameters <- function(model, parameters, n.chains, quiet = quiet) {
+  # estimate the number of iteration required for the estimation
+  # by using the raftery.diag
+  # INPUTS:
+  # - model: jags model from loading function
+  # - parameters: parameters from loading function
+  # - nchains: Number of chains desired
+  # - quiet: silent option
+  # OUTPUTS:
+  # - niter: number of iteration (mcmc)
+  # - thin: thining rate parameter
+  # - burnin: number of iteration burned
+  
+  # number of iteration for the pilote run required by raftery.diag
+  # default value: 3746
+  niter.init <- 5000
+  prog.b <- ifelse(quiet == TRUE, "none", "text") # plot progress bar option
+  mcmc <- coda.samples(model, parameters, n.iter = niter.init, thin = 1,
+                       progress.bar = prog.b)
+  RL <- raftery.diag(mcmc)
+  
+  # check raftery.diag result (number of sample for the diagnostic procedure)
+  if (n.chains < 2) stop('2 or more parallel chains required !')
+  
+  # extract raftery diagnostic results
+  resmatrix <- RL[[1]]$resmatrix
+  for (i in 2: length(RL)) {
+    resmatrix <- rbind(resmatrix, RL[[i]]$resmatrix)
+  }
+  
+  # creation of sampling parameters
+  thin <- round(max(resmatrix[, "I"]) + 0.5) # autocorrelation
+  niter <- max(resmatrix[, "Nmin"]) * thin # number of iteration
+  burnin <- max(resmatrix[, "M"]) # burnin period
+  
+  return(list(niter = niter, thin = thin, burnin = burnin))
+}
+
+#' @import rjags
+calcDIC <- function(m.M, sampling.parameters, quiet = quiet) {
+  # calculate the dic for a jags model
+  # INPUTS
+  # - m.M:  jags model object
+  # - niter: number of iterations for the sampling
+  # - thin
+  # OUTPUT:
+  # - numeric value of the DIC
+  
+  prog.b <- ifelse(quiet == TRUE, "none", "text") # plot progress bar option
+  
+  # estimation of DIC
+  dic <- dic.samples(m.M, n.iter = sampling.parameters$niter,
+                     thin = sampling.parameters$thin, progress.bar = prog.b)
+  
+  # return penalised DIC
+  return(round(sum(sapply(dic$deviance, mean) + sapply(dic$penalty, mean))))
+}
+
+survPARAMS <- function(mcmc, det.part) {
+  # create the table of posterior estimated parameters
+  # for the survival analyses
+  # INPUT:
+  # - mcmc:  list of estimated parameters for the model with each item representing
+  # a chain
+  # OUTPUT:
+  # - data frame with 3 columns (values, CIinf, CIsup) and 3-4rows (the estimated
+  # parameters)
+  
+  # Retrieving parameters of the model
+  res.M <- summary(mcmc)
+  
+  if (det.part ==  "loglogisticbinom_3") {
+    d <- res.M$quantiles["d", "50%"]
+    dinf <- res.M$quantiles["d", "2.5%"]
+    dsup <- res.M$quantiles["d", "97.5%"]
+  }
+  # for loglogisticbinom_2 and 3
+  b <- 10^res.M$quantiles["log10b", "50%"]
+  e <- 10^res.M$quantiles["log10e", "50%"]
+  binf <- 10^res.M$quantiles["log10b", "2.5%"]
+  einf <- 10^res.M$quantiles["log10e", "2.5%"]
+  bsup <- 10^res.M$quantiles["log10b", "97.5%"]
+  esup <- 10^res.M$quantiles["log10e", "97.5%"]
+  
+  # Definition of the parameter storage and storage data
+  # If Poisson Model
+  
+  if (det.part == "loglogisticbinom_3") {
+    # if mortality in control
+    rownames <- c("b", "d", "e")
+    params <- c(b, d, e)
+    CIinf <- c(binf, dinf, einf)
+    CIsup <- c(bsup, dsup, esup)
+  } else {
+    # if no mortality in control
+    # Definition of the parameter storage and storage data
+    rownames <- c("b", "e")
+    params <- c(b, e)
+    CIinf <- c(binf, einf)
+    CIsup <- c(bsup, esup)
+  }
+  
+  res <- data.frame(median = params, Q2.5 = CIinf, Q97.5 = CIsup,
+                    row.names = rownames)
+  
+  return(res)
+}
+
+survLCX <- function(mcmc, lcx) {
+  # create the table of estimated values of LCx
+  # for the survival analyses
+  
+  # INPUT:
+  # - mcmc:  list of estimated parameters for the model with each item representing
+  # a chains
+  # - lcx: vector of values of LCx
+  # OUTPUT:
+  # - data frame with the estimated ECx and their CIs 95% (3 columns (values,
+  # CIinf, CIsup) and length(x) rows)
+  
+  # Retrieving estimated parameters of the model
+  mctot <- do.call("rbind", mcmc)
+  b <- 10^mctot[, "log10b"]
+  e <- 10^mctot[, "log10e"]
+  
+  # Calculation LCx median and quantiles
+  LCx <- sapply(lcx, function(x) {e * ((100 / (100 - x)) - 1)^(1 / b)})
+  
+  q50 <- apply(LCx, 2, function(LCx) {quantile(LCx, probs = 0.5)})
+  qinf95 <- apply(LCx, 2, function(LCx) {quantile(LCx, probs = 0.025)})
+  qsup95 <- apply(LCx, 2, function(LCx) {quantile(LCx, probs = 0.975)})
+  
+  # defining names
+  LCname <- sapply(lcx, function(x) {paste("LC", x, sep = '')})
+  colnames(LCx) <- LCname
+  
+  # create the dataframe with ECx median and quantiles
+  res <- data.frame(median = q50, Q2.5 = qinf95, Q97.5 = qsup95,
+                    row.names = LCname)
+  
+  return(res)
 }
 
 survFullPlotGeneric <- function(data, xlab, ylab, addlegend) {
