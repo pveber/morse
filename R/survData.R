@@ -61,7 +61,7 @@
 #
 #' @export
 #' @importFrom dplyr left_join rename
-# @importFrom plyr rename
+#' @importFrom stringr str_c
 survData <- function(data) {
   ### INPUT
   # [data]: a [data.frame] with above mentionned requirements
@@ -80,7 +80,8 @@ survData <- function(data) {
   data <- data[order(data$replicate, data$conc, data$time), ]
 
   # create an ID column of triplet replicate_conc_time
-  data[, "ID"] <- idCreate(data, notime = FALSE)
+  data[, "ID"] <- str_c(data[, "replicate"], data[, "conc"], data[, "time"],
+                        sep = "_")
 
   Nsurv <- c() # this is needed to avoid a complaint from package check when
                # using dplyr::rename. R is such a sad language.
