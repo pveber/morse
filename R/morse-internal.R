@@ -207,14 +207,15 @@ survPARAMS <- function(mcmc, det.part) {
   return(res)
 }
 
-survLCX <- function(mcmc, lcx) {
-  # create the table of estimated values of LCx
+estimXCX <- function(mcmc, xcx, varx) {
+  # create the table of estimated values of LCx or ECx
   # for the survival analyses
   
   # INPUT:
   # - mcmc:  list of estimated parameters for the model with each item representing
   # a chains
-  # - lcx: vector of values of LCx
+  # - xcx: vector of values of LCx or ECX
+  # - varx: character string for lcx or ecx
   # OUTPUT:
   # - data frame with the estimated ECx and their CIs 95% (3 columns (values,
   # CIinf, CIsup) and length(x) rows)
@@ -224,20 +225,20 @@ survLCX <- function(mcmc, lcx) {
   b <- 10^mctot[, "log10b"]
   e <- 10^mctot[, "log10e"]
   
-  # Calculation LCx median and quantiles
-  LCx <- sapply(lcx, function(x) {e * ((100 / (100 - x)) - 1)^(1 / b)})
+  # Calculation XCx median and quantiles
+  XCx <- sapply(xcx, function(x) {e * ((100 / (100 - x)) - 1)^(1 / b)})
   
-  q50 <- apply(LCx, 2, function(LCx) {quantile(LCx, probs = 0.5)})
-  qinf95 <- apply(LCx, 2, function(LCx) {quantile(LCx, probs = 0.025)})
-  qsup95 <- apply(LCx, 2, function(LCx) {quantile(LCx, probs = 0.975)})
+  q50 <- apply(XCx, 2, function(XCx) {quantile(XCx, probs = 0.5)})
+  qinf95 <- apply(XCx, 2, function(XCx) {quantile(XCx, probs = 0.025)})
+  qsup95 <- apply(XCx, 2, function(XCx) {quantile(XCx, probs = 0.975)})
   
   # defining names
-  LCname <- sapply(lcx, function(x) {paste("LC", x, sep = '')})
-  colnames(LCx) <- LCname
+  XCname <- sapply(xcx, function(x) {paste(varx, x, sep = '')})
+  colnames(XCx) <- XCname
   
   # create the dataframe with ECx median and quantiles
   res <- data.frame(median = q50, Q2.5 = qinf95, Q97.5 = qsup95,
-                    row.names = LCname)
+                    row.names = XCname)
   
   return(res)
 }
@@ -431,3 +432,8 @@ survFullPlotGG <- function(data, xlab, ylab, addlegend) {
   }
   return(fd)
 }
+
+llbinom3.model.text <- "\nmodel # Loglogistic binomial model with 3 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- d/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nd ~ dunif(dmin, dmax)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
+
+llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- 1/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
+

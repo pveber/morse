@@ -340,7 +340,7 @@ survFitTt <- function(data,
   if (missing(lcx)) {
     lcx <- c(5, 10, 20, 50)
   }
-  estim.LCx <- survLCX(mcmc, lcx)
+  estim.LCx <- estimXCX(mcmc, lcx, "LC")
   
   # check if the maximum measured concentration is in the LC50's range of
   # 95% percentile
