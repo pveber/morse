@@ -19,11 +19,11 @@
 survDataPlotTargetTime <- function(data,
                                    xlab,
                                    ylab,
-                                   target.time = NULL,
-                                   log.scale = FALSE,
-                                   style = "generic",
-                                   addlegend = TRUE,
-                                   pool.replicate = TRUE) {
+                                   target.time,
+                                   log.scale,
+                                   style,
+                                   addlegend,
+                                   pool.replicate) {
   
   # response variable
   data$response <- data$Nsurv / data$Ninit
