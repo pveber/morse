@@ -3,7 +3,9 @@
 #' This function plots the survival rate in function of time per concentration.
 #' 
 #' @param data an object of class \code{survData}.
-#' @param type Graphical method: \code{generic} or \code{ggplot}.
+#' @param xlab X-axis label.
+#' @param ylab Y-axis label.
+#' @param style Graphical method: \code{generic} or \code{ggplot}.
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' pooled together for a same concentration by mean.
@@ -12,7 +14,7 @@
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
 #' @importFrom plyr ldply
-survPlotRateTimeConc <- function(data, concentration,
+survDataPlotFixedConc <- function(data, concentration,
                                  xlab,
                                  ylab,
                                  style = "generic",
