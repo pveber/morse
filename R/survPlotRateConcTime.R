@@ -103,20 +103,18 @@ survDataPlotTargetTime <- function(data,
   }
   if (style == "ggplot") {
     if (pool.replicate) {
-      df <- ggplot(responsetable, aes(x = conc2, y = response,
-                                      color = time))
+      df <- ggplot(responsetable, aes(x = conc2, y = response))
     } else {
-      df <- ggplot(responsetable, aes(x = conc2, y = resp,
-                                      color = time, group = interaction(time,
-                                                                        replicate)))
+      df <- ggplot(responsetable, aes(x = conc2, y = response,
+                                      color = factor(replicate),
+                                      group = replicate))
     }
     fd <- df + geom_point() + theme_minimal() +
       labs(x = "Concentrations",
            y = "Survival rate") +
-      scale_color_gradient("Time", limits = range(responsetable$time),
-                           high = "#132B43", low = "#56B1F7") +
       scale_x_continuous(breaks = unique(responsetable$conc2),
-                         labels = unique(responsetable$conc))
+                         labels = unique(responsetable$conc)) +
+      scale_color_hue("Replicate")
     
     # legend option
     if (addlegend){
