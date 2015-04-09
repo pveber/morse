@@ -53,9 +53,6 @@ survPlotRateTimeConc <- function(data, concentration,
     as.numeric(as.factor(responsetable$replicate))
   }
   
-  ifelse(test = pool.replicate, yes = 1,
-         no =  'bli')
-  
   if (style == "generic") {
     plot(responsetable$time, seq(0, 1, length.out = length(responsetable$time)),
          type = "n",
@@ -89,17 +86,16 @@ survPlotRateTimeConc <- function(data, concentration,
   }
   if (style == "ggplot") {
     if (pool.replicate) {
-      df <- ggplot(responsetable, aes(x = time, y = response,
-                                      color = factor(conc)))
+      df <- ggplot(responsetable, aes(x = time, y = response))
     } else {
-      df <- ggplot(responsetable, aes(x = time, y = resp,
-                                      color = factor(conc),
-                                      group = interaction(conc, replicate)))
+      df <- ggplot(responsetable, aes(x = time, y = response,
+                                      color = factor(replicate),
+                                      group = replicate))
     }
     fd <- df + geom_line() + geom_point() + theme_minimal() +
-      labs(x = "Time",
-           y = "Survival rate") +
-      scale_color_hue("Concentrations")
+      labs(x = xlab,
+           y = ylab) +
+      scale_color_hue("Replicate")
     
     # legend option
     if (addlegend){
