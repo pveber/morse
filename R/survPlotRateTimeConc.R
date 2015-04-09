@@ -10,58 +10,84 @@
 #' 
 #' @export
 #' @import ggplot2
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% filter
 #' @importFrom plyr ldply
-survPlotRateTimeConc <- function(data, type = "generic",
+survPlotRateTimeConc <- function(data, concentration,
+                                 xlab,
+                                 ylab,
+                                 style = "generic",
                                  addlegend = TRUE,
                                  pool.replicate = FALSE) {
   
-  data$resp <- data$Nsurv / data$Ninit
+  
+  # response variable
+  data$response <- data$Nsurv / data$Ninit
+  
+  # default argument
+  if (missing(xlab)) {
+    xlab <- "Time"
+  }
+  if (missing(ylab)) {
+    ylab <- "Survival rate"
+  }
+  if (missing(concentration)) {
+    concentration <- max(data$conc)
+  }
+  
+  # select the concentration
+  data <- filter(data, data$conc == concentration)
   
   #pool replicate
   if (pool.replicate) {
-    responsetable <- aggregate(data$resp, by = list(data$time, data$conc), mean)
-    colnames(responsetable) <- c("time", "conc", "response")
+    responsetable <- aggregate(data$response, by = list(data$time),
+                               mean)
+    colnames(responsetable) <- c("time", "response")
   } else {
     responsetable <- data
   }
   
-  responsetable$color <- as.numeric(as.factor(responsetable$conc))
+  # vector color
+  responsetable$color <- if (pool.replicate) {
+    1
+  } else {
+    as.numeric(as.factor(responsetable$replicate))
+  }
   
-  if (type == "generic") {
+  ifelse(test = pool.replicate, yes = 1,
+         no =  'bli')
+  
+  if (style == "generic") {
     plot(responsetable$time, seq(0, 1, length.out = length(responsetable$time)),
          type = "n",
-         xlab = "Time",
-         ylab = "Survival rate")
+         xlab = xlab,
+         ylab = ylab)
     
-    # lines
     if (pool.replicate) {
-      by(responsetable, responsetable$conc, function(x) {
-        lines(x$time, x$response,
-              col = x$color)
-        points(x$time, x$response,
-               pch = 16,
-               col = x$color)
-      })
+      # lines
+      lines(responsetable$time, responsetable$response)
+      # points
+      points(responsetable$time, responsetable$response,
+             pch = 16)
     } else {
-      by(responsetable, list(responsetable$replicate, responsetable$conc),
+      by(responsetable, list(responsetable$replicate),
          function(x) {
-           lines(x$time, x$resp,
+           # lines
+           lines(x$time, x$response,
                  col = x$color)
-           points(x$time, x$resp,
+           # points
+           points(x$time, x$response,
                   pch = 16,
                   col = x$color)
          })
-    }
-    
-    if (addlegend) {
-      legend("bottomleft", legend = unique(responsetable$conc) ,
-             col = unique(responsetable$color),
-             pch = 16,
-             lty = 1)
+      if (addlegend) {
+        legend("bottomleft", legend = unique(responsetable$replicate) ,
+               col = unique(responsetable$color),
+               pch = 16,
+               lty = 1)
+      }
     }
   }
-  if (type == "ggplot") {
+  if (style == "ggplot") {
     if (pool.replicate) {
       df <- ggplot(responsetable, aes(x = time, y = response,
                                       color = factor(conc)))
