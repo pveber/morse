@@ -24,7 +24,7 @@ reproINDTimeConc <- function(data,
     data[is.na(data)] <- 0
     ylab <- "Cumulated Nb of offspring / NID"
   } else {
-    data$response <- data$Nrepro / data$NindtimenoncumulTi
+    data$response <- data$Nrepro / data$NindtimeNoCumul
     ylab <- "Nb of offsring / Delta NID"
     data[is.na(data)] <- 0
   }
