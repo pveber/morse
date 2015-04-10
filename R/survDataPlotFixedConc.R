@@ -3,6 +3,8 @@
 #' This function plots the survival rate in function of time per concentration.
 #' 
 #' @param data an object of class \code{survData}.
+#' @param concentration a numeric value corresponding to some observed concentration
+#' in \code{data}.
 #' @param xlab X-axis label.
 #' @param ylab Y-axis label.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
