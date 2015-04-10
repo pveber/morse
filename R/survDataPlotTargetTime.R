@@ -17,13 +17,13 @@
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(data,
+                                   target.time = NULL,
                                    xlab = NULL,
                                    ylab = NULL,
-                                   target.time = NULL,
-                                   log.scale = FALSE,
                                    style = "generic",
                                    addlegend = TRUE,
-                                   pool.replicate = FALSE) {
+                                   pool.replicate = FALSE,
+                                   log.scale = FALSE) {
   
   # response variable
   data$response <- data$Nsurv / data$Ninit
@@ -119,7 +119,7 @@ survDataPlotTargetTime <- function(data,
       scale_color_hue("Replicate")
     
     # legend option
-    if (addlegend){
+    if (addlegend) {
       fd
     } else {
       fd + theme(legend.position = "none") # remove legend
