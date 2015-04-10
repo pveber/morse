@@ -18,12 +18,12 @@
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(data,
                                    target.time = NULL,
+                                   log.scale = FALSE,
                                    xlab = NULL,
                                    ylab = NULL,
                                    style = "generic",
                                    addlegend = TRUE,
-                                   pool.replicate = FALSE,
-                                   log.scale = FALSE) {
+                                   pool.replicate) {
   
   # response variable
   data$response <- data$Nsurv / data$Ninit
@@ -57,65 +57,56 @@ survDataPlotTargetTime <- function(data,
   # select the target.time
   data <- filter(data, data$time == target.time)
   
-  #pool replicate
-  if (pool.replicate) {
-    responsetable <- aggregate(data$response, by = list(data$conc,
-                                                        data$conc2), mean)
-    colnames(responsetable) <- c("conc", "conc2", "response")
-  } else {
-    responsetable <- data
-  }
-  
   # vector color
-  responsetable$color <- if (pool.replicate) {
+  data$color <- if (pool.replicate) {
     1
   } else {
-    as.numeric(as.factor(responsetable$replicate))
+    as.numeric(as.factor(data$replicate))
   }
   
   if (style == "generic") {
-    plot(responsetable$conc2, seq(0, 1, length.out = length(responsetable$conc2)),
+    plot(data$conc2, seq(0, 1, length.out = length(data$conc2)),
          type = "n",
          xaxt = "n",
          xlab = xlab,
          ylab = ylab)
     
-    axis(side = 1, at = unique(responsetable$conc2),
-         labels = unique(responsetable$conc))
+    axis(side = 1, at = unique(data$conc2),
+         labels = unique(data$conc))
     
     # points
     if (pool.replicate) {
       # points
-        points(responsetable$conc2, responsetable$response,
+        points(data$conc2, data$response,
                pch = 16)
     } else {
-      by(responsetable, list(responsetable$replicate),
+      by(data, list(data$replicate),
          function(x) {
            points(x$conc2, x$response,
                   pch = 16,
                   col = x$color)
          })
       if (addlegend) {
-        legend("bottomleft", legend = unique(responsetable$replicate) ,
+        legend("bottomleft", legend = unique(data$replicate) ,
                title = "Replicate",
-               col = unique(responsetable$color),
+               col = unique(data$color),
                pch = 16, ncol = 3)
       }
     }
   }
   if (style == "ggplot") {
     if (pool.replicate) {
-      df <- ggplot(responsetable, aes(x = conc2, y = response))
+      df <- ggplot(data, aes(x = conc2, y = response))
     } else {
-      df <- ggplot(responsetable, aes(x = conc2, y = response,
+      df <- ggplot(data, aes(x = conc2, y = response,
                                       color = factor(replicate),
                                       group = replicate))
     }
     fd <- df + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
-      scale_x_continuous(breaks = unique(responsetable$conc2),
-                         labels = unique(responsetable$conc)) +
+      scale_x_continuous(breaks = unique(data$conc2),
+                         labels = unique(data$conc)) +
       scale_color_hue("Replicate")
     
     # legend option
