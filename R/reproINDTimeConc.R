@@ -5,6 +5,7 @@
 #' @param data an object of class \code{reproData}.
 #' @param cumul If \code{TRUE}, the response is in cumulative number of offspring
 #' by individuals-day.
+#' @param xlab X-axis label.
 #' @param type Graphical method: \code{generic} or \code{ggplot}.
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
@@ -15,9 +16,14 @@
 #' @importFrom dplyr %>%
 #' @importFrom plyr ldply
 reproINDTimeConc <- function(data,
-                             cumul = TRUE, type = "generic",
+                             cumul = TRUE,
+                             xlab = NULL,
+                             type = "generic",
                              addlegend = TRUE,
                              pool.replicate = FALSE) {
+  
+  # default argument
+  xlab <- "Time"
   
   if (cumul) { # response cumulate of Nrepro and NID
     data$response <- data$Nreprocumul / data$Nindtime
@@ -46,7 +52,7 @@ reproINDTimeConc <- function(data,
     plot(responsetable$timeOrigine, seq(0, max(sapply(responsetable$response, max)),
                                         length.out = length(responsetable$timeOrigine)),
          type = "n",
-         xlab = "Time",
+         xlab = xlab,
          ylab = ylab)
     
     # lines
@@ -86,7 +92,7 @@ reproINDTimeConc <- function(data,
     }
     
     fd <- df + geom_line() + geom_point() + theme_minimal() +
-      labs(x = "Time",
+      labs(x = xlab,
            y = ylab) +
       scale_color_hue("Concentrations")
     
