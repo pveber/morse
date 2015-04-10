@@ -77,8 +77,8 @@ survDataPlotTargetTime <- function(data,
     plot(responsetable$conc2, seq(0, 1, length.out = length(responsetable$conc2)),
          type = "n",
          xaxt = "n",
-         xlab = "Concentrations",
-         ylab = "Survival rate")
+         xlab = xlab,
+         ylab = ylab)
     
     axis(side = 1, at = unique(responsetable$conc2),
          labels = unique(responsetable$conc))
@@ -112,8 +112,8 @@ survDataPlotTargetTime <- function(data,
                                       group = replicate))
     }
     fd <- df + geom_point() + theme_minimal() +
-      labs(x = "Concentrations",
-           y = "Survival rate") +
+      labs(x = xlab,
+           y = ylab) +
       scale_x_continuous(breaks = unique(responsetable$conc2),
                          labels = unique(responsetable$conc)) +
       scale_color_hue("Replicate")
