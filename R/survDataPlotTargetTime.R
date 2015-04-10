@@ -17,27 +17,29 @@
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(data,
-                                   xlab,
-                                   ylab,
-                                   target.time,
-                                   log.scale,
-                                   style,
-                                   addlegend,
-                                   pool.replicate) {
+                                   xlab = NULL,
+                                   ylab = NULL,
+                                   target.time = NULL,
+                                   log.scale = FALSE,
+                                   style = "generic",
+                                   addlegend = TRUE,
+                                   pool.replicate = FALSE) {
   
   # response variable
   data$response <- data$Nsurv / data$Ninit
   
   # default argument
-  if (missing(xlab)) {
+  if (is.null(xlab)) {
     xlab <- "Concentration"
   }
-  if (missing(ylab)) {
+  if (is.null(ylab)) {
     ylab <- "Survival rate"
   }
-  if (missing(target.time)) {
+  if (is.null(target.time)) {
     target.time <- max(data$time)
   }
+  if (!target.time %in% data$time)
+    stop("[target.time] is not one of the possible time !")
   
   # select only no null concentration datapoint for log reprsentation 
   sel <- if (log.scale) {
