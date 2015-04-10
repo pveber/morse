@@ -52,10 +52,14 @@ survDataPlotReplicates <- function(data,
   data <- filter(data, conc == concentration & time == target.time)
   
   if (style == "generic") {
-    plot(data$replicate, data$response,
+    plot(factor(data$replicate), data$response,
          type = "n",
-         xaxt = "n",
          xlab = xlab,
          ylab = ylab)
-    poin
   }
+  
+  if (style == "ggplot") {
+    df <- ggplot(data, aes(x = replicate, y = response))
+    df + geom_point() + labs(x = xlab, y = ylab)
+  }
+}
