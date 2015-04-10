@@ -12,29 +12,33 @@
 #' 
 #' @export
 #' @import ggplot2
-#' @importFrom dplyr %>% filter
-#' @importFrom plyr ldply
-survDataPlotFixedConc <- function(data, concentration,
-                                 xlab,
-                                 ylab,
-                                 style = "generic",
-                                 addlegend = TRUE,
-                                 pool.replicate = FALSE) {
+#' @importFrom dplyr filter
+survDataPlotFixedConc <- function(data,
+                                  concentration = NULL,
+                                  xlab = NULL,
+                                  ylab = NULL,
+                                  style = "generic",
+                                  addlegend = TRUE,
+                                  pool.replicate = FALSE) {
   
   
   # response variable
   data$response <- data$Nsurv / data$Ninit
   
   # default argument
-  if (missing(xlab)) {
+  if (is.null(xlab)) {
     xlab <- "Time"
   }
-  if (missing(ylab)) {
+  if (is.null(ylab)) {
     ylab <- "Survival rate"
   }
-  if (missing(concentration)) {
+  if (is.null(concentration)) {
     concentration <- max(data$conc)
   }
+  
+  # check concentration value
+  if (!concentration %in% data$conc)
+    stop("The choosen value for [concentration] is not possible !")
   
   # select the concentration
   data <- filter(data, data$conc == concentration)
@@ -62,23 +66,21 @@ survDataPlotFixedConc <- function(data, concentration,
          ylab = ylab)
     
     if (pool.replicate) {
-      # lines
-      lines(responsetable$time, responsetable$response)
-      # points
-      points(responsetable$time, responsetable$response,
+      lines(responsetable$time, responsetable$response) # lines
+      points(responsetable$time, responsetable$response, # points 
              pch = 16)
     } else {
+      # one line by replicate
       by(responsetable, list(responsetable$replicate),
          function(x) {
-           # lines
-           lines(x$time, x$response,
+           lines(x$time, x$response, # lines
                  col = x$color)
-           # points
-           points(x$time, x$response,
+           points(x$time, x$response, # points
                   pch = 16,
                   col = x$color)
          })
-      if (addlegend) {
+      
+      if (addlegend) { # only if pool.replicate == FALSE
         legend("bottomleft", legend = unique(responsetable$replicate) ,
                col = unique(responsetable$color),
                pch = 16,
@@ -99,8 +101,7 @@ survDataPlotFixedConc <- function(data, concentration,
            y = ylab) +
       scale_color_hue("Replicate")
     
-    # legend option
-    if (addlegend){
+    if (addlegend) {# only if pool.replicate == FALSE
       fd
     } else {
       fd + theme(legend.position = "none") # remove legend
