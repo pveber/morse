@@ -61,7 +61,6 @@
 #
 #' @export
 #' @importFrom dplyr left_join rename
-# @importFrom plyr rename
 survData <- function(data) {
   ### INPUT
   # [data]: a [data.frame] with above mentionned requirements
@@ -80,7 +79,8 @@ survData <- function(data) {
   data <- data[order(data$replicate, data$conc, data$time), ]
 
   # create an ID column of triplet replicate_conc_time
-  data[, "ID"] <- idCreate(data, notime = FALSE)
+  ID <- str_c(data[, "replicate"], data[, "conc"], data[, "time"],
+              + sep = "_")
 
   Nsurv <- c() # this is needed to avoid a complaint from package check when
                # using dplyr::rename. R is such a sad language.
@@ -88,17 +88,17 @@ survData <- function(data) {
   data.t0 <- rename(data.t0, Ninit = Nsurv)
   out <- left_join(data, data.t0, by = c("replicate", "conc"))
 
-  T <- sort(unique(data$time)) # observation times
-  Nindtime <- rep(0,dim(data)[1])
+  T <- sort(unique(out$time)) # observation times
+  Nindtime <- rep(0,dim(out)[1])
   for (i in 2:length(T)) {
-    now <- data$time == T[i]
-    before <- data$time == T[i - 1]
+    now <- out$time == T[i]
+    before <- out$time == T[i - 1]
     Nindtime[now] <- Nindtime[before] +
-      (data$Nsurv[before] - data$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
-      data$Nsurv[now] * (T[i] - T[i - 1])
+      (out$Nsurv[before] - out$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
+      out$Nsurv[now] * (T[i] - T[i - 1])
   }
 
-  data <- cbind(data, Nindtime)
+  out <- cbind(out, Nindtime)
 
   class(out) <- c("survData", "data.frame")
   return(out)
