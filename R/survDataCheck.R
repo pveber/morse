@@ -171,9 +171,8 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     errors <- errorTableAdd(errors, "ReplicateLabel", msg)
   }
 
-  ## call function survFullPlot
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
-    survFullPlot(data)
+    plot(data)
   }
   return(errors)
 }

@@ -118,10 +118,9 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   consistency.errors <- do.call("errorTableAppend", res)
   errors <- errorTableAppend(errors, consistency.errors)
 
-  # call function survFullPlot FIXME: restore when fn available
   if (diagnosis.plot &&
       ("NsurvIncrease" %in% errors$id || "NsurvMonotone" %in% errors$id)) {
-        survFullPlot(data)
+        plot(data)
       }
 
   return(errors)

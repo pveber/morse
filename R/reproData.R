@@ -20,8 +20,9 @@
 #' values only. This column should
 #' provide the number of offspring produced since the last observation.
 #'
-#' @param x An object of class \code{reproData}.
-#' @param object An object of class \code{reproData}.
+# FIXME: these may come back with print and summary generics
+# @param x An object of class \code{reproData}.
+# @param object An object of class \code{reproData}.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @return An object of class \code{reproData}. #'

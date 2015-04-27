@@ -187,7 +187,7 @@ survDataPlotFull <- function(data,
 #' concentration and target time are fixed, the function additionally plots
 #' the experimental values for the minimum available concentration.
 #'
-#' @param data an object of class \code{survData}
+#' @param x an object of class \code{survData}
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
@@ -198,43 +198,67 @@ survDataPlotFull <- function(data,
 #' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
+#' @param \dots further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' When \code{style = "lattice"}, the function returns an object of class
 #' \code{trellis}.
 #'
+#'#' @examples
+#'
+#' library(ggplot2)
+#'
+#' # (1) Load the data
+#' data(zinc)
+#' zinc <- survData(zinc)
+#'
+#' # (2) Plot the survival data
+#' plot(zinc, style = "generic", addlegend = TRUE)
+#'
+#' # (3) Plot the survival data with a lattice type
+#' plot(zinc, style = "lattice", addlegend = TRUE)
+#'
+#' # (4) Plot the survival data with a ggplot type
+#' plot(zinc, style = "ggplot", addlegend = FALSE)
+#'
+#' # (5) To build a specific legend with a ggplot type
+#' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
+#' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
+
 #' @export
 #'
 #' @import ggplot2
 #' @import grDevices
-#' @importFrom gridExtra grid.arrange arrangeGrob
-#' @importFrom grid grid.rect gpar
+# FIXME: delete imports if really not needed
+# @importFrom gridExtra grid.arrange arrangeGrob
+# @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
 #'
-plot.survData <- function(data,
+plot.survData <- function(x,
                           target.time = NULL,
                           concentration = NULL,
                           xlab = NULL,
                           ylab = NULL,
                           style = "generic",
                           addlegend = TRUE,
-                          pool.replicate = FALSE) {
+                          pool.replicate = FALSE,
+                          ...) {
 
-  if(! is(data,"survData"))
+  if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
 
   if (pool.replicate) {
     # agregate by sum of replicate
-    data <- cbind(aggregate(Nsurv ~ time + conc, data, sum),
+    x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
                   replicate = 1)
   }
 
   if (is.null(target.time) && is.null(concentration))
-    survDataPlotFull(data, xlab, ylab, style, addlegend)
+    survDataPlotFull(x, xlab, ylab, style, addlegend)
   else if (! is.null(target.time) && is.null(concentration))
-    survDataPlotTargetTime(data, target.time, xlab, ylab, style, addlegend)
+    survDataPlotTargetTime(x, target.time, xlab, ylab, style, addlegend)
   else if (is.null(target.time) && ! is.null(concentration))
-    survDataPlotFixedConc(data, concentration, xlab, ylab, style, addlegend)
+    survDataPlotFixedConc(x, concentration, xlab, ylab, style, addlegend)
   else
-    survDataPlotReplicates(data, target.time, concentration, xlab, ylab, style, addlegend)
+    survDataPlotReplicates(x, target.time, concentration, xlab, ylab, style, addlegend)
 }
