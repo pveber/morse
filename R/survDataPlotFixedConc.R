@@ -2,9 +2,9 @@
 #' 
 #' This function plots the survival rate in function of time per concentration.
 #' 
-#' @param data an object of class \code{survData}.
+#' @param x an object of class \code{survData}.
 #' @param concentration a numeric value corresponding to some observed concentration
-#' in \code{data}.
+#' in \code{x}.
 #' @param xlab X-axis label.
 #' @param ylab Y-axis label.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
@@ -15,7 +15,7 @@
 #' @export
 #' @import ggplot2
 #' @importFrom dplyr filter
-survDataPlotFixedConc <- function(data,
+survDataPlotFixedConc <- function(x,
                                   concentration = NULL,
                                   xlab = NULL,
                                   ylab = NULL,
@@ -25,7 +25,7 @@ survDataPlotFixedConc <- function(data,
   
   
   # response variable
-  data$response <- data$Nsurv / data$Ninit
+  x$response <- x$Nsurv / x$Ninit
   
   # default argument
   if (is.null(xlab)) {
@@ -35,23 +35,23 @@ survDataPlotFixedConc <- function(data,
     ylab <- "Survival rate"
   }
   if (is.null(concentration)) {
-    concentration <- max(data$conc)
+    concentration <- max(x$conc)
   }
   
   # check concentration value
-  if (!concentration %in% data$conc)
+  if (!concentration %in% x$conc)
     stop("The choosen value for [concentration] is not possible !")
   
   # select the concentration
-  data <- filter(data, data$conc == concentration)
+  x <- filter(x, x$conc == concentration)
   
   #pool replicate
   if (pool.replicate) {
-    responsetable <- aggregate(data$response, by = list(data$time),
+    responsetable <- aggregate(x$response, by = list(x$time),
                                mean)
     colnames(responsetable) <- c("time", "response")
   } else {
-    responsetable <- data
+    responsetable <- x
   }
   
   # vector color
