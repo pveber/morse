@@ -2,9 +2,9 @@
 #' 
 #' This function plots the survival rate in function of concentration per timepoints.
 #' 
-#' @param data an object of class \code{survData}.
+#' @param x an object of class \code{survData}.
 #' @param target.time a numeric value corresponding to some observed time in
-#' \code{data}.
+#' \code{x}.
 #' @param xlab X-axis label.
 #' @param ylab Y-axis label.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
@@ -16,7 +16,7 @@
 #' @export
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotTargetTime <- function(data,
+survDataPlotTargetTime <- function(x,
                                    target.time = NULL,
                                    log.scale = FALSE,
                                    xlab = NULL,
@@ -26,7 +26,7 @@ survDataPlotTargetTime <- function(data,
                                    pool.replicate) {
   
   # response variable
-  data$response <- data$Nsurv / data$Ninit
+  x$response <- x$Nsurv / x$Ninit
   
   # default argument
   if (is.null(xlab)) {
@@ -36,77 +36,77 @@ survDataPlotTargetTime <- function(data,
     ylab <- "Survival rate"
   }
   if (is.null(target.time)) {
-    target.time <- max(data$time)
+    target.time <- max(x$time)
   }
-  if (!target.time %in% data$time)
+  if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
   
   # select only no null concentration datapoint for log reprsentation 
   sel <- if (log.scale) {
-    data$conc > 0
+    x$conc > 0
   } else {
-    rep(TRUE, length(data$conc))
+    rep(TRUE, length(x$conc))
   }
   if (log.scale) {
-    data$conc2[sel] <- log(data$conc[sel])
+    x$conc2[sel] <- log(x$conc[sel])
   } else {
-    data$conc2[sel] <- data$conc[sel]
+    x$conc2[sel] <- x$conc[sel]
   }
-  data <- na.omit(data)
+  x <- na.omit(x)
   
   # select the target.time
-  data <- filter(data, data$time == target.time)
+  x <- filter(x, x$time == target.time)
   
   # vector color
-  data$color <- if (pool.replicate) {
+  x$color <- if (pool.replicate) {
     1
   } else {
-    as.numeric(as.factor(data$replicate))
+    as.numeric(as.factor(x$replicate))
   }
   
   if (style == "generic") {
-    plot(data$conc2, seq(0, 1, length.out = length(data$conc2)),
+    plot(x$conc2, seq(0, 1, length.out = length(x$conc2)),
          type = "n",
          xaxt = "n",
          xlab = xlab,
          ylab = ylab)
     
-    axis(side = 1, at = unique(data$conc2),
-         labels = unique(data$conc))
+    axis(side = 1, at = unique(x$conc2),
+         labels = unique(x$conc))
     
     # points
     if (pool.replicate) {
       # points
-        points(data$conc2, data$response,
+        points(x$conc2, x$response,
                pch = 16)
     } else {
-      by(data, list(data$replicate),
+      by(x, list(x$replicate),
          function(x) {
            points(x$conc2, x$response,
                   pch = 16,
                   col = x$color)
          })
       if (addlegend) {
-        legend("bottomleft", legend = unique(data$replicate) ,
+        legend("bottomleft", legend = unique(x$replicate) ,
                title = "Replicate",
-               col = unique(data$color),
+               col = unique(x$color),
                pch = 16, ncol = 3)
       }
     }
   }
   if (style == "ggplot") {
     if (pool.replicate) {
-      df <- ggplot(data, aes(x = conc2, y = response))
+      df <- ggplot(x, aes(x = conc2, y = response))
     } else {
-      df <- ggplot(data, aes(x = conc2, y = response,
+      df <- ggplot(x, aes(x = conc2, y = response,
                                       color = factor(replicate),
                                       group = replicate))
     }
     fd <- df + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
-      scale_x_continuous(breaks = unique(data$conc2),
-                         labels = unique(data$conc)) +
+      scale_x_continuous(breaks = unique(x$conc2),
+                         labels = unique(x$conc)) +
       scale_color_hue("Replicate")
     
     # legend option
