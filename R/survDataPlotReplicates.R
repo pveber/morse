@@ -3,11 +3,11 @@
 #' This function plots the survival rate in function for a fixed concentration
 #' and a fixed timepoint.
 #' 
-#' @param data an object of class \code{survData}.
+#' @param x an object of class \code{survData}.
 #' @param target.time a numeric value corresponding to some observed time in
-#' \code{data}.
+#' \code{x}.
 #' @param concentration a numeric value corresponding to some observed concentration
-#' in \code{data}.
+#' in \code{x}.
 #' @param xlab X-axis label.
 #' @param ylab Y-axis label.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
@@ -16,7 +16,7 @@
 #' @export
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotReplicates <- function(data,
+survDataPlotReplicates <- function(x,
                                    target.time = NULL,
                                    concentration = NULL,
                                    xlab = NULL,
@@ -25,7 +25,7 @@ survDataPlotReplicates <- function(data,
                                    addlegend = TRUE) {
   
   # response variable
-  data$response <- data$Nsurv / data$Ninit
+  x$response <- x$Nsurv / x$Ninit
   
   # default argument
   if (is.null(xlab)) {
@@ -35,31 +35,31 @@ survDataPlotReplicates <- function(data,
     ylab <- "Survival rate"
   }
   if (is.null(concentration)) {
-    concentration <- max(data$conc)
+    concentration <- max(x$conc)
   }
   if (is.null(target.time)) {
-    target.time <- max(data$time)
+    target.time <- max(x$time)
   }
   
   # check [target.time] and [concentration]
-  if (!target.time %in% data$time)
+  if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
   
-  if (!concentration %in% data$conc)
+  if (!concentration %in% x$conc)
     stop("The choosen value for [concentration] is not possible !")
   
   # select the concnetration and the target.time
-  data <- filter(data, conc == concentration & time == target.time)
+  x <- filter(x, conc == concentration & time == target.time)
   
   if (style == "generic") {
-    plot(factor(data$replicate), data$response,
+    plot(factor(x$replicate), x$response,
          type = "n",
          xlab = xlab,
          ylab = ylab)
   }
   
   if (style == "ggplot") {
-    df <- ggplot(data, aes(x = replicate, y = response))
+    df <- ggplot(x, aes(x = replicate, y = response))
     df + geom_point() + labs(x = xlab, y = ylab)
   }
 }
