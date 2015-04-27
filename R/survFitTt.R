@@ -259,15 +259,15 @@
 #' @import rjags
 #' @importFrom dplyr filter
 #' 
-survFitTt <- function(data,
+survFitTt <- function(x,
                       det.part = "loglogisticbinom_2",
                       target.time = NULL,
                       lcx,
                       n.chains = 3,
                       quiet = FALSE) {
   # test class object
-  if (class(data)[1] != "survData")
-    stop("The [data] argument is not of class 'survData' !\n")
+  if (class(x)[1] != "survData")
+    stop("The [x] argument is not of class 'survData' !\n")
   
   # test determinist part
   if (!any(det.part == "loglogisticbinom_2" || det.part == "loglogisticbinom_3"))
@@ -290,7 +290,7 @@ survFitTt <- function(data,
   }
   
   # select Data at target.time
-  dataTt <- selectDataTt(data, target.time)
+  dataTt <- selectDataTt(x, target.time)
   
   # create priors parameters
   jags.data <- survCreateJagsData(det.part, dataTt)
@@ -345,8 +345,8 @@ survFitTt <- function(data,
   # check if the maximum measured concentration is in the LC50's range of
   # 95% percentile
   if (50 %in% lcx) {
-    if (!(min(log10(data$conc)) < log10(estim.LCx["LC50", "median"]) &
-          log10(estim.LCx["LC50", "median"]) < max(log10(data$conc))))
+    if (!(min(log10(x$conc)) < log10(estim.LCx["LC50", "median"]) &
+          log10(estim.LCx["LC50", "median"]) < max(log10(x$conc))))
       warning("The LC50 estimation lies outsides the range of tested concentration and may be reliable !")
   }
   
@@ -363,7 +363,7 @@ survFitTt <- function(data,
                             end = summary(mcmc)$end),
               n.thin = summary(mcmc)$thin,
               jags.data = jags.data,
-              transformed.data = data,
+              transformed.data = x,
               dataTt = dataTt)
   
   class(OUT) <- "survFitTt"
