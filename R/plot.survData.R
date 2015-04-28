@@ -50,20 +50,20 @@ survDataPlotFullGeneric <- function(data, xlab, ylab, addlegend) {
     plot(x$time, rep(0, length(x$time)),
          xlab = xlab,
          ylab = ylab,
-         ylim = c(0,max(x$Nsurv)),
+         ylim = c(0,max(x$response)),
          type = "n",
          col = 'white',
          yaxt = 'n')
 
     # axis
-    axis(side = 2, at = pretty(c(0,max(x$Nsurv))))
+    axis(side = 2, at = pretty(c(0,max(x$response))))
 
     # lines and points
     by(x, x$replicate, function(y) {
-      lines(y$time, y$Nsurv,
+      lines(y$time, y$response,
             type = "l",
             col = colors[.convert(unique(y$replicate))])
-      points(y$time, y$Nsurv,
+      points(y$time, y$response,
              pch = pchs[.convert(unique(y$replicate))],
              col = colors[.convert(unique(y$replicate))])
     })
@@ -110,7 +110,7 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
   lattice.options(default.args = list(as.table = TRUE))
 
   if (addlegend) {
-    xyplot(Nsurv ~ time | factor(conc),
+    xyplot(response ~ time | factor(conc),
            data = data,
            group = replicate,
            index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
@@ -125,7 +125,7 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
                            lines = TRUE,
                            points = FALSE))
   } else {
-    xyplot(Nsurv ~ time | factor(conc),
+    xyplot(response ~ time | factor(conc),
            data = data,
            group = replicate,
            index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
@@ -143,17 +143,17 @@ survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   # each replicate for ggplot graphics
 
   time = NULL
-  Nsurv = NULL
+  response = NULL
   title.legend <- "Replicate"
 
-  # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, Nsurv, colour = factor(replicate))) +
+  # create ggplot object response / time / replicate / conc
+  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
     geom_point() +
     geom_line() +
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    ylim(0, max(data$Nsurv))
+    ylim(0, max(data$response))
 
   # legend option
   if (addlegend){
@@ -181,7 +181,7 @@ survDataPlotFull <- function(data,
 
 #' Plotting method for survData objects
 #'
-#' Plots the number of survivors as a
+#' Plots the survival rate as a
 #' function of either time and concentration, time only (for a fixed
 #' concentration), concentration only (for a given target time). If both
 #' concentration and target time are fixed, the function additionally plots
@@ -224,14 +224,13 @@ survDataPlotFull <- function(data,
 #' # (5) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
+#'
+#' # (6) Plot 
 
 #' @export
 #'
 #' @import ggplot2
 #' @import grDevices
-# FIXME: delete imports if really not needed
-# @importFrom gridExtra grid.arrange arrangeGrob
-# @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
 #'
 plot.survData <- function(x,
@@ -246,10 +245,13 @@ plot.survData <- function(x,
 
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
+  
+  # response variable survival rate
+  x$response <- x$Nsurv / x$Ninit
 
   if (pool.replicate) {
-    # agregate by sum of replicate
-    x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
+    # agregate by mean of replicate
+    x <- cbind(aggregate(response ~ time + conc, x, mean),
                   replicate = 1)
   }
 
