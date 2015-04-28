@@ -9,7 +9,6 @@
 #' @param ylab Y-axis label.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' @param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' pooled together for a same concentration by mean.
 #' 
@@ -21,7 +20,6 @@ survDataPlotTargetTime <- function(x,
                                    xlab = NULL,
                                    ylab = NULL,
                                    style = "generic",
-                                   log.scale = FALSE,
                                    addlegend = TRUE) {
   
   # default argument
@@ -37,19 +35,6 @@ survDataPlotTargetTime <- function(x,
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
   
-  # select only no null concentration datapoint for log reprsentation 
-  sel <- if (log.scale) {
-    x$conc > 0
-  } else {
-    rep(TRUE, length(x$conc))
-  }
-  if (log.scale) {
-    x$conc2[sel] <- log(x$conc[sel])
-  } else {
-    x$conc2[sel] <- x$conc[sel]
-  }
-  x <- na.omit(x)
-  
   # select the target.time
   x <- filter(x, x$time == target.time)
   
@@ -57,24 +42,24 @@ survDataPlotTargetTime <- function(x,
   x$color <- as.numeric(as.factor(x$replicate))
   
   if (style == "generic") {
-    plot(x$conc2, seq(0, 1, length.out = length(x$conc2)),
+    plot(x$conc, seq(0, 1, length.out = length(x$conc)),
          type = "n",
          xaxt = "n",
          xlab = xlab,
          ylab = ylab)
     
-    axis(side = 1, at = unique(x$conc2),
+    axis(side = 1, at = unique(x$conc),
          labels = unique(x$conc))
     
     # points
     if (length(unique(x$replicate)) == 1) {
       # points
-        points(x$conc2, x$response,
+        points(x$conc, x$response,
                pch = 16)
     } else {
       by(x, list(x$replicate),
          function(x) {
-           points(x$conc2, x$response,
+           points(x$conc, x$response,
                   pch = 16,
                   col = x$color)
          })
@@ -88,16 +73,16 @@ survDataPlotTargetTime <- function(x,
   }
   if (style == "ggplot") {
     if (length(unique(x$replicate)) == 1) {
-      df <- ggplot(x, aes(x = conc2, y = response))
+      df <- ggplot(x, aes(x = conc, y = response))
     } else {
-      df <- ggplot(x, aes(x = conc2, y = response,
+      df <- ggplot(x, aes(x = conc, y = response,
                                       color = factor(replicate),
                                       group = replicate))
     }
     fd <- df + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
-      scale_x_continuous(breaks = unique(x$conc2),
+      scale_x_continuous(breaks = unique(x$conc),
                          labels = unique(x$conc)) +
       scale_color_hue("Replicate")
     
