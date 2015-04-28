@@ -2,6 +2,14 @@ survDataPlotFullGeneric <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate
   # for generic graphics
+  
+  if (is.null(xlab)) {
+    xlab <- "Time"
+  }
+  
+  if (is.null(ylab)) {
+    ylab <- "Survival Rate"
+  }
 
   .convert <- function(x) {
     # conversion of a replicate name in a number coding for color
@@ -108,6 +116,14 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
 
   # change order of reading concentrations
   lattice.options(default.args = list(as.table = TRUE))
+  
+  if (is.null(xlab)) {
+    xlab <- "Time"
+  }
+  
+  if (is.null(ylab)) {
+    ylab <- "Survival Rate"
+  }
 
   if (addlegend) {
     xyplot(response ~ time | factor(conc),
@@ -141,6 +157,14 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
 survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate for ggplot graphics
+  
+  if (is.null(xlab)) {
+    xlab <- "Time"
+  }
+  
+  if (is.null(ylab)) {
+    ylab <- "Survival Rate"
+  }
 
   time = NULL
   response = NULL
@@ -198,6 +222,7 @@ survDataPlotFull <- function(data,
 #' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
+#' 
 #' @param \dots further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -224,6 +249,18 @@ survDataPlotFull <- function(data,
 #' # (5) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
+#' 
+#' # (6) Plot the survival in function of concentration for a fixed target.time
+#' with a generic type
+#' plot(zinc, target.time = 21, style = "generic", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#' 
+#' # (7) Plot the survival in function of concentration for a fixed target.time
+#' with a ggplot type
+#' plot(zinc, target.time = 21, style = "ggplot", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#' 
+#' # (8) 
 #'
 #' @export
 #'
