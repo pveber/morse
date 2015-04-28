@@ -224,14 +224,19 @@ survDataPlotFull <- function(data,
 #' # (5) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
+#' 
+#' # (6) Plot the survival rate in function of replicates for one concentration at
+#' # one target.time with a generic type
+#' plot(zinc, style = "generic", target.time = 21, concentration = 0.66)
+#' 
+#' # (7) Plot the survival rate in function of replicates for one concentration at
+#' # one target.time with a ggplot type
+#' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
 
 #' @export
 #'
 #' @import ggplot2
 #' @import grDevices
-# FIXME: delete imports if really not needed
-# @importFrom gridExtra grid.arrange arrangeGrob
-# @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
 #'
 plot.survData <- function(x,
