@@ -1,7 +1,7 @@
 #' Plot of survival data
 #' 
-#' This function plots the survival rate in function for a fixed concentration
-#' and a fixed timepoint.
+#' This function plots the survival rate in function of replicates for a fixed
+#' concentration and a fixed timepoint.
 #' 
 #' @param x an object of class \code{survData}.
 #' @param target.time a numeric value corresponding to some observed time in
