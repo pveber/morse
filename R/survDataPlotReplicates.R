@@ -24,9 +24,6 @@ survDataPlotReplicates <- function(x,
                                    style = "generic",
                                    addlegend = TRUE) {
   
-  # response variable
-  x$response <- x$Nsurv / x$Ninit
-  
   # default argument
   if (is.null(xlab)) {
     xlab <- "Replicates"
