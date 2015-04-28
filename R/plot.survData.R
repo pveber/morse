@@ -250,17 +250,36 @@ survDataPlotFull <- function(data,
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
 #' 
-#' # (6) Plot the survival in function of concentration for a fixed target.time
+#' # (6) Plot the survival data in function of concentration for a fixed target.time
 #' with a generic type
 #' plot(zinc, target.time = 21, style = "generic", pool.replicate = FALSE,
 #' addlegend = TRUE)
 #' 
-#' # (7) Plot the survival in function of concentration for a fixed target.time
+#' # (7) Plot the survival data in function of concentration for a fixed target.time
 #' with a ggplot type
 #' plot(zinc, target.time = 21, style = "ggplot", pool.replicate = FALSE,
 #' addlegend = TRUE)
 #' 
-#' # (8) 
+#' # (8) Plot the survival data in function of time by replicate for a concentration
+#' # with a generic type
+#' plot(zinc, concentration = 0.66, style = "generic", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#'
+#' # (9) Plot the survival data in function of time by replicate for a concentration
+#' # with a ggplot type
+#' plot(zinc, concentration = 0.66, style = "ggplot", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#' 
+#' # (10) Plot the survival data by replicate for one concentration at one target.time
+#' # with a generic type
+#' plot(zinc, concentration = 0.66, target.time = 21, addlegend = TRUE,
+#' style = "generic")
+#' 
+#' # (10) Plot the survival data by replicate for one concentration at one target.time
+#' # with a ggplot type
+#' plot(zinc, concentration = 0.66, target.time = 21, addlegend = TRUE,
+#' style = "ggplot")
+#'
 #'
 #' @export
 #'
