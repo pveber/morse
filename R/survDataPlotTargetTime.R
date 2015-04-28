@@ -18,11 +18,11 @@
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(x,
                                    target.time = NULL,
-                                   log.scale = FALSE,
                                    xlab = NULL,
                                    ylab = NULL,
                                    style = "generic",
                                    addlegend = TRUE,
+                                   log.scale = FALSE,
                                    pool.replicate) {
   
   # response variable
