@@ -21,12 +21,8 @@ survDataPlotTargetTime <- function(x,
                                    xlab = NULL,
                                    ylab = NULL,
                                    style = "generic",
-                                   addlegend = TRUE,
                                    log.scale = FALSE,
-                                   pool.replicate) {
-  
-  # response variable
-  x$response <- x$Nsurv / x$Ninit
+                                   addlegend = TRUE) {
   
   # default argument
   if (is.null(xlab)) {
@@ -58,11 +54,7 @@ survDataPlotTargetTime <- function(x,
   x <- filter(x, x$time == target.time)
   
   # vector color
-  x$color <- if (pool.replicate) {
-    1
-  } else {
-    as.numeric(as.factor(x$replicate))
-  }
+  x$color <- as.numeric(as.factor(x$replicate))
   
   if (style == "generic") {
     plot(x$conc2, seq(0, 1, length.out = length(x$conc2)),
@@ -75,7 +67,7 @@ survDataPlotTargetTime <- function(x,
          labels = unique(x$conc))
     
     # points
-    if (pool.replicate) {
+    if (length(unique(x$replicate)) == 1) {
       # points
         points(x$conc2, x$response,
                pch = 16)
@@ -95,7 +87,7 @@ survDataPlotTargetTime <- function(x,
     }
   }
   if (style == "ggplot") {
-    if (pool.replicate) {
+    if (length(unique(x$replicate)) == 1) {
       df <- ggplot(x, aes(x = conc2, y = response))
     } else {
       df <- ggplot(x, aes(x = conc2, y = response,
