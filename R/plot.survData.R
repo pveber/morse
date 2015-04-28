@@ -225,8 +225,6 @@ survDataPlotFull <- function(data,
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
 #'
-#' # (6) Plot 
-
 #' @export
 #'
 #' @import ggplot2
