@@ -42,7 +42,7 @@ survDataPlotFixedConc <- function(x,
   x$color <- as.numeric(as.factor(x$replicate))
   
   if (style == "generic") {
-    plot(x$time, seq(0, 1, length.out = length(x$time)),
+    plot(x$time, seq(0, max(x$response), length.out = length(x$time)),
          type = "n",
          xlab = xlab,
          ylab = ylab)
