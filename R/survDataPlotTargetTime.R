@@ -42,7 +42,7 @@ survDataPlotTargetTime <- function(x,
   x$color <- as.numeric(as.factor(x$replicate))
   
   if (style == "generic") {
-    plot(x$conc, seq(0, 1, length.out = length(x$conc)),
+    plot(x$conc, seq(0, max(x$response), length.out = length(x$conc)),
          type = "n",
          xaxt = "n",
          xlab = xlab,
