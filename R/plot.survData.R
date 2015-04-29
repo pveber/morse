@@ -205,13 +205,15 @@ survDataPlotFull <- function(data,
 
 #' Plotting method for survData objects
 #'
-#' Plots the survival rate as a
+#' Plots the survival data as a
 #' function of either time and concentration, time only (for a fixed
 #' concentration), concentration only (for a given target time). If both
 #' concentration and target time are fixed, the function additionally plots
 #' the experimental values for the minimum available concentration.
 #'
 #' @param x an object of class \code{survData}
+#' @param response if \code{"Nsurv"} the response variable was expressed as the
+#' number of survivor, if \code{"survRate"} as the survival rate.
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
@@ -275,12 +277,11 @@ survDataPlotFull <- function(data,
 #' plot(zinc, concentration = 0.66, target.time = 21, addlegend = TRUE,
 #' style = "generic")
 #' 
-#' # (10) Plot the survival data by replicate for one concentration at one target.time
+#' # (11) Plot the survival data by replicate for one concentration at one target.time
 #' # with a ggplot type
 #' plot(zinc, concentration = 0.66, target.time = 21, addlegend = TRUE,
 #' style = "ggplot")
-#'
-#'
+#' 
 #' @export
 #'
 #' @import ggplot2
@@ -288,6 +289,7 @@ survDataPlotFull <- function(data,
 #' @importFrom graphics plot
 #'
 plot.survData <- function(x,
+                          response = "Nsurv",
                           target.time = NULL,
                           concentration = NULL,
                           xlab = NULL,
@@ -301,12 +303,22 @@ plot.survData <- function(x,
     stop("plot.survData: object of class survData expected")
   
   # response variable survival rate
-  x$response <- x$Nsurv / x$Ninit
+  if (response == "Nsurv") {
+    x$response <- x$Nsurv
+    ylab <- "Number of survivors"
+  }
+  if (response == "survRate") {
+    x$response <- x$Nsurv / x$Ninit
+    ylab <- "Survival Rate"
+  }
+  if (response != "Nsurv" && response != "survRate")
+    stop("[response] must be 'Nsurv' or 'survRate' !")
 
   if (pool.replicate) {
     # agregate by mean of replicate
-    x <- cbind(aggregate(response ~ time + conc, x, mean),
-                  replicate = 1)
+    x <- cbind(aggregate(response ~ time + conc, x,
+                         ifelse(response == "Nsurv", sum, mean),
+                  replicate = 1))
   }
 
   if (is.null(target.time) && is.null(concentration))
