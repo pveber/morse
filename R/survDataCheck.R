@@ -116,8 +116,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 7 assert each (replicate, concentration, time) triplet is unique
   ##
-  ID <- str_c(data[, "replicate"], data[, "conc"], data[, "time"],
-              sep = "_")
+  ID <- idCreate(data)
   if (any(duplicated(ID))) {
     msg <- paste("The (replicate, conc, time) triplet ",
                  ID[duplicated(ID)],
