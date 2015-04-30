@@ -2,6 +2,14 @@ survDataPlotFullGeneric <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate
   # for generic graphics
+  
+  if (is.null(xlab)) {
+    xlab <- "Time"
+  }
+  
+  if (is.null(ylab)) {
+    ylab <- "Survival Rate"
+  }
 
   .convert <- function(x) {
     # conversion of a replicate name in a number coding for color
@@ -50,20 +58,20 @@ survDataPlotFullGeneric <- function(data, xlab, ylab, addlegend) {
     plot(x$time, rep(0, length(x$time)),
          xlab = xlab,
          ylab = ylab,
-         ylim = c(0,max(x$Nsurv)),
+         ylim = c(0,max(x$response)),
          type = "n",
          col = 'white',
          yaxt = 'n')
 
     # axis
-    axis(side = 2, at = pretty(c(0,max(x$Nsurv))))
+    axis(side = 2, at = pretty(c(0,max(x$response))))
 
     # lines and points
     by(x, x$replicate, function(y) {
-      lines(y$time, y$Nsurv,
+      lines(y$time, y$response,
             type = "l",
             col = colors[.convert(unique(y$replicate))])
-      points(y$time, y$Nsurv,
+      points(y$time, y$response,
              pch = pchs[.convert(unique(y$replicate))],
              col = colors[.convert(unique(y$replicate))])
     })
@@ -108,9 +116,17 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
 
   # change order of reading concentrations
   lattice.options(default.args = list(as.table = TRUE))
+  
+  if (is.null(xlab)) {
+    xlab <- "Time"
+  }
+  
+  if (is.null(ylab)) {
+    ylab <- "Survival Rate"
+  }
 
   if (addlegend) {
-    xyplot(Nsurv ~ time | factor(conc),
+    xyplot(response ~ time | factor(conc),
            data = data,
            group = replicate,
            index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
@@ -125,7 +141,7 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
                            lines = TRUE,
                            points = FALSE))
   } else {
-    xyplot(Nsurv ~ time | factor(conc),
+    xyplot(response ~ time | factor(conc),
            data = data,
            group = replicate,
            index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
@@ -137,23 +153,30 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
   }
 }
 
-#' @import ggplot2
 survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate for ggplot graphics
+  
+  if (is.null(xlab)) {
+    xlab <- "Time"
+  }
+  
+  if (is.null(ylab)) {
+    ylab <- "Survival Rate"
+  }
 
   time = NULL
-  Nsurv = NULL
+  response = NULL
   title.legend <- "Replicate"
 
-  # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, Nsurv, colour = factor(replicate))) +
+  # create ggplot object response / time / replicate / conc
+  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
     geom_point() +
     geom_line() +
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    ylim(0, max(data$Nsurv))
+    ylim(0, max(data$response))
 
   # legend option
   if (addlegend){
@@ -181,13 +204,15 @@ survDataPlotFull <- function(data,
 
 #' Plotting method for survData objects
 #'
-#' Plots the number of survivors as a
+#' Plots the survival data as a
 #' function of either time and concentration, time only (for a fixed
 #' concentration), concentration only (for a given target time). If both
 #' concentration and target time are fixed, the function additionally plots
 #' the experimental values for the minimum available concentration.
 #'
 #' @param x an object of class \code{survData}
+#' @param response if \code{"Nsurv"} the response variable was expressed as the
+#' number of survivor, if \code{"survRate"} as the survival rate.
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
@@ -198,6 +223,7 @@ survDataPlotFull <- function(data,
 #' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
+#' 
 #' @param \dots further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -205,8 +231,6 @@ survDataPlotFull <- function(data,
 #' \code{trellis}.
 #'
 #'#' @examples
-#'
-#' library(ggplot2)
 #'
 #' # (1) Load the data
 #' data(zinc)
@@ -224,17 +248,44 @@ survDataPlotFull <- function(data,
 #' # (5) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
-
+#' 
+#' # (6) Plot the survival data in function of concentration for a fixed target.time
+#' # with a generic type
+#' plot(zinc, target.time = 21, style = "generic", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#' 
+#' # (7) Plot the survival data in function of concentration for a fixed target.time
+#' # with a ggplot type
+#' plot(zinc, target.time = 21, style = "ggplot", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#' 
+#' # (8) Plot the survival data in function of time by replicate for a concentration
+#' # with a generic type
+#' plot(zinc, concentration = 0.66, style = "generic", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#'
+#' # (9) Plot the survival data in function of time by replicate for a concentration
+#' # with a ggplot type
+#' plot(zinc, concentration = 0.66, style = "ggplot", pool.replicate = FALSE,
+#' addlegend = TRUE)
+#' 
+#' # (10) Plot the survival data by replicate for one concentration at one target.time
+#' # with a generic type
+#' plot(zinc, concentration = 0.66, target.time = 21, addlegend = TRUE,
+#' style = "generic")
+#' 
+#' # (11) Plot the survival data by replicate for one concentration at one target.time
+#' # with a ggplot type
+#' plot(zinc, concentration = 0.66, target.time = 21, addlegend = TRUE,
+#' style = "ggplot")
+#' 
 #' @export
 #'
-#' @import ggplot2
 #' @import grDevices
-# FIXME: delete imports if really not needed
-# @importFrom gridExtra grid.arrange arrangeGrob
-# @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
 #'
 plot.survData <- function(x,
+                          response = "Nsurv",
                           target.time = NULL,
                           concentration = NULL,
                           xlab = NULL,
@@ -246,11 +297,24 @@ plot.survData <- function(x,
 
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
+  
+  # response variable survival rate
+  if (response == "Nsurv") {
+    x$response <- x$Nsurv
+    ylab <- "Number of survivors"
+  }
+  if (response == "survRate") {
+    x$response <- x$Nsurv / x$Ninit
+    ylab <- "Survival Rate"
+  }
+  if (response != "Nsurv" && response != "survRate")
+    stop("[response] must be 'Nsurv' or 'survRate' !")
 
   if (pool.replicate) {
-    # agregate by sum of replicate
-    x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
-                  replicate = 1)
+    # agregate by mean of replicate
+    x <- cbind(aggregate(response ~ time + conc, x,
+                         ifelse(response == "Nsurv", sum, mean),
+                  replicate = 1))
   }
 
   if (is.null(target.time) && is.null(concentration))
