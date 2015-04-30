@@ -11,7 +11,6 @@
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
 #' 
 #' @export
-#' @import ggplot2
 #' @importFrom dplyr filter
 survDataPlotFixedConc <- function(x,
                                   concentration = NULL,
