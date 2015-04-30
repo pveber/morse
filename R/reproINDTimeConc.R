@@ -12,7 +12,6 @@
 #' pooled together for a same concentration by mean.
 #' 
 #' @export
-#' @import ggplot2
 #' @importFrom dplyr %>%
 #' @importFrom plyr ldply
 reproINDTimeConc <- function(data,
@@ -81,7 +80,6 @@ reproINDTimeConc <- function(data,
     }
   }
   if (type == "ggplot") {
-    require("ggplot2")
     if (pool.replicate) {
       df <- ggplot(responsetable, aes(x = timeOrigine, y = response,
                                       color = factor(conc)))
