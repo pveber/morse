@@ -1,16 +1,13 @@
-#' @importFrom stringr str_c
-idCreate <- function(data, notime = FALSE) {
+#'@importFrom stringr str_c
+#'
+idCreate <- function(data) {
   # INPUT
-  # data: a raw data frame
-  # notime: if TRUE there is no column time in the dataset
+  # - data: a reordered dataframe
   # OUTPUT
-  # vector of triplet replicate_conc_time or couple replicate_conc
-  if (!notime) {
-    return(str_c(data[, "replicate"], data[, "conc"], data[, "time"],
-                 sep = "_"))
-  } else {
-    return(str_c(data[, "replicate"], data[, "conc"], sep = "_"))
-  }
+  # - vector of triplet replicate_conc_time
+  
+  return(str_c(data[, "replicate"], data[, "conc"], data[, "time"],
+               sep = "_"))
 }
 
 #' @importFrom dplyr right_join %>% rename
@@ -291,7 +288,6 @@ survFullPlotL <- function(data, xlab, ylab, addlegend) {
   }
 }
 
-#' @import ggplot2
 survFullPlotGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate for ggplot type
