@@ -13,7 +13,6 @@
 #' pooled together for a same concentration by mean.
 #' 
 #' @export
-#' @import ggplot2
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(x,
                                    target.time = NULL,
