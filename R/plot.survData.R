@@ -153,7 +153,6 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
   }
 }
 
-#' @import ggplot2
 survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate for ggplot graphics
@@ -233,8 +232,6 @@ survDataPlotFull <- function(data,
 #'
 #'#' @examples
 #'
-#' library(ggplot2)
-#'
 #' # (1) Load the data
 #' data(zinc)
 #' zinc <- survData(zinc)
@@ -284,7 +281,6 @@ survDataPlotFull <- function(data,
 #' 
 #' @export
 #'
-#' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot
 #'
