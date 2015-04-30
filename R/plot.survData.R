@@ -137,7 +137,6 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
   }
 }
 
-#' @import ggplot2
 survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate for ggplot graphics
@@ -227,7 +226,6 @@ survDataPlotFull <- function(data,
 
 #' @export
 #'
-#' @import ggplot2
 #' @import grDevices
 # FIXME: delete imports if really not needed
 # @importFrom gridExtra grid.arrange arrangeGrob
