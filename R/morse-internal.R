@@ -413,7 +413,6 @@ survFullPlotL <- function(data, xlab, ylab, addlegend) {
   }
 }
 
-#' @import ggplot2
 survFullPlotGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate for ggplot type
