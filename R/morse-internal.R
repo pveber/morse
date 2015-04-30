@@ -1,3 +1,15 @@
+#'@importFrom stringr str_c
+#'
+idCreate <- function(data) {
+  # INPUT
+  # - data: a reordered dataframe
+  # OUTPUT
+  # - vector of triplet replicate_conc_time
+  
+  return(str_c(data[, "replicate"], data[, "conc"], data[, "time"],
+               sep = "_"))
+}
+
 #' @importFrom dplyr right_join %>% rename
 #'
 reproTransformData <- function(data) {
