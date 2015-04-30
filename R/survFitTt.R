@@ -60,10 +60,9 @@
 #' \code{surFitTt} function is the \code{resmatrix} object. See the
 #' \code{\link[coda]{raftery.diag}} help for more details.
 #' 
-#' @aliases survFitTt survParfitTt print.survFitTt summary.survFitTt
-#' plot.survFitTt
+#' @aliases survFitTt
 #' 
-#' @param data An object of class \code{survData}.
+#' @param x An object of class \code{survData}.
 #' @param det.part Deterministic part of the model.
 #' @param target.time The chosen time to calculate the estimation. The time at
 #' which the number of individual-days and the cumulative number of offspring
