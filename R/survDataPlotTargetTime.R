@@ -9,8 +9,6 @@
 #' @param ylab Y-axis label.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
-#' pooled together for a same concentration by mean.
 #' 
 #' @export
 #' @importFrom dplyr %>% filter
