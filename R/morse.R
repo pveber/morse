@@ -1,4 +1,4 @@
-#' MOdelling tools for Reproduction and Survival data in Ecotoxicology
+#' MOdelling Tools for Reproduction and Survival Data in Ecotoxicology
 #'
 #' The package offers tools for ecotoxicologists and regulators based on
 #' advanced and innovative methods for a valuable quantitative environmental
