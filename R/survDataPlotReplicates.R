@@ -14,7 +14,6 @@
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
 #' 
 #' @export
-#' @import ggplot2
 #' @importFrom dplyr %>% filter
 survDataPlotReplicates <- function(x,
                                    target.time = NULL,
