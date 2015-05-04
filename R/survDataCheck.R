@@ -18,6 +18,7 @@
 #' \code{missingColumn} \tab at least one expected column heading is missing \cr
 #' \code{firstTime0} \tab the first time point for some (concentration, replicate) is not 0 \cr
 #' \code{concNumeric} \tab column \code{conc} contains a value of class other than \code{numeric} \cr
+#' \code{timeNumeric} \tab column \code{time} contains a value of class other than \code{numeric} \cr
 #' \code{NsurvInteger} \tab column \code{Nsurv} contains a value of class other than \code{integer} \cr
 #' \code{tablePositive} \tab some data are negative \cr
 #' \code{Nsurv0T0} \tab \code{Nsurv} is 0 at time 0 for some (concentration, replicate) \cr
@@ -88,7 +89,15 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 4. assert Nsurv contains integer
+  ## 4. assert time contains integer
+  ##
+  if (!is.numeric(data$time)) {
+    msg <- "Column 'time' must contain only numerical values."
+    errors <- errorTableAdd(errors, "timeNumeric", msg)
+  }
+  
+  ##
+  ## 5. assert Nsurv contains integer
   ##
   if (!is.integer(data$Nsurv)) {
     msg <- "Column 'Nsurv' must contain only integer values."
@@ -96,7 +105,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 5. assert all data are positive
+  ## 6. assert all data are positive
   ##
   table <- subset(data, select = -c(replicate)) # remove replicate column
   if (any(table < 0.0)) {
@@ -105,7 +114,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 6. assert Nsurv != 0 at time 0
+  ## 7. assert Nsurv != 0 at time 0
   ##
   datatime0 <- data[data$time == 0, ]  # select data for initial time points
   if (any(datatime0$Nsurv == 0)) { # test if Nsurv != 0 at time 0
@@ -114,7 +123,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 7 assert each (replicate, concentration, time) triplet is unique
+  ## 8 assert each (replicate, concentration, time) triplet is unique
   ##
   ID <- idCreate(data) # ID vector
   if (any(duplicated(ID))) {
@@ -133,7 +142,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     errors <- errorTableCreate()
 
     ##
-    ## 8. assert there is the same number of replicates for each conc and time
+    ## 9. assert there is the same number of replicates for each conc and time
     ##
     if (length(subdata$replicate) != length(unique(data$time))) {
       msg <- paste("Replicate ", unique(subdata$replicate),
@@ -143,7 +152,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     }
 
     ##
-    ## 9. assert Nsurv never increases with time
+    ## 10. assert Nsurv never increases with time
     ##
     nsurv.increase <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
     if (any(nsurv.increase)) {
@@ -160,7 +169,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   errors <- errorTableAppend(errors, consistency.errors)
 
   ##
-  ## 10. assert labels of replicates are the same for all (time, concentration)
+  ## 11. assert labels of replicates are the same for all (time, concentration)
   ##
   rep.labels <- by(data,
                    list(data$conc, data$time),
