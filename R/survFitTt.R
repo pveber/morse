@@ -265,8 +265,8 @@ survFitTt <- function(x,
                       n.chains = 3,
                       quiet = FALSE) {
   # test class object
-  if (class(x)[1] != "survData")
-    stop("The [x] argument is not of class 'survData' !\n")
+  if(! is(x,"survData"))
+    stop("survFitTt: object of class survData expected")
   
   # test determinist part
   if (!any(det.part == "loglogisticbinom_2" || det.part == "loglogisticbinom_3"))
