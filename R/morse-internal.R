@@ -1,17 +1,16 @@
+# Generates a character string vector from a data.frame using its replicate,
+# conc and time columns. The result can be used as identifiers for the rows
+# of the data.set.
+#
 #' @importFrom stringr str_c
-idCreate <- function(data, notime = FALSE) {
-  # INPUT
-  # data: a raw data frame
-  # notime: if TRUE there is no column time in the dataset
-  # OUTPUT
-  # vector of triplet replicate_conc_time or couple replicate_conc
-  if (!notime) {
-    return(str_c(data[, "replicate"], data[, "conc"], data[, "time"],
-                 sep = "_"))
-  } else {
-    return(str_c(data[, "replicate"], data[, "conc"], sep = "_"))
-  }
+#'
+idCreate <- function(data) {
+  str_c(data[, "replicate"],
+        data[, "conc"],
+        data[, "time"],
+        sep = "_")
 }
+
 
 #' @importFrom dplyr right_join %>% rename
 #'
