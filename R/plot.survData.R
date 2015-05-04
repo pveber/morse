@@ -313,8 +313,8 @@ plot.survData <- function(x,
   if (pool.replicate) {
     # agregate by mean of replicate
     x <- cbind(aggregate(response ~ time + conc, x,
-                         ifelse(response == "Nsurv", sum, mean),
-                  replicate = 1))
+                         ifelse(response == "Nsurv", sum, mean)),
+                  replicate = 1)
   }
 
   if (is.null(target.time) && is.null(concentration))
