@@ -164,7 +164,6 @@ survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   return(fd)
 }
 
-
 survDataPlotFull <- function(data,
                              xlab = NULL,
                              ylab = NULL,
@@ -178,6 +177,38 @@ survDataPlotFull <- function(data,
     survDataPlotFullGG(data, xlab, ylab, addlegend)
   else stop("Unknown plot style")
 }
+
+#' @importFrom dplyr %>% filter
+survDataPlotReplicates <-
+  function(x, target.time, concentration, xlab, ylab, style, addlegend) {
+
+  # check [target.time] and [concentration]
+  if (!target.time %in% x$time)
+    stop("[target.time] should be one of the observed time points!")
+
+  if (!concentration %in% x$conc)
+    stop("[concentration] should be one of the tested concentrations")
+
+  # select for concentration and target.time
+  x <- filter(x, conc == concentration & time == target.time)
+
+  if (style == "generic") {
+    plot(factor(x$replicate), x$Nsurv,
+         type = "n",
+         xlab = xlab,
+         ylab = ylab)
+  }
+
+  if (style == "ggplot") {
+    df <- ggplot(x, aes(x = replicate, y = Nsurv))
+    df + geom_point() + labs(x = xlab, y = ylab)
+  }
+
+  #FIXME: and lattice?
+  #FIXME: plot control too
+}
+
+
 
 #' Plotting method for survData objects
 #'
@@ -224,11 +255,11 @@ survDataPlotFull <- function(data,
 #' # (5) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
-#' 
+#'
 #' # (6) Plot the survival rate in function of replicates for one concentration at
 #' # one target.time with a generic type
 #' plot(zinc, style = "generic", target.time = 21, concentration = 0.66)
-#' 
+#'
 #' # (7) Plot the survival rate in function of replicates for one concentration at
 #' # one target.time with a ggplot type
 #' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
