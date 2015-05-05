@@ -326,81 +326,6 @@ survFullPlotGG <- function(data, xlab, ylab, addlegend) {
   return(fd)
 }
 
-llbinom3.model.text <- "\nmodel # Loglogistic binomial model with 3 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- d/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nd ~ dunif(dmin, dmax)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
-
-llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- 1/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
-
-#' @import dclone
-survLoadModelPar <- function(cl,
-                             model.program,
-                             data,
-                             n.chains,
-                             Nadapt,
-                             quiet = quiet) {
-  # create the JAGS model object
-  # INPUTS:
-  # - model.program: character string containing a jags model description
-  # - data: list of data created by survCreateJagsData
-  # - nchains: Number of chains desired
-  # - Nadapt: length of the adaptation phase
-  # - quiet: silent option
-  # OUTPUT:
-  # - JAGS model
-  
-  # load model text in a temporary file
-  model.file <- tempfile() # temporary file address
-  fileC <- file(model.file) # open connection
-  writeLines(model.program, fileC) # write text in temporary file
-  close(fileC) # close connection to temporary file
-  
-  # creation of the jags model
-  model <- parJagsModel(cl, name = "res", file = model.file, data = data,
-                        n.chains = n.chains, n.adapt = Nadapt, quiet = quiet)
-  unlink(model.file)
-  return(model)
-}
-
-#' @import dclone
-#' @importFrom coda raftery.diag
-modelSamplingParametersPar <- function(cl, model, parameters, n.chains,
-                                       quiet = quiet) {
-  # estimate the number of iteration required for the estimation
-  # by using the raftery.diag
-  # INPUTS:
-  # - model: jags model from loading function
-  # - parameters: parameters from loading function
-  # - nchains: Number of chains desired
-  # - quiet: silent option
-  # OUTPUTS:
-  # - niter: number of iteration (mcmc)
-  # - thin: thining rate parameter
-  # - burnin: number of iteration burned
-  
-  # number of iteration for the pilote run required by raftery.diag
-  # default value: 3746
-  niter.init <- 5000
-  prog.b <- ifelse(quiet == TRUE, "none", "text") # plot progress bar option
-  mcmc <- parCodaSamples(cl,"res", parameters, n.iter = niter.init, thin = 1,
-                         progress.bar = prog.b)
-  RL <- raftery.diag(mcmc)
-  
-  # check raftery.diag result (number of sample for the diagnostic procedure)
-  if (n.chains < 2) stop('2 or more parallel chains required !')
-  
-  # extract raftery diagnostic results
-  resmatrix <- RL[[1]]$resmatrix
-  for (i in 2: length(RL)) {
-    resmatrix <- rbind(resmatrix, RL[[i]]$resmatrix)
-  }
-  
-  # creation of sampling parameters
-  thin <- round(max(resmatrix[, "I"]) + 0.5) # autocorrelation
-  niter <- max(resmatrix[, "Nmin"]) * thin # number of iteration
-  burnin <- max(resmatrix[, "M"]) # burnin period
-  
-  return(list(niter = niter, thin = thin, burnin = burnin))
-}
-
 logTransXaxisFit <- function(log.scale, concentrations) {
   # remove concentrations 0 in log.scale if needed
   # INPUT :
@@ -525,4 +450,3 @@ legendGgplotFit <- function(a.gplot) {
   legend <- tmp$grobs[[leg]]
   return(legend)
 }
->>>>>>> a09b22f... add plot.survFitTt associated functions
