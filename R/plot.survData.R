@@ -251,6 +251,71 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
 }
 
 
+survDataPlotFixedConc <- function(x,
+                                  concentration,
+                                  style = "generic",
+                                  addlegend = TRUE,
+                                  ...) {
+
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+
+  # check concentration value
+  if (!concentration %in% x$conc)
+    stop("The argument [concentration] should correspond to one of the tested concentrations")
+
+  # select the concentration
+  x <- filter(x, x$conc == concentration)
+
+  # vector color
+  x$color <- as.numeric(as.factor(x$replicate))
+
+  if (style == "generic") {
+    plot(x$time, x$Nsurv,
+         type = "n",
+         xlab = xlab,
+         ylab = ylab)
+
+    # one line by replicate
+    by(x, list(x$replicate),
+       function(x) {
+         lines(x$time, x$Nsurv, # lines
+               col = x$color)
+         points(x$time, x$Nsurv, # points
+                pch = 16,
+                col = x$color)
+       })
+
+    if (addlegend) {
+      legend("bottomleft", legend = unique(x$replicate) ,
+             col = unique(x$color),
+             pch = 16,
+             lty = 1)
+    }
+  }
+  if (style == "ggplot") {
+    if (length(unique(x$replicate)) == 1) {
+      df <- ggplot(x, aes(x = time, y = Nsurv))
+    } else {
+      df <- ggplot(x, aes(x = time, y = Nsurv,
+                          color = factor(replicate),
+                          group = replicate))
+    }
+    fd <- df + geom_line() + geom_point() + theme_minimal() +
+      labs(x = xlab,
+           y = ylab) +
+      scale_color_hue("Replicate")
+
+    if (addlegend) {# only if pool.replicate == FALSE
+      fd
+    } else {
+      fd + theme(legend.position = "none") # remove legend
+    }
+  }
+}
+
+
 #' @importFrom dplyr %>% filter
 survDataPlotReplicates <- function(x,
                                    target.time,
@@ -265,10 +330,10 @@ survDataPlotReplicates <- function(x,
 
   # check [target.time] and [concentration]
   if (!target.time %in% x$time)
-    stop("[target.time] should be one of the observed time points!")
+    stop("The argument [target.time] should correspond to one of the observed time points")
 
   if (!concentration %in% x$conc)
-    stop("[concentration] should be one of the tested concentrations")
+    stop("The argument [concentration] should correspond to one of the tested concentrations")
 
   # select for concentration and target.time
   x <- filter(x, conc == concentration & time == target.time)
@@ -370,7 +435,7 @@ plot.survData <- function(x,
   else if (! is.null(target.time) && is.null(concentration))
     survDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
-    survDataPlotFixedConc(x, concentration, style, addlegend)
+    survDataPlotFixedConc(x, concentration, style, addlegend, ...)
   else
     survDataPlotReplicates(x, target.time, concentration, style, addlegend, ...)
 }
