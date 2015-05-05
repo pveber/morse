@@ -137,7 +137,6 @@ survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
   }
 }
 
-#' @import ggplot2
 survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate for ggplot graphics
@@ -206,8 +205,6 @@ survDataPlotFull <- function(data,
 #'
 #'#' @examples
 #'
-#' library(ggplot2)
-#'
 #' # (1) Load the data
 #' data(zinc)
 #' zinc <- survData(zinc)
@@ -224,14 +221,18 @@ survDataPlotFull <- function(data,
 #' # (5) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
+#' 
+#' # (6) Plot the survival rate in function of replicates for one concentration at
+#' # one target.time with a generic type
+#' plot(zinc, style = "generic", target.time = 21, concentration = 0.66)
+#' 
+#' # (7) Plot the survival rate in function of replicates for one concentration at
+#' # one target.time with a ggplot type
+#' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
 
 #' @export
-#'
-#' @import ggplot2
+#' 
 #' @import grDevices
-# FIXME: delete imports if really not needed
-# @importFrom gridExtra grid.arrange arrangeGrob
-# @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
 #'
 plot.survData <- function(x,
