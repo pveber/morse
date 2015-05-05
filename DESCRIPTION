@@ -8,7 +8,7 @@ Maintainer: Philippe Ruiz <philippe.ruiz@univ-lyon1.fr>
 Description: A package for ecotoxicologists and regulators dedicated to the mathematical and statistical modelling of bioassay data. The package uses advanced and innovative methods for a valuable quantitative environmental risk assessment.
 Depends: R (>= 3.0.0), ggplot2
 SystemRequirements: jags (>= 3.0.0) (see http://mcmc-jags.sourceforge.nte)
-Imports: coda, dplyr, stringr, lattice, rjags
+Imports: coda, dclone, dplyr, graphics, grDevices, grid, gridExtra, lattice, parallel, rjags, stringr
 License: GPL (>=2)
-Suggests: knitr, rmarkdown, testthat
+Suggests: knitr, rmarkdown, testthat, snow
 VignetteBuilder: knitr
