@@ -164,11 +164,12 @@ survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   return(fd)
 }
 
-survDataPlotFull <- function(data,
-                             xlab = NULL,
-                             ylab = NULL,
-                             style = "generic",
-                             addlegend = TRUE) {
+survDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
+
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+
   if (style == "generic")
     survDataPlotFullGeneric(data, xlab, ylab, addlegend)
   else if (style == "lattice")
@@ -178,9 +179,89 @@ survDataPlotFull <- function(data,
   else stop("Unknown plot style")
 }
 
+#' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotReplicates <-
-  function(x, target.time, concentration, xlab, ylab, style, addlegend) {
+survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
+
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+
+  if (!target.time %in% x$time)
+    stop("[target.time] is not one of the possible time !")
+
+  # select the target.time
+  x <- filter(x, x$time == target.time)
+
+  # vector color
+  x$color <- as.numeric(as.factor(x$replicate))
+
+  if (style == "generic") {
+    plot(x$conc, seq(0, max(x$Nsurv), length.out = length(x$conc)),
+         type = "n",
+         xaxt = "n",
+         xlab = xlab,
+         ylab = ylab)
+
+    axis(side = 1, at = unique(x$conc),
+         labels = unique(x$conc))
+
+    # points
+    if (length(unique(x$replicate)) == 1) {
+      # points
+      points(x$conc, x$Nsurv,
+             pch = 16)
+    } else {
+      by(x, list(x$replicate),
+         function(x) {
+           points(x$conc, x$Nsurv,
+                  pch = 16,
+                  col = x$color)
+         })
+      if (addlegend) {
+        legend("bottomleft", legend = unique(x$replicate) ,
+               title = "Replicate",
+               col = unique(x$color),
+               pch = 16, ncol = 3)
+      }
+    }
+  }
+  if (style == "ggplot") {
+    if (length(unique(x$replicate)) == 1) {
+      df <- ggplot(x, aes(x = conc, y = Nsurv))
+    } else {
+      df <- ggplot(x, aes(x = conc, y = Nsurv,
+                          color = factor(replicate),
+                          group = replicate))
+    }
+    fd <- df + geom_point() + theme_minimal() +
+      labs(x = xlab,
+           y = ylab) +
+      scale_x_continuous(breaks = unique(x$conc),
+                         labels = unique(x$conc)) +
+      scale_color_hue("Replicate")
+
+    # legend option
+    if (addlegend) {
+      fd
+    } else {
+      fd + theme(legend.position = "none") # remove legend
+    }
+  }
+}
+
+
+#' @importFrom dplyr %>% filter
+survDataPlotReplicates <- function(x,
+                                   target.time,
+                                   concentration,
+                                   style,
+                                   addlegend,
+                                   ...) {
+
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
 
   # check [target.time] and [concentration]
   if (!target.time %in% x$time)
@@ -221,15 +302,12 @@ survDataPlotReplicates <-
 #' @param x an object of class \code{survData}
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
-#' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
-#' @param ylab a label for the \eqn{Y}-axis, by default \code{Number of
-#' survivors}.
 #' @param style graphical backend, can be \code{'generic'}, \code{'lattice'} or
 #' \code{'ggplot'}
 #' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
-#' @param \dots further arguments to be passed to generic methods.
+#' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' When \code{style = "lattice"}, the function returns an object of class
@@ -273,8 +351,6 @@ survDataPlotReplicates <-
 plot.survData <- function(x,
                           target.time = NULL,
                           concentration = NULL,
-                          xlab = NULL,
-                          ylab = NULL,
                           style = "generic",
                           addlegend = TRUE,
                           pool.replicate = FALSE,
@@ -290,11 +366,11 @@ plot.survData <- function(x,
   }
 
   if (is.null(target.time) && is.null(concentration))
-    survDataPlotFull(x, xlab, ylab, style, addlegend)
+    survDataPlotFull(x, style, addlegend, ...)
   else if (! is.null(target.time) && is.null(concentration))
-    survDataPlotTargetTime(x, target.time, xlab, ylab, style, addlegend)
+    survDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
-    survDataPlotFixedConc(x, concentration, xlab, ylab, style, addlegend)
+    survDataPlotFixedConc(x, concentration, style, addlegend)
   else
-    survDataPlotReplicates(x, target.time, concentration, xlab, ylab, style, addlegend)
+    survDataPlotReplicates(x, target.time, concentration, style, addlegend, ...)
 }
