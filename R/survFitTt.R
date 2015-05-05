@@ -62,7 +62,7 @@
 #' 
 #' @aliases survFitTt
 #' 
-#' @param x An object of class \code{survData}.
+#' @param sD An object of class \code{survData}.
 #' @param det.part Deterministic part of the model.
 #' @param target.time The chosen time to calculate the estimation. The time at
 #' which the number of individual-days and the cumulative number of offspring
@@ -73,38 +73,35 @@
 #' is 2.
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
 #' JAGS compilation.
-#' 
-#' # FIXME
-#' 
 #' #@param object An object of class \code{survFitTt}.
-#' #@param x An object of class \code{survFitTt}.
-#' #@param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
-#' #@param ylab A label for the \eqn{Y}-axis, by default \code{Response}.
-#' #@param main A main title for the plot.
-#' #@param fitcol A single color to plot the fitted curve, by default
-#' #\code{red}.
-#' #@param fitlty A single line type to plot the fitted curve, by default
-#' #\code{1}.
-#' #@param fitlwd A single numeric which controls the width of the fitted curve,
-#' #by default \code{1}.
-#' #@param ci If \code{TRUE}, the 95 \% credible limits of the model are
-#' #plotted.
-#' #@param cicol A single color to plot the 95 \% credible limits, by default
-#' #\code{red}.
-#' #@param cilty A single line type to plot 95 \% credible limits, by default
+#' @param x An object of class \code{survFitTt}.
+#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Response}.
+#' @param main A main title for the plot.
+#' @param fitcol A single color to plot the fitted curve, by default
+#' \code{red}.
+#' @param fitlty A single line type to plot the fitted curve, by default
 #' \code{1}.
-#' #@param cilwd A single numeric which controls the width of the 95 \% credible
-#' #limits, by default \code{2}.
-#' #@param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' ##@param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
-#' #@param type Graphical method: \code{generic} or \code{ggplot}.
-#' #@param ppc If \code{TRUE}, plot a representation of predictions as 95 \%
-#' #credible intervals, against observed values.
-#' #@param pool.replicate If \code{TRUE}, the datapoints of each replicate are
-#' #pooled together for a same concentration. The circles matches to the mean of
+#' @param fitlwd A single numeric which controls the width of the fitted curve,
+#' by default \code{1}.
+#' @param ci If \code{TRUE}, the 95 \% credible limits of the model are
+#' plotted.
+#' @param cicol A single color to plot the 95 \% credible limits, by default
+#' \code{red}.
+#' @param cilty A single line type to plot 95 \% credible limits, by default
+#' \code{1}.
+#' @param cilwd A single numeric which controls the width of the 95 \% credible
+#' limits, by default \code{2}.
+#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
+#' @param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
+#' @param style Graphical method: \code{generic} or \code{ggplot}.
+#' @param ppc If \code{TRUE}, plot a representation of predictions as 95 \%
+#' credible intervals, against observed values.
+#' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
+#' pooled together for a same concentration. The circles matches to the mean of
 #' datapoints for one concentration.
-#' #@param \dots Further arguments to be passed to generic methods.
-#'# 
+#' @param \dots Further arguments to be passed to generic methods.
+#'
 #' @return The function returns an object of class \code{survFitTt}. A list
 #' of 13 objects:
 #' \item{DIC}{DIC value of the selected model.}
@@ -172,7 +169,6 @@
 #' @keywords estimation
 #' 
 #' @examples
-#' # FIXME
 #' 
 #' # From repro-survival data
 #' # With mortality in the control dataset
@@ -184,32 +180,32 @@
 #' 
 #' \dontrun{
 #' # (3) Run the survFitTt function with the three parameters log-logistic
-#' binomial model
+#' # binomial model
 #' out <- survFitTt(dat, det.part = "loglogisticbinom_3",
 #' lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #' 
 #' # (3') Run the fit (parallel version)
-#' # out <- survParfitTt(dat, det.part = "loglogisticbinom_3",
-#' # lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
+#' out <- survParfitTt(dat, det.part = "loglogisticbinom_3",
+#' lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #' 
-#' # (5) Summary
+#' # (4) Summary
 #' # out
 #' # summary(out)
 #' 
-#' # (6) Plot the fitted curve
-#' # plot(out, log.scale = TRUE, ci = TRUE)
+#' # (5) Plot the fitted curve
+#' plot(out, log.scale = TRUE, ci = TRUE)
 #' 
-#' # (7) Plot the fitted curve with ggplot type
-#' # plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#' # fitcol = "blue", ci = TRUE, cicol = "blue",  type = "ggplot")
+#' # (6) Plot the fitted curve with ggplot style
+#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
+#' fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
 #' 
-#' # (8) Add a specific legend with generic type
-#' # plot(out, addlegend = FALSE)
-#' # legend("left", legend = c("Without mortality", "With mortality"),
-#' # pch = c(19,1)) 
+#' # (7) Add a specific legend with generic type
+#' plot(out, addlegend = FALSE)
+#' legend("left", legend = c("Without mortality", "With mortality"),
+#' pch = c(19,1)) 
 #' 
-#' # (9) Plot posterior predictive check 
-#' # plot(out, ppc = TRUE)
+#' # (8) Plot posterior predictive check 
+#' plot(out, ppc = TRUE)
 #' }
 #' 
 #' # Without mortality in the control dataset
@@ -225,32 +221,32 @@
 #' lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #' 
 #' # (3') Run the fit (parallel version)
-#' # out <- survParfitTt(dat2, det.part = "loglogisticbinom_2",
-#' # n.chains = 3)
+#' out <- survParfitTt(dat2, det.part = "loglogisticbinom_2",
+#' n.chains = 3)
 #' 
 #' # (4) Summary
 #' # out
 #' # summary(out)
 #' 
 #' # (5) Plot the fitted curve
-#' # plot(out, log.scale = TRUE, ci = TRUE,
-#' # main = "log-logistic binomial 2 parameters model")
+#' plot(out, log.scale = TRUE, ci = TRUE,
+#' main = "log-logistic binomial 2 parameters model")
 #' 
-#' # (6) Plot the fitted curve with ggplot type
-#' # plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#' # fitcol = "blue", ci = TRUE, cicol = "blue",  type = "ggplot",
-#' # main = "log-logistic binomial 2 parameters model")
+#' # (6) Plot the fitted curve with ggplot style
+#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
+#' fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot",
+#' main = "log-logistic binomial 2 parameters model")
 #' 
-#' # (7) Add a specific legend with generic type
-#' # plot(out, addlegend = FALSE)
-#' # legend("left", legend = c("Without mortality", "With mortality"),
-#' # pch = c(19,1)) 
+#' # (7) Add a specific legend with generic style
+#' plot(out, addlegend = FALSE)
+#' legend("left", legend = c("Without mortality", "With mortality"),
+#' pch = c(19,1)) 
 #' 
 #' # (8) Plot posterior predictive check 
-#' # plot(out, ppc = TRUE)
+#' plot(out, ppc = TRUE)
 #' 
 #' # (9) Don't pool the replicate 
-#' # plot(out, pool.replicate = FALSE)
+#' plot(out, pool.replicate = FALSE)
 #' }
 #' 
 #' @export
@@ -258,14 +254,14 @@
 #' @import rjags
 #' @importFrom dplyr filter
 #' 
-survFitTt <- function(x,
+survFitTt <- function(sD,
                       det.part = "loglogisticbinom_2",
                       target.time = NULL,
                       lcx,
                       n.chains = 3,
                       quiet = FALSE) {
   # test class object
-  if(! is(x,"survData"))
+  if(! is(sD, "survData"))
     stop("survFitTt: object of class survData expected")
   
   # test determinist part
@@ -289,7 +285,7 @@ survFitTt <- function(x,
   }
   
   # select Data at target.time
-  dataTt <- selectDataTt(x, target.time)
+  dataTt <- selectDataTt(sD, target.time)
   
   # create priors parameters
   jags.data <- survCreateJagsData(det.part, dataTt)
@@ -344,8 +340,8 @@ survFitTt <- function(x,
   # check if the maximum measured concentration is in the LC50's range of
   # 95% percentile
   if (50 %in% lcx) {
-    if (!(min(log10(x$conc)) < log10(estim.LCx["LC50", "median"]) &
-          log10(estim.LCx["LC50", "median"]) < max(log10(x$conc))))
+    if (!(min(log10(sD$conc)) < log10(estim.LCx["LC50", "median"]) &
+          log10(estim.LCx["LC50", "median"]) < max(log10(sD$conc))))
       warning("The LC50 estimation lies outsides the range of tested concentration and may be reliable !")
   }
   
@@ -362,7 +358,7 @@ survFitTt <- function(x,
                             end = summary(mcmc)$end),
               n.thin = summary(mcmc)$thin,
               jags.data = jags.data,
-              transformed.data = x,
+              transformed.data = sD,
               dataTt = dataTt)
   
   class(OUT) <- "survFitTt"
