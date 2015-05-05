@@ -82,8 +82,6 @@ survData <- function(data) {
   # create an ID column of triplet replicate_conc_time
   data[, "ID"] <- idCreate(data)
 
-  Nsurv <- c() # this is needed to avoid a complaint from package check when
-               # using dplyr::rename. R is such a sad language.
   data.t0 <- data[data$time == 0, c("replicate", "conc", "Nsurv")]
   data.t0 <- rename(data.t0, Ninit = Nsurv)
   out <- left_join(data, data.t0, by = c("replicate", "conc"))
