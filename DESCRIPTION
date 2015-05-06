@@ -10,5 +10,5 @@ Depends: R (>= 3.0.0)
 SystemRequirements: jags (>= 3.0.0) (see http://mcmc-jags.sourceforge.net)
 Imports: coda, dplyr, graphics, ggplot2, lattice, rjags, stringr
 License: GPL (>=2)
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, testthat
 VignetteBuilder: knitr
