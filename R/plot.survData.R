@@ -212,17 +212,17 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
       points(x$conc, x$Nsurv,
              pch = 16)
     } else {
-      by(x, list(x$replicate),
-         function(x) {
-           points(x$conc, x$Nsurv,
-                  pch = 16,
-                  col = x$color)
-         })
+      tt <- xyTable(x$conc, x$Nsurv)
+      points(tt$x, tt$y,
+             cex = (tt$number) / 3,
+             pch = 16)
       if (addlegend) {
-        legend("bottomleft", legend = unique(x$replicate) ,
-               title = "Replicate",
-               col = unique(x$color),
-               pch = 16, ncol = 3)
+        legend("bottomleft",
+               legend = sort(unique(tt$number)),
+               pt.cex = sort(unique((tt$number) / 3)),
+               title = "Overplotted replicates",
+               pch = 16,
+               bty = "n")
       }
     }
   }
@@ -230,9 +230,8 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
     if (length(unique(x$replicate)) == 1) {
       df <- ggplot(x, aes(x = conc, y = Nsurv))
     } else {
-      df <- ggplot(x, aes(x = conc, y = Nsurv,
-                          color = factor(replicate),
-                          group = replicate))
+      df <- ggplot(x, aes(x = conc, y = Nsurv)) +
+        stat_sum(aes(size = factor(..n..)))
     }
     fd <- df + geom_point() + theme_minimal() +
       labs(x = xlab,
