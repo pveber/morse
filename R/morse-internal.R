@@ -137,3 +137,65 @@ estimXCX <- function(mcmc, xcx, varx) {
 
   return(res)
 }
+
+logTransXaxisFit <- function(log.scale, concentrations) {
+  # remove concentrations 0 in log.scale if needed
+  # INPUT :
+  # - log.scale: booleen
+  # - concentrations: vector of concentrations
+  # OUTPUT
+  # - X: new vector of concentration of length 100
+  
+  if (log.scale && any(concentrations == 0)) { # log.scale yes
+    # 0 in the concentrations
+    X <- seq(min(unique(concentrations)[-1]), max(concentrations),
+             length = 100)
+  } else { # no 0 in the concentrations
+    X <- seq(min(concentrations), max(concentrations), length = 100)
+  }
+  return(X)
+}
+
+logTransConcFit <- function(log.scale, X, x, concentrations) {
+  # transform vector conccentration in log.scale if needed
+  # X axis log.scale value
+  
+  # select non 0 values
+  sel <- if (log.scale) {
+    X > 0
+  } else {
+    rep(TRUE, length(X))
+  }
+  
+  if (log.scale) {
+    X[sel] <- log(X[sel])
+  } else {
+    X[sel] <- X[sel]
+  }
+  
+  # log transform concentrations values
+  sel2 <- if (log.scale) {
+    x$dataTt$conc > 0
+  } else {
+    rep(TRUE, length(x$dataTt$conc))
+  }
+  if (log.scale) {
+    concentrations[sel2] <- log(concentrations[sel2])
+  } else {
+    concentrations[sel2] <- concentrations[sel2]
+  }
+  
+  return(list(sel = sel,
+              X = X,
+              sel2 = sel2,
+              concentrations = concentrations))
+}
+
+legendGgplotFit <- function(a.gplot) {
+  # create multi legend for plot.reproFitTt and plot.survFitTt
+  # to have differente legend for points and mean and CI curve
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
