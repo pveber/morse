@@ -8,7 +8,6 @@ Companion R package for MOSAIC website
   `R CMD build mosaic-r`
 - Test (need `Rtools 3.1`, works with `Rtools 3.2` but generate a warning message):
   - generate the documentation
-  - in the package directory under the R interpreter: `devtools::test()` 
   - in the package directory under the R interpreter: `devtools::test()`
   
 - Generate documentation
