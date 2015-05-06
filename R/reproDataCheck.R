@@ -111,7 +111,6 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
                    ", there are some Nsurv = 0 followed by Nrepro > 0 at the next time point.",
                    sep = "")
       errors <- errorTableAdd(errors, "Nsurvt0Nreprotp1P", msg)
-      print(errors)
     }
     return(errors)
   }
@@ -119,10 +118,9 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   consistency.errors <- do.call("errorTableAppend", res)
   errors <- errorTableAppend(errors, consistency.errors)
 
-  # call function survFullPlot FIXME: restore when fn available
   if (diagnosis.plot &&
       ("NsurvIncrease" %in% errors$id || "NsurvMonotone" %in% errors$id)) {
-        survFullPlot(data)
+        plot(data)
       }
 
   return(errors)
