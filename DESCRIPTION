@@ -7,7 +7,7 @@ Author: Marie Laure Delignette-Muller [aut, cre], Philippe Ruiz [aut, cre], Sand
 Maintainer: Philippe Ruiz <philippe.ruiz@univ-lyon1.fr>
 Description: A package for ecotoxicologists and regulators dedicated to the mathematical and statistical modelling of bioassay data. The package uses advanced and innovative methods for a valuable quantitative environmental risk assessment.
 Depends: R (>= 3.0.0)
-SystemRequirements: jags (>= 3.0.0)
+SystemRequirements: jags (>= 3.0.0) (see http://mcmc-jags.sourceforge.net)
 Imports: coda, dplyr, graphics, ggplot2, lattice, rjags, stringr
 License: GPL (>=2)
 Suggests: knitr, rmarkdown
