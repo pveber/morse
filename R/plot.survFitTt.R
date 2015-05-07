@@ -42,6 +42,7 @@ survLlbinomCi <- function(x, X) {
   
   # quantiles
   qinf95 = NULL
+  med = NULL
   qsup95 = NULL
   
   for (i in 1:length(X)) {
@@ -53,10 +54,12 @@ survLlbinomCi <- function(x, X) {
     
     # IC 95%
     qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
+    med[i] <- median(theomean, na.rm = TRUE)
     qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
   }
   # values for CI
   ci <- list(qinf95 = qinf95,
+             med = med,
              qsup95 = qsup95)
   return(ci)
 }
@@ -85,7 +88,6 @@ plot.survFitTt <- function(x,
                            addlegend = TRUE,
                            log.scale = FALSE,
                            style = "generic",
-                           ppc = FALSE,
                            pool.replicate = TRUE, ...) {
   # plot the fitted curve estimated by survFitTt
   # INPUTS
@@ -103,7 +105,6 @@ plot.survFitTt <- function(x,
   # - addlegend : boolean
   # - log.scale : x log option
   # - style : generic or ggplot
-  # - ppc : plot posterior predictive check
   # OUTPUT:
   # - plot of fitted regression	
   
@@ -289,28 +290,6 @@ plot.survFitTt <- function(x,
                         x$det.part, paste("Credible limits of", x$det.part,
                                           sep = " ")),
              bty = "n")
-    }
-  }
-  
-  # posterior predictive check
-  if (ppc) {
-    if (Sys.getenv("RSTUDIO") == "") {
-      dev.new() # create a new page plot
-      # when not use RStudio
-    }
-    plot(response, response,
-         bty = "n",
-         type = "n",
-         main = "Posterior predictive check",
-         ylab = "Predicted survival rate for each replicate",
-         xlab = "Observed survival rate for each replicate")
-    abline(a = 0, b = 1, lty = 2)
-    
-    # create segments for post predictive check plot
-    CI.ppc <- survLlbinomCi(x, concentrations)
-    for (i in 1:length(concentrations)) {
-      segments(response[i], CI.ppc$qinf95[i],
-               response[i], CI.ppc$qsup95[i], col = "red")
     }
   }
   
