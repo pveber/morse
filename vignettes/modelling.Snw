@@ -1,0 +1,51 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+%\VignetteIndexEntry{Modelling}
+\title{Models in MORSE package}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\section{Survival assays}
+In a survival assay, subjects are exposed to a controlled dose of a pollutant for some time and the number of surviving individuals is measured at certain time points after exposition. In most standard bioassays, the dose is held constant throughout the whole experiment, which we will assume here. An experiment is generally replicated several times and also repeated for various levels of pollutant.
+
+In the case of endpoint assays, the mortality is measured only once, and the chosen time point is called \emph{target time}. Let us how this particular case is handled in MORSE.
+
+\subsection{Analysis of endpoint survival assays}
+
+A dataset from an endpoint survival assay is a collection $D = \{ (c_i, n_i^{init}, n_i) \}_i$ of experiments, where $c_i$ is the tested concentration, $n_i^{init}$ the initial number of individuals and $n_i$ the number of individuals at the target time. Triplets s.t. $c_i = 0$ correspond to control experiments.
+
+\paragraph{Modelling} In the particular case of endpoint assays, the model used in MORSE is defined as follows. Let $t$ be the target time in days. We suppose the \emph{mean survival rate during $t$ days} is provided by a function $f$ of the pollutant level $c$. We also suppose that the death of two individuals are two independent events. Hence, given an initial number $n^{init}$ of individuals in the assay, we obtain that the number $N$ of surviving individuals follows a binomial distribution:
+$$
+N \sim \mathcal{B}(n^{init}, f(c))
+$$
+
+There may be various possibilities for $f$. In MORSE we assume:
+$$
+f(c) = \frac{d}{1 + (\frac{c}{e})^b}
+$$
+where $b$, $e$ and $d$ are (positive) parameters. In particular $d$ corresponds to the survival rate in absence of pollutant and $e$ corresponds to the $LC_{50}$.
+
+\paragraph{Inference} A posteriori distributions for parameters $b$, $d$ and $e$ are estimated using JAGS. The likelihood is given by:
+
+$$\mathbb{P}[ D | b, d, e] = \prod_i \mbox{dbinom}(n_i^{init}, f_{b,d,e}(c_i)) $$
+
+\paragraph{Priors}
+
+\begin{align*}
+\log_{10} b & \sim \mathcal{U}(-2,2)\\
+\log_{10} e & \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})
+\end{align*}
+
+The prior on $d$ is chosen in a more \emph{ad hoc} way: if we observe no mortality in control experiments then we set $d = 1$, otherwise we assume a uniform prior for $d$ between 0 and 1.
+
+
+\section{Reproduction assays}
+
+
+\end{document}
