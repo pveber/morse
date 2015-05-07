@@ -259,123 +259,123 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #'
 #' FIXME
 #'
-# Generic functions: \describe{
-# \item{\code{summary}}{provides the following information: the type of model
-# used, median and 2.5 \% and 97.5 \% quantiles of priors on estimated parameter
-# distributions, median and 2.5 \% and 97.5 \% quantiles of posteriors on
-# estimated parameter distributions and median and 2.5 \% and 97.5 \% quantiles
-# of \eqn{LC_{x}}{LCx} estimates (x = 5, 10, 20, 50 by default).}
-# \item{\code{print}}{shows information about the estimation method: the full
-# JAGS model, the number of chains, the total number of iterations, the number
-# of iterations in the burn-in period, the thin value and the DIC.}
-# \item{\code{plot}}{shows the fitted exposure-response curve superimposed to
-# experimental data at target time. The response is here expressed as the survival
-# rate.
-# When \code{ppc = TRUE}, the posterior predictive check representation is drawing
-# in a new graphical window. Two types of output are available: \code{generic}
-# or \code{ggplot}.
-# }}
-#
+#' Generic functions: \describe{
+#' \item{\code{summary}}{provides the following information: the type of model
+#' used, median and 2.5 \% and 97.5 \% quantiles of priors on estimated parameter
+#' distributions, median and 2.5 \% and 97.5 \% quantiles of posteriors on
+#' estimated parameter distributions and median and 2.5 \% and 97.5 \% quantiles
+#' of \eqn{LC_{x}}{LCx} estimates (x = 5, 10, 20, 50 by default).}
+#' \item{\code{print}}{shows information about the estimation method: the full
+#' JAGS model, the number of chains, the total number of iterations, the number
+#' of iterations in the burn-in period, the thin value and the DIC.}
+#' \item{\code{plot}}{shows the fitted exposure-response curve superimposed to
+#' experimental data at target time. The response is here expressed as the survival
+#' rate.
+#' When \code{ppc = TRUE}, the posterior predictive check representation is drawing
+#' in a new graphical window. Two types of output are available: \code{generic}
+#' or \code{ggplot}.
+#' }}
+#'
 #' @author Marie Laure Delignette-Muller
 #' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
 #' <philippe.ruiz@@univ-lyon1.fr>
-#
-# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-# \code{\link[rjags]{dic.samples}}, \code{\link[coda]{summary.mcmc}},
-# \code{\link[dclone]{parJagsModel}}, \code{\link[dclone]{parCodaSamples}},
-# \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
-# \code{\link[ggplot2]{ggplot}}
-#
+#'
+#' @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
+#' \code{\link[rjags]{dic.samples}}, \code{\link[coda]{summary.mcmc}},
+#' \code{\link[dclone]{parJagsModel}}, \code{\link[dclone]{parCodaSamples}},
+#' \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
+#' \code{\link[ggplot2]{ggplot}}
+#'
 #' @references Plummer, M. (2013) JAGS Version 3.4.0 user manual.
 #' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
 #'
 #' Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
 #' measures of model complexity and fit (with discussion).  \emph{Journal of
 #' the Royal Statistical Society}, Series B 64, 583-639.
+#'
+#' @keywords estimation
 #
-# @keywords estimation
-#
-# @examples
-#
-# # From repro-survival data
-# # With mortality in the control dataset
-# # (1) Load the data
-# data(cadmium1)
-#
-# # (2) Create an object of class "survData"
-# dat <- survData(cadmium1)
-#
-# \dontrun{
-# # (3) Run the survFitTT function with the three parameters log-logistic
-# # binomial model
-# out <- survFitTT(dat, det.part = "loglogisticbinom_3",
-# lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
-#
-# # (3') Run the fit (parallel version)
-# out <- survParfitTT(dat, det.part = "loglogisticbinom_3",
-# lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
-#
-# # (4) Summary
-# # out
-# # summary(out)
-#
-# # (5) Plot the fitted curve
-# plot(out, log.scale = TRUE, ci = TRUE)
-#
-# # (6) Plot the fitted curve with ggplot style
-# plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-# fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
-#
-# # (7) Add a specific legend with generic type
-# plot(out, addlegend = FALSE)
-# legend("left", legend = c("Without mortality", "With mortality"),
-# pch = c(19,1))
-#
-# # (8) Plot posterior predictive check
-# plot(out, ppc = TRUE)
-# }
-#
-# # Without mortality in the control dataset
-# # (1) Load the data
-# data(cadmium2)
-#
-# # (2) Create an object of class "survData"
-# dat2 <- survData(cadmium2)
-#
-# \dontrun{
-# # (3) Run the fit
-# out <- survFitTT(dat2, det.part = "loglogisticbinom_2",
-# lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
-#
-# # (3') Run the fit (parallel version)
-# out <- survParfitTT(dat2, det.part = "loglogisticbinom_2",
-# n.chains = 3)
-#
-# # (4) Summary
-# # out
-# # summary(out)
-#
-# # (5) Plot the fitted curve
-# plot(out, log.scale = TRUE, ci = TRUE,
-# main = "log-logistic binomial 2 parameters model")
-#
-# # (6) Plot the fitted curve with ggplot style
-# plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-# fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot",
-# main = "log-logistic binomial 2 parameters model")
-#
-# # (7) Add a specific legend with generic style
-# plot(out, addlegend = FALSE)
-# legend("left", legend = c("Without mortality", "With mortality"),
-# pch = c(19,1))
-#
-# # (8) Plot posterior predictive check
-# plot(out, ppc = TRUE)
-#
-# # (9) Don't pool the replicate
-# plot(out, pool.replicate = FALSE)
-# }
-#
+#' @examples
+#'
+#' # From repro-survival data
+#' # With mortality in the control dataset
+#' # (1) Load the data
+#' data(cadmium1)
+#'
+#' # (2) Create an object of class "survData"
+#' dat <- survData(cadmium1)
+#'
+#' \dontrun{
+#' # (3) Run the survFitTT function with the three parameters log-logistic
+#' # binomial model
+#' out <- survFitTT(dat, det.part = "loglogisticbinom_3",
+#' lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
+#'
+#' # (3') Run the fit (parallel version)
+#' out <- survParfitTT(dat, det.part = "loglogisticbinom_3",
+#' lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
+#'
+#' # (4) Summary
+#' # out
+#' # summary(out)
+#'
+#' # (5) Plot the fitted curve
+#' plot(out, log.scale = TRUE, ci = TRUE)
+#'
+#' # (6) Plot the fitted curve with ggplot style
+#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
+#' fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
+#'
+#' # (7) Add a specific legend with generic type
+#' plot(out, addlegend = FALSE)
+#' legend("left", legend = c("Without mortality", "With mortality"),
+#' pch = c(19,1))
+#'
+#' # (8) Plot posterior predictive check
+#' plot(out, ppc = TRUE)
+#' }
+#'
+#' # Without mortality in the control dataset
+#' # (1) Load the data
+#' data(cadmium2)
+#'
+#' # (2) Create an object of class "survData"
+#' dat2 <- survData(cadmium2)
+#'
+#' \dontrun{
+#' # (3) Run the fit
+#' out <- survFitTT(dat2, det.part = "loglogisticbinom_2",
+#' lcx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
+#'
+#' # (3') Run the fit (parallel version)
+#' out <- survParfitTT(dat2, det.part = "loglogisticbinom_2",
+#' n.chains = 3)
+#'
+#' # (4) Summary
+#' # out
+#' # summary(out)
+#'
+#' # (5) Plot the fitted curve
+#' plot(out, log.scale = TRUE, ci = TRUE,
+#' main = "log-logistic binomial 2 parameters model")
+#'
+#' # (6) Plot the fitted curve with ggplot style
+#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
+#' fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot",
+#' main = "log-logistic binomial 2 parameters model")
+#'
+#' # (7) Add a specific legend with generic style
+#' plot(out, addlegend = FALSE)
+#' legend("left", legend = c("Without mortality", "With mortality"),
+#' pch = c(19,1))
+#'
+#' # (8) Plot posterior predictive check
+#' plot(out, ppc = TRUE)
+#'
+#' # (9) Don't pool the replicate
+#' plot(out, pool.replicate = FALSE)
+#' }
+#'
 #' @export
 #'
 #' @import rjags
@@ -418,6 +418,8 @@ survFitTT <- function(data,
   jags.data <- survCreateJagsData(det.part, dataTT)
 
   # Test mortality in the control
+  # FIXME: I don't get why we leave a choice to the user here:
+  # the choice of the model is dictated by mortality in the control!
   control <- filter(dataTT, conc == 0)
   if (
       det.part == "loglogisticbinom_2"
@@ -469,12 +471,11 @@ survFitTT <- function(data,
   }
   estim.LCx <- estimXCX(mcmc, lcx, "LC")
 
-  # check if the maximum measured concentration is in the LC50's range of
-  # 95% percentile
+  # check if estimated LC50 lies in the tested concentration range
   if (50 %in% lcx) {
-    if (!(min(log10(data$conc)) < log10(estim.LCx["LC50", "median"]) &
-          log10(estim.LCx["LC50", "median"]) < max(log10(data$conc))))
-      warning("The LC50 estimation lies outsides the range of tested concentration and may be reliable !")
+    LC50 <- log10(estim.LCx["LC50", "median"])
+    if (!(min(log10(data$conc)) < LC50 & LC50 < max(log10(data$conc))))
+      warning("The LC50 estimation lies outsides the range of tested concentration and may be unreliable !")
   }
 
   # output
