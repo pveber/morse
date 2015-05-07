@@ -33,7 +33,7 @@ where $b$, $e$ and $d$ are (positive) parameters. In particular $d$ corresponds 
 
 \paragraph{Inference} A posteriori distributions for parameters $b$, $d$ and $e$ are estimated using JAGS. The likelihood is given by:
 
-$$\mathbb{P}[ D | b, d, e] = \prod_i \mbox{dbinom}(n_i^{init}, f_{b,d,e}(c_i)) $$
+$$\mathbb{P}[ D | b, d, e] = \prod_i \mbox{dbinom}(n_i, n_i^{init}, f_{b,d,e}(c_i)) $$
 
 \paragraph{Priors}
 
