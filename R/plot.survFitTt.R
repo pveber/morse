@@ -65,7 +65,8 @@ survLlbinomCi <- function(x, X) {
 }
 
 survFitPlotGenericNoCi <- function(concentrations, response, x, X,
-                                   fNsurvtheo, sel2, sel, mortality, ...)
+                                   fNsurvtheo, sel2, sel, mortality, addlegend,
+                                   ...)
 {
 opt_args <- list(...)
 xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
@@ -88,10 +89,21 @@ axis(side = 1, at = unique(concentrations[sel2]),
 # fitted curve
 lines(X[sel], fNsurvtheo[sel], col = fitcol,
       lty = fitlty, lwd = fitlwd, type = "l")
+
+# legend
+if (addlegend) {
+  legend(legend.position, title = legend.title, pch = c(19, 1, NA),
+         lty = c(0, 0, fitlty),
+         lwd = c(1, 1, fitlwd),
+         col = c(1, 1, fitcol),
+         legend = c(legend.name.no, legend.name.yes, x$det.part),
+         bty = "n")
+}
 }
 
 survFitPlotGenericCi <- function(concentrations, response, x, X,
-                     fNsurvtheo, CI, sel2, sel, mortality, ...)
+                     fNsurvtheo, CI, sel2, sel, mortality, addlegend,
+                     ...)
 {
 opt_args <- list(...)
 xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
@@ -124,8 +136,21 @@ lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
 
 lines(X[sel], fNsurvtheo[sel], col = fitcol,
       lty = fitlty, lwd = fitlwd, type = "l")
+
 # points
 points(concentrations[sel2], response[sel2], pch = mortality)
+
+# legend
+if (addlegend) {
+  legend(legend.position, title = legend.title, pch = c(19, 1, NA, NA),
+         lty = c(0, 0, fitlty, cilty),
+         lwd = c(1, 1, fitlwd, cilwd),
+         col = c(1, 1, fitcol, cicol),
+         legend = c(legend.name.no, legend.name.yes,
+                    x$det.part, paste("Credible limits of", x$det.part,
+                                      sep = " ")),
+         bty = "n")
+}
 }
 
 #' @export
@@ -291,25 +316,8 @@ plot.survFitTT <- function(x,
                              fNsurvtheo, CI, sel2, sel, mortality, ...)
     }
     
-    # legend
-    if (addlegend  && !ci) { # legend yes CI no
-      legend(legend.position, title = legend.title, pch = c(19, 1, NA),
-             lty = c(0, 0, fitlty),
-             lwd = c(1, 1, fitlwd),
-             col = c(1, 1, fitcol),
-             legend = c(legend.name.no, legend.name.yes, x$det.part),
-             bty = "n")
-    }
-    
     if (addlegend  && ci) { # legend yes CI yes
-      legend(legend.position, title = legend.title, pch = c(19, 1, NA, NA),
-             lty = c(0, 0, fitlty, cilty),
-             lwd = c(1, 1, fitlwd, cilwd),
-             col = c(1, 1, fitcol, cicol),
-             legend = c(legend.name.no, legend.name.yes,
-                        x$det.part, paste("Credible limits of", x$det.part,
-                                          sep = " ")),
-             bty = "n")
+
     }
   }
   
