@@ -67,14 +67,14 @@ survLlbinomCi <- function(x, X) {
 
 #' @export
 #' 
-#' @name survFitTt
+#' @name survFitTT
 #' 
 #' @import grDevices
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
 #' 
-plot.survFitTt <- function(x,
+plot.survFitTT <- function(x,
                            xlab,
                            ylab,
                            main,
