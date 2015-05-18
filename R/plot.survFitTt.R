@@ -67,29 +67,37 @@ survLlbinomCi <- function(x, X) {
 survFitPlotGenericNoCi <- function(concentrations, response, x, X,
                                    fNsurvtheo, sel2, sel, mortality, ...)
 {
-                                     plot(concentrations[sel2], response[sel2],
-                                          xlab = xlab,
-                                          ylab = ylab,
-                                          main = main,
-                                          pch = mortality,
-                                          xaxt = "n",
-                                          yaxt = "n",
-                                          ylim = c(0, 1.2),
-                                          ...)
-                                     # axis
-                                     axis(side = 2, at = c(0, 1))
-                                     axis(side = 1, at = unique(concentrations[sel2]),
-                                          labels = unique(x$dataTT$conc[sel2]))
-                                     
-                                     # fitted curve
-                                     lines(X[sel], fNsurvtheo[sel], col = fitcol,
-                                           lty = fitlty, lwd = fitlwd, type = "l")
-                                   }
+opt_args <- list(...)
+xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
+ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Survival Rate"
+
+plot(concentrations[sel2], response[sel2],
+     xlab = xlab,
+     ylab = ylab,
+     main = main,
+     pch = mortality,
+     xaxt = "n",
+     yaxt = "n",
+     ylim = c(0, 1.2),
+     ...)
+# axis
+axis(side = 2, at = c(0, 1))
+axis(side = 1, at = unique(concentrations[sel2]),
+     labels = unique(x$dataTT$conc[sel2]))
+
+# fitted curve
+lines(X[sel], fNsurvtheo[sel], col = fitcol,
+      lty = fitlty, lwd = fitlwd, type = "l")
+}
 
 survFitPlotGenericCi <- function(concentrations, response, x, X,
                      fNsurvtheo, CI, sel2, sel, mortality, ...)
 {
-                       plot(concentrations[sel2], response[sel2],
+opt_args <- list(...)
+xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
+ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Survival Rate"
+
+plot(concentrations[sel2], response[sel2],
                             xlab = xlab,
                             ylab = ylab,
                             main = main,
@@ -98,26 +106,26 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
                             ylim = c(0, max(CI$qsup95) + 0.2),
                             type = "n",
                             ...)
-                       # axis
-                       axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
-                       axis(side = 1, at = unique(concentrations[sel2]),
-                            labels = unique(x$dataTT$conc[sel2]))
-                       
-                       # Plotting the theoretical curve
-                       # CI ribbon + lines
-                       polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
-                               col = "grey40", border = NA)
-                       lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
-                             lwd = cilwd)
-                       lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
-                             lwd = cilwd)
-                       
-                       # fitted curve
-                       lines(X[sel], fNsurvtheo[sel], col = fitcol, 
-                             lty = fitlty, lwd = fitlwd, type = "l")
-                       
-                       # points
-                       points(concentrations[sel2], response[sel2], pch = mortality)
+# axis
+axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
+axis(side = 1, at = unique(concentrations[sel2]),
+     labels = unique(x$dataTT$conc[sel2]))
+
+# Plotting the theoretical curve
+# CI ribbon + lines
+polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
+        col = "grey40", border = NA)
+lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
+      lwd = cilwd)
+lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
+      lwd = cilwd)
+
+# fitted curve
+
+lines(X[sel], fNsurvtheo[sel], col = fitcol,
+      lty = fitlty, lwd = fitlwd, type = "l")
+# points
+points(concentrations[sel2], response[sel2], pch = mortality)
 }
 
 #' @export
@@ -277,57 +285,10 @@ plot.survFitTT <- function(x,
     if (!ci) {
       survFitPlotGenericNoCi(concentrations, response, x, X,
                                          fNsurvtheo, sel2, sel, mortality, ...)
-      
-#       plot(concentrations[sel2], response[sel2],
-#            xlab = xlab,
-#            ylab = ylab,
-#            main = main,
-#            pch = mortality,
-#            xaxt = "n",
-#            yaxt = "n",
-#            ylim = c(0, 1.2),
-#            ...)
-#       # axis
-#       axis(side = 2, at = c(0, 1))
-#       axis(side = 1, at = unique(concentrations[sel2]),
-#            labels = unique(x$dataTT$conc[sel2]))
-#       
-#       # fitted curve
-#       lines(X[sel], fNsurvtheo[sel], col = fitcol,
-#             lty = fitlty, lwd = fitlwd, type = "l")
-    }
+      }
     if (ci) {
       survFitPlotGenericCi(concentrations, response, x, X,
                              fNsurvtheo, CI, sel2, sel, mortality, ...)
-#       plot(concentrations[sel2], response[sel2],
-#            xlab = xlab,
-#            ylab = ylab,
-#            main = main,
-#            xaxt = "n",
-#            yaxt = "n",
-#            ylim = c(0, max(CI$qsup95) + 0.2),
-#            type = "n",
-#            ...)
-#       # axis
-#       axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
-#       axis(side = 1, at = unique(concentrations[sel2]),
-#            labels = unique(x$dataTT$conc[sel2]))
-#       
-#       # Plotting the theoretical curve
-#       # CI ribbon + lines
-#       polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
-#               col = "grey40", border = NA)
-#       lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
-#             lwd = cilwd)
-#       lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
-#             lwd = cilwd)
-#       
-#       # fitted curve
-#       lines(X[sel], fNsurvtheo[sel], col = fitcol, 
-#             lty = fitlty, lwd = fitlwd, type = "l")
-#       
-#       # points
-#       points(concentrations[sel2], response[sel2], pch = mortality)
     }
     
     # legend
