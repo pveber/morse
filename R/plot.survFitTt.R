@@ -71,6 +71,10 @@ survFitPlotGenericNoCi <- function(concentrations, response, x, X,
 opt_args <- list(...)
 xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
 ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Survival Rate"
+main <- if("main" %in% names(opt_args)) opt_args[["main"]] else "NULL"
+fitcol <- if("fitcol" %in% names(opt_args)) opt_args[["fitcol"]] else "red"
+fitlty <- if("fitlty" %in% names(opt_args)) opt_args[["fitlty"]] else 1
+fitlwd <- if("fitlwd" %in% names(opt_args)) opt_args[["fitlwd"]] else 1
 
 plot(concentrations[sel2], response[sel2],
      xlab = xlab,
@@ -108,6 +112,13 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
 opt_args <- list(...)
 xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
 ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Survival Rate"
+main <- if("main" %in% names(opt_args)) opt_args[["main"]] else "NULL"
+fitcol <- if("fitcol" %in% names(opt_args)) opt_args[["fitcol"]] else "red"
+fitlty <- if("fitlty" %in% names(opt_args)) opt_args[["fitlty"]] else 1
+fitlwd <- if("fitlwd" %in% names(opt_args)) opt_args[["fitlwd"]] else 1
+cicol <- if("cicol" %in% names(opt_args)) opt_args[["cicol"]] else "red"
+cilty <- if("fitlwd" %in% names(opt_args)) opt_args[["cilty"]] else 2
+cilwd <- if("cilwd" %in% names(opt_args)) opt_args[["cilwd"]] else 1
 
 plot(concentrations[sel2], response[sel2],
                             xlab = xlab,
@@ -266,26 +277,26 @@ plot.survFitTT <- function(x,
   }
   
   # default axis parameters
-  if (missing(xlab)) {
-    xlab <- "Concentrations"
-  }
-  if (missing(ylab)) {
-    ylab <- "Response"
-  }
-  
-  # default legend parameters
-  if (missing(fitcol)) {
-    fitcol <- "red"
-  }
-  if (missing(fitlty)) {
-    fitlty <- 1
-  }
-  if (missing(fitlwd)) {
-    fitlwd <- 1
-  }
-  if (missing(main)) {
-    main = NULL
-  }
+#   if (missing(xlab)) {
+#     xlab <- "Concentrations"
+#   }
+#   if (missing(ylab)) {
+#     ylab <- "Response"
+#   }
+#   
+#   # default legend parameters
+#   if (missing(fitcol)) {
+#     fitcol <- "red"
+#   }
+#   if (missing(fitlty)) {
+#     fitlty <- 1
+#   }
+#   if (missing(fitlwd)) {
+#     fitlwd <- 1
+#   }
+#   if (missing(main)) {
+#     main = NULL
+#   }
   if (style == "generic") {
     legend.position <- "bottomleft"
     legend.position.ci <- "left"
@@ -294,16 +305,16 @@ plot.survFitTT <- function(x,
   legend.name.no <- "No"
   legend.name.yes <- "Yes"
   
-  # IC parameters
-  if (missing(cicol)) {
-    cicol <- "red"
-  }
-  if (missing(cilty)) {
-    cilty <- 2
-  }
-  if (missing(cilwd)) {
-    cilwd <- 1
-  }
+#   # IC parameters
+#   if (missing(cicol)) {
+#     cicol <- "red"
+#   }
+#   if (missing(cilty)) {
+#     cilty <- 2
+#   }
+#   if (missing(cilwd)) {
+#     cilwd <- 1
+#   }
   
   # Plotting data
   if (style == "generic") {
@@ -314,10 +325,6 @@ plot.survFitTT <- function(x,
     if (ci) {
       survFitPlotGenericCi(concentrations, response, x, X,
                              fNsurvtheo, CI, sel2, sel, mortality, ...)
-    }
-    
-    if (addlegend  && ci) { # legend yes CI yes
-
     }
   }
   
