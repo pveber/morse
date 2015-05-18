@@ -17,7 +17,7 @@ idCreate <- function(data) {
 }
 
 #' @importFrom dplyr filter
-selectDataTT <- function(data, target.time) {
+selectdataTT <- function(data, target.time) {
   # INPUT
   # - data: An object of class reproData or survData
   # - target.time: the time we want to consider as the last time for the analysis.
@@ -34,12 +34,12 @@ selectDataTT <- function(data, target.time) {
     if (!any(data$time == target.time))
       stop("target.time is not one of the possible time !")
 
-    datatt <- filter(data, time == target.time)
+    dataTT <- filter(data, time == target.time)
   } else {
-    datatt <- cbind(data, time = 1)
+    dataTT <- cbind(data, time = 1)
   }
 
-  return(datatt)
+  return(dataTT)
 }
 
 #' @import rjags
@@ -175,9 +175,9 @@ logTransConcFit <- function(log.scale, X, x, concentrations) {
   
   # log transform concentrations values
   sel2 <- if (log.scale) {
-    x$dataTt$conc > 0
+    x$dataTT$conc > 0
   } else {
-    rep(TRUE, length(x$dataTt$conc))
+    rep(TRUE, length(x$dataTT$conc))
   }
   if (log.scale) {
     concentrations[sel2] <- log(concentrations[sel2])
