@@ -65,59 +65,82 @@ survLlbinomCi <- function(x, X) {
 }
 
 survFitPlotGenericNoCi <- function(concentrations, response, x, X,
-                                   fNsurvtheo, sel2, sel, mortality, ...)
+                                   fNsurvtheo, sel2, sel, mortality, addlegend,
+                                   ...)
 {
-                                     plot(concentrations[sel2], response[sel2],
-                                          xlab = xlab,
-                                          ylab = ylab,
-                                          main = main,
-                                          pch = mortality,
-                                          xaxt = "n",
-                                          yaxt = "n",
-                                          ylim = c(0, 1.2),
-                                          ...)
-                                     # axis
-                                     axis(side = 2, at = c(0, 1))
-                                     axis(side = 1, at = unique(concentrations[sel2]),
-                                          labels = unique(x$dataTT$conc[sel2]))
-                                     
-                                     # fitted curve
-                                     lines(X[sel], fNsurvtheo[sel], col = fitcol,
-                                           lty = fitlty, lwd = fitlwd, type = "l")
-                                   }
+  plot(concentrations[sel2], response[sel2],
+       xlab = xlab,
+       ylab = ylab,
+       main = main,
+       pch = mortality,
+       xaxt = "n",
+       yaxt = "n",
+       ylim = c(0, 1.2),
+       ...)
+  
+  # axis
+  axis(side = 2, at = c(0, 1))
+  axis(side = 1, at = unique(concentrations[sel2]),
+       labels = unique(x$dataTT$conc[sel2]))
+  
+  # fitted curve
+  lines(X[sel], fNsurvtheo[sel], col = fitcol,
+        lty = fitlty, lwd = fitlwd, type = "l")
+  
+  # legend
+  if (addlegend) {
+    legend(legend.position, title = legend.title, pch = c(19, 1, NA),
+           lty = c(0, 0, fitlty),
+           lwd = c(1, 1, fitlwd),
+           col = c(1, 1, fitcol),
+           legend = c(legend.name.no, legend.name.yes, x$det.part),
+           bty = "n")
+  }
+  }
 
 survFitPlotGenericCi <- function(concentrations, response, x, X,
-                     fNsurvtheo, CI, sel2, sel, mortality, ...)
+                     fNsurvtheo, CI, sel2, sel, mortality, addlegend, ...)
 {
-                       plot(concentrations[sel2], response[sel2],
-                            xlab = xlab,
-                            ylab = ylab,
-                            main = main,
-                            xaxt = "n",
-                            yaxt = "n",
-                            ylim = c(0, max(CI$qsup95) + 0.2),
-                            type = "n",
-                            ...)
-                       # axis
-                       axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
-                       axis(side = 1, at = unique(concentrations[sel2]),
-                            labels = unique(x$dataTT$conc[sel2]))
-                       
-                       # Plotting the theoretical curve
-                       # CI ribbon + lines
-                       polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
-                               col = "grey40", border = NA)
-                       lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
-                             lwd = cilwd)
-                       lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
-                             lwd = cilwd)
-                       
-                       # fitted curve
-                       lines(X[sel], fNsurvtheo[sel], col = fitcol, 
-                             lty = fitlty, lwd = fitlwd, type = "l")
-                       
-                       # points
-                       points(concentrations[sel2], response[sel2], pch = mortality)
+  plot(concentrations[sel2], response[sel2],
+       xlab = xlab,
+       ylab = ylab,
+       main = main,
+       xaxt = "n",
+       yaxt = "n",
+       ylim = c(0, max(CI$qsup95) + 0.2),
+       type = "n",
+       ...)
+  
+  # axis
+  axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
+  axis(side = 1, at = unique(concentrations[sel2]),
+       labels = unique(x$dataTT$conc[sel2]))
+
+  # Plotting the theoretical curve
+  # CI ribbon + lines
+  polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
+          col = "grey40", border = NA)
+  lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
+        lwd = cilwd)
+  lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
+        lwd = cilwd)
+  # fitted curve
+  lines(X[sel], fNsurvtheo[sel], col = fitcol,
+        lty = fitlty, lwd = fitlwd, type = "l")
+  # points
+  points(concentrations[sel2], response[sel2], pch = mortality)
+  
+  # legend
+  if (addlegend) { # legend yes CI yes
+    legend(legend.position, title = legend.title, pch = c(19, 1, NA, NA),
+           lty = c(0, 0, fitlty, cilty),
+           lwd = c(1, 1, fitlwd, cilwd),
+           col = c(1, 1, fitcol, cicol),
+           legend = c(legend.name.no, legend.name.yes,
+                      x$det.part, paste("Credible limits of", x$det.part,
+                                        sep = " ")),
+           bty = "n")
+  }
 }
 
 #' @export
@@ -276,80 +299,15 @@ plot.survFitTT <- function(x,
   if (style == "generic") {
     if (!ci) {
       survFitPlotGenericNoCi(concentrations, response, x, X,
-                                         fNsurvtheo, sel2, sel, mortality, ...)
-      
-#       plot(concentrations[sel2], response[sel2],
-#            xlab = xlab,
-#            ylab = ylab,
-#            main = main,
-#            pch = mortality,
-#            xaxt = "n",
-#            yaxt = "n",
-#            ylim = c(0, 1.2),
-#            ...)
-#       # axis
-#       axis(side = 2, at = c(0, 1))
-#       axis(side = 1, at = unique(concentrations[sel2]),
-#            labels = unique(x$dataTT$conc[sel2]))
-#       
-#       # fitted curve
-#       lines(X[sel], fNsurvtheo[sel], col = fitcol,
-#             lty = fitlty, lwd = fitlwd, type = "l")
+                                         fNsurvtheo, sel2, sel, mortality, 
+                             addlegend, ...)
     }
     if (ci) {
       survFitPlotGenericCi(concentrations, response, x, X,
-                             fNsurvtheo, CI, sel2, sel, mortality, ...)
-#       plot(concentrations[sel2], response[sel2],
-#            xlab = xlab,
-#            ylab = ylab,
-#            main = main,
-#            xaxt = "n",
-#            yaxt = "n",
-#            ylim = c(0, max(CI$qsup95) + 0.2),
-#            type = "n",
-#            ...)
-#       # axis
-#       axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
-#       axis(side = 1, at = unique(concentrations[sel2]),
-#            labels = unique(x$dataTT$conc[sel2]))
-#       
-#       # Plotting the theoretical curve
-#       # CI ribbon + lines
-#       polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
-#               col = "grey40", border = NA)
-#       lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
-#             lwd = cilwd)
-#       lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
-#             lwd = cilwd)
-#       
-#       # fitted curve
-#       lines(X[sel], fNsurvtheo[sel], col = fitcol, 
-#             lty = fitlty, lwd = fitlwd, type = "l")
-#       
-#       # points
-#       points(concentrations[sel2], response[sel2], pch = mortality)
+                             fNsurvtheo, CI, sel2, sel, mortality, addlegend,
+                           ...)
     }
-    
-    # legend
-    if (addlegend  && !ci) { # legend yes CI no
-      legend(legend.position, title = legend.title, pch = c(19, 1, NA),
-             lty = c(0, 0, fitlty),
-             lwd = c(1, 1, fitlwd),
-             col = c(1, 1, fitcol),
-             legend = c(legend.name.no, legend.name.yes, x$det.part),
-             bty = "n")
-    }
-    
-    if (addlegend  && ci) { # legend yes CI yes
-      legend(legend.position, title = legend.title, pch = c(19, 1, NA, NA),
-             lty = c(0, 0, fitlty, cilty),
-             lwd = c(1, 1, fitlwd, cilwd),
-             col = c(1, 1, fitcol, cicol),
-             legend = c(legend.name.no, legend.name.yes,
-                        x$det.part, paste("Credible limits of", x$det.part,
-                                          sep = " ")),
-             bty = "n")
-    }
+
   }
   
   if (style == "ggplot") {
