@@ -17,7 +17,7 @@ idCreate <- function(data) {
 }
 
 #' @importFrom dplyr filter
-selectdataTT <- function(data, target.time) {
+selectDataTT <- function(data, target.time) {
   # INPUT
   # - data: An object of class reproData or survData
   # - target.time: the time we want to consider as the last time for the analysis.
