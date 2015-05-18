@@ -64,6 +64,27 @@ survLlbinomCi <- function(x, X) {
   return(ci)
 }
 
+survFitPlotGenericNoCi <- function(concentrations, response, x, X,
+                                   fNsurvtheo, sel2, sel, mortality, ...)
+{
+                                     plot(concentrations[sel2], response[sel2],
+                                          xlab = xlab,
+                                          ylab = ylab,
+                                          main = main,
+                                          pch = mortality,
+                                          xaxt = "n",
+                                          yaxt = "n",
+                                          ylim = c(0, 1.2),
+                                          ...)
+                                     # axis
+                                     axis(side = 2, at = c(0, 1))
+                                     axis(side = 1, at = unique(concentrations[sel2]),
+                                          labels = unique(x$dataTT$conc[sel2]))
+                                     
+                                     # fitted curve
+                                     lines(X[sel], fNsurvtheo[sel], col = fitcol,
+                                           lty = fitlty, lwd = fitlwd, type = "l")
+                                   }
 
 #' @export
 #' 
@@ -219,27 +240,31 @@ plot.survFitTT <- function(x,
   
   # Plotting data
   if (style == "generic") {
-    if (!ci) { # CI no
-      plot(concentrations[sel2], response[sel2],
-           xlab = xlab,
-           ylab = ylab,
-           main = main,
-           pch = mortality,
-           xaxt = "n",
-           yaxt = "n",
-           ylim = c(0, 1.2),
-           ...)
-      # axis
-      axis(side = 2, at = c(0, 1))
-      axis(side = 1, at = unique(concentrations[sel2]),
-           labels = unique(x$dataTT$conc[sel2]))
+    if (!ci) {
+      survFitPlotGenericNoCi(concentrations, response, x, X,
+                                         fNsurvtheo, sel2, sel, mortality, ...)
       
-      # fitted curve
-      lines(X[sel], fNsurvtheo[sel], col = fitcol,
-            lty = fitlty, lwd = fitlwd, type = "l")
+#       plot(concentrations[sel2], response[sel2],
+#            xlab = xlab,
+#            ylab = ylab,
+#            main = main,
+#            pch = mortality,
+#            xaxt = "n",
+#            yaxt = "n",
+#            ylim = c(0, 1.2),
+#            ...)
+#       # axis
+#       axis(side = 2, at = c(0, 1))
+#       axis(side = 1, at = unique(concentrations[sel2]),
+#            labels = unique(x$dataTT$conc[sel2]))
+#       
+#       # fitted curve
+#       lines(X[sel], fNsurvtheo[sel], col = fitcol,
+#             lty = fitlty, lwd = fitlwd, type = "l")
     }
-    if (ci) { # CI yes
-      # plotting data
+    if (ci) {
+      survFitPlotGenericCi(concentrations, response, x, X,
+                             fNsurvtheo, sel2, sel, mortality, ...)
       plot(concentrations[sel2], response[sel2],
            xlab = xlab,
            ylab = ylab,
