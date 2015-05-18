@@ -123,11 +123,11 @@ plot.survFitTT <- function(x,
   }
   
   # Define data
-  concentrations <- x$dataTt$conc
-  response <- x$dataTt$Nsurv / x$dataTt$Ninit
+  concentrations <- x$dataTT$conc
+  response <- x$dataTT$Nsurv / x$dataTT$Ninit
   
   if (pool.replicate) {
-    resp.temp <- cbind(response, x$dataTt$conc)
+    resp.temp <- cbind(response, x$dataTT$conc)
     response <- aggregate(resp.temp, by = list(resp.temp[,2]), mean)$response
   }
   
@@ -155,11 +155,11 @@ plot.survFitTT <- function(x,
   
   rm(temp.conc.lt)
   
-  nomortality <- match(x$dataTt$Nsurv[sel2] == x$dataTt$Ninit[sel2],
+  nomortality <- match(x$dataTT$Nsurv[sel2] == x$dataTT$Ninit[sel2],
                        c(TRUE, FALSE)) # valid if at least one replicat
   
   if (pool.replicate) {
-    nomortality.temp <- cbind(nomortality, x$dataTt$conc[sel2])
+    nomortality.temp <- cbind(nomortality, x$dataTT$conc[sel2])
     nomortality <- aggregate(nomortality.temp, by = list(nomortality.temp[,2]),
                              mean)$nomortality
     nomortality[nomortality != 1] <- 2
@@ -232,7 +232,7 @@ plot.survFitTT <- function(x,
       # axis
       axis(side = 2, at = c(0, 1))
       axis(side = 1, at = unique(concentrations[sel2]),
-           labels = unique(x$dataTt$conc[sel2]))
+           labels = unique(x$dataTT$conc[sel2]))
       
       # fitted curve
       lines(X[sel], fNsurvtheo[sel], col = fitcol,
@@ -252,7 +252,7 @@ plot.survFitTT <- function(x,
       # axis
       axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
       axis(side = 1, at = unique(concentrations[sel2]),
-           labels = unique(x$dataTt$conc[sel2]))
+           labels = unique(x$dataTT$conc[sel2]))
       
       # Plotting the theoretical curve
       # CI ribbon + lines
@@ -385,7 +385,7 @@ plot.survFitTT <- function(x,
       if (ci) mylegend_3 <- legendGgplotFit(plt_3) # CI legend
       if (log.scale) { # log.sclae yes
         plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
-                                            labels =  unique(x$dataTt$conc[sel2]))
+                                            labels =  unique(x$dataTT$conc[sel2]))
       } else { # log.scale no
         plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
       }
@@ -401,7 +401,7 @@ plot.survFitTT <- function(x,
       if (log.scale) { # log.scale yes
         plt_5 <- plt_4 +
           scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
-                             labels = unique(x$dataTt$conc[sel2]))
+                             labels = unique(x$dataTT$conc[sel2]))
       } else { # log.scale no
         plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
       }
