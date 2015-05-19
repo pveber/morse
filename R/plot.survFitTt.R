@@ -336,41 +336,49 @@ plot.survFitTT <- function(x,
     data.two <- data.frame(X[sel], fNsurvtheo[sel], Line = x$det.part)
     
     # colors
-    # points vector
-    n <- length(unique(data.one$mortality))
-    cols <- hcl(h=seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
-    cols1 <- cols[1:n]
-    names(cols1) <- sort(unique(data.one$mortality))
-    # fitted curve
-    cols2 <- fitcol
-    names(cols2) <- c(x$det.part)
+    fCols <- function(data.one, x, fitcol, cicol) {
+      # points vector
+      n <- length(unique(data.one$mortality))
+      cols <- hcl(h=seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
+      cols1 <- cols[1:n]
+      names(cols1) <- sort(unique(data.one$mortality))
+      # fitted curve
+      cols2 <- fitcol
+      names(cols2) <- c(x$det.part)
+      # CI curve
+      cols3 <- cicol
+      names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " ")) 
+      
+      return(list(cols1 = cols1,
+                  cols2 = cols2,
+                  cols3 = cols3))
+    }
+    
+    valCols <- fCols(data.one, x, fitcol, cicol)
     
     # points (to create the legend)
     plt_1 <- ggplot(data.one) +
       geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
                                       color = mortality)) +
-      scale_color_manual(values = cols1)
+      scale_color_manual(values = valCols$cols1)
     
     # curve (to create the legend)
     plt_2 <- ggplot(data.one) +
       geom_line(data = data.two, aes(X.sel., fNsurvtheo.sel., color = Line),
                 linetype = fitlty, size = fitlwd) +
-      scale_color_manual(values = cols2)
+      scale_color_manual(values = valCols$cols2)
     if (ci) { # IC yes
       # IC
       data.three <- data.frame(X[sel], CI$qinf95[sel], CI$qsup95[sel],
                                Ci = paste("Credible limits of", x$det.part,
                                           sep = " "))
-      # colors
-      cols3 <- cicol
-      names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " ")) 
-      
+
       plt_3 <- ggplot(data.one) +
         geom_line(data = data.three, aes(X.sel., CI.qinf95.sel., color = Ci),
                   linetype = cilty, size = cilwd) +
         geom_line(data = data.three, aes(X.sel., CI.qsup95.sel., color = Ci),
                   linetype = cilty, size = cilwd) +
-        scale_color_manual(values = cols3)
+        scale_color_manual(values = valCols$cols3)
       
       # plot IC
       # final plot
@@ -378,11 +386,11 @@ plot.survFitTT <- function(x,
         geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
                                         color = mortality)) +
         geom_line(aes(X.sel., fNsurvtheo.sel.), data.two, linetype = fitlty,
-                  size = fitlwd, color = cols2) +
+                  size = fitlwd, color = valCols$cols2) +
         geom_line(aes(X.sel., CI.qinf95.sel.), data.three, linetype = cilty,
-                  size = cilwd, color = cols3) +
+                  size = cilwd, color = valCols$cols3) +
         geom_line(aes(X.sel., CI.qsup95.sel.), data.three, linetype = cilty,
-                  size = cilwd, color = cols3) +
+                  size = cilwd, color = valCols$cols3) +
         geom_ribbon(data = data.three, aes(x = X.sel., ymin = CI.qinf95.sel.,
                                            ymax = CI.qsup95.sel.),
                     alpha = 0.4) +
@@ -399,7 +407,7 @@ plot.survFitTT <- function(x,
         geom_point(data=data.one, aes(concentrations.sel2., response.sel2.,
                                       color = mortality)) +
         geom_line(aes(X.sel., fNsurvtheo.sel.), data.two,
-                  linetype = fitlty, size = fitlwd, color = cols2) +
+                  linetype = fitlty, size = fitlwd, color = valCols$cols2) +
         scale_color_discrete(guide = "none") +
         ylim(0, 1) +
         labs(x = xlab, y = ylab)
