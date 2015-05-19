@@ -287,10 +287,10 @@ plot.survFitTT <- function(x,
   
   # Define visual parameters
   mortality <- c(0, 1) # code 0/1 mortality
-  sel <- logTransConcFit(log.scale, X, x, concentrations)$sel
-  X <- logTransConcFit(log.scale, X, x, concentrations)$X
-  sel2 <- logTransConcFit(log.scale, X, x, concentrations)$sel2
-  concentrations <- logTransConcFit(log.scale, X, x, concentrations)$concentrations
+  sel <- logTransConcFit(log.scale, X, x, concentrations, "sel")
+  X <- logTransConcFit(log.scale, X, x, concentrations, "X")
+  sel2 <- logTransConcFit(log.scale, X, x, concentrations, "sel2")
+  concentrations <- logTransConcFit(log.scale, X, x, concentrations, "conc")
 
   nomortality <- match(x$dataTT$Nsurv[sel2] == x$dataTT$Ninit[sel2],
                        c(TRUE, FALSE)) # valid if at least one replicat

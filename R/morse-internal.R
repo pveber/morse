@@ -156,7 +156,7 @@ logTransXaxisFit <- function(log.scale, concentrations) {
   return(X)
 }
 
-logTransConcFit <- function(log.scale, X, x, concentrations) {
+logTransConcFit <- function(log.scale, X, x, concentrations, val) {
   # transform vector conccentration in log.scale if needed
   # X axis log.scale value
   
@@ -185,10 +185,18 @@ logTransConcFit <- function(log.scale, X, x, concentrations) {
     concentrations[sel2] <- concentrations[sel2]
   }
   
-  return(list(sel = sel,
-              X = X,
-              sel2 = sel2,
-              concentrations = concentrations))
+  if (val == "sel") {
+    return(sel)
+  }
+  if (val == "X") {
+    return(X)
+  }
+  if (val == "sel2") {
+    return(sel2)
+  }
+  if (val == "conc") {
+    return(concentrations)
+  }
 }
 
 legendGgplotFit <- function(a.gplot) {
