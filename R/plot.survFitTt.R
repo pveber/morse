@@ -153,6 +153,58 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
   }
 }
 
+survFitPlotGGNoCi <- function(data.one, data.two, valCols, 
+                              fitlty, fitlwd, xlab, ylab, main) {
+  plt_4 <- ggplot(data.one) +
+    geom_point(data=data.one, aes(concentrations.sel2., response.sel2.,
+                                  color = mortality)) +
+    geom_line(aes(X.sel., fNsurvtheo.sel.), data.two,
+              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
+    scale_color_discrete(guide = "none") +
+    ylim(0, 1) +
+    labs(x = xlab, y = ylab) +
+    ggtitle(main) + theme_minimal()
+  
+  return(plt_4)
+}
+
+survFitPlotGGCi <- function(X, x, CI, sel, data.one, data.two, cilty, cilwd,
+                            valCols, fitlty, fitlwd, xlab, ylab, main) {
+  # IC
+  data.three <- data.frame(X[sel], CI$qinf95[sel], CI$qsup95[sel],
+                           Ci = paste("Credible limits of", x$det.part,
+                                      sep = " "))
+  
+  plt_3 <- ggplot(data.one) +
+    geom_line(data = data.three, aes(X.sel., CI.qinf95.sel., color = Ci),
+              linetype = cilty, size = cilwd) +
+    geom_line(data = data.three, aes(X.sel., CI.qsup95.sel., color = Ci),
+              linetype = cilty, size = cilwd) +
+    scale_color_manual(values = valCols$cols3)
+  
+  # plot IC
+  # final plot
+  plt_4 <- ggplot(data.one) +
+    geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
+                                    color = mortality)) +
+    geom_line(aes(X.sel., fNsurvtheo.sel.), data.two, linetype = fitlty,
+              size = fitlwd, color = valCols$cols2) +
+    geom_line(aes(X.sel., CI.qinf95.sel.), data.three, linetype = cilty,
+              size = cilwd, color = valCols$cols3) +
+    geom_line(aes(X.sel., CI.qsup95.sel.), data.three, linetype = cilty,
+              size = cilwd, color = valCols$cols3) +
+    geom_ribbon(data = data.three, aes(x = X.sel., ymin = CI.qinf95.sel.,
+                                       ymax = CI.qsup95.sel.),
+                alpha = 0.4) +
+    scale_color_discrete(guide = "none") +
+    ylim(0, 1) +
+    labs(x = xlab, y = ylab) +
+    ggtitle(main) + theme_minimal()
+  
+  return(list(plt_3 = plt_3,
+              plt_4 = plt_4))
+}
+
 #' @export
 #' 
 #' @name survFitTT
@@ -346,48 +398,17 @@ plot.survFitTT <- function(x,
       geom_line(data = data.two, aes(X.sel., fNsurvtheo.sel., color = Line),
                 linetype = fitlty, size = fitlwd) +
       scale_color_manual(values = valCols$cols2)
+    
     if (ci) { # IC yes
-      # IC
-      data.three <- data.frame(X[sel], CI$qinf95[sel], CI$qsup95[sel],
-                               Ci = paste("Credible limits of", x$det.part,
-                                          sep = " "))
+      plt_3 <- survFitPlotGGCi(X, x, CI, sel, data.one, data.two, cilty, cilwd,
+                               valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
 
-      plt_3 <- ggplot(data.one) +
-        geom_line(data = data.three, aes(X.sel., CI.qinf95.sel., color = Ci),
-                  linetype = cilty, size = cilwd) +
-        geom_line(data = data.three, aes(X.sel., CI.qsup95.sel., color = Ci),
-                  linetype = cilty, size = cilwd) +
-        scale_color_manual(values = valCols$cols3)
-      
-      # plot IC
-      # final plot
-      plt_4 <- ggplot(data.one) +
-        geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
-                                        color = mortality)) +
-        geom_line(aes(X.sel., fNsurvtheo.sel.), data.two, linetype = fitlty,
-                  size = fitlwd, color = valCols$cols2) +
-        geom_line(aes(X.sel., CI.qinf95.sel.), data.three, linetype = cilty,
-                  size = cilwd, color = valCols$cols3) +
-        geom_line(aes(X.sel., CI.qsup95.sel.), data.three, linetype = cilty,
-                  size = cilwd, color = valCols$cols3) +
-        geom_ribbon(data = data.three, aes(x = X.sel., ymin = CI.qinf95.sel.,
-                                           ymax = CI.qsup95.sel.),
-                    alpha = 0.4) +
-        scale_color_discrete(guide = "none") +
-        ylim(0, 1) +
-        labs(x = xlab, y = ylab) +
-        ggtitle(main)
+      plt_4 <- survFitPlotGGCi(X, x, CI, sel, data.one, data.two, cilty, cilwd,
+                               valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
     }
     if (!ci) { # IC no
-      plt_4 <- ggplot(data.one) +
-        geom_point(data=data.one, aes(concentrations.sel2., response.sel2.,
-                                      color = mortality)) +
-        geom_line(aes(X.sel., fNsurvtheo.sel.), data.two,
-                  linetype = fitlty, size = fitlwd, color = valCols$cols2) +
-        scale_color_discrete(guide = "none") +
-        ylim(0, 1) +
-        labs(x = xlab, y = ylab) +
-        ggtitle(main)
+      plt_4 <- survFitPlotGGNoCi(data.one, data.two, valCols, fitlty, fitlwd,
+                                 xlab, ylab, main)
     }
     
     if (addlegend) { # legend yes
