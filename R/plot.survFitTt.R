@@ -65,8 +65,10 @@ survLlbinomCi <- function(x, X) {
 }
 
 survFitPlotGenericNoCi <- function(concentrations, response, x, X,
-                                   fNsurvtheo, sel2, sel, mortality, addlegend,
-                                   ...)
+                                   fNsurvtheo, sel2, sel, mortality, 
+                                   xlab, ylab, fitcol, fitlty, fitlwd,
+                                   main, addlegend, legend.position, legend.title,
+                                   legend.name.no, legend.name.yes, ...)
 {
   plot(concentrations[sel2], response[sel2],
        xlab = xlab,
@@ -99,7 +101,11 @@ survFitPlotGenericNoCi <- function(concentrations, response, x, X,
   }
 
 survFitPlotGenericCi <- function(concentrations, response, x, X,
-                     fNsurvtheo, CI, sel2, sel, mortality, addlegend, ...)
+                                 fNsurvtheo, CI, sel2, sel, mortality, 
+                                 xlab, ylab, fitcol, fitlty, fitlwd,
+                                 main, addlegend, legend.position, legend.title,
+                                 legend.name.no, legend.name.yes, legend.position.ci,
+                                 cicol, cilty, cilwd, ...)
 {
   plot(concentrations[sel2], response[sel2],
        xlab = xlab,
@@ -299,13 +305,18 @@ plot.survFitTT <- function(x,
   if (style == "generic") {
     if (!ci) {
       survFitPlotGenericNoCi(concentrations, response, x, X,
-                                         fNsurvtheo, sel2, sel, mortality, 
-                             addlegend, ...)
+                             fNsurvtheo, sel2, sel, mortality, 
+                             xlab, ylab, fitcol, fitlty, fitlwd,
+                             main, addlegend, legend.position, legend.title,
+                             legend.name.no, legend.name.yes, ...)
     }
     if (ci) {
       survFitPlotGenericCi(concentrations, response, x, X,
-                             fNsurvtheo, CI, sel2, sel, mortality, addlegend,
-                           ...)
+                           fNsurvtheo, CI, sel2, sel, mortality, 
+                           xlab, ylab, fitcol, fitlty, fitlwd,
+                           main, addlegend, legend.position, legend.title,
+                           legend.name.no, legend.name.yes, legend.position.ci,
+                           cicol, cilty, cilwd, ...)
     }
 
   }
