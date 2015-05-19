@@ -375,11 +375,8 @@ plot.survFitTT <- function(x,
                     alpha = 0.4) +
         scale_color_discrete(guide = "none") +
         ylim(0, 1) +
-        labs(x = xlab, y = ylab)
-      
-      if (!is.null(main)) { # main title
-        plt_4 <- plt_4 + ggtitle(main)
-      }
+        labs(x = xlab, y = ylab) +
+        ggtitle(main)
     }
     if (!ci) { # IC no
       plt_4 <- ggplot(data.one) +
@@ -389,11 +386,8 @@ plot.survFitTT <- function(x,
                   linetype = fitlty, size = fitlwd, color = valCols$cols2) +
         scale_color_discrete(guide = "none") +
         ylim(0, 1) +
-        labs(x = xlab, y = ylab)
-      
-      if (!is.null(main)) { # personal title
-        plt_4 <- plt_4 + ggtitle(main)
-      }
+        labs(x = xlab, y = ylab) +
+        ggtitle(main)
     }
     
     if (addlegend) { # legend yes
