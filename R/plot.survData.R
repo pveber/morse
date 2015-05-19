@@ -153,7 +153,7 @@ survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    ylim(0, max(data$Nsurv))
+    ylim(0, max(data$Nsurv)) + theme_minimal()
 
   # legend option
   if (addlegend){
