@@ -70,6 +70,8 @@ survFitPlotGenericNoCi <- function(concentrations, response, x, X,
                                    main, addlegend, legend.position, legend.title,
                                    legend.name.no, legend.name.yes, ...)
 {
+  # plot the fitted curve estimated by survFitTT
+  # with generic style without credible interval
   plot(concentrations[sel2], response[sel2],
        xlab = xlab,
        ylab = ylab,
@@ -107,6 +109,8 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
                                  legend.name.no, legend.name.yes, legend.position.ci,
                                  cicol, cilty, cilwd, ...)
 {
+  # plot the fitted curve estimated by survFitTT
+  # with generic style with credible interval
   plot(concentrations[sel2], response[sel2],
        xlab = xlab,
        ylab = ylab,
@@ -173,7 +177,7 @@ plot.survFitTT <- function(x,
                            log.scale = FALSE,
                            style = "generic",
                            pool.replicate = TRUE, ...) {
-  # plot the fitted curve estimated by survFitTt
+  # plot the fitted curve estimated by survFitTT
   # INPUTS
   # - x:  survFitTt object
   # - xlab : label x
