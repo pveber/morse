@@ -199,3 +199,21 @@ legendGgplotFit <- function(a.gplot) {
   legend <- tmp$grobs[[leg]]
   return(legend)
 }
+
+fCols <- function(data.one, x, fitcol, cicol) {
+  # points vector
+  n <- length(unique(data.one$mortality))
+  cols <- hcl(h=seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
+  cols1 <- cols[1:n]
+  names(cols1) <- sort(unique(data.one$mortality))
+  # fitted curve
+  cols2 <- fitcol
+  names(cols2) <- c(x$det.part)
+  # CI curve
+  cols3 <- cicol
+  names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " ")) 
+  
+  return(list(cols1 = cols1,
+              cols2 = cols2,
+              cols3 = cols3))
+}
