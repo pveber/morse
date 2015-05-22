@@ -434,7 +434,7 @@ survFitTT <- function(data,
     &&
       ! any(control$Nsurv < control$Ninit)
     )
-    warning("Beware! There is no mortality in the control. A model with two parameters must be chosen.")
+    stop("Beware! There is no mortality in the control. A model with two parameters must be chosen.")
 
   # Model computing
 
