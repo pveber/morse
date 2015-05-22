@@ -208,9 +208,9 @@ convergence <- function(out,
     # PPC
       
     plt = list()
-    CI.ppc <- cbind(as.data.frame(CI.ppc), response)
+    CI.ppc <- cbind(as.data.frame(CI.ppc), observation)
     
-    ggppc <- ggplot(CI.ppc, aes(x = response, y = med,
+    ggppc <- ggplot(CI.ppc, aes(x = observation, y = med,
                                 ymin = qinf95, ymax = qsup95, color = "red"))
     
     plt[["ppc"]] <- ggppc + geom_pointrange() + geom_abline(linetype = 2) +
