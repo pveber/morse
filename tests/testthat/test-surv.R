@@ -99,3 +99,16 @@ test_that("survDataCheck", {
   expect_equal(survDataCheck(cadmium19, diagnosis.plot = FALSE)$id[4],
                "ReplicateLabel")
 })
+
+test_that("survData", {
+  skip_on_cran()
+  lapply(d, function(x) {
+    dat <- survData(x)
+    expect_is(dat, c("survData", "data.frame"))
+    expect_is(dat$conc, c("numeric", "integer"))
+    expect_true("ID" %in% names(dat))
+    expect_true(!is.null(dat))
+    expect_true(any(!is.na(dat)))
+    expect_true(all(dat >= 0))
+  })
+})
