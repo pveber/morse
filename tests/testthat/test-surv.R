@@ -112,3 +112,37 @@ test_that("survData", {
     expect_true(all(dat >= 0))
   })
 })
+
+test_that("survFitTT", {
+  skip_on_cran()
+  lapply(d, function(x) {
+    dat <- survData(x)
+    # select Data at target.time
+    dataTT <- morse:::selectDataTT(dat, max(dat$time))
+    # Test mortality in the control
+    control <- filter(dataTT, conc == 0)
+    
+    if (any(control$Nsurv < control$Ninit)) {
+      options(warn = -1)
+      out <- survFitTT(dat, det.part = "loglogisticbinom_3",quiet = T)
+      options(warn = 0)
+      expect_is(out, "survFitTT")
+      expect_equal(typeof(out), "list")
+      expect_true(!is.null(out))
+      expect_true(any(!is.na(out)))
+      expect_error(survFitTT(dat, det.part = "loglogisticbinom_2",
+                             quiet = T))
+    } else {
+      options(warn = -1)
+      out <- survFitTT(dat, det.part = "loglogisticbinom_2",quiet = T)
+      options(warn = 0)
+      expect_is(out, "survFitTT")
+      expect_equal(typeof(out), "list")
+      expect_true(!is.null(out))
+      expect_true(any(!is.na(out)))
+      expect_error(survFitTT(dat, det.part = "loglogisticbinom_3",
+                             quiet = T))
+    }
+  })
+})
+
