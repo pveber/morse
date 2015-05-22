@@ -109,7 +109,7 @@ test_that("survData", {
     expect_true("ID" %in% names(dat))
     expect_true(!is.null(dat))
     expect_true(any(!is.na(dat)))
-    expect_true(all(dat >= 0))
+    expect_true(all(dat[-1] >= 0))
   })
 })
 
@@ -124,7 +124,7 @@ test_that("survFitTT", {
     
     if (any(control$Nsurv < control$Ninit)) {
       options(warn = -1)
-      out <- survFitTT(dat, det.part = "loglogisticbinom_3",quiet = T)
+      out <- survFitTT(dat, det.part = "loglogisticbinom_3", quiet = T)
       options(warn = 0)
       expect_is(out, "survFitTT")
       expect_equal(typeof(out), "list")
@@ -134,13 +134,13 @@ test_that("survFitTT", {
                              quiet = T))
     } else {
       options(warn = -1)
-      out <- survFitTT(dat, det.part = "loglogisticbinom_2",quiet = T)
+      out <- survFitTT(dat, det.part = "loglogisticbinom_2", quiet = T)
       options(warn = 0)
       expect_is(out, "survFitTT")
       expect_equal(typeof(out), "list")
       expect_true(!is.null(out))
       expect_true(any(!is.na(out)))
-      expect_error(survFitTT(dat, det.part = "loglogisticbinom_3",
+      expect_warning(survFitTT(dat, det.part = "loglogisticbinom_3",
                              quiet = T))
     }
   })
