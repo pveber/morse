@@ -197,11 +197,12 @@ convergence <- function(out,
     if(! trace || ! density || ! autocorr) {
       blank <- grid.rect(gp = gpar(col = "white"))
     }
-
-   do.call(grid.arrange, list(if (trace) trp else blank,
-                              if (density) dns else blank,
-                              if (autocorr) atc else blank,
-                              ncol = 2))
+    if(trace || density || autocorr) {
+      do.call(grid.arrange, list(if (trace) trp else blank,
+                                 if (density) dns else blank,
+                                 if (autocorr) atc else blank,
+                                 ncol = 2))
+    }
     
     if (ppc) {
       if (Sys.getenv("RSTUDIO") == "") dev.new() # create a new page plot
