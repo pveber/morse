@@ -125,8 +125,8 @@ convergence <- function(out,
     
     # PPC
     # Define data
-    concentrations <- out$dataTt$conc
-    response <- out$dataTt$Nsurv / out$dataTt$Ninit
+    concentrations <- out$dataTT$conc
+    observation <- out$dataTT$Nsurv / out$dataTT$Ninit
     parameters <- out$parameters
     CI.ppc <- survLlbinomCi(out, concentrations)
   }
@@ -154,7 +154,7 @@ convergence <- function(out,
       
       par(mfrow = c(2, 2))
       
-      plot(response, response,
+      plot(observation, observation,
            bty = "n",
            type = "n",
            main = "Posterior predictive check",
@@ -164,9 +164,9 @@ convergence <- function(out,
       
       # create segments for post predictive check plot
       for (i in 1:length(concentrations)) {
-        points(response[i], CI.ppc$med[i], pch = 16, col = "red")
-        segments(response[i], CI.ppc$qinf95[i],
-                 response[i], CI.ppc$qsup95[i], col = "red")
+        points(observation[i], CI.ppc$med[i], pch = 16, col = "red")
+        segments(observation[i], CI.ppc$qinf95[i],
+                 observation[i], CI.ppc$qsup95[i], col = "red")
       }
 
       # CPPS
