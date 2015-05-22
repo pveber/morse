@@ -114,14 +114,16 @@ convergence <- function(out,
     close(fileC) # close connection to temporary file
     # null model
     M0 <- jags.model(model.file, data = nodata, n.chains = out$n.chains,
-                     n.adapt = length(out$mcmc[[1]]) / out$n.chains)
+                     n.adapt = 5000)
     # Sampling
     M0.mcmc <- coda.samples(M0, out$parameters,
-                            n.iter = length(out$mcmc[[1]]) / out$n.chains,
+                            n.iter = 5000,
                             progress.bar = "none")
     
-    M0.mcmctot <- data.frame(cbind(do.call("rbind", M0.mcmc),
-                                   do.call("rbind", out$mcmc)))
+    M0.mcmc <- do.call("rbind", M0.mcmc)
+    mcmcTot <- do.call("rbind", out$mcmc)
+    M0.mcmcTot <- data.frame(cbind(M0.mcmc[1:length(mcmcTot[,1]),],
+                                   mcmcTot))
     
     # PPC
     # Define data
@@ -171,12 +173,12 @@ convergence <- function(out,
 
       # CPPS
         for (i in 1:length(parameters)) {
-          plot(density(M0.mcmctot[, length(parameters) + i]),
-               xlim = range(density(M0.mcmctot[, i])$x),
+          plot(density(M0.mcmcTot[, length(parameters) + i]),
+               xlim = range(density(M0.mcmcTot[, i])$x),
                main = "",
-               xlab = colnames(M0.mcmctot)[i],
+               xlab = colnames(M0.mcmcTot)[i],
                lty = 1) # posterior
-          lines(density(M0.mcmctot[, i]),
+          lines(density(M0.mcmcTot[, i]),
                 lty = 2) # prior
           legend("topleft", legend = c("prior",
                                        "posterior"),
@@ -219,7 +221,7 @@ convergence <- function(out,
       ylim(0, 1) + xlim(0, 1) + theme_minimal() +
       theme(legend.position = "none")
     
-     mcmc.ppc <- melt(list(prior = do.call("rbind", M0.mcmc),
+     mcmc.ppc <- melt(list(prior = M0.mcmc,
                                 posterior = do.call("rbind", out$mcmc)))
      mcmc.ppc <- split(mcmc.ppc, mcmc.ppc$Var2)
     
