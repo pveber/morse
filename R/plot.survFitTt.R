@@ -121,7 +121,7 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
            lwd = c(1, 1, fitlwd, cilwd),
            col = c(1, 1, fitcol, cicol),
            legend = c(legend.name.no, legend.name.yes,
-                      x$det.part, "confidente interval"),
+                      x$det.part, "Confidence interval"),
            bty = "n")
   }
 }
@@ -144,16 +144,15 @@ survFitPlotGGNoCi <- function(data.one, data.two, valCols,
 survFitPlotGGCi <- function(X, x, CI, sel, data.one, data.two, cilty, cilwd,
                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
-  data.three <- data.frame(X[sel], CI$qinf95[sel], CI$qsup95[sel],
-                           Ci = paste("Credible limits of", x$det.part,
-                                      sep = " "))
+  data.three <- data.frame(conc = unique(concentrations[sel2]),
+                           qinf95 = CI["qinf95", ][sel3],
+                           qsup95 = CI["qsup95", ][sel3],
+                           Ci = paste("Confidence interval"))
   
   plt_3 <- ggplot(data.one) +
-    geom_line(data = data.three, aes(X.sel., CI.qinf95.sel., color = Ci),
-              linetype = cilty, size = cilwd) +
-    geom_line(data = data.three, aes(X.sel., CI.qsup95.sel., color = Ci),
-              linetype = cilty, size = cilwd) +
-    scale_color_manual(values = valCols$cols3)
+    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
+                 data.three, col = valCols$cols3, linetype = cilty,
+                 dize = cilwd)
   
   # plot IC
   # final plot
