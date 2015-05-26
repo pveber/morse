@@ -31,7 +31,7 @@ survLlbinomCi <- function(x) {
              Ninit = aggregate(Ninit ~ time + conc, x$dataTT, sum)$Ninit)
   
   ci <- apply(x, 1, function(x) {
-    binom.test(c(x["Nsurv"], x["Ninit"]))$conf.int
+    binom.test(x["Nsurv"], x["Ninit"])$conf.int
     })
   rownames(ci) <- c("qinf95", "qsup95")
   colnames(ci) <- x$conc
@@ -78,7 +78,7 @@ survFitPlotGenericNoCi <- function(concentrations, response, x, X,
   }
 
 survFitPlotGenericCi <- function(concentrations, response, x, X,
-                                 fNsurvtheo, CI, sel2, sel, mortality, 
+                                 fNsurvtheo, CI, sel3, sel2, sel, mortality, 
                                  xlab, ylab, fitcol, fitlty, fitlwd,
                                  main, addlegend, legend.position, legend.title,
                                  legend.name.no, legend.name.yes, legend.position.ci,
@@ -92,28 +92,27 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(CI$qsup95) + 0.2),
+       ylim = c(0, 1.2),
        type = "n",
        ...)
   
   # axis
-  axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
+  axis(side = 2, at = pretty(c(0, 1.2)))
   axis(side = 1, at = unique(concentrations[sel2]),
        labels = unique(x$dataTT$conc[sel2]))
 
   # Plotting the theoretical curve
-  # CI ribbon + lines
-  polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
-          col = "grey40", border = NA)
-  lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
-        lwd = cilwd)
-  lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
-        lwd = cilwd)
+
   # fitted curve
   lines(X[sel], fNsurvtheo[sel], col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
   # points
   points(concentrations[sel2], response[sel2], pch = mortality)
+  
+  # segment CI
+  segments(unique(concentrations[sel2]),
+           CI["qinf95",][sel3], concentrations[sel2],
+           CI["qsup95", ][sel3], col = cicol, lty = cilty, lwd = cilwd)
   
   # legend
   if (addlegend) { # legend yes CI yes
@@ -122,8 +121,7 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
            lwd = c(1, 1, fitlwd, cilwd),
            col = c(1, 1, fitcol, cicol),
            legend = c(legend.name.no, legend.name.yes,
-                      x$det.part, paste("Credible limits of", x$det.part,
-                                        sep = " ")),
+                      x$det.part, "confidente interval"),
            bty = "n")
   }
 }
@@ -265,6 +263,7 @@ plot.survFitTT <- function(x,
   sel <- logTransConcFit(log.scale, X, x, concentrations, "sel")
   X <- logTransConcFit(log.scale, X, x, concentrations, "X")
   sel2 <- logTransConcFit(log.scale, X, x, concentrations, "sel2")
+  sel3 <- logTransConcFit(log.scale, X, x, concentrations, "sel3")
   concentrations <- logTransConcFit(log.scale, X, x, concentrations, "conc")
 
   nomortality <- match(x$dataTT$Nsurv[sel2] == x$dataTT$Ninit[sel2],
@@ -340,7 +339,7 @@ plot.survFitTT <- function(x,
     }
     if (ci) {
       survFitPlotGenericCi(concentrations, response, x, X,
-                           fNsurvtheo, CI, sel2, sel, mortality, 
+                           fNsurvtheo, CI, sel3, sel2, sel, mortality, 
                            xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend, legend.position, legend.title,
                            legend.name.no, legend.name.yes, legend.position.ci,

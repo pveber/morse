@@ -179,6 +179,11 @@ logTransConcFit <- function(log.scale, X, x, concentrations, val) {
   } else {
     rep(TRUE, length(x$dataTT$conc))
   }
+  sel3 <- if (log.scale) {
+    unique(x$dataTT$conc) > 0
+  } else {
+    rep(TRUE, length(unique(x$dataTT$conc)))
+  }
   if (log.scale) {
     concentrations[sel2] <- log(concentrations[sel2])
   } else {
@@ -193,6 +198,9 @@ logTransConcFit <- function(log.scale, X, x, concentrations, val) {
   }
   if (val == "sel2") {
     return(sel2)
+  }
+  if (val == "sel3") {
+    return(sel3)
   }
   if (val == "conc") {
     return(concentrations)
