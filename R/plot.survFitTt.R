@@ -21,47 +21,14 @@ survLlbinomFit <- function(res.M, x, X) {
 }
 
 survLlbinomCi <- function(x, X) {
-  # create the parameters for credible interval for the log logistic model
+  # create confidente interval on observed data for the log logistic
+  # binomial model
   # INPUT:
-  # - x : object of class repro.fit
+  # - x : object of class survFitTT
   # - X : vector of concentrations values (x axis)
   # OUTPUT:
-  # - ci : credible limit
+  # - ci : confidente interval
   
-  mctot <- do.call("rbind", x$mcmc)
-  k <- nrow(mctot)
-  
-  # parameters
-  if (x$det.part == "loglogisticbinom_3"){
-    d2 <- mctot[,"d"]
-  }
-  log10b2 <- mctot[,"log10b"]
-  b2 <- 10^log10b2
-  log10e2 <- mctot[,"log10e"]
-  e2 <- 10^log10e2
-  
-  # quantiles
-  qinf95 = NULL
-  med = NULL
-  qsup95 = NULL
-  
-  for (i in 1:length(X)) {
-    if (x$det.part == "loglogisticbinom_3") {
-      theomean <- d2/(1 + (X[i] / e2)^(b2))
-    } else {
-      theomean <- 1/(1 + (X[i] / e2)^(b2))
-    }
-    
-    # IC 95%
-    qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
-    med[i] <- median(theomean, na.rm = TRUE)
-    qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
-  }
-  # values for CI
-  ci <- list(qinf95 = qinf95,
-             med = med,
-             qsup95 = qsup95)
-  return(ci)
 }
 
 survFitPlotGenericNoCi <- function(concentrations, response, x, X,
