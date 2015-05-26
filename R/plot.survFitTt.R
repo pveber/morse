@@ -20,15 +20,23 @@ survLlbinomFit <- function(res.M, x, X) {
   return(fNsurvtheo)
 }
 
-survLlbinomCi <- function(x, X) {
+survLlbinomCi <- function(x) {
   # create confidente interval on observed data for the log logistic
-  # binomial model
+  # binomial model by a binomial test
   # INPUT:
   # - x : object of class survFitTT
-  # - X : vector of concentrations values (x axis)
   # OUTPUT:
   # - ci : confidente interval
+  x <- cbind(aggregate(Nsurv ~ time + conc, x$dataTT, sum),
+             Ninit = aggregate(Ninit ~ time + conc, x$dataTT, sum)$Ninit)
   
+  ci <- apply(x, 1, function(x) {
+    binom.test(c(x["Nsurv"], x["Ninit"]))$conf.int
+    })
+  rownames(ci) <- c("qinf95", "qsup95")
+  colnames(ci) <- x$conc
+  
+  return(ci)
 }
 
 survFitPlotGenericNoCi <- function(concentrations, response, x, X,
@@ -249,7 +257,7 @@ plot.survFitTT <- function(x,
   
   # calculate IC 95 values
   if (ci) {
-    CI <- survLlbinomCi(x, X)
+    CI <- survLlbinomCi(x)
   }
   
   # Define visual parameters
