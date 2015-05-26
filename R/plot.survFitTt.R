@@ -129,9 +129,9 @@ survFitPlotGenericCi <- function(concentrations, response, x, X,
 survFitPlotGGNoCi <- function(data.one, data.two, valCols, 
                               fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data.one) +
-    geom_point(data=data.one, aes(concentrations.sel2., response.sel2.,
+    geom_point(data=data.one, aes(conc, response,
                                   color = mortality)) +
-    geom_line(aes(X.sel., fNsurvtheo.sel.), data.two,
+    geom_line(aes(X, fNsurvtheo), data.two,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     scale_color_discrete(guide = "none") +
     ylim(0, 1) +
@@ -141,8 +141,9 @@ survFitPlotGGNoCi <- function(data.one, data.two, valCols,
   return(plt_4)
 }
 
-survFitPlotGGCi <- function(X, x, CI, sel, data.one, data.two, cilty, cilwd,
-                            valCols, fitlty, fitlwd, xlab, ylab, main) {
+survFitPlotGGCi <- function(X, x, concentrations, CI, sel, sel2, sel3, data.one,
+                            data.two, cilty, cilwd, valCols, fitlty, fitlwd,
+                            xlab, ylab, main) {
   # IC
   data.three <- data.frame(conc = unique(concentrations[sel2]),
                            qinf95 = CI["qinf95", ][sel3],
@@ -150,24 +151,20 @@ survFitPlotGGCi <- function(X, x, CI, sel, data.one, data.two, cilty, cilwd,
                            Ci = paste("Confidence interval"))
   
   plt_3 <- ggplot(data.one) +
-    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
-                 data.three, col = valCols$cols3, linetype = cilty,
-                 dize = cilwd)
+    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
+                     linetype = Ci), data.three, color = valCols$cols3) +
+    scale_linetype_manual(values = cilty)
   
   # plot IC
   # final plot
   plt_4 <- ggplot(data.one) +
-    geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
+    geom_point(data = data.one, aes(conc, response,
                                     color = mortality)) +
-    geom_line(aes(X.sel., fNsurvtheo.sel.), data.two, linetype = fitlty,
+    geom_line(aes(X, fNsurvtheo), data.two, linetype = fitlty,
               size = fitlwd, color = valCols$cols2) +
-    geom_line(aes(X.sel., CI.qinf95.sel.), data.three, linetype = cilty,
-              size = cilwd, color = valCols$cols3) +
-    geom_line(aes(X.sel., CI.qsup95.sel.), data.three, linetype = cilty,
-              size = cilwd, color = valCols$cols3) +
-    geom_ribbon(data = data.three, aes(x = X.sel., ymin = CI.qinf95.sel.,
-                                       ymax = CI.qsup95.sel.),
-                alpha = 0.4) +
+    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
+                 data.three, col = valCols$cols3, linetype = cilty,
+                 size = cilwd) +
     scale_color_discrete(guide = "none") +
     ylim(0, 1) +
     labs(x = xlab, y = ylab) +
@@ -222,14 +219,6 @@ plot.survFitTT <- function(x,
   
   if (style == "ggplot") {
     # variables declarations
-    concentrations.sel2. = NULL
-    response.sel2. = NULL
-    X.sel. = NULL
-    fNsurvtheo.sel. = NULL
-    qinf95.sel. = NULL
-    qsup95.sel. = NULL
-    CI.qinf95.sel. = NULL
-    CI.qsup95.sel. = NULL
     Line = NULL
     Ci = NULL
   }
@@ -364,22 +353,24 @@ plot.survFitTT <- function(x,
     
     # points (to create the legend)
     plt_1 <- ggplot(data.one) +
-      geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
+      geom_point(data = data.one, aes(conc, response,
                                       color = mortality)) +
       scale_color_manual(values = valCols$cols1)
     
     # curve (to create the legend)
     plt_2 <- ggplot(data.one) +
-      geom_line(data = data.two, aes(X.sel., fNsurvtheo.sel., color = Line),
+      geom_line(data = data.two, aes(X, fNsurvtheo, color = Line),
                 linetype = fitlty, size = fitlwd) +
       scale_color_manual(values = valCols$cols2)
     
     if (ci) { # IC yes
-      plt_3 <- survFitPlotGGCi(X, x, CI, sel, data.one, data.two, cilty, cilwd,
-                               valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
+      plt_3 <- survFitPlotGGCi(X, x, concentrations, CI, sel, sel2, sel3, data.one,
+                               data.two, cilty, cilwd, valCols, fitlty, fitlwd,
+                               xlab, ylab, main)$plt_3
 
-      plt_4 <- survFitPlotGGCi(X, x, CI, sel, data.one, data.two, cilty, cilwd,
-                               valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
+      plt_4 <- survFitPlotGGCi(X, x, concentrations, CI, sel, sel2, sel3, data.one,
+                               data.two, cilty, cilwd, valCols, fitlty, fitlwd,
+                               xlab, ylab, main)$plt_4
     }
     if (!ci) { # IC no
       plt_4 <- survFitPlotGGNoCi(data.one, data.two, valCols, fitlty, fitlwd,
@@ -393,10 +384,10 @@ plot.survFitTT <- function(x,
       
       if (ci) mylegend_3 <- legendGgplotFit(plt_3) # CI legend
       if (log.scale) { # log.sclae yes
-        plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
+        plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$conc),
                                             labels =  unique(x$dataTT$conc[sel2]))
       } else { # log.scale no
-        plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
+        plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$conc))
       }
       if (!ci) { # CI no
         grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, nrow = 6),
@@ -409,10 +400,10 @@ plot.survFitTT <- function(x,
     } else { # legend no
       if (log.scale) { # log.scale yes
         plt_5 <- plt_4 +
-          scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
+          scale_x_continuous(breaks = unique(data.one$conc),
                              labels = unique(x$dataTT$conc[sel2]))
       } else { # log.scale no
-        plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
+        plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$conc))
       }
       return(plt_5)
     }
