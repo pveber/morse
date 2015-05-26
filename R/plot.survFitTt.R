@@ -354,8 +354,10 @@ plot.survFitTT <- function(x,
     }
     
     # dataframes points (one) and curve (two)
-    data.one <- data.frame(concentrations[sel2], response[sel2], mortality)
-    data.two <- data.frame(X[sel], fNsurvtheo[sel], Line = x$det.part)
+    data.one <- data.frame(conc = concentrations[sel2],
+                           response = response[sel2], mortality)
+    data.two <- data.frame(X = X[sel], fNsurvtheo = fNsurvtheo[sel],
+                           Line = x$det.part)
     
     # colors
     valCols <- fCols(data.one, x, fitcol, cicol)
