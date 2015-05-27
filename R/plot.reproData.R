@@ -2,7 +2,6 @@
 reproDataPlotTargetTime <- function(x,
                                     target.time,
                                     style,
-                                    pool.replicate,
                                     addlegend, ...) {
   # plot of cumulated number of offspring as a funtion of concentration
   # for a fixed time
@@ -69,7 +68,7 @@ reproDataPlotTargetTime <- function(x,
       geom_point(size = 2.5) +
       labs(x = xlab, y = ylab) +
       theme_minimal() +
-      scale_colour_hue(legend.title, breaks = c("19","1"),
+      scale_colour_hue(legend.title, breaks = c("No","Yes"),
                        labels = c(legend.name.no, legend.name.yes)) +
       scale_x_continuous(breaks = unique(df$conc))
     if (addlegend) {
@@ -115,24 +114,9 @@ reproDataPlotTargetTime <- function(x,
 #' # (2) Plot the reproduction data
 #' plot(zinc, style = "generic", addlegend = TRUE)
 #'
-#' # (3) Plot the survival data with a lattice type
-#' plot(zinc, style = "lattice", addlegend = TRUE)
-#'
-#' # (4) Plot the survival data with a ggplot type
+#' # (3) Plot the survival data with a ggplot type
 #' plot(zinc, style = "ggplot", addlegend = FALSE)
 #'
-#' # (5) To build a specific legend with a ggplot type
-#' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
-#' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
-#'
-#' # (6) Plot the reproduction rate in function of replicates for one concentration at
-#' # one target.time with a generic type
-#' plot(zinc, style = "generic", target.time = 21, concentration = 0.66)
-#'
-#' # (7) Plot the reproduction rate in function of replicates for one concentration at
-#' # one target.time with a ggplot type
-#' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
-
 #' @export
 #'
 #' @import ggplot2
@@ -144,6 +128,7 @@ plot.reproData <- function(x,
                            concentration = NULL,
                            style = "generic",
                            pool.replicate = FALSE,
+                           addlegend = TRUE,
                            ...) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
@@ -155,8 +140,7 @@ plot.reproData <- function(x,
   }
   
   if (! is.null(target.time) && is.null(concentration))
-    reproDataPlotTargetTime(x, target.time, style, pool.replicate,
-                            addlegend, ...)
+    reproDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
     reproDataPlotFixedConc(x, concentration, style, addlegend, ...)
 }
