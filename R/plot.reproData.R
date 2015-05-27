@@ -101,9 +101,6 @@ reproDataPlotFixedConc <- function(x, concentration, style, addlegend, ...) {
   # vector color
   x$color <- as.numeric(as.factor(x$replicate))
   
-  # default legend argument
-  legend.position <- "right"
-  
   if (style == "generic") {
     plot(x$time, x$Nreprocumul,
          type = "n",
