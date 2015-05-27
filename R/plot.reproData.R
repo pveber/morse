@@ -1,3 +1,40 @@
+#' @importFrom dplyr filter
+reproDataPlotTargetTime <- function(x,
+                                    target.time,
+                                    style,
+                                    pool.replicate,
+                                    addlegend, ...) {
+  # plot of cumulated number of offspring as a funtion of concentration
+  # for a fixed time
+  
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  
+  if (!target.time %in% x$time)
+    stop("[target.time] is not one of the possible time !")
+  
+  # select the target.time
+  x <- filter(x, x$time == target.time)
+  
+  # Define visual parameters
+  mortality <- c(0, 1) # code 0/1 mortality
+  nomortality <- match(x$Nsurv == x$Ninit, c(TRUE, FALSE))
+  
+  # without mortality
+  mortality <- mortality[nomortality] # vector of 0 and 1
+  
+  # encodes mortality empty dots (1) and not mortality solid dots (19)
+  if (style == "generic") {
+    mortality[which(mortality == 0)] <- 19
+  }
+  if (style == "ggplot") {
+    mortality[which(mortality == 0)] <- "No"
+    mortality[which(mortality == 1)] <- "Yes"
+  }
+}
+
+
 #' Plotting method for reproData objects
 #'
 #' Plots the cumulated number of offspring as a
@@ -71,7 +108,8 @@ plot.reproData <- function(x,
   }
   
   if (! is.null(target.time) && is.null(concentration))
-    reproDataPlotTargetTime(x, target.time, style, addlegend, ...)
+    reproDataPlotTargetTime(x, target.time, style, pool.replicate,
+                            addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
     reproDataPlotFixedConc(x, concentration, style, addlegend, ...)
 }
