@@ -32,6 +32,33 @@ reproDataPlotTargetTime <- function(x,
     mortality[which(mortality == 0)] <- "No"
     mortality[which(mortality == 1)] <- "Yes"
   }
+  
+  # default legend argument
+  legend.position <- "right"
+  legend.title <- "Mortality"
+  legend.name.no <- "No"
+  legend.name.yes <- "Yes"
+  
+  # generic
+  if (type == "generic") {
+    plot(x$conc,
+         x$Nreprocumul,
+         xlab = xlab,
+         ylab = ylab,
+         pch = mortality,
+         yaxt = "n",
+         xaxt = "n",
+         ...)
+    # axis
+    axis(side = 2, at = pretty(c(0, max(x$Nreprocumul))))
+    axis(side = 1, at = unique(x$conc), labels = unique(x$conc))
+    
+    # legend
+    if (addlegend) {
+      legend(legend.position,title = legend.title, pch = c(19, 1), bty = "n",
+             legend = c(legend.name.no, legend.name.yes))
+    }
+  }
 }
 
 
