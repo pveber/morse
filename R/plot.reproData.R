@@ -179,11 +179,17 @@ reproDataPlotFixedConc <- function(x, concentration, style, addlegend, ...) {
 #' data(cadmium1)
 #' cadmium1 <- reproData(cadmium1)
 #'
-#' # (2) Plot the reproduction data
+#' # (2) Plot the reproduction data for a fixed time
 #' plot(cadmium1, target.time = 21, style = "generic", addlegend = TRUE)
 #'
-#' # (3) Plot the survival data with a ggplot type
+#' # (3) Plot the survival data for a fixed time with a ggplot type
 #' plot(cadmium1, target.time = 21, style = "ggplot", addlegend = FALSE)
+#' 
+#' # (4) Plot the reproduction data for a fixed concentration 
+#' plot(cadmium1, concentration = 4.36, style = "generic", addlegend = TRUE)
+#'
+#' # (5) Plot the survival data for a fixed concentration with a ggplot type
+#' plot(cadmium1, concentration = 4.36, style = "ggplot", addlegend = FALSE)
 #'
 #' @export
 #'
