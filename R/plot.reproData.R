@@ -108,14 +108,14 @@ reproDataPlotTargetTime <- function(x,
 #' library(ggplot2)
 #'
 #' # (1) Load the data
-#' data(zinc)
-#' zinc <- reproData(zinc)
+#' data(cadmium1)
+#' cadmium1 <- reproData(cadmium1)
 #'
 #' # (2) Plot the reproduction data
-#' plot(zinc, style = "generic", addlegend = TRUE)
+#' plot(cadmium1, target.time = 21, style = "generic", addlegend = TRUE)
 #'
 #' # (3) Plot the survival data with a ggplot type
-#' plot(zinc, style = "ggplot", addlegend = FALSE)
+#' plot(cadmium1, target.time = 21, style = "ggplot", addlegend = FALSE)
 #'
 #' @export
 #'
