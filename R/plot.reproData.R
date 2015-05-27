@@ -1,3 +1,4 @@
+#' @import ggplot2
 #' @importFrom dplyr filter
 reproDataPlotTargetTime <- function(x,
                                     target.time,
@@ -78,6 +79,76 @@ reproDataPlotTargetTime <- function(x,
       return(gp)
     }
   }
+}
+
+#' @import ggplot2
+#' @importFrom dplyr filter
+reproDataPlotFixedConc <- function(x, concentration, style, addlegend, ...) {
+  # plot of cumulated number of offspring as a funtion of time
+  # for a fixed concnetration
+  
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  
+  # check concentration value
+  if (!concentration %in% x$conc)
+    stop("The argument [concentration] should correspond to one of the tested concentrations")
+  
+  # select the target.time
+  x <- filter(x, x$conc == concentration)
+  
+  # vector color
+  x$color <- as.numeric(as.factor(x$replicate))
+  
+  # default legend argument
+  legend.position <- "right"
+  
+  if (style == "generic") {
+    plot(x$time, x$Nreprocumul,
+         type = "n",
+         xlab = xlab,
+         ylab = ylab)
+    
+    # one line by replicate
+    by(x, list(x$replicate),
+       function(x) {
+         lines(x$time, x$Nreprocumul, # lines
+               col = x$color)
+         points(x$time, x$Nreprocumul, # points
+                pch = 16,
+                col = x$color)
+       })
+    
+    if (addlegend) {
+      legend("topleft", legend = unique(x$replicate) ,
+             col = unique(x$color),
+             pch = 16,
+             lty = 1)
+    }
+  }
+  
+  if (style == "ggplot") {
+    if (length(unique(x$replicate)) == 1) {
+      df <- ggplot(x, aes(x = time, y = Nreprocumul))
+    } else {
+      df <- ggplot(x, aes(x = time, y = Nreprocumul,
+                          color = factor(replicate),
+                          group = replicate))
+    }
+    fd <- df + geom_line() + geom_point() + theme_minimal() +
+      labs(x = xlab,
+           y = ylab) +
+      scale_color_hue("Replicate")
+    
+    if (addlegend) {# only if pool.replicate == FALSE
+      fd
+    } else {
+      fd + theme(legend.position = "none") # remove legend
+    }
+  }
+  
+  
 }
 
 
