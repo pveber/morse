@@ -178,6 +178,7 @@ survFitPlotGGCi <- function(X, x, concentrations, CI, sel, sel2, sel3, data.one,
 #' 
 #' @name survFitTT
 #' 
+#' @import ggplot2
 #' @import grDevices
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
