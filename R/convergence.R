@@ -67,6 +67,7 @@
 #' 
 #' @export
 #' 
+#' @import ggplot2
 #' @importFrom coda autocorr.plot gelman.diag
 #' @importFrom ggmcmc ggs ggs_traceplot ggs_density ggs_autocorrelation
 #' @importFrom gridExtra grid.arrange arrangeGrob
@@ -80,15 +81,15 @@ convergence <- function(out,
                         ppc = TRUE,
                         style = "generic") {
   # test class object
-  if (class(out) != "reproFitTt" && class(out) != "survFitTt")
-    stop("The object passed in argument [out] is not of class 'reproFitTt' or 'survFitTt' !\n")
-
+  if (class(out) != "reproFitTT" && class(out) != "survFitTT")
+    stop("The object passed in argument [out] is not of class 'reproFitTT' or 'survFitTT' !\n")
+  
   # keep MCMC list
   mcmc <- out$mcmc
   #  Gelamn and Rubin diagnostic
   GelRubmulti <- gelman.diag(mcmc)$mpsrf
   GelRubesti <- gelman.diag(mcmc)$psrf[, "Point est."]
-
+  
   # return the psrf and mprsf value
   cat("Gelman and Rubin:\n")
   cat("Potential scale reduction factor for each parameter:\n")
@@ -130,9 +131,9 @@ convergence <- function(out,
     concentrations <- out$dataTT$conc
     observation <- out$dataTT$Nsurv / out$dataTT$Ninit
     parameters <- out$parameters
-    CI.ppc <- survLlbinomCi(out, concentrations)
+    CI.ppc <- survLlbinomCi(out)
   }
-
+  
   # generic plot
   if (style == "generic") {
     # trace and density
@@ -143,7 +144,7 @@ convergence <- function(out,
     if (autocorr ) {
       if (trace || density) {
         if (Sys.getenv("RSTUDIO") == "") dev.new() # create a new page plot
-                                                   # when not use RStudio
+        # when not use RStudio
       }
       autocorr.plot(mcmc, ask = TRUE)
     }
@@ -151,42 +152,27 @@ convergence <- function(out,
     if (ppc) {
       if (trace || density || autocorr) {
         if (Sys.getenv("RSTUDIO") == "") dev.new() # create a new page plot
-                                                   # when not use RStudio
+        # when not use RStudio
       }
       
       par(mfrow = c(2, 2))
       
-      plot(observation, observation,
-           bty = "n",
-           type = "n",
-           main = "Posterior predictive check",
-           ylab = "Predicted survival rate for each replicate",
-           xlab = "Observed survival rate for each replicate")
-      abline(a = 0, b = 1, lty = 2)
-      
-      # create segments for post predictive check plot
-      for (i in 1:length(concentrations)) {
-        points(observation[i], CI.ppc$med[i], pch = 16, col = "red")
-        segments(observation[i], CI.ppc$qinf95[i],
-                 observation[i], CI.ppc$qsup95[i], col = "red")
-      }
-
       # CPPS
-        for (i in 1:length(parameters)) {
-          plot(density(M0.mcmcTot[, length(parameters) + i]),
-               xlim = range(density(M0.mcmcTot[, i])$x),
-               main = "",
-               xlab = colnames(M0.mcmcTot)[i],
-               lty = 1) # posterior
-          lines(density(M0.mcmcTot[, i]),
-                lty = 2) # prior
-          legend("topleft", legend = c("prior",
-                                       "posterior"),
-                 lty = c(2, 1), bty = "n")
-        }
+      for (i in 1:length(parameters)) {
+        plot(density(M0.mcmcTot[, length(parameters) + i]),
+             xlim = range(density(M0.mcmcTot[, i])$x),
+             main = "",
+             xlab = colnames(M0.mcmcTot)[i],
+             lty = 1) # posterior
+        lines(density(M0.mcmcTot[, i]),
+              lty = 2) # prior
+        legend("topleft", legend = c("prior",
+                                     "posterior"),
+               lty = c(2, 1), bty = "n")
+      }
     }
   }
-
+  
   # ggplot
   if (style == "ggplot") {
     # creat ggs objects
@@ -208,37 +194,27 @@ convergence <- function(out,
       if (Sys.getenv("RSTUDIO") == "") dev.new() # create a new page plot
       # when not use RStudio
       
-    # PPC
+      # PPC
       
-    plt = list()
-    CI.ppc <- cbind(as.data.frame(CI.ppc), observation)
-    
-    ggppc <- ggplot(CI.ppc, aes(x = observation, y = med,
-                                ymin = qinf95, ymax = qsup95, color = "red"))
-    
-    plt[["ppc"]] <- ggppc + geom_pointrange() + geom_abline(linetype = 2) +
-      labs(x = "Observed survival rate for each replicate",
-           y = "Predicted survival rate for each replicate") +
-      ylim(0, 1) + xlim(0, 1) + theme_minimal() +
-      theme(legend.position = "none")
-    
-     mcmc.ppc <- melt(list(prior = M0.mcmc,
-                                posterior = do.call("rbind", out$mcmc)))
-     mcmc.ppc <- split(mcmc.ppc, mcmc.ppc$Var2)
-    
-    # CPPS
-    for (i in parameters) {
-      plt[[i]] <- ggplot(mcmc.ppc[[i]], aes(x = value, color = L1)) +
-        geom_density() + labs(x = i) + theme_minimal() +
-        theme(legend.title = element_blank())
-    }
-    
-    do.call(grid.arrange, plt)
-    
+      plt = list()
+      
+      mcmc.ppc <- melt(list(prior = M0.mcmc,
+                            posterior = do.call("rbind", out$mcmc)))
+      mcmc.ppc <- split(mcmc.ppc, mcmc.ppc$Var2)
+      
+      # CPPS
+      for (i in parameters) {
+        plt[[i]] <- ggplot(mcmc.ppc[[i]], aes(x = value, color = L1)) +
+          geom_density() + labs(x = i) + theme_minimal() +
+          theme(legend.title = element_blank())
+      }
+      
+      do.call(grid.arrange, plt)
+      
     }
     
   }
-
+  
   return(invisible(list(mpsrf = GelRubmulti,
                         psrf = GelRubesti)))
 }
