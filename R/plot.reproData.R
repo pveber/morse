@@ -40,7 +40,7 @@ reproDataPlotTargetTime <- function(x,
   legend.name.yes <- "Yes"
   
   # generic
-  if (type == "generic") {
+  if (style == "generic") {
     plot(x$conc,
          x$Nreprocumul,
          xlab = xlab,
@@ -57,6 +57,26 @@ reproDataPlotTargetTime <- function(x,
     if (addlegend) {
       legend(legend.position,title = legend.title, pch = c(19, 1), bty = "n",
              legend = c(legend.name.no, legend.name.yes))
+    }
+  }
+  
+  #ggplot2
+  if (style == "ggplot") {
+    df <- data.frame(x, mortality = mortality)
+    
+    # plot
+    gp <- ggplot(df, aes(conc, Nreprocumul, colour = factor(mortality))) +
+      geom_point(size = 2.5) +
+      labs(x = xlab, y = ylab) +
+      theme_minimal() +
+      scale_colour_hue(legend.title, breaks = c("19","1"),
+                       labels = c(legend.name.no, legend.name.yes)) +
+      scale_x_continuous(breaks = unique(df$conc))
+    if (addlegend) {
+      return(gp)
+    } else {
+      gp <- gp + theme(legend.position = "none")
+      return(gp)
     }
   }
 }
