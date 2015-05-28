@@ -155,11 +155,11 @@ plot.reproData <- function(x,
   
   if (is.null(target.time) && is.null(concentration))
     survDataPlotFull(x, "Nreprocumul", style, addlegend, ...)
-  if (! is.null(target.time) && is.null(concentration))
+  else if (! is.null(target.time) && is.null(concentration))
     reproDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
     survDataPlotFixedConc(x, "Nreprocumul", concentration, style, addlegend, ...)
-  else if (! is.null(target.time) && ! is.null(concentration))
+  else
     survDataPlotReplicates(x, "Nreprocumul", target.time, concentration, style,
                             addlegend, ...)
 }
