@@ -144,10 +144,45 @@ reproDataPlotFixedConc <- function(x, concentration, style, addlegend, ...) {
       fd + theme(legend.position = "none") # remove legend
     }
   }
-  
-  
 }
 
+#' @import ggplot2
+#' @importFrom dplyr %>% filter
+reproDataPlotReplicates <- function(x,
+                                    target.time,
+                                    concentration,
+                                    style,
+                                    addlegend,
+                                    ...) {
+  # plot of cumulated number of offspring as a funtion of replicate
+  # for a fixed concnetration and a fixed time
+  
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  
+  # check [target.time] and [concentration]
+  if (!target.time %in% x$time)
+    stop("The argument [target.time] should correspond to one of the observed time points")
+  
+  if (!concentration %in% x$conc)
+    stop("The argument [concentration] should correspond to one of the tested concentrations")
+  
+  # select for concentration and target.time
+  x <- filter(x, conc == concentration & time == target.time)
+  
+  if (style == "generic") {
+    plot(factor(x$replicate), x$Nsurv,
+         type = "n",
+         xlab = xlab,
+         ylab = ylab)
+  }
+  
+  if (style == "ggplot") {
+    df <- ggplot(x, aes(x = replicate, y = Nsurv))
+    df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
+  }
+}
 
 #' Plotting method for reproData objects
 #'
@@ -217,4 +252,7 @@ plot.reproData <- function(x,
     reproDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
     reproDataPlotFixedConc(x, concentration, style, addlegend, ...)
+  else if (! is.null(target.time) && ! is.null(concentration))
+    reproDataPlotReplicates(x, target.time, concentration, style,
+                            addlegend, ...)
 }
