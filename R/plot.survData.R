@@ -145,15 +145,21 @@ survDataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
   time = NULL
   Nsurv = NULL
   title.legend <- "Replicate"
+  
+  data$response <- if (resp == "Nsurv"){
+    data$Nsurv
+  } else {
+    data$Nreprocumul
+  }
 
   # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, cat(resp), colour = factor(replicate))) +
+  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
     geom_point() +
     geom_line() +
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    ylim(0, max(data[,resp])) + theme_minimal()
+    ylim(0, max(data$response)) + theme_minimal()
 
   # legend option
   if (addlegend){
@@ -307,10 +313,16 @@ survDataPlotFixedConc <- function(x, resp,
     }
   }
   if (style == "ggplot") {
-    if (length(unique(x$replicate)) == 1) {
-      df <- ggplot(x, aes(x = time, y = cat(resp)))
+    x$response <- if (resp == "Nsurv"){
+      x$Nsurv
     } else {
-      df <- ggplot(x, aes(x = time, y = cat(resp),
+      x$Nreprocumul
+    }
+    
+    if (length(unique(x$replicate)) == 1) {
+      df <- ggplot(x, aes(x = time, y = response))
+    } else {
+      df <- ggplot(x, aes(x = time, y = response,
                           color = factor(replicate),
                           group = replicate))
     }
@@ -363,8 +375,14 @@ survDataPlotReplicates <- function(x,
   }
 
   if (style == "ggplot") {
-    df <- ggplot(x, aes(x = replicate, y = cat(resp)))
-    df + geom_point() + labs(x = xlab, y = ylab)
+    x$response <- if (resp == "Nsurv"){
+      x$Nsurv
+    } else {
+      x$Nreprocumul
+    }
+    
+    df <- ggplot(x, aes(x = replicate, y = response))
+    df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
   }
 }
 
