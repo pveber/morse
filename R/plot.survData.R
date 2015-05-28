@@ -271,6 +271,7 @@ survDataPlotFixedConc <- function(x, resp,
   } else {
     if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
   }
+  legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
 
   # check concentration value
   if (!concentration %in% x$conc)
@@ -299,7 +300,7 @@ survDataPlotFixedConc <- function(x, resp,
        })
 
     if (addlegend) {
-      legend("bottomleft", legend = unique(x$replicate) ,
+      legend(legend.position, legend = unique(x$replicate) ,
              col = unique(x$color),
              pch = 16,
              lty = 1)
