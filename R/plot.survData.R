@@ -168,7 +168,11 @@ survDataPlotFull <- function(data, resp, style = "generic", addlegend = TRUE, ..
 
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  ylab <- if(resp == "Nsurv") {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  } else {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  }
 
   if (style == "generic")
     survDataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
@@ -185,7 +189,11 @@ survDataPlotTargetTime <- function(x, resp, target.time, style, addlegend, ...) 
 
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  ylab <- if(resp == "Nsurv") {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  } else {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  }
 
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
@@ -258,7 +266,11 @@ survDataPlotFixedConc <- function(x, resp,
 
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  ylab <- if(resp == "Nsurv") {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  } else {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  }
 
   # check concentration value
   if (!concentration %in% x$conc)
@@ -326,7 +338,11 @@ survDataPlotReplicates <- function(x,
 
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  ylab <- if(resp == "Nsurv") {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  } else {
+    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  }
 
   # check [target.time] and [concentration]
   if (!target.time %in% x$time)
