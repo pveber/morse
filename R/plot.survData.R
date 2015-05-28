@@ -348,9 +348,6 @@ survDataPlotReplicates <- function(x,
     df <- ggplot(x, aes(x = replicate, y = Nsurv))
     df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
   }
-
-  #FIXME: and lattice?
-  #FIXME: plot control too
 }
 
 
