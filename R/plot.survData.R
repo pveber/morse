@@ -346,7 +346,7 @@ survDataPlotReplicates <- function(x,
 
   if (style == "ggplot") {
     df <- ggplot(x, aes(x = replicate, y = Nsurv))
-    df + geom_point() + labs(x = xlab, y = ylab)
+    df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
   }
 
   #FIXME: and lattice?
