@@ -191,18 +191,14 @@ survDataPlotFull <- function(data, resp, style = "generic", addlegend = TRUE, ..
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotTargetTime <- function(x, resp, target.time, style, addlegend, ...) {
+survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
 
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
-  ylab <- if(resp == "Nsurv") {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-  } else {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  }
-
-  if (!target.time %in% x$time)
-    stop("[target.time] is not one of the possible time !")
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  
+    if (!target.time %in% x$time)
+      stop("[target.time] is not one of the possible time !")
 
   # select the target.time
   x <- filter(x, x$time == target.time)
@@ -211,7 +207,7 @@ survDataPlotTargetTime <- function(x, resp, target.time, style, addlegend, ...) 
   x$color <- as.numeric(as.factor(x$replicate))
 
   if (style == "generic") {
-    plot(x$conc, seq(0, max(x[,resp]), length.out = length(x$conc)),
+    plot(x$conc, seq(0, max(x$Nsurv), length.out = length(x$conc)),
          type = "n",
          xaxt = "n",
          xlab = xlab,
@@ -223,10 +219,10 @@ survDataPlotTargetTime <- function(x, resp, target.time, style, addlegend, ...) 
     # points
     if (length(unique(x$replicate)) == 1) {
       # points
-      points(x$conc, x[,resp],
+      points(x$conc, x$Nsurv,
              pch = 16)
     } else {
-      tt <- xyTable(x$conc, x[,resp])
+      tt <- xyTable(x$conc, x$Nsurv)
       points(tt$x, tt$y,
              cex = (tt$number) / 3,
              pch = 16)
@@ -242,17 +238,17 @@ survDataPlotTargetTime <- function(x, resp, target.time, style, addlegend, ...) 
   }
   if (style == "ggplot") {
     if (length(unique(x$replicate)) == 1) {
-      df <- ggplot(x, aes(x = conc, y = cat(resp)))
+      df <- ggplot(x, aes(x = conc, y = Nsurv))
     } else {
-      df <- ggplot(x, aes(x = conc, y = cat(resp))) +
-        stat_sum(aes(size = factor(..n..)))
+      df <- ggplot(x, aes(x = conc, y = Nsurv)) +
+        stat_sum(aes(size = factor(..n..))) +
+        scale_size_discrete("Replicate")
     }
     fd <- df + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
       scale_x_continuous(breaks = unique(x$conc),
-                         labels = unique(x$conc)) +
-      scale_color_hue("Replicate")
+                         labels = unique(x$conc))
 
     # legend option
     if (addlegend) {
@@ -465,7 +461,7 @@ plot.survData <- function(x,
   if (is.null(target.time) && is.null(concentration))
     survDataPlotFull(x, "Nsurv", style, addlegend, ...)
   else if (! is.null(target.time) && is.null(concentration))
-    survDataPlotTargetTime(x, "Nsurv", target.time, style, addlegend, ...)
+    survDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
     survDataPlotFixedConc(x, "Nsurv", concentration, style, addlegend, ...)
   else
