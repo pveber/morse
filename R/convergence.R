@@ -81,8 +81,8 @@ convergence <- function(out,
                         ppc = TRUE,
                         style = "generic") {
   # test class object
-  if (class(out) != "reproFitTT" && class(out) != "survFitTT")
-    stop("The object passed in argument [out] is not of class 'reproFitTT' or 'survFitTT' !\n")
+  if (class(out) != "reproFitTT" && class(out) != "survFitTT" && class(out) != "survFitTKTD")
+    stop("The object passed in argument [out] is not of class 'reproFitTT', 'survFitTT' or 'survFitTKTD' !\n")
   
   # keep MCMC list
   mcmc <- out$mcmc
@@ -101,13 +101,28 @@ convergence <- function(out,
     # create null model
     nodata <- out$jags.data
     nodata["Nsurv"] <- NULL
-    # select model text
-    if (out$det.part == "loglogisticbinom_2") {
-      model.text <- llbinom2.model.text
+    
+    if (class(out) == "survFitTT") {
+      # select model text
+      if (out$det.part == "loglogisticbinom_2") {
+        model.text <- llbinom2.model.text
+      }
+      else if (out$det.part == "loglogisticbinom_3") {
+        model.text <- llbinom3.model.text
+      }
     }
-    if (out$det.part == "loglogisticbinom_3") {
-      model.text <- llbinom3.model.text
+    else if (class(out) == "survFitTKTD") {
+      model.text <- model_TKTD1
     }
+    else if (class(out) == "reproFitTT") {
+      if (out$stoc.part == "poisson") {
+        model.text <- llm.poisson.model.text
+      }
+      else if (out$stoc.part == "gammapoisson") {
+        model.text <- llm.gammapoisson.model.text
+      }
+    }
+
     # load model text in a temporary file
     model.file <- tempfile() # temporary file address
     fileC <- file(model.file) # open connection
@@ -131,7 +146,6 @@ convergence <- function(out,
     concentrations <- out$dataTT$conc
     observation <- out$dataTT$Nsurv / out$dataTT$Ninit
     parameters <- out$parameters
-    CI.ppc <- survLlbinomCi(out)
   }
   
   # generic plot
