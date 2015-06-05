@@ -1,6 +1,9 @@
 # Ugly hack to get rid of spurious notes in package check, caused by uses
 # of dplyr::{rename, filter}. R is such a sad language.
-if(getRversion() >= "2.15.1")  utils::globalVariables(c("Nsurv","conc","Ninit"))
+if(getRversion() >= "2.15.1")  utils::globalVariables(c(
+  "Nsurv","conc","Ninit", "concentrations.sel2.", "response.sel2.",
+  "X.sel.", "fNsurvtheo.sel.", "qinf95.sel.", "qsup95.sel.", "CI.qinf95.sel.",
+  "CI.qsup95.sel.", "Line", "CI"))
 
 
 # Generates a character string vector from a data.frame using its replicate,
@@ -156,6 +159,10 @@ logTransXaxisFit <- function(log.scale, concentrations) {
   return(X)
 }
 
+optLogTransform <- function(log.scale, x) {
+  if(log.scale) log(x) else x
+}
+  
 logTransConcFit <- function(log.scale, X, x, concentrations, val) {
   # transform vector conccentration in log.scale if needed
   # X axis log.scale value
@@ -209,19 +216,12 @@ legendGgplotFit <- function(a.gplot) {
 }
 
 fCols <- function(data.one, x, fitcol, cicol) {
-  # points vector
-  n <- length(unique(data.one$mortality))
-  cols <- hcl(h=seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
-  cols1 <- cols[1:n]
-  names(cols1) <- sort(unique(data.one$mortality))
-  # fitted curve
   cols2 <- fitcol
   names(cols2) <- c(x$det.part)
   # CI curve
   cols3 <- cicol
   names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " ")) 
   
-  return(list(cols1 = cols1,
-              cols2 = cols2,
+  return(list(cols2 = cols2,
               cols3 = cols3))
 }
