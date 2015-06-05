@@ -6,6 +6,8 @@ reproEvalFit <- function(fit, x) {
   # OUTPUT :
   # - fNcumulpidtheo
   
+  res.M <- summary(x$mcmc)
+  
   # unlog parameters
   d <- res.M$quantiles["d", "50%"]
   b <- 10^res.M$quantiles["log10b", "50%"]
@@ -13,6 +15,57 @@ reproEvalFit <- function(fit, x) {
   fNcumulpidtheo <- d / (1 + ( x / e)^b) # mean curve equation
   
   return(fNcumulpidtheo)
+}
+
+reproLlmCI <- function(x, X) {
+  # create the parameters for credible interval for the log logistic model
+  # INPUT:
+  # - x : object of class reproFitTT
+  # - X : vector of concentrations values (x axis)
+  # OUTPUT:
+  # - ci : credible limit
+  
+  mctot <- do.call("rbind", x$mcmc)
+  k <- nrow(mctot)
+  # parameters
+  d2 <- mctot[, "d"]
+  log10b2 <- mctot[, "log10b"]
+  b2 <- 10^log10b2
+  log10e2 <- mctot[, "log10e"]
+  e2 <- 10^log10e2
+  
+  # quantiles
+  qinf95 = NULL
+  qsup95 = NULL
+  
+  # poisson
+  if (x$model.label == "P") {
+    for (i in 1:length(X)) {
+      theomean <- d2 / (1 + (X[i] / e2)^(b2)) # mean curve
+      # IC 95%
+      qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
+      qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
+    }
+  }
+  
+  # gamma poisson
+  if (x$model.label == "GP") {
+    # parameters
+    log10omega2 <- mctot[, "log10omega"]
+    omega2 <- 10^(log10omega2)
+    
+    for (i in 1:length(X)) {
+      theomean <- d2 / (1 + (X[i] / e2)^(b2)) # mean curve
+      theo <- rgamma(n = k, shape = theomean / omega2, rate = 1 / omega2)
+      # IC 95%
+      qinf95[i] <- quantile(theo, probs = 0.025, na.rm = TRUE)
+      qsup95[i] <- quantile(theo, probs = 0.975, na.rm = TRUE)
+    }
+  }
+  # values for CI
+  ci <- list(qinf95 = qinf95,
+             qsup95 = qsup95)
+  return(ci)
 }
 
 #' @export
@@ -38,11 +91,11 @@ plot.reproFitTt <- function(x,
                             cilwd,
                             addlegend = TRUE,
                             log.scale = FALSE,
-                            type = "generic",
-                            ppc = FALSE, ...) {
-  # plot the fitted curve estimated by repro.tt.fit
+                            style = "generic",
+                            ...) {
+  # plot the fitted curve estimated by reproFitTT
   # INPUTS
-  # - x:  repro.tt.fit object
+  # - x:  reproFitTT object
   # - xlab : label x
   # - ylab : label y
   # - main : main title
@@ -55,114 +108,80 @@ plot.reproFitTt <- function(x,
   # - cilwd : width line ci
   # - addlegend : boolean
   # - log.scale : x log option
-  # - type : generic ou ggplot
-  # - ppc : plot posterior predictive check
+  # - style : generic ou ggplot
   # OUTPUT:
   # - plot of fitted regression
   
-  if (type == "ggplot") {
-    # variables declarations
-    concentrations.sel2. = NULL
-    response.sel2. = NULL
-    X.sel. = NULL
-    fNcumulpidtheo.sel. = NULL
-    qinf95.sel. = NULL
-    qsup95.sel. = NULL
-    CI.qinf95.sel. = NULL
-    CI.qsup95.sel. = NULL
-    Line = NULL
-    Ci = NULL
-  }
+  # Selection of datapoints that can be displayed given the type of scale
+  sel <- if(log.scale) x$dataTT$conc > 0 else TRUE
   
-  # Define data
-  concentrations <- x$dataTt$conc
-  response <- x$dataTt$Nreprocumul / x$dataTt$Nindtime
-  if (ppc) {
-    Nreprocumul <- x$dataTt$Nreprocumul
-    Nindtime <- x$dataTt$Nindtime
-    res.Mtot <- do.call("rbind", x$mcmc)
-  }
+  dataTT <- x$dataTT[sel, ]
+  dataTT$resp <- dataTT$Nreprocumul / dataTT$Nindtime
+  transf_data_conc <- optLogTransform(log.scale, dataTT$conc)
   
-  # Fitted curve parameters
-  X <- logTransXaxisFit(log.scale, concentrations) # X log.scale transformation
+  # Concentration values used for display in linear scale
+  display.conc <- (function() {
+    x <- optLogTransform(log.scale, dataTT$conc)
+    s <- seq(min(x),max(x), length = 100)
+    if(log.scale) exp(s) else s
+  })()
   
-  res.M <- summary(x$mcmc)
+  # Possibly log transformed concentration values for display
+  curv_conc <- optLogTransform(log.scale, display.conc)
   
-  # Choose median of posteriors as parameter values
-  fNcumulpidtheo <- reproLlmFit(res.M, X)
+  curv_resp <- reproEvalFit(x, display.conc)
   
-  # calculate IC 95 values
-  if (ci) {
-    CI <- reproLlmCi(x, X)
-  }
+  # default axis parameters
+  if (missing(xlab)) xlab <- "Concentrations"
+  if(missing(ylab)) ylab <- "Response"
+  
+  # default legend parameters	
+  if (missing(fitcol)) fitcol <- "red"
+  if (missing(fitlty)) fitlty <- 1
+  if (missing(fitlwd)) fitlwd <- 1
+  
+  if (missing(main)) main = NULL
+  
+  # IC parameters
+  if (missing(cicol)) cicol <- "red"
+  if (missing(cilty)) cilty <- 2
+  if(missing(cilwd)) cilwd <- 1
   
   # Define visual parameters
   mortality <- c(0, 1) # code 0/1 mortality
-  temp.conc.lt <- logTransConcFit(log.scale, X, x, concentrations)
-  sel <- temp.conc.lt$sel
-  X <- temp.conc.lt$X
-  sel2 <- temp.conc.lt$sel2
-  concentrations <- temp.conc.lt$concentrations
-  
-  rm(temp.conc.lt)
-  
-  nomortality <- match(x$dataTt$Nsurv[sel2] == x$dataTt$Ninit[sel2],
-                       c(TRUE, FALSE)) # valid if at least one replicat
-  
-  # without mortality
-  mortality <- mortality[nomortality] # vector of 0 and 1
+  # valid if at least one replicat
+  mortality <- mortality[match(dataTT$Nsurv == dataTT$Ninit,
+                               c(TRUE, FALSE))] # vector of 0 and 1
   
   # encodes mortality empty dots (1) and not mortality solid dots (19)
-  if (type == "generic") {
-    mortality[which(mortality == 0)] <- 19
-  }
-  if (type == "ggplot") {
+  if (type == "generic")  mortality[which(mortality == 0)] <- 19
+  else if (type == "ggplot") {
     mortality[which(mortality == 0)] <- "No"
     mortality[which(mortality == 1)] <- "Yes"
   }
   
-  # default axis parameters
-  if (missing(xlab)) {
-    xlab <- "Concentrations"
-  }
-  if(missing(ylab)) {
-    ylab <- "Response"
-  }
-  
-  # default legend parameters	
-  if (missing(fitcol)) {
-    fitcol <- "red"
-  }
-  if (missing(fitlty)) {
-    fitlty <- 1
-  }
-  if (missing(fitlwd)) {
-    fitlwd <- 1
-  }
-  if (missing(main)) {
-    main = NULL
-  }
+  CI <- if (ci) { CI <- reproLlmCI(x, X) } else NULL
+
   if (type == "generic") {
-    legend.position <- "bottomleft"
-    legend.position.ci <- "left"
+    reproFitPlotGeneric(x,
+                        dataTT$conc, transf_data_conc, dataTT$resp,
+                        curv_conc, curv_resp,
+                        CI,
+                        xlab, ylab, fitcol, fitlty, fitlwd,
+                        main, addlegend,
+                        cicol, cilty, cilwd, ...)
   }
-  legend.title <- "Mortality"
-  legend.name.no <- "No"
-  legend.name.yes <- "Yes"
-  
-  # IC parameters
-  if (missing(cicol)) {
-    cicol <- "red"
+  else if (style == "ggplot") {
+    reproFitPlotGG(x,
+                   dataTT$conc, transf_data_conc, dataTT$resp,
+                   curv_conc, curv_resp,
+                   CI,
+                   xlab, ylab, fitcol, fitlty, fitlwd,
+                   main, addlegend,
+                   cicol, cilty, cilwd, ...)
   }
-  if (missing(cilty)) {
-    cilty <- 2
-  }
-  if(missing(cilwd)) {
-    cilwd <- 1
-  }
-  
-  # Plotting data
-  if (type == "generic") {
+  else stop("Unknown style")
+}
     if (!ci) { # CI no
       plot(concentrations[sel2], response[sel2],
            xlab = xlab,
@@ -176,7 +195,7 @@ plot.reproFitTt <- function(x,
       # axis
       axis(side = 2, at = pretty(c(0, max(response))))
       axis(side = 1, at = unique(concentrations[sel2]),
-           labels = unique(x$dataTt$conc[sel2]))
+           labels = unique(x$dataTT$conc[sel2]))
       
       # fitted curve
       lines(X[sel], fNcumulpidtheo[sel], col = fitcol,
@@ -196,7 +215,7 @@ plot.reproFitTt <- function(x,
       # axis
       axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
       axis(side = 1, at = unique(concentrations[sel2]),
-           labels = unique(x$dataTt$conc[sel2]))
+           labels = unique(x$dataTT$conc[sel2]))
       
       # Plotting the theoretical curve
       # CI ribbon + lines
@@ -354,7 +373,7 @@ plot.reproFitTt <- function(x,
       if (log.scale) { # log.sacle yes
         plt_5 <- plt_4 +
           scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
-                             labels =  unique(x$dataTt$conc[sel2]))
+                             labels =  unique(x$dataTT$conc[sel2]))
       } else { # log.scale no
         plt_5 <- plt_4 +
           scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
@@ -371,7 +390,7 @@ plot.reproFitTt <- function(x,
       if (log.scale) { # log.scale yes
         plt_5 <- plt_4 +
           scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
-                             labels = unique(x$dataTt$conc[sel2]))
+                             labels = unique(x$dataTT$conc[sel2]))
       } else { # log.scale no
         plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
       }
