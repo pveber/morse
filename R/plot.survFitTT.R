@@ -180,33 +180,26 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   data.three <- data.frame(conc = curv$conc,
-                           qinf95 = CI$qinf95,
-                           qsup95 = CI$qsup95,
-                           CI = paste("Credible limits of", x$det.part,
-                                      sep = " "))
+                           qinf95 = CI["qinf95",],
+                           qsup95 = CI["qsup95",],
+                           CI = "Confidence interval")
   
   plt_3 <- ggplot(data) +
-    geom_line(data = data.three, aes(conc, qinf95, color = CI),
-              linetype = cilty, size = cilwd) +
-    geom_line(data = data.three, aes(conc, qsup95, color = CI),
-              linetype = cilty, size = cilwd) +
-    scale_color_manual(values = valCols$cols3)
+    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
+                     linetype = CI), data.three, color = valCols$cols3) +
+    scale_linetype_manual(values = cilty) + theme_minimal()
   
   # plot IC
   # final plot
   plt_4 <- ggplot(data) +
-    geom_point(data = data, aes(conc, resp, color = 16)) +
+    geom_point(data = data, aes(conc, resp)) +
     geom_line(aes(conc, resp), curv, linetype = fitlty,
               size = fitlwd, color = valCols$cols2) +
-    geom_line(aes(conc, qinf95), data.three, linetype = cilty,
-              size = cilwd, color = valCols$cols3) +
-    geom_line(aes(conc, qsup95), data.three, linetype = cilty,
-              size = cilwd, color = valCols$cols3) +
-    geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
-                                       ymax = qsup95),
-                alpha = 0.4) +
+    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
+                 data.three, color = valCols$cols3, linetype = cilty,
+                 size = cilwd) +
     scale_color_discrete(guide = "none") +
-    ylim(0, 1) +
+    ylim(0, max(CI["qsup95",]) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
   
@@ -230,7 +223,7 @@ survFitPlotGG <- function(x,
   
   # dataframes points (one) and curve (two)
   data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
-                     resp = data_resp)
+                     resp = data_resp, pts = "Observed values")
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
   
   # colors
@@ -238,8 +231,9 @@ survFitPlotGG <- function(x,
   
   # points (to create the legend)
   plt_1 <- ggplot(data) +
-    geom_point(data = data, aes(transf_conc, resp)) +
-    scale_color_manual(values = valCols$cols1) + theme_minimal()
+    geom_point(data = data, aes(transf_conc, resp, color = pts)) +
+    scale_color_manual(values = valCols$cols1) +
+    theme_minimal()
   
   # curve (to create the legend)
   plt_2 <- ggplot(data) +
@@ -257,7 +251,7 @@ survFitPlotGG <- function(x,
   
   if (addlegend) { # legend yes
     # create legends
-    #    mylegend_1 <- legendGgplotFit(plt_1) # points legend
+    mylegend_1 <- legendGgplotFit(plt_1) # points legend
     mylegend_2 <- legendGgplotFit(plt_2) # mean line legend
     
     plt_5 <- plt_4 + scale_x_continuous(breaks = data$transf_conc,

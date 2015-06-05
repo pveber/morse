@@ -215,13 +215,19 @@ legendGgplotFit <- function(a.gplot) {
   return(legend)
 }
 
-fCols <- function(data.one, x, fitcol, cicol) {
+fCols <- function(data, x, fitcol, cicol) {
+  
+  #points
+  cols1 <- "black"
+  names(cols1) <- unique(data$pts)
+  # curve
   cols2 <- fitcol
   names(cols2) <- c(x$det.part)
   # CI curve
   cols3 <- cicol
   names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " ")) 
   
-  return(list(cols2 = cols2,
+  return(list(cols1 = cols1,
+              cols2 = cols2,
               cols3 = cols3))
 }
