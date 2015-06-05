@@ -70,8 +70,8 @@ reproLlmCI <- function(x, X) {
 
 reproFitPlotGenericNoCI <- function(x,
                         data_conc, transf_data_conc, data_resp,
-                        curv_conc, curv_resp,
-                        xlab, ylab, mortality, fitcol, fitlty, fitlwd,
+                        curv_conc, curv_resp, mortality,
+                        xlab, ylab, fitcol, fitlty, fitlwd,
                         main, addlegend, ...) {
   # plot the fitted curve estimated by reproFitTT
   # with generic style without credible interval
@@ -107,7 +107,7 @@ reproFitPlotGenericNoCI <- function(x,
 
 reproFitPlotGenericCI <- function(x, 
                                   data_conc, transf_data_conc, data_resp,
-                                  curv_conc, curv_resp,
+                                  curv_conc, curv_resp, mortality,
                                   CI,
                                   xlab, ylab, fitcol, fitlty, fitlwd,
                                   main, addlegend,
@@ -163,14 +163,14 @@ reproFitPlotGenericCI <- function(x,
 reproFitPlotGeneric <- function(x,
                     data_conc, transf_data_conc, data_resp,
                     curv_conc, curv_resp,
-                    CI,
+                    CI, mortality,
                     xlab, ylab, fitcol, fitlty, fitlwd,
                     main, addlegend,
                     cicol, cilty, cilwd, ...) {
   
   if(!is.null(CI)) reproFitPlotGenericCI(x,
                                         data_conc, transf_data_conc, data_resp,
-                                        curv_conc, curv_resp,
+                                        curv_conc, curv_resp, mortality,
                                         CI,
                                         xlab, ylab, fitcol, fitlty, fitlwd,
                                         main, addlegend,
@@ -178,9 +178,125 @@ reproFitPlotGeneric <- function(x,
   else {
     reproFitPlotGenericNoCI(x,
                            data_conc, transf_data_conc, data_resp,
-                           curv_conc, curv_resp,
-                           xlab, ylab, mortality, fitcol, fitlty, fitlwd,
+                           curv_conc, curv_resp, mortality,
+                           xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend, ...)
+  }
+}
+
+reproFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
+                 valCols, fitlty, fitlwd, xlab, ylab, main) {
+  # IC
+  data.three <- data.frame(conc = data$transf_conc,
+                           qinf95 = CI["qinf95",],
+                           qsup95 = CI["qsup95",],
+                           CI = paste("Credible limits of", x$det.part,
+                                      sep = " "))
+  
+  # colors 
+  cols3 <- cicol
+  names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " "))
+  
+  plt_3 <- ggplot(data) +
+    geom_line(data = data.three, aes(conc, qinf95, color = CI),
+              linetype = cilty, size = cilwd) +
+    geom_line(data = data.three, aes(conc, qsup95, color = CI),
+              linetype = cilty,size = cilwd) +
+    scale_color_manual(values = cols3) + theme_minimal()
+  
+  plt_4 <- ggplot(data) +
+    geom_point(data = data, aes(transf_conc, resp,
+                                    color = mortality)) +
+    geom_line(aes(conc, resp), curv,
+              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
+    scale_color_discrete(guide = "none") +
+    labs(x = xlab, y = ylab) +
+    ggtitle(main) + theme_minimal()
+  
+  return(list(plt_3 = plt_3,
+              plt_4 = plt_4))
+}
+
+reproFitPlotGG <- function(x,
+                           data_conc, transf_data_conc, data_resp,
+                           curv_conc, curv_resp, mortality,
+                           CI,
+                           xlab, ylab, fitcol, fitlty, fitlwd,
+                           main, addlegend,
+                           cicol, cilty, cilwd, ...) {
+  
+  if (Sys.getenv("RSTUDIO") == "") {
+    dev.new() # create a new page plot
+    # when not use RStudio
+  }
+  
+  # dataframes points (data) and curve (curv)
+  data <- data.frame(conc = data_conc, transf_data_conc = transf_data_conc,
+                     resp = data_resp, Points = mortality,
+                     Points = "Observed values")
+  curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
+  
+#   # colors
+#   # points vector
+#   n <- length(unique(data.one$mortality))
+#   cols <- hcl(h = seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
+#   cols1 <- cols[1:n]
+#   names(cols1) <- sort(unique(data.one$mortality))
+#   # fitted curve
+#   cols2 <- fitcol
+#   names(cols2) <- c(x$det.part)
+  
+  # colors
+  valCols <- fCols(data, x, fitcol, cicol)
+  
+  # points (to create the legend)
+  plt_1 <- ggplot(data) +
+    geom_point(data = data, aes(conc, resp,
+                                color = Points)) +
+    scale_color_manual(values = valCols$cols1) +
+    theme_minimal()
+  
+  # curve (to create the legend)
+  plt_2 <- ggplot(data) +
+    geom_line(data = curv, aes(conc, resp, color = Line),
+              linetype = fitlty, size = fitlwd) +
+    scale_color_manual(values = valCols$cols2) +
+    theme_minimal()
+  
+  plt_4 <-
+    if (! is.null(CI)) {
+      reproFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
+                       valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
+    } else {
+      reproFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
+                         xlab, ylab, main)
+    }
+  
+  if (addlegend) {
+    # create legends
+    mylegend_1 <- legendGgplotFit(plt_1) # points legend
+    mylegend_2 <- legendGgplotFit(plt_2) # mean line legend
+    
+    plt_5 <- plt_4 + scale_x_continuous(breaks = data$transf_conc,
+                                        labels = data$conc)
+    
+    if (is.null(CI)) {
+      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, nrow = 6),
+                   ncol = 2, widths = c(6, 2))
+    }
+    else {
+      plt_3 <- reproFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
+                               valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
+      mylegend_3 <- legendGgplotFit(plt_3)
+      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
+                                      nrow = 6), ncol = 2,
+                   widths = c(6, 2))
+    }
+  }
+  else { # no legend
+    plt_5 <- plt_4 + scale_x_continuous(breaks = data$transf_conc,
+                                        labels = data$conc)
+    return(plt_5)
   }
 }
 
@@ -282,7 +398,7 @@ plot.reproFitTt <- function(x,
     reproFitPlotGeneric(x,
                         dataTT$conc, transf_data_conc, dataTT$resp,
                         curv_conc, curv_resp,
-                        CI,
+                        CI, mortality,
                         xlab, ylab, fitcol, fitlty, fitlwd,
                         main, addlegend,
                         cicol, cilty, cilwd, ...)
@@ -291,129 +407,10 @@ plot.reproFitTt <- function(x,
     reproFitPlotGG(x,
                    dataTT$conc, transf_data_conc, dataTT$resp,
                    curv_conc, curv_resp,
-                   CI,
+                   CI, mortality,
                    xlab, ylab, fitcol, fitlty, fitlwd,
                    main, addlegend,
                    cicol, cilty, cilwd, ...)
   }
   else stop("Unknown style")
-}
-
-  if (type == "ggplot") {
-    if (Sys.getenv("RSTUDIO") == "") {
-      dev.new() # create a new page plot
-      # when not use RStudio
-    }
-    
-    # dataframes points (one) and curve (two)
-    data.one <- data.frame(concentrations[sel2], response[sel2], mortality)
-    data.two <- data.frame(X[sel], fNcumulpidtheo[sel], Line = x$det.part)
-    
-    # colors
-    # points vector
-    n <- length(unique(data.one$mortality))
-    cols <- hcl(h = seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
-    cols1 <- cols[1:n]
-    names(cols1) <- sort(unique(data.one$mortality))
-    # fitted curve
-    cols2 <- fitcol
-    names(cols2) <- c(x$det.part)
-    
-    # points (to create the legend)
-    plt_1 <- ggplot(data.one) +
-      geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
-                                      color = mortality)) +
-      scale_color_manual(values = cols1)
-    
-    # curve (to create the legend)
-    plt_2 <- ggplot(data.one) +
-      geom_line(data = data.two, aes(X.sel., fNcumulpidtheo.sel.,
-                                     color = Line), linetype = fitlty,
-                size = fitlwd) +
-      scale_color_manual(values = cols2)
-    if (ci) { # IC yes
-      # IC
-      data.three <- data.frame(X[sel], CI$qinf95[sel], CI$qsup95[sel],
-                               Ci = paste("Credible limits of", x$det.part,
-                                          sep = " "))
-      # colors 
-      cols3 <- cicol
-      names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " "))
-      
-      plt_3 <- ggplot(data.one) +
-        geom_line(data = data.three, aes(X.sel., CI.qinf95.sel., color = Ci),
-                  linetype = cilty, size = cilwd) +
-        geom_line(data = data.three, aes(X.sel., CI.qsup95.sel., color = Ci),
-                  linetype = cilty,size = cilwd) +
-        scale_color_manual(values = cols3)
-      
-      # plot IC
-      # final plot
-      plt_4 <- ggplot(data.one) +
-        geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
-                                        color = mortality)) +
-        geom_line(aes(X.sel., fNcumulpidtheo.sel.), data.two,
-                  linetype = fitlty, size = fitlwd, color = cols2) +
-        geom_line(aes(X.sel., CI.qinf95.sel.), data.three, linetype = cilty,
-                  size = cilwd, color = cols3) +
-        geom_line(aes(X.sel., CI.qsup95.sel.), data.three, linetype = cilty,
-                  size = cilwd, color = cols3) +
-        geom_ribbon(data = data.three, aes(x = X.sel., ymin = CI.qinf95.sel.,
-                                           ymax = CI.qsup95.sel.),
-                    alpha = 0.4) +
-        scale_color_discrete(guide = "none") +
-        labs(x = xlab, y = ylab)
-      
-      if (!is.null(main)) { # main title
-        plt_4 <- plt_4 + ggtitle(main)
-      }
-    }
-    if (!ci) { # IC no
-      plt_4 <- ggplot(data.one) +
-        geom_point(data = data.one, aes(concentrations.sel2., response.sel2.,
-                                        color = mortality)) +
-        geom_line(aes(X.sel., fNcumulpidtheo.sel.), data.two,
-                  linetype = fitlty, size = fitlwd, color = cols2) +
-        scale_color_discrete(guide = "none") +
-        labs(x = xlab, y = ylab)
-      
-      if (!is.null(main)) { # personal title
-        plt_4 <- plt_4 + ggtitle(main)
-      }
-    }
-    
-    if (addlegend) { # legend yes
-      # create legends
-      mylegend_1 <- legendGgplotFit(plt_1) # points legend
-      mylegend_2 <- legendGgplotFit(plt_2) # mean line legend
-      
-      if (ci) mylegend_3 <- legendGgplotFit(plt_3) # CI legend
-      
-      if (log.scale) { # log.sacle yes
-        plt_5 <- plt_4 +
-          scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
-                             labels =  unique(x$dataTT$conc[sel2]))
-      } else { # log.scale no
-        plt_5 <- plt_4 +
-          scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
-      }
-      if (!ci) { # CI no
-        grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, nrow = 6),
-                     ncol = 2, widths = c(7,1))
-      }
-      if (ci) { # CI yes
-        grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
-                                        nrow = 6), ncol = 2, widths = c(7,1))
-      }
-    } else { # legend no
-      if (log.scale) { # log.scale yes
-        plt_5 <- plt_4 +
-          scale_x_continuous(breaks = unique(data.one$concentrations.sel2.),
-                             labels = unique(x$dataTT$conc[sel2]))
-      } else { # log.scale no
-        plt_5 <- plt_4 + scale_x_continuous(breaks = unique(data.one$concentrations.sel2.))
-      }
-      return(plt_5)
-    }
-  }
 }
