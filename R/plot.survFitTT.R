@@ -306,6 +306,7 @@ survFitPlotGG <- function(x,
 #' @export
 #'
 #' @import grDevices
+#' @import ggplot2
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
@@ -343,14 +344,17 @@ plot.survFitTT <- function(x,
   # OUTPUT:
   # - plot of fitted regression
 
+  # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) x$dataTT$conc > 0 else TRUE
 
   dataTT <- x$dataTT[sel, ]
   dataTT$resp <- dataTT$Nsurv / dataTT$Ninit
+  # data points are systematically pooled, since our model does not
+  # take individual variation into account
   dataTT <- aggregate(resp ~ conc, dataTT, mean)
   transf_data_conc <- optLogTransform(log.scale, dataTT$conc)
 
-  # Concentration values used for display
+  # Concentration values used for display in linear scale
   display.conc <- (function() {
     x <- optLogTransform(log.scale, dataTT$conc)
     s <- seq(min(x),max(x), length = 100)
