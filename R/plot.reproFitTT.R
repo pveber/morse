@@ -299,32 +299,6 @@ plot.reproFitTt <- function(x,
   else stop("Unknown style")
 }
 
-  
-  # posterior predictive check
-  if (ppc) {
-    if (Sys.getenv("RSTUDIO") == "") {
-      dev.new() # create a new page plot
-      # when not use RStudio
-    }
-    plot(Nreprocumul, Nreprocumul,
-         bty = "n",
-         type = "n",
-         main = "Posterior predictive check",
-         ylab = "Predicted Nr of offsprings for each replicate",
-         xlab = "Observed Nr of offsprings for each replicate")
-    abline(a = 0, b = 1, lty = 2) # add x = y
-    
-    # create segments for post predictive check plot
-    fNcumulpidtheo.ppc <- reproLlmFit(res.M, concentrations)
-    for (i in 1:length(concentrations)) {
-      nbi <- rpois(n = nrow(res.Mtot),
-                   lambda = fNcumulpidtheo.ppc[i] * Nindtime[i])
-      qinf95nbi <- quantile(nbi, probs = 0.025)
-      qsup95nbi <- quantile(nbi, probs = 0.975)
-      segments(Nreprocumul[i], qinf95nbi, Nreprocumul[i], qsup95nbi, col = "red")
-    }
-  }
-  
   if (type == "ggplot") {
     if (Sys.getenv("RSTUDIO") == "") {
       dev.new() # create a new page plot
