@@ -1,7 +1,7 @@
 survEvalFit <- function(fit, x) {
   # eval the fitted function on x
   # INPUT :
-  # - x: repro.fit object
+  # - fit: repro.fit object
   # - x: vector of concentrations
   # OUTPUT :
   # - fNsurvtheo
@@ -20,49 +20,29 @@ survEvalFit <- function(fit, x) {
   }
 }
 
-survLlbinomCI <- function(x, X) {
-  # create the parameters for credible interval for the log logistic model
+survLlbinomCI <- function(x, log.scale) {
+  # create confidente interval on observed data for the log logistic
+  # binomial model by a binomial test
   # INPUT:
-  # - x : object of class repro.fit
-  # - X : vector of concentrations values (x axis)
+  # - x : object of class survFitTT
+  # - log.scale : boolean
   # OUTPUT:
-  # - ci : credible limit
 
-  mctot <- do.call("rbind", x$mcmc)
-  k <- nrow(mctot)
+  # - ci : confidente interval
+  x <- cbind(aggregate(Nsurv ~ time + conc, x$dataTT, sum),
+             Ninit = aggregate(Ninit ~ time + conc, x$dataTT, sum)$Ninit)
+  
+  ci <- apply(x, 1, function(x) {
+    binom.test(x["Nsurv"], x["Ninit"])$conf.int
+  })
+  rownames(ci) <- c("qinf95", "qsup95")
+  colnames(ci) <- x$conc
+  
+  if (log.scale) ci <- ci[ ,colnames(ci) != 0]
 
-  # parameters
-  if (x$det.part == "loglogisticbinom_3"){
-    d2 <- mctot[,"d"]
-  }
-  log10b2 <- mctot[,"log10b"]
-  b2 <- 10^log10b2
-  log10e2 <- mctot[,"log10e"]
-  e2 <- 10^log10e2
-
-  # quantiles
-  qinf95 = NULL
-  med = NULL
-  qsup95 = NULL
-
-  for (i in 1:length(X)) {
-    if (x$det.part == "loglogisticbinom_3") {
-      theomean <- d2/(1 + (X[i] / e2)^(b2))
-    } else {
-      theomean <- 1/(1 + (X[i] / e2)^(b2))
-    }
-
-    # IC 95%
-    qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
-    med[i] <- median(theomean, na.rm = TRUE)
-    qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
-  }
-  # values for CI
-  ci <- list(qinf95 = qinf95,
-             med = med,
-             qsup95 = qsup95)
   return(ci)
 }
+
 
 survFitPlotGenericNoCI <- function(x,
                                    data_conc, transf_data_conc, data_resp,
@@ -84,7 +64,7 @@ survFitPlotGenericNoCI <- function(x,
        ...)
 
   # axis
-  axis(side = 2, at = pretty(c(0,1)))
+  axis(side = 2, at = pretty(c(0, 1)))
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
@@ -120,27 +100,28 @@ survFitPlotGenericCI <- function(x,
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(CI$qsup95) + 0.2),
+       ylim = c(0, max(CI["qsup95",]) + 0.2),
        type = "n",
        ...)
 
   # axis
-  axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
-  axis(side   = 1,
-       at     = transf_data_conc,
+  axis(side = 2, at = pretty(c(0, max(CI["qsup95",]))))
+  axis(side = 1,
+       at = transf_data_conc,
        labels = data_conc)
-
+  
   # Plotting the theoretical curve
-  # CI ribbon + lines
-  polygon(c(curv_conc, rev(curv_conc)), c(CI$qinf95, rev(CI$qsup95)),
-          col = "grey40", border = NA)
-  lines(curv_conc, CI$qsup95, type = "l", col = cicol, lty = cilty, lwd = cilwd)
-  lines(curv_conc, CI$qinf95, type = "l", col = cicol, lty = cilty, lwd = cilwd)
+  
   # fitted curve
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
   # points
   points(transf_data_conc, data_resp, pch = 16)
+
+  # segment CI
+  segments(transf_data_conc,
+           CI["qinf95",], transf_data_conc,
+           CI["qsup95", ], col = cicol, lty = cilty, lwd = cilwd)
 
   # legend
   if (addlegend) {
@@ -148,8 +129,7 @@ survFitPlotGenericCI <- function(x,
            lty = c(fitlty, cilty),
            lwd = c(fitlwd, cilwd),
            col = c(fitcol, cicol),
-           legend = c(x$det.part, paste("Credible limits of", x$det.part,
-                                        sep = " ")),
+           legend = c(x$det.part, "Confidence interval"),
            bty = "n")
   }
 }
@@ -184,7 +164,7 @@ survFitPlotGeneric <- function(x,
 survFitPlotGGNoCI <- function(data, curv, valCols,
                               fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
-    geom_point(data=data, aes(transf_conc, resp)) +
+    geom_point(data = data, aes(transf_conc, resp)) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     scale_color_discrete(guide = "none") +
@@ -248,7 +228,8 @@ survFitPlotGG <- function(x,
   }
 
   # dataframes points (one) and curve (two)
-  data <- data.frame(conc = data_conc, transf_conc = transf_data_conc, resp = data_resp)
+  data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
+                     resp = data_resp)
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
 
   # colors
@@ -257,14 +238,13 @@ survFitPlotGG <- function(x,
   # points (to create the legend)
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp)) +
-    scale_color_manual(values = valCols$cols1)
+    scale_color_manual(values = valCols$cols1) + theme_minimal()
 
   # curve (to create the legend)
   plt_2 <- ggplot(data) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
-    scale_color_manual(values = valCols$cols2)
-
+    scale_color_manual(values = valCols$cols2) + theme_minimal()
 
   plt_4 <-
     if (is.null(CI))
@@ -300,8 +280,6 @@ survFitPlotGG <- function(x,
     return(plt_5)
   }
 }
-
-
 
 #' @export
 #'
@@ -381,10 +359,8 @@ plot.survFitTT <- function(x,
   if (missing(cicol)) cicol <- "red"
   if (missing(cilty)) cilty <- 2
   if (missing(cilwd)) cilwd <- 1
-  CI <- if(ci) {
-    survLlbinomCI(x, display.conc)
-  }
-  else NULL
+  
+  CI <- if(ci) { survLlbinomCi(x, log.scale) } else NULL
 
   if (style == "generic") {
     survFitPlotGeneric(x,
