@@ -179,7 +179,7 @@ survFitPlotGGNoCI <- function(data, curv, valCols,
 survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
-  data.three <- data.frame(conc = data$conc,
+  data.three <- data.frame(conc = data$transf_conc,
                            qinf95 = CI["qinf95",],
                            qsup95 = CI["qsup95",],
                            CI = "Confidence interval")
@@ -192,7 +192,7 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
   # plot IC
   # final plot
   plt_4 <- ggplot(data) +
-    geom_point(data = data, aes(conc, resp)) +
+    geom_point(data = data, aes(transf_conc, resp)) +
     geom_line(aes(conc, resp), curv, linetype = fitlty,
               size = fitlwd, color = valCols$cols2) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
@@ -221,7 +221,7 @@ survFitPlotGG <- function(x,
     # when not use RStudio
   }
   
-  # dataframes points (one) and curve (two)
+  # dataframes points (data) and curve (curv)
   data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
                      resp = data_resp, Points = "Observed values")
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
