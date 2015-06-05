@@ -68,6 +68,122 @@ reproLlmCI <- function(x, X) {
   return(ci)
 }
 
+reproFitPlotGenericNoCI <- function(x,
+                        data_conc, transf_data_conc, data_resp,
+                        curv_conc, curv_resp,
+                        xlab, ylab, mortality, fitcol, fitlty, fitlwd,
+                        main, addlegend, ...) {
+  # plot the fitted curve estimated by reproFitTT
+  # with generic style without credible interval
+  
+  plot(transf_data_conc, data_resp,
+       xlab = xlab,
+       ylab = ylab,
+       main = main,
+       pch = mortality,
+       xaxt = "n",
+       yaxt = "n",
+       ylim = c(0, 1.05),
+       ...)
+  # axis
+  axis(side = 2, at = pretty(c(0, 1)))
+  axis(side = 1, at = transf_data_conc,
+       labels = data_conc)
+  
+  # fitted curve
+  lines(curv_conc, curv_resp, col = fitcol,
+        lty = fitlty, lwd = fitlwd, type = "l")
+  
+  # legend
+  if (addlegend) {
+    legend("bottomleft", pch = c(19, 1, NA),
+           lty = c(0, 0, fitlty),
+           lwd = c(1, 1, fitlwd),
+           col = c(1, 1, fitcol),
+           legend = c("No mortality", "Mortality", x$det.part),
+           bty = "n")
+  }
+}
+
+reproFitPlotGenericCI <- function(x, 
+                                  data_conc, transf_data_conc, data_resp,
+                                  curv_conc, curv_resp,
+                                  CI,
+                                  xlab, ylab, fitcol, fitlty, fitlwd,
+                                  main, addlegend,
+                                  cicol, cilty, cilwd, ...) {
+  # plot the fitted curve estimated by reproFitTT
+  # with generic style with credible interval
+
+  plot(transf_data_conc, data_resp,
+       xlab = xlab,
+       ylab = ylab,
+       main = main,
+       xaxt = "n",
+       yaxt = "n",
+       ylim = c(0, max(CI["qsup95",]) + 0.2),
+       type = "n",
+       ...)
+  
+  # axis
+  axis(side = 2, at = pretty(c(0, max(CI["qsup95",]))))
+  axis(side = 1,
+       at = transf_data_conc,
+       labels = data_conc)
+  
+  # Plotting the theoretical curve
+  # CI ribbon + lines
+  polygon(c(curv_conc, rev(curv_conc)), c(CI["qinf95",], rev(CI["qsup95",])),
+          col = "grey40")
+  lines(curv_conc, CI["qsup95",], type = "l", col = cicol, lty = cilty,
+        lwd = cilwd)
+  lines(curv_conc, CI["qinf95",], type = "l", col = cicol, lty = cilty,
+        lwd = cilwd)
+  
+  # fitted curve
+  lines(curv_conc, curv_resp, col = fitcol,
+        lty = fitlty, lwd = fitlwd, type = "l")
+  
+  # points
+  points(transf_data_conc, data_resp, pch = mortality)
+  
+  # legend
+  if(addlegend)
+  legend("bottomleft", pch = c(19, 1, NA, NA),
+         lty = c(0, 0, fitlty, cilty),
+         lwd = c(1, 1, fitlwd, cilwd),
+         col = c(1, 1, fitcol, cicol),
+         legend = c("No mortality", "Mortality",
+                    x$det.part, paste("Credible limits of", x$det.part,
+                                      sep = " ")),
+         bty = "n")
+}
+
+
+reproFitPlotGeneric <- function(x,
+                    data_conc, transf_data_conc, data_resp,
+                    curv_conc, curv_resp,
+                    CI,
+                    xlab, ylab, fitcol, fitlty, fitlwd,
+                    main, addlegend,
+                    cicol, cilty, cilwd, ...) {
+  
+  if(!is.null(CI)) reproFitPlotGenericCI(x,
+                                        data_conc, transf_data_conc, data_resp,
+                                        curv_conc, curv_resp,
+                                        CI,
+                                        xlab, ylab, fitcol, fitlty, fitlwd,
+                                        main, addlegend,
+                                        cicol, cilty, cilwd, ...)
+  else {
+    reproFitPlotGenericNoCI(x,
+                           data_conc, transf_data_conc, data_resp,
+                           curv_conc, curv_resp,
+                           xlab, ylab, mortality, fitcol, fitlty, fitlwd,
+                           main, addlegend, ...)
+  }
+}
+
 #' @export
 #' 
 #' @name reproFitTt
@@ -182,78 +298,7 @@ plot.reproFitTt <- function(x,
   }
   else stop("Unknown style")
 }
-    if (!ci) { # CI no
-      plot(concentrations[sel2], response[sel2],
-           xlab = xlab,
-           ylab = ylab,
-           main = main,
-           pch = mortality,
-           xaxt = "n",
-           yaxt = "n",
-           ylim = c(0, max(response)),
-           ...)
-      # axis
-      axis(side = 2, at = pretty(c(0, max(response))))
-      axis(side = 1, at = unique(concentrations[sel2]),
-           labels = unique(x$dataTT$conc[sel2]))
-      
-      # fitted curve
-      lines(X[sel], fNcumulpidtheo[sel], col = fitcol,
-            lty = fitlty, lwd = fitlwd, type = "l")
-    }
-    if (ci) {# CI yes
-      # plotting data
-      plot(concentrations[sel2], response[sel2],
-           xlab = xlab,
-           ylab = ylab,
-           main = main,
-           xaxt = "n",
-           yaxt = "n",
-           ylim = c(0, max(CI$qsup95)),
-           type = "n",
-           ...)
-      # axis
-      axis(side = 2, at = pretty(c(0, max(CI$qsup95))))
-      axis(side = 1, at = unique(concentrations[sel2]),
-           labels = unique(x$dataTT$conc[sel2]))
-      
-      # Plotting the theoretical curve
-      # CI ribbon + lines
-      polygon(c(X[sel], rev(X[sel])), c(CI$qinf95[sel], rev(CI$qsup95[sel])),
-              col = "grey40")
-      lines(X[sel], CI$qsup95[sel], type = "l", col = cicol, lty = cilty,
-            lwd = cilwd)
-      lines(X[sel], CI$qinf95[sel], type = "l", col = cicol, lty = cilty,
-            lwd = cilwd)
-      
-      # fitted curve
-      lines(X[sel], fNcumulpidtheo[sel], col = fitcol,
-            lty = fitlty, lwd = fitlwd, type = "l")
-      
-      # points
-      points(concentrations[sel2], response[sel2], pch = mortality)
-    }
-    
-    # legend
-    if (addlegend && !ci) { # legend yes CI no
-      legend(legend.position, title = legend.title, pch = c(19, 1, NA),
-             lty = c(0, 0, fitlty),
-             lwd = c(1, 1, fitlwd),
-             col = c(1, 1, fitcol),
-             legend = c(legend.name.no, legend.name.yes, x$det.part),
-             bty = "n")
-    }
-    if (addlegend && ci) { # legend yes CI yes
-      legend(legend.position, title = legend.title, pch = c(19, 1, NA, NA),
-             lty = c(0, 0, fitlty, cilty),
-             lwd = c(1, 1, fitlwd, cilwd),
-             col = c(1, 1, fitcol, cicol),
-             legend = c(legend.name.no, legend.name.yes,
-                        x$det.part, paste("Credible limits of", x$det.part,
-                                          sep = " ")),
-             bty = "n")
-    }
-  }
+
   
   # posterior predictive check
   if (ppc) {
