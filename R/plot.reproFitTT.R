@@ -1,16 +1,16 @@
 reproEvalFit <- function(fit, x) {
   # eval the fitted function on x
   # INPUT :
-  # - fit: repro.fit object
+  # - fit: reproFitTT object
   # - x: vector of concentrations
   # OUTPUT :
-  # - fNsurvtheo
+  # - fNcumulpidtheo
   
   # unlog parameters
   d <- res.M$quantiles["d", "50%"]
   b <- 10^res.M$quantiles["log10b", "50%"]
   e <- 10^res.M$quantiles["log10e", "50%"]
-  fNcumulpidtheo <- d / (1 + ( X / e)^b) # mean curve equation
+  fNcumulpidtheo <- d / (1 + ( x / e)^b) # mean curve equation
   
   return(fNcumulpidtheo)
 }
