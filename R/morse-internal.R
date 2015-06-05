@@ -219,7 +219,7 @@ fCols <- function(data, x, fitcol, cicol) {
   
   #points
   cols1 <- "black"
-  names(cols1) <- unique(data$pts)
+  names(cols1) <- unique(data$Points)
   # curve
   cols2 <- fitcol
   names(cols2) <- c(x$det.part)

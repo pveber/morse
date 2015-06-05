@@ -179,7 +179,7 @@ survFitPlotGGNoCI <- function(data, curv, valCols,
 survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
-  data.three <- data.frame(conc = curv$conc,
+  data.three <- data.frame(conc = data$conc,
                            qinf95 = CI["qinf95",],
                            qsup95 = CI["qsup95",],
                            CI = "Confidence interval")
@@ -223,7 +223,7 @@ survFitPlotGG <- function(x,
   
   # dataframes points (one) and curve (two)
   data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
-                     resp = data_resp, pts = "Observed values")
+                     resp = data_resp, Points = "Observed values")
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
   
   # colors
@@ -231,7 +231,7 @@ survFitPlotGG <- function(x,
   
   # points (to create the legend)
   plt_1 <- ggplot(data) +
-    geom_point(data = data, aes(transf_conc, resp, color = pts)) +
+    geom_point(data = data, aes(transf_conc, resp, color = Points)) +
     scale_color_manual(values = valCols$cols1) +
     theme_minimal()
   
@@ -242,12 +242,13 @@ survFitPlotGG <- function(x,
     scale_color_manual(values = valCols$cols2) + theme_minimal()
   
   plt_4 <-
-    if (is.null(CI))
+    if (! is.null(CI)) {
       survFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
                       valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
-  else
-    survFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
-                      xlab, ylab, main)
+    } else {
+      survFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
+                        xlab, ylab, main)
+    }
   
   if (addlegend) { # legend yes
     # create legends
@@ -258,15 +259,16 @@ survFitPlotGG <- function(x,
                                         labels = data$conc)
     
     if (is.null(CI)) {
-      grid.arrange(plt_5, arrangeGrob(mylegend_2, nrow = 6),
-                   ncol = 2, widths = c(7,1))
+      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, nrow = 6),
+                   ncol = 2, widths = c(6, 2))
     }
     else {
       plt_3 <- survFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
       mylegend_3 <- legendGgplotFit(plt_3)
-      grid.arrange(plt_5, arrangeGrob(mylegend_2, mylegend_3,
-                                      nrow = 6), ncol = 2, widths = c(7,1))
+      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
+                                      nrow = 6), ncol = 2,
+                   widths = c(6, 2))
     }
   }
   else { # no legend
