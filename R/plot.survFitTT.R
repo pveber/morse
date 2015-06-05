@@ -1,7 +1,7 @@
 survEvalFit <- function(fit, x) {
   # eval the fitted function on x
   # INPUT :
-  # - fit: repro.fit object
+  # - fit: survFitTT object
   # - x: vector of concentrations
   # OUTPUT :
   # - fNsurvtheo
