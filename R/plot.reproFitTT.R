@@ -6,7 +6,7 @@ reproEvalFit <- function(fit, x) {
   # OUTPUT :
   # - fNcumulpidtheo
   
-  res.M <- summary(x$mcmc)
+  res.M <- summary(fit$mcmc)
   
   # unlog parameters
   d <- res.M$quantiles["d", "50%"]
@@ -17,15 +17,15 @@ reproEvalFit <- function(fit, x) {
   return(fNcumulpidtheo)
 }
 
-reproLlmCI <- function(x, X) {
+reproLlmCI <- function(fit, x) {
   # create the parameters for credible interval for the log logistic model
   # INPUT:
-  # - x : object of class reproFitTT
-  # - X : vector of concentrations values (x axis)
+  # - fit : object of class reproFitTT
+  # - x : vector of concentrations values (x axis)
   # OUTPUT:
   # - ci : credible limit
   
-  mctot <- do.call("rbind", x$mcmc)
+  mctot <- do.call("rbind", fit$mcmc)
   k <- nrow(mctot)
   # parameters
   d2 <- mctot[, "d"]
@@ -39,9 +39,9 @@ reproLlmCI <- function(x, X) {
   qsup95 = NULL
   
   # poisson
-  if (x$model.label == "P") {
-    for (i in 1:length(X)) {
-      theomean <- d2 / (1 + (X[i] / e2)^(b2)) # mean curve
+  if (fit$model.label == "P") {
+    for (i in 1:length(x)) {
+      theomean <- d2 / (1 + (x[i] / e2)^(b2)) # mean curve
       # IC 95%
       qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
@@ -49,13 +49,13 @@ reproLlmCI <- function(x, X) {
   }
   
   # gamma poisson
-  if (x$model.label == "GP") {
+  if (fit$model.label == "GP") {
     # parameters
     log10omega2 <- mctot[, "log10omega"]
     omega2 <- 10^(log10omega2)
     
-    for (i in 1:length(X)) {
-      theomean <- d2 / (1 + (X[i] / e2)^(b2)) # mean curve
+    for (i in 1:length(x)) {
+      theomean <- d2 / (1 + (x[i] / e2)^(b2)) # mean curve
       theo <- rgamma(n = k, shape = theomean / omega2, rate = 1 / omega2)
       # IC 95%
       qinf95[i] <- quantile(theo, probs = 0.025, na.rm = TRUE)
@@ -65,14 +65,14 @@ reproLlmCI <- function(x, X) {
   # values for CI
   ci <- list(qinf95 = qinf95,
              qsup95 = qsup95)
+  
   return(ci)
 }
 
-reproFitPlotGenericNoCI <- function(x,
-                        data_conc, transf_data_conc, data_resp,
-                        curv_conc, curv_resp, mortality,
-                        xlab, ylab, fitcol, fitlty, fitlwd,
-                        main, addlegend, ...) {
+reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
+                                    curv_conc, curv_resp, mortality,
+                                    xlab, ylab, fitcol, fitlty, fitlwd,
+                                    main, addlegend, ...) {
   # plot the fitted curve estimated by reproFitTT
   # with generic style without credible interval
   
@@ -83,10 +83,10 @@ reproFitPlotGenericNoCI <- function(x,
        pch = mortality,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, 1.05),
+       ylim = c(0, max(data_resp) + 0.2),
        ...)
   # axis
-  axis(side = 2, at = pretty(c(0, 1)))
+  axis(side = 2, at = pretty(c(0, max(data_resp))))
   axis(side = 1, at = transf_data_conc,
        labels = data_conc)
   
@@ -100,44 +100,43 @@ reproFitPlotGenericNoCI <- function(x,
            lty = c(0, 0, fitlty),
            lwd = c(1, 1, fitlwd),
            col = c(1, 1, fitcol),
-           legend = c("No mortality", "Mortality", x$det.part),
+           legend = c("No mortality", "Mortality", "loglogistic"),
            bty = "n")
   }
 }
 
-reproFitPlotGenericCI <- function(x, 
-                                  data_conc, transf_data_conc, data_resp,
-                                  curv_conc, curv_resp, mortality,
-                                  CI,
+reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
+                                  curv_conc, curv_resp,
+                                  CI, mortality,
                                   xlab, ylab, fitcol, fitlty, fitlwd,
                                   main, addlegend,
                                   cicol, cilty, cilwd, ...) {
   # plot the fitted curve estimated by reproFitTT
   # with generic style with credible interval
-
+  
   plot(transf_data_conc, data_resp,
        xlab = xlab,
        ylab = ylab,
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(CI["qsup95",]) + 0.2),
+       ylim = c(0, max(CI[["qsup95"]]) + 0.2),
        type = "n",
        ...)
   
   # axis
-  axis(side = 2, at = pretty(c(0, max(CI["qsup95",]))))
+  axis(side = 2, at = pretty(c(0, max(CI[["qsup95"]]))))
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
   
   # Plotting the theoretical curve
   # CI ribbon + lines
-  polygon(c(curv_conc, rev(curv_conc)), c(CI["qinf95",], rev(CI["qsup95",])),
+  polygon(c(curv_conc, rev(curv_conc)), c(CI[["qinf95"]], rev(CI[["qsup95"]])),
           col = "grey40")
-  lines(curv_conc, CI["qsup95",], type = "l", col = cicol, lty = cilty,
+  lines(curv_conc, CI[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
-  lines(curv_conc, CI["qinf95",], type = "l", col = cicol, lty = cilty,
+  lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   
   # fitted curve
@@ -149,53 +148,62 @@ reproFitPlotGenericCI <- function(x,
   
   # legend
   if(addlegend)
-  legend("bottomleft", pch = c(19, 1, NA, NA),
-         lty = c(0, 0, fitlty, cilty),
-         lwd = c(1, 1, fitlwd, cilwd),
-         col = c(1, 1, fitcol, cicol),
-         legend = c("No mortality", "Mortality",
-                    x$det.part, paste("Credible limits of", x$det.part,
-                                      sep = " ")),
-         bty = "n")
+    legend("bottomleft", pch = c(19, 1, NA, NA),
+           lty = c(0, 0, fitlty, cilty),
+           lwd = c(1, 1, fitlwd, cilwd),
+           col = c(1, 1, fitcol, cicol),
+           legend = c("No mortality", "Mortality",
+                      "loglogistic", "Credible limits of loglogistic"),
+           bty = "n")
 }
 
-
-reproFitPlotGeneric <- function(x,
-                    data_conc, transf_data_conc, data_resp,
-                    curv_conc, curv_resp,
-                    CI, mortality,
-                    xlab, ylab, fitcol, fitlty, fitlwd,
-                    main, addlegend,
-                    cicol, cilty, cilwd, ...) {
+reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
+                                curv_conc, curv_resp,
+                                CI, mortality,
+                                xlab, ylab, fitcol, fitlty, fitlwd,
+                                main, addlegend,
+                                cicol, cilty, cilwd, ...) {
   
-  if(!is.null(CI)) reproFitPlotGenericCI(x,
-                                        data_conc, transf_data_conc, data_resp,
-                                        curv_conc, curv_resp, mortality,
-                                        CI,
-                                        xlab, ylab, fitcol, fitlty, fitlwd,
-                                        main, addlegend,
-                                        cicol, cilty, cilwd, ...)
+  if(!is.null(CI)) reproFitPlotGenericCI(data_conc, transf_data_conc,
+                                         data_resp,
+                                         curv_conc, curv_resp,
+                                         CI, mortality,
+                                         xlab, ylab, fitcol, fitlty, fitlwd,
+                                         main, addlegend,
+                                         cicol, cilty, cilwd, ...)
   else {
-    reproFitPlotGenericNoCI(x,
-                           data_conc, transf_data_conc, data_resp,
-                           curv_conc, curv_resp, mortality,
-                           xlab, ylab, fitcol, fitlty, fitlwd,
-                           main, addlegend, ...)
+    reproFitPlotGenericNoCI(data_conc, transf_data_conc, data_resp,
+                            curv_conc, curv_resp, mortality,
+                            xlab, ylab, fitcol, fitlty, fitlwd,
+                            main, addlegend, ...)
   }
 }
 
-reproFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
-                 valCols, fitlty, fitlwd, xlab, ylab, main) {
+reproFitPlotGGNoCI <- function(data, curv, cols2,
+                               fitlty, fitlwd, xlab, ylab, main) {
+  plt_4 <- ggplot(data) +
+    geom_point(data = data, aes(transf_conc, resp, color = Mortality)) +
+    geom_line(aes(conc, resp), curv,
+              linetype = fitlty, size = fitlwd, color = cols2) +
+    scale_color_discrete(guide = "none") +
+    ylim(0, max(data$resp) + 1) +
+    labs(x = xlab, y = ylab) +
+    ggtitle(main) + theme_minimal()
+  
+  return(plt_4)
+}
+
+reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
+                             cols2, fitlty, fitlwd, xlab, ylab, main) {
   # IC
-  data.three <- data.frame(conc = data$transf_conc,
-                           qinf95 = CI["qinf95",],
-                           qsup95 = CI["qsup95",],
-                           CI = paste("Credible limits of", x$det.part,
-                                      sep = " "))
+  data.three <- data.frame(conc = curv$conc,
+                           qinf95 = CI[["qinf95"]],
+                           qsup95 = CI[["qsup95"]],
+                           CI = "Credible limits of loglogistic")
   
   # colors 
   cols3 <- cicol
-  names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " "))
+  names(cols3) <- "Credible limits of loglogistic"
   
   plt_3 <- ggplot(data) +
     geom_line(data = data.three, aes(conc, qinf95, color = CI),
@@ -206,10 +214,15 @@ reproFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
   
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp,
-                                    color = mortality)) +
+                                color = Mortality)) +
     geom_line(aes(conc, resp), curv,
-              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
+              linetype = fitlty, size = fitlwd, color = cols2) +
+    geom_line(data = data.three, aes(conc, qinf95, color = CI),
+              linetype = cilty, size = cilwd) +
+    geom_line(data = data.three, aes(conc, qsup95, color = CI),
+              linetype = cilty, size = cilwd) +
     scale_color_discrete(guide = "none") +
+    ylim(0, max(CI[["qsup95"]]) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
   
@@ -217,10 +230,9 @@ reproFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
               plt_4 = plt_4))
 }
 
-reproFitPlotGG <- function(x,
-                           data_conc, transf_data_conc, data_resp,
-                           curv_conc, curv_resp, mortality,
-                           CI,
+reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
+                           curv_conc, curv_resp,
+                           CI, mortality,
                            xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend,
                            cicol, cilty, cilwd, ...) {
@@ -231,44 +243,40 @@ reproFitPlotGG <- function(x,
   }
   
   # dataframes points (data) and curve (curv)
-  data <- data.frame(conc = data_conc, transf_data_conc = transf_data_conc,
-                     resp = data_resp, Points = mortality,
-                     Points = "Observed values")
-  curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
-  
-#   # colors
-#   # points vector
-#   n <- length(unique(data.one$mortality))
-#   cols <- hcl(h = seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
-#   cols1 <- cols[1:n]
-#   names(cols1) <- sort(unique(data.one$mortality))
-#   # fitted curve
-#   cols2 <- fitcol
-#   names(cols2) <- c(x$det.part)
+  data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
+                     resp = data_resp, Mortality = mortality)
+  curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
   # colors
-  valCols <- fCols(data, x, fitcol, cicol)
+  # points vector
+  n <- length(unique(data$Mortality))
+  cols <- hcl(h = seq(15, 375 - 360 / n, length = n) %% 360, c = 100, l = 65)
+  cols1 <- cols[1:n]
+  names(cols1) <- sort(unique(data$Mortality))
+  # fitted curve
+  cols2 <- fitcol
+  names(cols2) <- "loglogistic"
   
   # points (to create the legend)
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(conc, resp,
-                                color = Points)) +
-    scale_color_manual(values = valCols$cols1) +
+                                color = Mortality)) +
+    scale_color_manual(values = cols1) +
     theme_minimal()
   
   # curve (to create the legend)
   plt_2 <- ggplot(data) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
-    scale_color_manual(values = valCols$cols2) +
+    scale_color_manual(values = cols2) +
     theme_minimal()
   
   plt_4 <-
     if (! is.null(CI)) {
-      reproFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
-                       valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
+      reproFitPlotGGCI(data, curv, CI, cicol, cilty, cilwd,
+                       cols2, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
-      reproFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
+      reproFitPlotGGNoCI(data, curv, cols2, fitlty, fitlwd,
                          xlab, ylab, main)
     }
   
@@ -285,8 +293,8 @@ reproFitPlotGG <- function(x,
                    ncol = 2, widths = c(6, 2))
     }
     else {
-      plt_3 <- reproFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
-                               valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
+      plt_3 <- reproFitPlotGGCI(data, curv, CI, cicol, cilty, cilwd,
+                                cols2, fitlty, fitlwd, xlab, ylab, main)$plt_3
       mylegend_3 <- legendGgplotFit(plt_3)
       grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
                                       nrow = 6), ncol = 2,
@@ -302,7 +310,7 @@ reproFitPlotGG <- function(x,
 
 #' @export
 #' 
-#' @name reproFitTt
+#' @name reproFitTT
 #' 
 #' @import ggplot2
 #' @import grDevices
@@ -310,7 +318,7 @@ reproFitPlotGG <- function(x,
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
 #' 
-plot.reproFitTt <- function(x,
+plot.reproFitTT <- function(x,
                             xlab,
                             ylab,
                             main,
@@ -386,17 +394,16 @@ plot.reproFitTt <- function(x,
                                c(TRUE, FALSE))] # vector of 0 and 1
   
   # encodes mortality empty dots (1) and not mortality solid dots (19)
-  if (type == "generic")  mortality[which(mortality == 0)] <- 19
-  else if (type == "ggplot") {
+  if (style == "generic")  mortality[which(mortality == 0)] <- 19
+  else if (style == "ggplot") {
     mortality[which(mortality == 0)] <- "No"
     mortality[which(mortality == 1)] <- "Yes"
   }
   
-  CI <- if (ci) { CI <- reproLlmCI(x, X) } else NULL
-
-  if (type == "generic") {
-    reproFitPlotGeneric(x,
-                        dataTT$conc, transf_data_conc, dataTT$resp,
+  CI <- if (ci) { CI <- reproLlmCI(x, display.conc) } else NULL
+  
+  if (style == "generic") {
+    reproFitPlotGeneric(dataTT$conc, transf_data_conc, dataTT$resp,
                         curv_conc, curv_resp,
                         CI, mortality,
                         xlab, ylab, fitcol, fitlty, fitlwd,
@@ -404,8 +411,7 @@ plot.reproFitTt <- function(x,
                         cicol, cilty, cilwd, ...)
   }
   else if (style == "ggplot") {
-    reproFitPlotGG(x,
-                   dataTT$conc, transf_data_conc, dataTT$resp,
+    reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
                    curv_conc, curv_resp,
                    CI, mortality,
                    xlab, ylab, fitcol, fitlty, fitlwd,
