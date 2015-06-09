@@ -92,7 +92,7 @@ reproDataPlotTargetTime <- function(x,
 #' @param x an object of class \code{reproData}
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
-#' @param style graphical backend, can be \code{'generic'}, \code{'lattice'} or
+#' @param style graphical backend, can be \code{'generic'} or
 #' \code{'ggplot'}
 #' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
@@ -100,8 +100,6 @@ reproDataPlotTargetTime <- function(x,
 #' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
-#' When \code{style = "lattice"}, the function returns an object of class
-#' \code{trellis}.
 #'
 #'#' @examples
 #'
