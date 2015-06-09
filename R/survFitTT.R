@@ -449,24 +449,27 @@ survFitTT <- function(data,
   if (sampling.parameters$niter > 100000)
     stop("The model needs too many iterations to provide reliable parameter estimates !")
 
+  # calcul DIC
+  modelDIC <- calcDIC(model, sampling.parameters, quiet)
+
   # Sampling
   prog.b <- ifelse(quiet == TRUE, "none", "text")
 
-  mcmc <- coda.samples.dic(model, parameters,
-                           n.iter = sampling.parameters$niter,
-                           thin = sampling.parameters$thin,
-                           progress.bar = prog.b)
+  mcmc <- coda.samples(model, parameters,
+                       n.iter = sampling.parameters$niter,
+                       thin = sampling.parameters$thin,
+                       progress.bar = prog.b)
 
   # summarize estime.par et CIs
   # calculate from the estimated parameters
-  estim.par <- survPARAMS(mcmc$samples, det.part)
+  estim.par <- survPARAMS(mcmc, det.part)
 
   # LCx calculation  estimated LCx and their CIs 95%
   # vector of LCX
   if (missing(lcx)) {
     lcx <- c(5, 10, 20, 50)
   }
-  estim.LCx <- estimXCX(mcmc$samples, lcx, "LC")
+  estim.LCx <- estimXCX(mcmc, lcx, "LC")
 
   # check if estimated LC50 lies in the tested concentration range
   if (50 %in% lcx) {
@@ -476,17 +479,17 @@ survFitTT <- function(data,
   }
 
   # output
-  OUT <- list(DIC = mcmc$dic,
+  OUT <- list(DIC = modelDIC,
               estim.LCx = estim.LCx,
               estim.par = estim.par,
               det.part = det.part,
-              mcmc = mcmc$samples,
+              mcmc = mcmc,
               model = model,
               parameters = parameters,
-              n.chains = summary(mcmc$samples)$nchain,
-              n.iter = list(start = summary(mcmc$samples)$start,
-                            end = summary(mcmc$samples)$end),
-              n.thin = summary(mcmc$samples)$thin,
+              n.chains = summary(mcmc)$nchain,
+              n.iter = list(start = summary(mcmc)$start,
+                            end = summary(mcmc)$end),
+              n.thin = summary(mcmc)$thin,
               jags.data = jags.data,
               transformed.data = data,
               dataTT = dataTT)
