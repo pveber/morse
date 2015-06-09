@@ -100,43 +100,6 @@ survDataPlotFullGeneric <- function(data, xlab, ylab, addlegend) {
   par(mfrow = c(1, 1))
 }
 
-
-#' @importFrom lattice lattice.options xyplot
-survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
-  # plot of survival data: one subplot for each concentration, and one color for
-  # each replicate for lattice graphics
-
-  # change order of reading concentrations
-  lattice.options(default.args = list(as.table = TRUE))
-
-  if (addlegend) {
-    xyplot(Nsurv ~ time | factor(conc),
-           data = data,
-           group = replicate,
-           index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
-                               1:(round(length(unique(data$conc)) / 2)))),
-           type = "b",
-           pch = 16,
-           xlab = xlab,
-           ylab = ylab,
-           auto.key = list(space = "right",
-                           title = "Replicate",
-                           cex.title = 1,
-                           lines = TRUE,
-                           points = FALSE))
-  } else {
-    xyplot(Nsurv ~ time | factor(conc),
-           data = data,
-           group = replicate,
-           index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
-                               1:(round(length(unique(data$conc))/2)))),
-           type = "b",
-           pch = 16,
-           xlab = xlab,
-           ylab = ylab)
-  }
-}
-
 #' @import ggplot2
 survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
@@ -172,8 +135,6 @@ survDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
 
   if (style == "generic")
     survDataPlotFullGeneric(data, xlab, ylab, addlegend)
-  else if (style == "lattice")
-    survDataPlotFullLattice(data, xlab, ylab, addlegend)
   else if (style == "ggplot")
     survDataPlotFullGG(data, xlab, ylab, addlegend)
   else stop("Unknown plot style")
@@ -363,7 +324,7 @@ survDataPlotReplicates <- function(x,
 #' @param x an object of class \code{survData}
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
-#' @param style graphical backend, can be \code{'generic'}, \code{'lattice'} or
+#' @param style graphical backend, can be \code{'generic'} or
 #' \code{'ggplot'}
 #' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
@@ -371,8 +332,6 @@ survDataPlotReplicates <- function(x,
 #' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
-#' When \code{style = "lattice"}, the function returns an object of class
-#' \code{trellis}.
 #'
 #'#' @examples
 #'
@@ -385,21 +344,18 @@ survDataPlotReplicates <- function(x,
 #' # (2) Plot the survival data
 #' plot(zinc, style = "generic", addlegend = TRUE)
 #'
-#' # (3) Plot the survival data with a lattice type
-#' plot(zinc, style = "lattice", addlegend = TRUE)
-#'
-#' # (4) Plot the survival data with a ggplot type
+#' # (3) Plot the survival data with a ggplot type
 #' plot(zinc, style = "ggplot", addlegend = FALSE)
 #'
-#' # (5) To build a specific legend with a ggplot type
+#' # (4) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
 #'
-#' # (6) Plot the survival rate in function of replicates for one concentration at
+#' # (5) Plot the survival rate in function of replicates for one concentration at
 #' # one target.time with a generic type
 #' plot(zinc, style = "generic", target.time = 21, concentration = 0.66)
 #'
-#' # (7) Plot the survival rate in function of replicates for one concentration at
+#' # (6) Plot the survival rate in function of replicates for one concentration at
 #' # one target.time with a ggplot type
 #' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
 
