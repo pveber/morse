@@ -1,6 +1,9 @@
 # Ugly hack to get rid of spurious notes in package check, caused by uses
 # of dplyr::{rename, filter}. R is such a sad language.
-if(getRversion() >= "2.15.1")  utils::globalVariables(c("Nsurv","conc","Ninit"))
+if(getRversion() >= "2.15.1")  utils::globalVariables(c(
+  "Nsurv","conc","Ninit", "concentrations.sel2.", "response.sel2.",
+  "X.sel.", "fNsurvtheo.sel.", "qinf95.sel.", "qsup95.sel.", "CI.qinf95.sel.",
+  "CI.qsup95.sel.", "Line", "CI"))
 
 
 # Generates a character string vector from a data.frame using its replicate,
@@ -34,12 +37,12 @@ selectDataTT <- function(data, target.time) {
     if (!any(data$time == target.time))
       stop("target.time is not one of the possible time !")
 
-    datatt <- filter(data, time == target.time)
+    dataTT <- filter(data, time == target.time)
   } else {
-    datatt <- cbind(data, time = 1)
+    dataTT <- cbind(data, time = 1)
   }
 
-  return(datatt)
+  return(dataTT)
 }
 
 #' @import rjags
@@ -136,4 +139,95 @@ estimXCX <- function(mcmc, xcx, varx) {
                     row.names = XCname)
 
   return(res)
+}
+
+logTransXaxisFit <- function(log.scale, concentrations) {
+  # remove concentrations 0 in log.scale if needed
+  # INPUT :
+  # - log.scale: booleen
+  # - concentrations: vector of concentrations
+  # OUTPUT
+  # - X: new vector of concentration of length 100
+  
+  if (log.scale && any(concentrations == 0)) { # log.scale yes
+    # 0 in the concentrations
+    X <- seq(min(unique(concentrations)[-1]), max(concentrations),
+             length = 100)
+  } else { # no 0 in the concentrations
+    X <- seq(min(concentrations), max(concentrations), length = 100)
+  }
+  return(X)
+}
+
+optLogTransform <- function(log.scale, x) {
+  if(log.scale) log(x) else x
+}
+  
+logTransConcFit <- function(log.scale, X, x, concentrations, val) {
+  # transform vector conccentration in log.scale if needed
+  # X axis log.scale value
+  
+  # select non 0 values
+  sel <- if (log.scale) {
+    X > 0
+  } else {
+    rep(TRUE, length(X))
+  }
+  
+  if (log.scale) {
+    X[sel] <- log(X[sel])
+  } else {
+    X[sel] <- X[sel]
+  }
+  
+  # log transform concentrations values
+  sel2 <- if (log.scale) {
+    x$dataTT$conc > 0
+  } else {
+    rep(TRUE, length(x$dataTT$conc))
+  }
+  if (log.scale) {
+    concentrations[sel2] <- log(concentrations[sel2])
+  } else {
+    concentrations[sel2] <- concentrations[sel2]
+  }
+  
+  if (val == "sel") {
+    return(sel)
+  }
+  if (val == "X") {
+    return(X)
+  }
+  if (val == "sel2") {
+    return(sel2)
+  }
+  if (val == "conc") {
+    return(concentrations)
+  }
+}
+
+legendGgplotFit <- function(a.gplot) {
+  # create multi legend for plot.reproFitTt and plot.survFitTt
+  # to have differente legend for points and mean and CI curve
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+
+fCols <- function(data, x, fitcol, cicol) {
+  
+  #points
+  cols1 <- "black"
+  names(cols1) <- unique(data$Points)
+  # curve
+  cols2 <- fitcol
+  names(cols2) <- c(x$det.part)
+  # CI curve
+  cols3 <- cicol
+  names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " ")) 
+  
+  return(list(cols1 = cols1,
+              cols2 = cols2,
+              cols3 = cols3))
 }
