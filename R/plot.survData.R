@@ -4,33 +4,11 @@ survDataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
   # for generic graphics
   replicate.index <- ReplicateIndex(data)
 
-  .NbPlot <- function(conc) {
-    # definition of the number of subplots
-    # INPUT
-    # - conc: vector of tested concentrations
-    # OUTPUT
-    # - vector defining the number of columns and rows in par(mfrow)
-
-    nbconc <- length(conc)
-    PlotPar <- c(c(2, 2), c(2, 3), c(2, 4), c(3, 3), c(2, 5), c(3, 4), c(3, 5),
-                 c(4, 4))
-    NbPlotTheo <- matrix(ncol = 2, nrow = 8)
-    NbPlotTheo[, 1] <- c(1, 3, 5, 7, 9, 11, 13, 15)
-    NbPlotTheo[, 2] <- c(4, 6, 8, 9, 10, 12, 15, 16)
-    if (nbconc < 15) {
-      PlotTrue <- NbPlotTheo[NbPlotTheo[, 2] - nbconc > 0, ][1, 1]
-    } else {
-      PlotTrue = 15
-    }
-    return(c(PlotPar[PlotTrue], PlotPar[PlotTrue + 1]))
-  }
-
-
   # creation of a vector of colors
   colors <- rainbow(length(unique(data$replicate)))
   pchs <- as.numeric(unique(data$replicate))
   # split of the graphical window in subplots
-  par(mfrow = .NbPlot(unique(data$conc)))
+  par(mfrow = plotMatrixGeometry(length(unique(data$conc))))
 
   by(data, data$conc, function(x) {
     # bakground
