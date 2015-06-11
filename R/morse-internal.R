@@ -231,3 +231,13 @@ fCols <- function(data, x, fitcol, cicol) {
               cols2 = cols2,
               cols3 = cols3))
 }
+
+# [ReplicateIndex(data)] builds a list of indices, each one named after
+# a replicate of [data], thus providing a dictionary from replicate names to
+# integer keys.
+ReplicateIndex <- function(data) {
+  replicate <- unique(data$replicate)
+  r <- as.list(seq(1, length(replicate)))
+  names(r) <- as.character(replicate)
+  return(r)
+}

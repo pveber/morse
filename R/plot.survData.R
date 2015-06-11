@@ -2,20 +2,7 @@ survDataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
   # plot of survival data: one subplot for each concentration, and one color for
   # each replicate
   # for generic graphics
-
-  .convert <- function(x) {
-    # conversion of a replicate name in a number coding for color
-    # INPUT
-    # - x: name of replicate
-    # OUTPUT
-    #  !!!!!! data are supposed to be sorted by replicate, conc and time !!!!!!
-    # - a position of replicate in vector to display color
-    replicate <- unique(data$replicate)
-    mat <- matrix(ncol = 2, nrow = length(replicate))
-    mat[, 1] <- as.character(replicate)
-    mat[, 2] <- as.character(seq(1, length(replicate)))
-    return(as.integer(mat[mat[, 1] == as.character(x)][2]))
-  }
+  replicate.index <- ReplicateIndex(data)
 
   .NbPlot <- function(conc) {
     # definition of the number of subplots
@@ -60,12 +47,13 @@ survDataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
 
     # lines and points
     by(x, x$replicate, function(y) {
+      index <- replicate.index[[y$replicate[1]]]
       lines(y$time, y[, resp],
             type = "l",
-            col = colors[.convert(unique(y$replicate))])
+            col = colors[index])
       points(y$time, y[, resp],
-             pch = pchs[.convert(unique(y$replicate))],
-             col = colors[.convert(unique(y$replicate))])
+             pch = pchs[index],
+             col = colors[index])
     })
 
     # title
