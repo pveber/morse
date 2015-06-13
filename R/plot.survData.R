@@ -1,7 +1,34 @@
-survDataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
-  # plot of survival data: one subplot for each concentration, and one color for
-  # each replicate
-  # for generic graphics
+# [ReplicateIndex(data)] builds a list of indices, each one named after
+# a replicate of [data], thus providing a dictionary from replicate names to
+# integer keys.
+ReplicateIndex <- function(data) {
+  replicate <- unique(data$replicate)
+  r <- as.list(seq(1, length(replicate)))
+  names(r) <- as.character(replicate)
+  return(r)
+}
+
+
+# [plotMatrixGeometry(n)] returns a vector [c(w,h)] such that a matrix of plots
+# of dimension ([w], [h]) is big enough to display [n] plots in a pretty way.
+# This will typically be used in [par(mfrow)] calls.
+plotMatrixGeometry <- function(nblevels) {
+  PlotPar <- c(c(2, 2), c(2, 3), c(2, 4), c(3, 3), c(2, 5), c(3, 4), c(3, 5),
+               c(4, 4))
+  NbPlotTheo <- matrix(ncol = 2, nrow = 8)
+  NbPlotTheo[, 1] <- c(1, 3, 5, 7, 9, 11, 13, 15)
+  NbPlotTheo[, 2] <- c(4, 6, 8, 9, 10, 12, 15, 16)
+  if (nblevels < 15) {
+    i <- NbPlotTheo[NbPlotTheo[, 2] - nblevels > 0, 1][1]
+  } else {
+    i <- 15
+  }
+  return(c(PlotPar[i], PlotPar[i + 1]))
+}
+
+# General full plot: one subplot for each concentration, and one color for
+# each replicate (for generic graphics)
+dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
   replicate.index <- ReplicateIndex(data)
 
   # creation of a vector of colors
@@ -66,47 +93,14 @@ survDataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
   par(mfrow = c(1, 1))
 }
 
+survDataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend)
+  dataPlotFullGeneric(data,"Nsurv",xlab,ylab,addlegend)
+  
 
-#' @importFrom lattice lattice.options xyplot
-survDataPlotFullLattice <- function(data, resp, xlab, ylab, addlegend) {
-  # plot of survival data: one subplot for each concentration, and one color for
-  # each replicate for lattice graphics
-
-  # change order of reading concentrations
-  lattice.options(default.args = list(as.table = TRUE))
-
-  if (addlegend) {
-    xyplot(cat(resp) ~ time | factor(conc),
-           data = data,
-           group = replicate,
-           index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
-                               1:(round(length(unique(data$conc)) / 2)))),
-           type = "b",
-           pch = 16,
-           xlab = xlab,
-           ylab = ylab,
-           auto.key = list(space = "right",
-                           title = "Replicate",
-                           cex.title = 1,
-                           lines = TRUE,
-                           points = FALSE))
-  } else {
-    xyplot(cat(resp) ~ time | factor(conc),
-           data = data,
-           group = replicate,
-           index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
-                               1:(round(length(unique(data$conc))/2)))),
-           type = "b",
-           pch = 16,
-           xlab = xlab,
-           ylab = ylab)
-  }
-}
-
+# general full plot (ggplot variant): one subplot for each concentration,
+# and one color for each replicate
 #' @import ggplot2
 survDataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
-  # plot of survival data: one subplot for each concentration, and one color for
-  # each replicate for ggplot graphics
 
   time = NULL
   Nsurv = NULL
@@ -425,7 +419,7 @@ plot.survData <- function(x,
   }
 
   if (is.null(target.time) && is.null(concentration))
-    survDataPlotFull(x, "Nsurv", style, addlegend, ...)
+    survDataPlotFull(x, style, addlegend, ...)
   else if (! is.null(target.time) && is.null(concentration))
     survDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
