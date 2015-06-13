@@ -102,7 +102,7 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
   Nsurv = NULL
   title.legend <- "Replicate"
 
-  data$response <- data[,"Nsurv"]
+  data$response <- data[,resp]
 
   # create ggplot object Nsurv / time / replicate / conc
   fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
@@ -125,8 +125,6 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
 dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = TRUE, ...) {
   if (style == "generic")
     dataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
-  else if (style == "lattice")
-    dataPlotFullLattice(data, resp, xlab, ylab, addlegend)
   else if (style == "ggplot")
     dataPlotFullGG(data, resp, xlab, ylab, addlegend)
   else stop("Unknown plot style")

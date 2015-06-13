@@ -1,3 +1,11 @@
+reproDataPlotFull <- function(x, style, addlegend, ...) {
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  dataPlotFull(x, "Nreprocumul", xlab, ylab, style, addlegend, ...)
+}
+
+
 #' @import ggplot2
 #' @importFrom dplyr filter
 reproDataPlotTargetTime <- function(x,
@@ -6,24 +14,24 @@ reproDataPlotTargetTime <- function(x,
                                     addlegend, ...) {
   # plot of cumulated number of offspring as a funtion of concentration
   # for a fixed time
-  
+
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
   ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  
+
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
-  
+
   # select the target.time
   x <- filter(x, x$time == target.time)
-  
+
   # Define visual parameters
   mortality <- c(0, 1) # code 0/1 mortality
   nomortality <- match(x$Nsurv == x$Ninit, c(TRUE, FALSE))
-  
+
   # without mortality
   mortality <- mortality[nomortality] # vector of 0 and 1
-  
+
   # encodes mortality empty dots (1) and not mortality solid dots (19)
   if (style == "generic") {
     mortality[which(mortality == 0)] <- 19
@@ -32,13 +40,13 @@ reproDataPlotTargetTime <- function(x,
     mortality[which(mortality == 0)] <- "No"
     mortality[which(mortality == 1)] <- "Yes"
   }
-  
+
   # default legend argument
   legend.position <- "right"
   legend.title <- "Mortality"
   legend.name.no <- "No"
   legend.name.yes <- "Yes"
-  
+
   # generic
   if (style == "generic") {
     plot(x$conc,
@@ -52,18 +60,18 @@ reproDataPlotTargetTime <- function(x,
     # axis
     axis(side = 2, at = pretty(c(0, max(x$Nreprocumul))))
     axis(side = 1, at = unique(x$conc), labels = unique(x$conc))
-    
+
     # legend
     if (addlegend) {
       legend(legend.position,title = legend.title, pch = c(19, 1), bty = "n",
              legend = c(legend.name.no, legend.name.yes))
     }
   }
-  
+
   #ggplot2
   if (style == "ggplot") {
     df <- data.frame(x, mortality = mortality)
-    
+
     # plot
     gp <- ggplot(df, aes(conc, Nreprocumul, colour = factor(mortality))) +
       geom_point(size = 2.5) +
@@ -114,13 +122,13 @@ reproDataPlotTargetTime <- function(x,
 #'
 #' # (3) Plot the reproduction data for a fixed time with a ggplot type
 #' plot(cadmium1, target.time = 21, style = "ggplot", addlegend = FALSE)
-#' 
-#' # (4) Plot the reproduction data for a fixed concentration 
+#'
+#' # (4) Plot the reproduction data for a fixed concentration
 #' plot(cadmium1, concentration = 4.36, style = "generic", addlegend = TRUE)
 #'
 #' # (5) Plot the reproduction data for a fixed concentration with a ggplot type
 #' plot(cadmium1, concentration = 4.36, style = "ggplot", addlegend = FALSE)
-#' 
+#'
 #' # (6) Plot the reproduction data in function of replicates for one concentration at
 #' # one target.time with a generic type
 #' plot(cadmium1, style = "generic", target.time = 21, concentration = 0.66)
@@ -144,15 +152,15 @@ plot.reproData <- function(x,
                            ...) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
-  
+
   if (pool.replicate) {
     # agregate by sum of replicate
     x <- cbind(aggregate(Nreprocumul ~ time + conc, x, sum),
                replicate = 1)
   }
-  
+
   if (is.null(target.time) && is.null(concentration))
-    survDataPlotFull(x, "Nreprocumul", style, addlegend, ...)
+    reproDataPlotFull(x, style, addlegend, ...)
   else if (! is.null(target.time) && is.null(concentration))
     reproDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
