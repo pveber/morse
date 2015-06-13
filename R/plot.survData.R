@@ -285,21 +285,15 @@ dataPlotFixedConc(x, "Nsurv", concentration, xlab, ylab, style, addlegend, ...)
 }
 
 #' @importFrom dplyr %>% filter
-survDataPlotReplicates <- function(x,
-                                   resp,
-                                   target.time,
-                                   concentration,
-                                   style,
-                                   addlegend,
-                                   ...) {
-
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
-  ylab <- if(resp == "Nsurv") {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-  } else {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  }
+dataPlotReplicates <- function(x,
+                               resp,
+                               target.time,
+                               concentration,
+                               xlab,
+                               ylab,
+                               style,
+                               addlegend,
+                               ...) {
 
   # check [target.time] and [concentration]
   if (!target.time %in% x$time)
@@ -319,17 +313,24 @@ survDataPlotReplicates <- function(x,
   }
 
   if (style == "ggplot") {
-    x$response <- if (resp == "Nsurv"){
-      x$Nsurv
-    } else {
-      x$Nreprocumul
-    }
-
+    x$response <- x[,resp]
     df <- ggplot(x, aes(x = replicate, y = response))
     df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
   }
 }
 
+survDataPlotReplicates <- function(x,
+                                   target.time,
+                                   concentration,
+                                   style,
+                                   addlegend,
+                                   ...) {
+
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  dataPlotReplicates(x, "Nsurv", target.time, concentration, xlab, ylab, style, addlegend)
+}
 
 
 #' Plotting method for survData objects
@@ -413,5 +414,5 @@ plot.survData <- function(x,
   else if (is.null(target.time) && ! is.null(concentration))
     survDataPlotFixedConc(x, concentration, style, addlegend, ...)
   else
-    survDataPlotReplicates(x, "Nsurv", target.time, concentration, style, addlegend, ...)
+    survDataPlotReplicates(x, target.time, concentration, style, addlegend, ...)
 }
