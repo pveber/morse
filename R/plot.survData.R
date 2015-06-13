@@ -93,24 +93,16 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
   par(mfrow = c(1, 1))
 }
 
-survDataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend)
-  dataPlotFullGeneric(data,"Nsurv",xlab,ylab,addlegend)
-  
-
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-survDataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
+dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
 
   time = NULL
   Nsurv = NULL
   title.legend <- "Replicate"
-  
-  data$response <- if (resp == "Nsurv"){
-    data$Nsurv
-  } else {
-    data$Nreprocumul
-  }
+
+  data$response <- data[,"Nsurv"]
 
   # create ggplot object Nsurv / time / replicate / conc
   fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
@@ -130,23 +122,21 @@ survDataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
   return(fd)
 }
 
-survDataPlotFull <- function(data, resp, style = "generic", addlegend = TRUE, ...) {
+dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = TRUE, ...) {
+  if (style == "generic")
+    dataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
+  else if (style == "lattice")
+    dataPlotFullLattice(data, resp, xlab, ylab, addlegend)
+  else if (style == "ggplot")
+    dataPlotFullGG(data, resp, xlab, ylab, addlegend)
+  else stop("Unknown plot style")
+}
 
+survDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if(resp == "Nsurv") {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-  } else {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  }
-
-  if (style == "generic")
-    survDataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
-  else if (style == "lattice")
-    survDataPlotFullLattice(data, resp, xlab, ylab, addlegend)
-  else if (style == "ggplot")
-    survDataPlotFullGG(data, resp, xlab, ylab, addlegend)
-  else stop("Unknown plot style")
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  dataPlotFull(data, "Nsurv", xlab, ylab, style, addlegend, ...)
 }
 
 #' @import ggplot2
@@ -156,7 +146,7 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
   ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-  
+
     if (!target.time %in% x$time)
       stop("[target.time] is not one of the possible time !")
 
@@ -274,7 +264,7 @@ survDataPlotFixedConc <- function(x, resp,
     } else {
       x$Nreprocumul
     }
-    
+
     if (length(unique(x$replicate)) == 1) {
       df <- ggplot(x, aes(x = time, y = response))
     } else {
@@ -336,7 +326,7 @@ survDataPlotReplicates <- function(x,
     } else {
       x$Nreprocumul
     }
-    
+
     df <- ggplot(x, aes(x = replicate, y = response))
     df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
   }
