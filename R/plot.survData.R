@@ -1,71 +1,64 @@
-survDataPlotFullGeneric <- function(data, xlab, ylab, addlegend) {
-  # plot of survival data: one subplot for each concentration, and one color for
-  # each replicate
-  # for generic graphics
+# [ReplicateIndex(data)] builds a list of indices, each one named after
+# a replicate of [data], thus providing a dictionary from replicate names to
+# integer keys.
+ReplicateIndex <- function(data) {
+  replicate <- unique(data$replicate)
+  r <- as.list(seq(1, length(replicate)))
+  names(r) <- as.character(replicate)
+  return(r)
+}
 
-  .convert <- function(x) {
-    # conversion of a replicate name in a number coding for color
-    # INPUT
-    # - x: name of replicate
-    # OUTPUT
-    #  !!!!!! data are supposed to be sorted by replicate, conc and time !!!!!!
-    # - a position of replicate in vector to display color
-    replicate <- unique(data$replicate)
-    mat <- matrix(ncol = 2, nrow = length(replicate))
-    mat[, 1] <- as.character(replicate)
-    mat[, 2] <- as.character(seq(1, length(replicate)))
-    return(as.integer(mat[mat[, 1] == as.character(x)][2]))
+
+# [plotMatrixGeometry(n)] returns a vector [c(w,h)] such that a matrix of plots
+# of dimension ([w], [h]) is big enough to display [n] plots in a pretty way.
+# This will typically be used in [par(mfrow)] calls.
+plotMatrixGeometry <- function(nblevels) {
+  PlotPar <- c(c(2, 2), c(2, 3), c(2, 4), c(3, 3), c(2, 5), c(3, 4), c(3, 5),
+               c(4, 4))
+  NbPlotTheo <- matrix(ncol = 2, nrow = 8)
+  NbPlotTheo[, 1] <- c(1, 3, 5, 7, 9, 11, 13, 15)
+  NbPlotTheo[, 2] <- c(4, 6, 8, 9, 10, 12, 15, 16)
+  if (nblevels < 15) {
+    i <- NbPlotTheo[NbPlotTheo[, 2] - nblevels > 0, 1][1]
+  } else {
+    i <- 15
   }
+  return(c(PlotPar[i], PlotPar[i + 1]))
+}
 
-  .NbPlot <- function(conc) {
-    # definition of the number of subplots
-    # INPUT
-    # - conc: vector of tested concentrations
-    # OUTPUT
-    # - vector defining the number of columns and rows in par(mfrow)
-
-    nbconc <- length(conc)
-    PlotPar <- c(c(2, 2), c(2, 3), c(2, 4), c(3, 3), c(2, 5), c(3, 4), c(3, 5),
-                 c(4, 4))
-    NbPlotTheo <- matrix(ncol = 2, nrow = 8)
-    NbPlotTheo[, 1] <- c(1, 3, 5, 7, 9, 11, 13, 15)
-    NbPlotTheo[, 2] <- c(4, 6, 8, 9, 10, 12, 15, 16)
-    if (nbconc < 15) {
-      PlotTrue <- NbPlotTheo[NbPlotTheo[, 2] - nbconc > 0, ][1, 1]
-    } else {
-      PlotTrue = 15
-    }
-    return(c(PlotPar[PlotTrue], PlotPar[PlotTrue + 1]))
-  }
-
+# General full plot: one subplot for each concentration, and one color for
+# each replicate (for generic graphics)
+dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
+  replicate.index <- ReplicateIndex(data)
 
   # creation of a vector of colors
   colors <- rainbow(length(unique(data$replicate)))
   pchs <- as.numeric(unique(data$replicate))
   # split of the graphical window in subplots
-  par(mfrow = .NbPlot(unique(data$conc)))
+  par(mfrow = plotMatrixGeometry(length(unique(data$conc))))
 
   by(data, data$conc, function(x) {
     # bakground
     plot(x$time, rep(0, length(x$time)),
          xlab = xlab,
          ylab = ylab,
-         ylim = c(0,max(x$Nsurv)),
+         ylim = c(0, max(x[, resp])),
          type = "n",
          col = 'white',
          yaxt = 'n')
 
     # axis
-    axis(side = 2, at = pretty(c(0,max(x$Nsurv))))
+    axis(side = 2, at = pretty(c(0,max(x[, resp]))))
 
     # lines and points
     by(x, x$replicate, function(y) {
-      lines(y$time, y$Nsurv,
+      index <- replicate.index[[y$replicate[1]]]
+      lines(y$time, y[, resp],
             type = "l",
-            col = colors[.convert(unique(y$replicate))])
-      points(y$time, y$Nsurv,
-             pch = pchs[.convert(unique(y$replicate))],
-             col = colors[.convert(unique(y$replicate))])
+            col = colors[index])
+      points(y$time, y[, resp],
+             pch = pchs[index],
+             col = colors[index])
     })
 
     # title
@@ -100,60 +93,25 @@ survDataPlotFullGeneric <- function(data, xlab, ylab, addlegend) {
   par(mfrow = c(1, 1))
 }
 
-
-#' @importFrom lattice lattice.options xyplot
-survDataPlotFullLattice <- function(data, xlab, ylab, addlegend) {
-  # plot of survival data: one subplot for each concentration, and one color for
-  # each replicate for lattice graphics
-
-  # change order of reading concentrations
-  lattice.options(default.args = list(as.table = TRUE))
-
-  if (addlegend) {
-    xyplot(Nsurv ~ time | factor(conc),
-           data = data,
-           group = replicate,
-           index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
-                               1:(round(length(unique(data$conc)) / 2)))),
-           type = "b",
-           pch = 16,
-           xlab = xlab,
-           ylab = ylab,
-           auto.key = list(space = "right",
-                           title = "Replicate",
-                           cex.title = 1,
-                           lines = TRUE,
-                           points = FALSE))
-  } else {
-    xyplot(Nsurv ~ time | factor(conc),
-           data = data,
-           group = replicate,
-           index.cond = list(c((round(length(unique(data$conc)) / 2) + 1):length(unique(data$conc)),
-                               1:(round(length(unique(data$conc))/2)))),
-           type = "b",
-           pch = 16,
-           xlab = xlab,
-           ylab = ylab)
-  }
-}
-
+# general full plot (ggplot variant): one subplot for each concentration,
+# and one color for each replicate
 #' @import ggplot2
-survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
-  # plot of survival data: one subplot for each concentration, and one color for
-  # each replicate for ggplot graphics
+dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
 
   time = NULL
   Nsurv = NULL
   title.legend <- "Replicate"
 
+  data$response <- data[,resp]
+
   # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, Nsurv, colour = factor(replicate))) +
+  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
     geom_point() +
     geom_line() +
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    ylim(0, max(data$Nsurv)) + theme_minimal()
+    ylim(0, max(data$response)) + theme_minimal()
 
   # legend option
   if (addlegend){
@@ -164,19 +122,19 @@ survDataPlotFullGG <- function(data, xlab, ylab, addlegend) {
   return(fd)
 }
 
-survDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
+dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = TRUE, ...) {
+  if (style == "generic")
+    dataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
+  else if (style == "ggplot")
+    dataPlotFullGG(data, resp, xlab, ylab, addlegend)
+  else stop("Unknown plot style")
+}
 
+survDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
   ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-
-  if (style == "generic")
-    survDataPlotFullGeneric(data, xlab, ylab, addlegend)
-  else if (style == "lattice")
-    survDataPlotFullLattice(data, xlab, ylab, addlegend)
-  else if (style == "ggplot")
-    survDataPlotFullGG(data, xlab, ylab, addlegend)
-  else stop("Unknown plot style")
+  dataPlotFull(data, "Nsurv", xlab, ylab, style, addlegend, ...)
 }
 
 #' @import ggplot2
@@ -187,8 +145,8 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
   ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
 
-  if (!target.time %in% x$time)
-    stop("[target.time] is not one of the possible time !")
+    if (!target.time %in% x$time)
+      stop("[target.time] is not one of the possible time !")
 
   # select the target.time
   x <- filter(x, x$time == target.time)
@@ -231,14 +189,14 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
       df <- ggplot(x, aes(x = conc, y = Nsurv))
     } else {
       df <- ggplot(x, aes(x = conc, y = Nsurv)) +
-        stat_sum(aes(size = factor(..n..)))
+        stat_sum(aes(size = factor(..n..))) +
+        scale_size_discrete("Replicate")
     }
     fd <- df + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
       scale_x_continuous(breaks = unique(x$conc),
-                         labels = unique(x$conc)) +
-      scale_color_hue("Replicate")
+                         labels = unique(x$conc))
 
     # legend option
     if (addlegend) {
@@ -249,16 +207,14 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
   }
 }
 
+dataPlotFixedConc <- function(x, resp,
+                              concentration,
+                              xlab, ylab,
+                              style = "generic",
+                              addlegend = TRUE,
+                              ...) {
 
-survDataPlotFixedConc <- function(x,
-                                  concentration,
-                                  style = "generic",
-                                  addlegend = TRUE,
-                                  ...) {
-
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
 
   # check concentration value
   if (!concentration %in% x$conc)
@@ -271,7 +227,7 @@ survDataPlotFixedConc <- function(x,
   x$color <- as.numeric(as.factor(x$replicate))
 
   if (style == "generic") {
-    plot(x$time, x$Nsurv,
+    plot(x$time, x[,resp],
          type = "n",
          xlab = xlab,
          ylab = ylab)
@@ -279,25 +235,27 @@ survDataPlotFixedConc <- function(x,
     # one line by replicate
     by(x, list(x$replicate),
        function(x) {
-         lines(x$time, x$Nsurv, # lines
+         lines(x$time, x[,resp], # lines
                col = x$color)
-         points(x$time, x$Nsurv, # points
+         points(x$time, x[,resp], # points
                 pch = 16,
                 col = x$color)
        })
 
     if (addlegend) {
-      legend("bottomleft", legend = unique(x$replicate) ,
+      legend(legend.position, legend = unique(x$replicate) ,
              col = unique(x$color),
              pch = 16,
              lty = 1)
     }
   }
   if (style == "ggplot") {
+    x$response <- x[,resp]
+
     if (length(unique(x$replicate)) == 1) {
-      df <- ggplot(x, aes(x = time, y = Nsurv))
+      df <- ggplot(x, aes(x = time, y = response))
     } else {
-      df <- ggplot(x, aes(x = time, y = Nsurv,
+      df <- ggplot(x, aes(x = time, y = response,
                           color = factor(replicate),
                           group = replicate))
     }
@@ -314,18 +272,28 @@ survDataPlotFixedConc <- function(x,
   }
 }
 
+survDataPlotFixedConc <- function(x,
+                                  concentration,
+                                  style = "generic",
+                                  addlegend = TRUE,
+                                  ...) {
+
+opt_args <- list(...)
+xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
+ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+dataPlotFixedConc(x, "Nsurv", concentration, xlab, ylab, style, addlegend, ...)
+}
 
 #' @importFrom dplyr %>% filter
-survDataPlotReplicates <- function(x,
-                                   target.time,
-                                   concentration,
-                                   style,
-                                   addlegend,
-                                   ...) {
-
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+dataPlotReplicates <- function(x,
+                               resp,
+                               target.time,
+                               concentration,
+                               xlab,
+                               ylab,
+                               style,
+                               addlegend,
+                               ...) {
 
   # check [target.time] and [concentration]
   if (!target.time %in% x$time)
@@ -338,21 +306,31 @@ survDataPlotReplicates <- function(x,
   x <- filter(x, conc == concentration & time == target.time)
 
   if (style == "generic") {
-    plot(factor(x$replicate), x$Nsurv,
+    plot(factor(x$replicate), x[,resp],
          type = "n",
          xlab = xlab,
          ylab = ylab)
   }
 
   if (style == "ggplot") {
-    df <- ggplot(x, aes(x = replicate, y = Nsurv))
-    df + geom_point() + labs(x = xlab, y = ylab)
+    x$response <- x[,resp]
+    df <- ggplot(x, aes(x = replicate, y = response))
+    df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
   }
-
-  #FIXME: and lattice?
-  #FIXME: plot control too
 }
 
+survDataPlotReplicates <- function(x,
+                                   target.time,
+                                   concentration,
+                                   style,
+                                   addlegend,
+                                   ...) {
+
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  dataPlotReplicates(x, "Nsurv", target.time, concentration, xlab, ylab, style, addlegend)
+}
 
 
 #' Plotting method for survData objects
