@@ -207,20 +207,13 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
   }
 }
 
+dataPlotFixedConc <- function(x, resp,
+                              concentration,
+                              xlab, ylab,
+                              style = "generic",
+                              addlegend = TRUE,
+                              ...) {
 
-survDataPlotFixedConc <- function(x, resp,
-                                  concentration,
-                                  style = "generic",
-                                  addlegend = TRUE,
-                                  ...) {
-
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if(resp == "Nsurv") {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-  } else {
-    if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  }
   legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
 
   # check concentration value
@@ -257,11 +250,7 @@ survDataPlotFixedConc <- function(x, resp,
     }
   }
   if (style == "ggplot") {
-    x$response <- if (resp == "Nsurv"){
-      x$Nsurv
-    } else {
-      x$Nreprocumul
-    }
+    x$response <- x[,resp]
 
     if (length(unique(x$replicate)) == 1) {
       df <- ggplot(x, aes(x = time, y = response))
@@ -283,6 +272,17 @@ survDataPlotFixedConc <- function(x, resp,
   }
 }
 
+survDataPlotFixedConc <- function(x,
+                                  concentration,
+                                  style = "generic",
+                                  addlegend = TRUE,
+                                  ...) {
+
+opt_args <- list(...)
+xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
+ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+dataPlotFixedConc(x, "Nsurv", concentration, xlab, ylab, style, addlegend, ...)
+}
 
 #' @importFrom dplyr %>% filter
 survDataPlotReplicates <- function(x,
@@ -411,7 +411,7 @@ plot.survData <- function(x,
   else if (! is.null(target.time) && is.null(concentration))
     survDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
-    survDataPlotFixedConc(x, "Nsurv", concentration, style, addlegend, ...)
+    survDataPlotFixedConc(x, concentration, style, addlegend, ...)
   else
     survDataPlotReplicates(x, "Nsurv", target.time, concentration, style, addlegend, ...)
 }

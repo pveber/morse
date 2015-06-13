@@ -89,6 +89,19 @@ reproDataPlotTargetTime <- function(x,
   }
 }
 
+reproDataPlotFixedConc <- function(x,
+                                   concentration,
+                                   style = "generic",
+                                   addlegend = TRUE,
+                                   ...) {
+
+  opt_args <- list(...)
+  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
+  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  dataPlotFixedConc(x, "Nreprocumul", concentration, xlab, ylab, style, addlegend, ...)
+}
+
+
 #' Plotting method for reproData objects
 #'
 #' Plots the cumulated number of offspring as a
@@ -164,7 +177,7 @@ plot.reproData <- function(x,
   else if (! is.null(target.time) && is.null(concentration))
     reproDataPlotTargetTime(x, target.time, style, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
-    survDataPlotFixedConc(x, "Nreprocumul", concentration, style, addlegend, ...)
+    reproDataPlotFixedConc(x, concentration, style, addlegend, ...)
   else
     survDataPlotReplicates(x, "Nreprocumul", target.time, concentration, style,
                             addlegend, ...)
