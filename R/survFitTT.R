@@ -382,7 +382,6 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #' @importFrom dplyr filter
 #'
 survFitTT <- function(data,
-                      det.part = "loglogisticbinom_2",
                       target.time = NULL,
                       lcx,
                       n.chains = 3,
@@ -391,9 +390,14 @@ survFitTT <- function(data,
   if(! is(data, "survData"))
     stop("survFitTT: object of class survData expected")
 
-  # test determinist part
-  if (! (det.part == "loglogisticbinom_2" || det.part == "loglogisticbinom_3"))
-    stop("Invalid value for argument [det.part]")
+  # select Data at target.time
+  dataTT <- selectDataTT(data, target.time)
+
+  # Choose model by testing mortality in the control
+  control <- filter(dataTT, conc == 0)
+  det.part <-
+    if (any(control$Nsurv < control$Ninit)) "loglogisticbinom_3"
+  else "loglogisticbinom_2"
 
   # select model text
   if (det.part == "loglogisticbinom_2") {
@@ -411,31 +415,8 @@ survFitTT <- function(data,
       c("log10b", "d", "log10e")}
   }
 
-  # select Data at target.time
-  dataTT <- selectDataTT(data, target.time)
-
   # create priors parameters
   jags.data <- survCreateJagsData(det.part, dataTT)
-
-  # Test mortality in the control
-  # FIXME: I don't get why we leave a choice to the user here:
-  # the choice of the model is dictated by mortality in the control!
-  control <- filter(dataTT, conc == 0)
-  if (
-      det.part == "loglogisticbinom_2"
-    &&
-      any(control$Nsurv < control$Ninit)
-  )
-    stop("Beware! There is mortality in the control. A model with three parameters must be chosen.")
-
-  if (
-      det.part == "loglogisticbinom_3"
-    &&
-      ! any(control$Nsurv < control$Ninit)
-    )
-    stop("Beware! There is no mortality in the control. A model with two parameters must be chosen.")
-
-  # Model computing
 
   # Define model
   model <- survLoadModel(model.program = model.text,
