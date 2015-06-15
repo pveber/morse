@@ -418,6 +418,26 @@ survFitTT <- function(data,
   # create priors parameters
   jags.data <- survCreateJagsData(det.part, dataTT)
 
+  # Test mortality in the control
+  # FIXME: I don't get why we leave a choice to the user here:
+  # the choice of the model is dictated by mortality in the control!
+  control <- filter(dataTT, conc == 0)
+  if (
+      det.part == "loglogisticbinom_2"
+    &&
+      any(control$Nsurv < control$Ninit)
+  )
+    stop("Beware! There is mortality in the control. A model with three parameters must be chosen.")
+
+  if (
+      det.part == "loglogisticbinom_3"
+    &&
+      ! any(control$Nsurv < control$Ninit)
+    )
+    warning("Beware! There is no mortality in the control. A model with two parameters should be chosen.")
+
+  # Model computing
+
   # Define model
   model <- survLoadModel(model.program = model.text,
                          data = jags.data, n.chains,
