@@ -99,3 +99,37 @@ test_that("survDataCheck", {
   expect_equal(survDataCheck(cadmium19, diagnosis.plot = FALSE)$id[4],
                "ReplicateLabel")
 })
+
+test_that("survData", {
+  skip_on_cran()
+  lapply(d, function(x) {
+    dat <- survData(x)
+    expect_is(dat, c("survData", "data.frame"))
+    expect_is(dat$conc, c("numeric", "integer"))
+    expect_true("ID" %in% names(dat))
+    expect_true(!is.null(dat))
+    expect_true(any(!is.na(dat)))
+    expect_true(all(dat[-1] >= 0))
+  })
+})
+
+test_that("survFitTT", {
+  skip_on_cran()
+  lapply(d, function(x) {
+    dat <- survData(x)
+    # select Data at target.time
+    dataTT <- morse:::selectDataTT(dat, max(dat$time))
+    # Test mortality in the control
+    control <- filter(dataTT, conc == 0)
+    out <- survFitTT(dat, quiet = T)
+    expect_is(out, "survFitTT")
+    expect_equal(typeof(out), "list")
+    expect_true(!is.null(out))
+    expect_true(any(!is.na(out)))
+    if (any(control$Nsurv < control$Ninit)) {
+      expect_true(out$det.part == "loglogisticbinom_3")
+    } else {
+      expect_true(out$det.part == "loglogisticbinom_2")
+    }
+  })
+})
