@@ -9,6 +9,8 @@
 .RData
 ..pdf
 
+scriptTestcomparmodel.R
+
 # RStudio files
 .Rproj.user/
 .Rbuildignore
@@ -22,3 +24,4 @@ r-mosaic.Rproj
 
 # some generated files
 man/*.Rd
+ppc/*.pdf
