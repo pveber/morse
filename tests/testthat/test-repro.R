@@ -90,3 +90,16 @@ test_that("reproData", {
     }
   })
 })
+
+test_that("reproFitTT", {
+  skip_on_cran()
+  lapply(d, function(x) {
+    dat <- reproData(x)
+    out <- reproFitTT(dat, quiet = T)
+    expect_is(out, "reproFitTT")
+    expect_equal(typeof(out), "list")
+    expect_true(!is.null(out))
+    expect_true(any(!is.na(out)))
+  })
+})
+
