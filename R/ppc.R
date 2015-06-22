@@ -19,7 +19,6 @@ ppc <- function(x) {
     dataTT$pred <- reproEvalFit(x, dataTT$conc)
     CI <- reproLlmCI(x, dataTT$conc)
     
-    
     plot(dataTT$obs, dataTT$obs,
          type = "n",
          bty = "n",
@@ -27,8 +26,8 @@ ppc <- function(x) {
          yaxt = "n",
          xlim = c(0, max(pretty(c(0, max(CI$qsup95))))),
          ylim = c(0, max(pretty(c(0, max(CI$qsup95))))),
-         ylab = "Predicted survival rate",
-         xlab = "Observed survival rate")
+         ylab = "Predicted reproduction rate",
+         xlab = "Observed reproduction rate")
     abline(a = 0, b = 1)
     
     # axis
@@ -43,6 +42,28 @@ ppc <- function(x) {
   }
   if (is(x, "survFitTT")) {
     dataTT$obs <- dataTT$Nsurv / dataTT$Ninit
+    dataTT$pred <- survEvalFit(x, dataTT$conc)
+    CI <- survLlbinomCI(x, log.scale = FALSE)
     
+    plot(dataTT$obs, dataTT$obs,
+         type = "n",
+         bty = "n",
+         xaxt = "n",
+         yaxt = "n",
+         xlim = c(0, max(pretty(c(0, max(CI["qsup95",]))))),
+         ylim = c(0, max(pretty(c(0, max(CI["qsup95",]))))),
+         ylab = "Predicted survival rate",
+         xlab = "Observed survival rate")
+    abline(a = 0, b = 1)
+    
+    # axis
+    axis(side = 2, at = pretty(c(0, max(CI["qsup95",]))))
+    axis(side = 1, at = pretty(c(0, max(CI["qsup95",]))))
+    
+    for (i in 1:length(dataTT$conc)) {
+      points(dataTT$obs[i], dataTT$pred[i], pch = 16)
+      segments(dataTT$obs[i], CI["qinf95",][i], dataTT$obs[i], CI["qsup95",][i],
+               col = ifelse(CI["qinf95",][i] > dataTT$obs[i] && CI["qsup95",][i] < dataTT$obs[i], "red", "green"))
+    }
   }
 }
