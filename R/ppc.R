@@ -15,16 +15,19 @@ survPpcGeneric <- function(data, CI) {
   axis(side = 1, at = pretty(c(0, max(CI["qsup95",]))))
   
   points(data$obs, data$pred, pch = 16)
-  segments(data$obs, CI["qinf95",], data$obs, CI["qsup95",],
-             col = ifelse(CI["qinf95",] > data$obs && CI["qsup95",] < data$obs,
-                          "red", "green"))
+  for(i in 1:length(data$conc)) {
+    segments(data$obs[i], CI["qinf95",][i], data$obs[i], CI["qsup95",][i],
+             col = if (CI["qinf95",][i] > data$obs[i] | CI["qsup95",][i] < data$obs[i]) { "red" } else { "green" })
+  }
 }
 
 #' @import ggplot2
 survPpcGG <- function(data, CI) {
   data <- data.frame(data, qinf95 = CI["qinf95",],
                      qsup95 = CI["qsup95",],
-                     color = ifelse(CI["qinf95",] > data$obs && CI["qsup95",] < data$obs, "red", "green"))
+                     color = ifelse(CI["qinf95",] > data$obs | CI["qsup95",] < data$obs,
+                                    "red", "green"))
+
   ggplot(data, aes(x = obs, y = pred)) +
     geom_point() +
     geom_segment(aes(x = obs, xend = obs, y = qinf95, yend = qsup95),
@@ -71,16 +74,17 @@ reproPpcGeneric <- function(data, CI) {
   axis(side = 1, at = pretty(c(0, max(CI$qsup95))))
   
   points(data$obs, data$pred, pch = 16)
-  segments(data$obs, CI$qinf95, data$obs, CI$qsup95,
-           col = ifelse(CI$qinf95 > data$obs && CI$qsup95 < data$obs,
-                        "red", "green"))
+  for (i in 1:length(data$conc)) {
+    segments(data$obs[i], CI$qinf95[i], data$obs[i], CI$qsup95[i],
+             col = if (CI$qinf95[i] > data$obs[i] | CI$qsup95[i] < data$obs[i]) { "red" } else { "green" })
+  }
 }
 
 #' @import ggplot2
 reproPpcGG <- function(data, CI) {
   data <- data.frame(data, qinf95 = CI$qinf95,
                      qsup95 = CI$qsup95,
-                     color = ifelse(CI$qinf95 > data$obs && CI$qsup95 < data$obs, "red", "green"))
+                     color = ifelse(CI$qinf95 > data$obs | CI$qsup95 < data$obs, "red", "green"))
   ggplot(data, aes(x = obs, y = pred)) +
     geom_point() +
     geom_segment(aes(x = obs, xend = obs, y = qinf95, yend = qsup95),
@@ -127,7 +131,7 @@ ppc <- function(x, style = "generic") {
   if (is(x, "reproFitTT")) {
     reproPpc(x, dataTT, style)
   }
-  if (is(x, "survFitTT")) {
+  else if (is(x, "survFitTT")) {
     survPpc(x, dataTT, style)
   }
 }
