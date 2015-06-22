@@ -37,6 +37,7 @@ reproLlmCI <- function(fit, x) {
   # quantiles
   qinf95 = NULL
   qsup95 = NULL
+  qmed = NULL
   
   # poisson
   if (fit$model.label == "P") {
@@ -45,6 +46,7 @@ reproLlmCI <- function(fit, x) {
       # IC 95%
       qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
+      qmed[i] <- quantile(theomean, probs = 0.5, na.rm = TRUE)
     }
   }
   
@@ -60,11 +62,13 @@ reproLlmCI <- function(fit, x) {
       # IC 95%
       qinf95[i] <- quantile(theo, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theo, probs = 0.975, na.rm = TRUE)
+      qmed[i] <- quantile(theo, probs = 0.5, na.rm = TRUE)
     }
   }
   # values for CI
   ci <- list(qinf95 = qinf95,
-             qsup95 = qsup95)
+             qsup95 = qsup95,
+             qmed = qmed)
   
   return(ci)
 }
