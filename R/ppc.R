@@ -16,8 +16,9 @@ ppc <- function(x) {
   
   if (is(x, "reproFitTT")) {
     dataTT$obs <- dataTT$Nreprocumul / dataTT$Nindtime
-    
+    dataTT$pred <- reproEvalFit(x, dataTT$conc)
     CI <- reproLlmCI(x, dataTT$conc)
+    
     
     plot(dataTT$obs, dataTT$obs,
          type = "n",
@@ -35,9 +36,13 @@ ppc <- function(x) {
     axis(side = 1, at = pretty(c(0, max(CI$qsup95))))
     
     for (i in 1:length(dataTT$conc)) {
-      points(dataTT$obs[i], CI$qmed[i], pch = 16)
+      points(dataTT$obs[i], dataTT$pred[i], pch = 16)
       segments(dataTT$obs[i], CI$qinf95[i], dataTT$obs[i], CI$qsup95[i],
                col = ifelse(CI$qinf95[i] > dataTT$obs[i] && CI$qsup95[i] < dataTT$obs[i], "red", "green"))
     }
+  }
+  if (is(x, "survFitTT")) {
+    dataTT$obs <- dataTT$Nsurv / dataTT$Ninit
+    
   }
 }
