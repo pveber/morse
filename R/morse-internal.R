@@ -1,9 +1,9 @@
 # Ugly hack to get rid of spurious notes in package check, caused by uses
 # of dplyr::{rename, filter}. R is such a sad language.
 if(getRversion() >= "2.15.1")  utils::globalVariables(c(
-  "Nsurv","conc","Ninit", "concentrations.sel2.", "response.sel2.",
-  "X.sel.", "fNsurvtheo.sel.", "qinf95.sel.", "qsup95.sel.", "CI.qinf95.sel.",
-  "CI.qsup95.sel.", "Line", "CI"))
+  "response", "Nreprocumul", "resp", "Mortality", "qinf95", "qsup95",
+  "transf_conc", "obs", "pred", "..n..", "Points"
+))
 
 
 # Generates a character string vector from a data.frame using its replicate,
