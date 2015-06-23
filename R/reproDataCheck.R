@@ -118,8 +118,7 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   consistency.errors <- do.call("errorTableAppend", res)
   errors <- errorTableAppend(errors, consistency.errors)
 
-  if (diagnosis.plot &&
-      ("NsurvIncrease" %in% errors$id || "NsurvMonotone" %in% errors$id)) {
+  if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
     survDataPlotFull(data)
       }
 
