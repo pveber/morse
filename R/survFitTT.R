@@ -290,6 +290,7 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #' plot(out, log.scale = TRUE, ci = TRUE)
 #'
 #' # (6) Plot the fitted curve with ggplot style
+#' require(ggplot2)
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
 #' fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
 #'

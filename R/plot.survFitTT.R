@@ -280,6 +280,8 @@ survFitPlotGG <- function(x,
 
 #' @export
 #'
+#' @name survFitTT
+#'
 #' @import grDevices
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange arrangeGrob
