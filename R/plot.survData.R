@@ -355,7 +355,7 @@ survDataPlotReplicates <- function(x,
 #' When \code{style = "lattice"}, the function returns an object of class
 #' \code{trellis}.
 #'
-#'#' @examples
+#' @examples
 #'
 #' library(ggplot2)
 #'
@@ -366,10 +366,7 @@ survDataPlotReplicates <- function(x,
 #' # (2) Plot the survival data
 #' plot(zinc, style = "generic", addlegend = TRUE)
 #'
-#' # (3) Plot the survival data with a lattice type
-#' plot(zinc, style = "lattice", addlegend = TRUE)
-#'
-#' # (4) Plot the survival data with a ggplot type
+#' # (3) Plot the survival data with a ggplot type
 #' plot(zinc, style = "ggplot", addlegend = FALSE)
 #'
 #' # (5) To build a specific legend with a ggplot type
