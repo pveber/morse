@@ -119,7 +119,7 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
 
   if (diagnosis.plot &&
       ("NsurvIncrease" %in% errors$id || "NsurvMonotone" %in% errors$id)) {
-        plot(data)
+    survDataPlotFull(data)
       }
 
   return(errors)
