@@ -270,8 +270,7 @@ llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\
 #' then the Poisson model is selected. If this number is more than 100 000 for
 #' only one model, the other one is selected.
 #' 
-#' @aliases reproFitTT repro.ParfitTt print.reproFitTT
-#' summary.reproFitTT plot.reproFitTT
+#' @aliases reproFitTT plot.reproFitTT
 #' 
 #' @param data An object of class \code{reproData}.
 #' @param stoc.part Stochastic part of the model.
@@ -284,7 +283,6 @@ llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\
 #' is 2.
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
 #' JAGS compilation.
-#' @param object An object of class \code{reproFitTT}.
 #' @param x An object of class \code{reproFitTT}.
 #' @param xlab A label for the \eqn{X}-label, by default \code{Concentrations}.
 #' @param ylab A label for the \eqn{Y}-label, by default \code{Response}.
@@ -304,13 +302,11 @@ llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\
 #' limits, by default \code{2}.
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
 #' @param log.scale Log option for the \eqn{X}-axis.
-#' @param type Graphical package method: \code{generic} or \code{ggplot}.
-#' @param ppc If \code{TRUE}, the function draws a representation of
-#' predictions as 95 \% credible intervals, against observed values.
+#' @param style Graphical package method: \code{generic} or \code{ggplot}.
 #' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @return The function returns an object of class \code{reproFitTT}. A list
-#' of 15 objects:
+#' of 14 objects:
 #' \item{DIC}{DIC value of the selected model.}
 #' \item{estim.ECx}{A table of the estimated 5, 10, 20 and 50 \% effective
 #' concentrations (by default) and their 95 \% credible intervals.}
@@ -332,38 +328,16 @@ llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\
 #' \code{\link[rjags]{jags.model}} function. This object is intended for the
 #' case when the user wishes to use the \code{\link[rjags]{rjags}} package
 #' instead of the automatied estimation function.}
+#' \item{transformed.data}{The dataframe of the \code{\link{survData}} object.}
 #' \item{dataTT}{The subset of transformed.data at target time.}
-#' 
-#' Generic functions: \describe{
-#' \item{\code{summary}}{ provides the following information: the type of model
-#' used, median and 2.5 \% and 97.5 \% quantiles of priors on estimated parameter
-#' distributions, median and 2.5 \% and 97.5 \% quantiles of posteriors on estimated
-#' parameter distributions and median and 2.5 \% and 97.5 \% quantiles of
-#' \eqn{EC_{x}}{ECx} estimates (x = 5, 10, 20, 50 by default).}
-#' \item{\code{print}}{ shows information about the estimation method: the full
-#' JAGS model, the number of chains, the total number of iterations, the number
-#' of iterations in the burn-in period, the thin value and the DIC.}
-#' \item{\code{plot}}{ shows the fitted exposure-response curve superimposed to
-#' experimental data at target time.
-#' The response is here expressed as the cumulative number of offspring per
-#' individual-day. See \code{\link{reproData}}.  When \code{ppc = TRUE}, the
-#' posterior predictive check representation is drawing in a new graphical
-#' window.  Two types of output are available: \code{generic} or \code{ggplot}.
-#' }
-#' }
-#' 
-#' @note When the \code{reproParfitTt} function is used, the number of
-#' clusters is automatically defined by the function. It is equal to argument
-#' \code{n.chains}.
 #' 
 #' @author Marie Laure Delignette-Muller
 #' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
 #' <philippe.ruiz@@univ-lyon1.fr>
 #' 
 #' @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-#' \code{\link[rjags]{dic.samples}}, \code{\link[coda]{summary.mcmc}},
-#' \code{\link[dclone]{parJagsModel}}, \code{\link[dclone]{parCodaSamples}},
-#' \code{\link[coda]{raftery.diag}} and \code{\link[ggplot2]{ggplot}}
+#' \code{\link[rjags]{dic.samples}}, \code{\link[coda]{raftery.diag}}
+#' and \code{\link[ggplot2]{ggplot}}
 #' 
 #' @references Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
 #' (2014) Statistical handling of reproduction data for exposure-response
@@ -393,34 +367,27 @@ llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\
 #' 
 #' \dontrun{
 #' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
-#' out <- reproFitTT(dat2, stoc.part = "gammapoisson", 
+#' out <- reproFitTT(dat, stoc.part = "gammapoisson", 
 #' ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #' 
-#' # (4') Run the fit (parallel version)
-#' out <- reproParfitTt(dat2, stoc.part = "gammapoisson",
-#' ecx = c(5, 10, 15, 20, 30, 50, 80),
-#' n.chains = 3, quiet = TRUE)
+#' # (4) Summary look the estimated values (ECx and parameters)
+#' out$estim.ECx
+#' out$estim.par
 #' 
-#' # (5) Summary
-#' out
-#' summary(out)
-#' 
-#' # (6) Plot the fitted curve
+#' # (5) Plot the fitted curve with credible limits
 #' plot(out, log.scale = TRUE, ci = TRUE,
 #' main = "log-logistic gamma-poisson model")
 #' 
-#' # (7) Plot the fitted curve with ggplot type
+#' # (6) Plot the fitted curve with ggplot style
+#' require("ggplot2")
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#' fitcol = "blue", ci = TRUE, cicol = "blue",  type = "ggplot",
+#' fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
 #' main = "log-logistic gamma-poisson model")
 #' 
-#' # (8) Add a specific legend with generic type
+#' # (7) Add a specific legend with generic type
 #' plot(out, addlegend = FALSE)
-#' legend("left", legend = c("Without mortality", "With mortality"),
-#' pch = c(19,1)) 
-#' 
-#' # (9) Plot posterior predictive check 
-#' plot(out, ppc = TRUE)
+#' legend("bottomleft", legend = c("Without mortality", "With mortality"),
+#' pch = c(19, 1))
 #' }
 #' 
 #' @export
