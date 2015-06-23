@@ -39,7 +39,7 @@
 #' <philippe.veber@@univ-lyon1.fr>
 #'
 #' Maintainer: Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
-#' @seealso \code{\link[rjags]{rjags}}, \code{\link[lattice]{lattice}},
+#' @seealso \code{\link[rjags]{rjags}},
 #' \code{\link[ggplot2]{ggplot}}
 #' @references Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
 #' (2014) \emph{Statistical handling of reproduction data for exposure-response
@@ -49,59 +49,57 @@
 #' Plummer, M. (2013) \emph{JAGS Version 3.4.0 user manual}.
 #' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}.
 #' @keywords package
-#FIXME @examples
-#
-# # (1) Load the data
-# data(cadmium1)
-#
-# # Reproduction analysis at final time with log-logistic model
-# # on reproduction data
-#
-# # (2) Check data
-# reproDataCheck(cadmium1)
-#
-# # (3) Create an object of class "reproData"
-# dat1 <- reproData(cadmium1)
-#
-# # (4) Plot raw data
-# survPlotTt(dat1, log.scale = TRUE, type = "generic")
-# survFullPlot(cadmium1, type = "lattice")
-# reproCumulPlotTt(dat1, type = "ggplot")
-#
-# \dontrun{
-# # (5) Fit the exposure-response log-logistic model on reproduction data at
-# # final time
-# out1 <- reproFitTt(dat1, n.chains = 3)
-#
-# # (6) Check the mcmc convergence
-# convergence(out1, type = "generic")
-#
-# # (7) Summarize the results
-# plot(out1, ci = TRUE, log.scale = TRUE)
-# summary(out1)
-# print(out1)
-# }
-#
-# # Survival analysis at final time with log-logistic binomial
-# # model on survival data
-#
-# # (8) Create an object of class "survData"
-# dat2 <- survData(cadmium1)
-#
-# \dontrun{
-# # (9) Fit the exposure-response log-logistic model on survival data
-# out2 <- survFitTt(dat2, det.part = "loglogisticbinom_3")
-#
-# # (12) Check the mcmc convergence
-# convergence(out2, type = "generic")
-#
-# # (13) Summarize the results
-# plot(out2, ci = TRUE, log.scale = TRUE,
-# pool.replicate = FALSE)
-# summary(out2)
-# print(out2)
-# }
-#
+#' 
+#' @examples
+#' 
+#' # Survival analyses
+#' 
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a survData object
+#' dats <- survData(cadmium1)
+#' 
+#' # (3) Explore the raw data
+#' # in function of time
+#' plot(dats)
+#' # for a fixed concentration
+#' plot(dats, concentration = 4.36)
+#' # for a fixed time
+#' plot(dats, target.time = 21)
+#' 
+#' \dontrun{
+#' # (4) Run the survFitTT function
+#' outs <- survFitTT(dats)
+#' 
+#' # (5) Plot the fitted curve
+#' plot(outs)
+#' }
+#' 
+#'# Reproduction analyses
+#' 
+#' # (1) Load the data
+#' data(cadmium2)
+#' 
+#' # (2) Create a repro object
+#' datr <- reproData(cadmium2)
+#' 
+#' # (3) Explore the raw data
+#' # in function of time
+#' plot(datr)
+#' # for a fixed concentration
+#' plot(datr, concentration = 284)
+#' # for a fixed time
+#' plot(datr, target.time = 56)
+#' 
+#' \dontrun{
+#' # (4) Run the reproFitTT function
+#' outr <- reproFitTT(datr)
+#' 
+#' # (5) Plot the fitted curve
+#' plot(outr)
+#' }
+#' 
 NULL
 
 

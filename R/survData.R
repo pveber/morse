@@ -53,11 +53,6 @@
 #' # (2) Create an objet of class 'survData'
 #' dat <- survData(zinc)
 #' class(dat)
-#'
-#' # (3) Print and summarize object dat
-#FIXME
-# print(dat)
-# summary(dat)
 #
 #' @export
 #' @importFrom dplyr left_join rename

@@ -134,7 +134,7 @@ reproDataPlotReplicates <- function(x,
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #'
-#'#' @examples
+#' @examples
 #'
 #' library(ggplot2)
 #'
@@ -156,11 +156,11 @@ reproDataPlotReplicates <- function(x,
 #'
 #' # (6) Plot the reproduction data in function of replicates for one concentration at
 #' # one target.time with a generic type
-#' plot(cadmium1, style = "generic", target.time = 21, concentration = 0.66)
+#' plot(cadmium1, style = "generic", target.time = 21, concentration = 0.86)
 #'
 #' # (7) Plot the reproduction data in function of replicates for one concentration at
 #' # one target.time with a ggplot type
-#' plot(cadmium1, style = "ggplot", target.time = 21, concentration = 0.66)
+#' plot(cadmium1, style = "ggplot", target.time = 21, concentration = 0.86)
 #'
 #' @export
 #'

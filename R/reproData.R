@@ -48,11 +48,7 @@
 #' dat <- reproData(cadmium1)
 #' dat
 #' class(dat)
-#'
-#' # (3) Print and summarize object dat
-#' print(dat)
-#' summary(dat)
-#'
+#' 
 #' @export
 #'
 reproData <- function(data) {
