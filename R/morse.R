@@ -24,7 +24,7 @@
 #' home page at \url{http://mcmc-jags.sourceforge.net}.
 #'
 #' \tabular{ll}{ Package: \tab morse\cr Type: \tab Package\cr Version: \tab
-#' 2.0.0\cr Date: \tab 2015-01-14\cr License: \tab GPL (>=2)\cr }
+#' 2.0.0\cr Date: \tab 2015-06-23\cr License: \tab GPL (>=2)\cr }
 #'
 #' @name morse-package
 #' @aliases morse-package morse
