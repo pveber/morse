@@ -36,7 +36,7 @@
 #' Philippe Veber <philippe.veber@@univ-lyon1.fr>,
 #' Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #'
-# FIXME: @seealso \code{\link{survFullPlot}}, \code{\link{reproData}}
+#' @seealso \code{\link{reproData}}
 #'
 #' @keywords check
 #'
