@@ -183,24 +183,25 @@ NULL
 #' number of offspring at each time point for each concentration and each
 #' replicate.} }
 #' @keywords datasets
-# @examples
-#
-# # (1) Load the data
-# data(cadmium2)
-#
-# # (2) Create an object of class "reproData"
-# dat <- reproData(cadmium2)
-#
-# # (3) Plot the number of survivors during time for each concentration
-# survFullPlot(cadmium2)
-#
-# # (4) Plot the survival data depending on the concentration
-# survPlotTt(dat, log.scale = TRUE)
-#
-# # (5) Plot the cumulated number of offspring depending on the concentration
-# reproCumulPlotTt(dat, log.scale = TRUE)
-#
-#
+#' 
+#' @examples
+#'
+#' # (1) Load the data
+#' data(cadmium2)
+#'
+#' # (2) Create an object of class "reproData"
+#' dat <- reproData(cadmium2)
+#'
+#' # (3) Plot the cummulated number of offspring in function of time
+#' plot(dat)
+#'
+#' # (4) Plot the cummulated number of offspring for a fixed concentration
+#' plot(dat, concentration = 284)
+#'
+#' # (5) Plot the cumulated number of offspring for a fixed time
+#' plot(dat, target.time = 56)
+#'
+#'
 NULL
 
 
