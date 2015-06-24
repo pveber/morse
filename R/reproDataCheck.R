@@ -2,8 +2,7 @@
 #'
 #' The \code{reproDataCheck} function can be used to check if an object
 #' containing data from a reproduction toxicity assay meets the expectations
-#FIXME link
-#' of the function \code{reproData}.
+#' of the function \code{\link{reproData}}.
 #'
 #' As in MORSE, reproduction datasets are a special case of survival datasets,
 #' \code{reproDataCheck} performs the same verifications than
