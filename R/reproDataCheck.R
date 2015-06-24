@@ -9,7 +9,7 @@
 #' \code{\link{survDataCheck}} plus additional ones that are specific to
 #' reproduction data.
 #'
-#' @aliases reproDataCheck print.reproDataCheck
+#' @aliases reproDataCheck
 #'
 #' @param data any object
 #' @param diagnosis.plot if \code{TRUE}, may produce a diagnosis plot
