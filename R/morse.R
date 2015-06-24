@@ -346,25 +346,25 @@ NULL
 #' Charles S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords datasets
-# @examples
-#
-# # (1) Load the data
-# data(zinc)
-#
-# # (2) Create an object of class "reproData"
-# dat <- reproData(zinc)
-#
-# # (3) Plot the number of survivors during time for each concentration
-# survFullPlot(zinc)
-#
-# # (4) Plot the survival data depending on the concentration
-# survPlotTt(dat, log.scale = TRUE)
-#
-# # (5) Plot the cumulated number of offspring depending on the concentration
-# reproCumulPlotTt(dat, log.scale = TRUE)
-#
-#
-#
+#' 
+#' @examples
+#'
+#' # (1) Load the data
+#' data(zinc)
+#'
+#' # (2) Create an object of class "reproData"
+#' dat <- reproData(zinc)
+#'
+#' # (3) Plot the cummulated number of offspring in function of time
+#' plot(dat)
+#'
+#' # (4) Plot the cummulated number of offspring for a fixed concentration
+#' plot(dat, concentration = 0.660)
+#'
+#' # (5) Plot the cumulated number of offspring for a fixed time
+#' plot(dat, target.time = 21)
+#'
+#'
 NULL
 
 
