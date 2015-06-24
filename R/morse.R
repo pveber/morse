@@ -236,24 +236,25 @@ NULL
 #' and bioaccumulation of chlordan in Daphnia magna, \emph{Environmental
 #' Toxicology and Chemistry}, 28, 2150-2159.
 #' @keywords datasets
-# @examples
-#
-# # (1) Load the data
-# data(chlordan)
-#
-# # (2) Create an object of class "reproData"
-# dat <- reproData(chlordan)
-#
-# # (3) Plot the number of survivors during time for each concentration
-# survFullPlot(chlordan)
-#
-# # (4) Plot the survival data depending on the concentration
-# survPlotTt(dat, log.scale = TRUE)
-#
-# # (5) Plot the cumulated number of offspring depending on the concentration
-# reproCumulPlotTt(dat, log.scale = TRUE)
-#
-#
+#' 
+#' @examples
+#'
+#' # (1) Load the data
+#' data(chlordan)
+#'
+#' # (2) Create an object of class "reproData"
+#' dat <- reproData(chlordan)
+#'
+#' # (3) Plot the cummulated number of offspring in function of time
+#' plot(dat)
+#'
+#' # (4) Plot the cummulated number of offspring for a fixed concentration
+#' plot(dat, concentration = 7)
+#'
+#' # (5) Plot the cumulated number of offspring for a fixed time
+#' plot(dat, target.time = 21)
+#'
+#'
 NULL
 
 
