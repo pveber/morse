@@ -133,22 +133,23 @@ NULL
 #' value of dynamic modelling in predictive ecotoxicology, \emph{Ecotoxicology
 #' and Environmental Safety}, 75, 80-86.
 #' @keywords datasets
-#FIXME @examples
-#
-# # (1) Load the data
-# data(cadmium1)
-#
-# # (2) Create an object of class "reproData"
-# dat <- reproData(cadmium1)
-#
-# # (3) Plot the number of survivors during time for each concentration
-# survFullPlot(cadmium1)
-#
-# # (4) Plot the survival data depending on the concentration
-# survPlotTt(dat, log.scale = TRUE)
-#
-# # (5) Plot the cumulated number of offspring depending on the concentration
-# reproCumulPlotTt(dat, log.scale = TRUE)
+#' 
+#' @examples
+#'
+#' # (1) Load the data
+#' data(cadmium1)
+#'
+#' # (2) Create an object of class "reproData"
+#' dat <- reproData(cadmium1)
+#'
+#' # (3) Plot the cummulated number of offspring in function of time
+#' plot(dat)
+#'
+#' # (4) Plot the cummulated number of offspring for a fixed concentration
+#' plot(dat, concentration = 4.36)
+#'
+#' # (5) Plot the cumulated number of offspring for a fixed time
+#' plot(dat, target.time = 21)
 #'
 #'
 NULL
