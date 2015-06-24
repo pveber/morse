@@ -128,7 +128,7 @@ reproPpc <- function(x, data, style) {
 #' 
 #' \dontrun{
 #' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
-#' out <- reproFitTT(dat2, stoc.part = "gammapoisson", 
+#' out <- reproFitTT(dat, stoc.part = "gammapoisson", 
 #' ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #' 
 #' # (4) Plot the observed vs predicted values with generic style
