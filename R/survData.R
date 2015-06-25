@@ -43,6 +43,8 @@
 #'
 #' @seealso \code{\link{survDataCheck}}
 #'
+#' @keywords transformation
+#'
 #' @examples
 #'
 #' # (1) Load the survival dataset
