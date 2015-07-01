@@ -92,7 +92,7 @@ reproDataPlotTargetTime <- function(x,
 reproDataPlotFixedConc <- function(x,
                                    concentration,
                                    style = "generic",
-                                   addlegend = TRUE,
+                                   addlegend = FALSE,
                                    ...) {
 
   opt_args <- list(...)
@@ -143,13 +143,13 @@ reproDataPlotReplicates <- function(x,
 #' cadmium1 <- reproData(cadmium1)
 #'
 #' # (2) Plot the reproduction data for a fixed time
-#' plot(cadmium1, target.time = 21, style = "generic", addlegend = TRUE)
+#' plot(cadmium1, target.time = 21, style = "generic", addlegend = FALSE)
 #'
 #' # (3) Plot the reproduction data for a fixed time with a ggplot type
 #' plot(cadmium1, target.time = 21, style = "ggplot", addlegend = FALSE)
 #'
 #' # (4) Plot the reproduction data for a fixed concentration
-#' plot(cadmium1, concentration = 4.36, style = "generic", addlegend = TRUE)
+#' plot(cadmium1, concentration = 4.36, style = "generic", addlegend = FALSE)
 #'
 #' # (5) Plot the reproduction data for a fixed concentration with a ggplot type
 #' plot(cadmium1, concentration = 4.36, style = "ggplot", addlegend = FALSE)
@@ -173,7 +173,7 @@ plot.reproData <- function(x,
                            concentration = NULL,
                            style = "generic",
                            pool.replicate = FALSE,
-                           addlegend = TRUE,
+                           addlegend = FALSE,
                            ...) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
