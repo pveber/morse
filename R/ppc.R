@@ -1,49 +1,128 @@
-survPpcGeneric <- function(tab, xlab, ylab) {
-  plot(c(0, max(tab[, "Ninit"])),
-       c(0, max(tab[, "Ninit"])),
+EvalsurvPpc <- function(x) {
+  tot.mcmc <- do.call("rbind", x$mcmc)
+  
+  if (x$det.part == "loglogisticbinom_3") {
+    d <- tot.mcmc[1:5000, "d"]
+  }
+  b <- 10^tot.mcmc[1:5000, "log10b"]
+  e <- 10^tot.mcmc[1:5000, "log10e"]
+  
+  n <- x$jags.data$n
+  xconc <- x$jags.data$xconc
+  Ninit <- x$jags.data$Ninit
+  NsurvObs <- x$jags.data$Nsurv
+  NsurvPred <- matrix(NA, nrow = 5000, ncol = n)
+  
+  if (x$det.part == "loglogisticbinom_2") {
+    for (i in 1:n) {
+      p <- 1 / (1 + (xconc[i]/e)^b)
+      NsurvPred[, i] <- rbinom(5000, Ninit[i], p)
+    }
+  }
+  if (x$det.part == "loglogisticbinom_3") {
+    for (i in 1:n) {
+      p <- d / (1 + (xconc[i]/e)^b)
+      NsurvPred[, i] <- rbinom(5000, Ninit[i], p)
+    }
+  }
+  QNsurvPred <- t(apply(NsurvPred, 2, quantile,
+                        probs = c(2.5, 50, 97.5) / 100))
+  tab <- data.frame(QNsurvPred,
+                    Ninit, NsurvObs,
+                    col = ifelse(QNsurvPred[,"2.5%"] > NsurvObs | QNsurvPred[,"97.5%"] < NsurvObs,
+                                 "red", "green"))
+  colnames(tab) <- c("P2.5", "P50", "P97.5", "Ninit", "Obs", "col")
+  
+  return(tab)
+}
+
+EvalreproPpc <- function(x) {
+  tot.mcmc <- do.call("rbind", x$mcmc)
+  
+  if (x$model.label == "GP") {
+    omega <- 10^tot.mcmc[1:5000, "log10omega"]
+  }
+  b <- 10^tot.mcmc[1:5000, "log10b"]
+  d <- tot.mcmc[1:5000, "d"]
+  e <- 10^tot.mcmc[1:5000, "log10e"]
+  
+  n <- x$jags.data$n
+  xconc <- x$jags.data$xconc
+  Nindtime <- x$jags.data$Nindtime
+  NcumulObs <- x$jags.data$Ncumul
+  NcumulPred <- matrix(NA, nrow = 5000, ncol = n)
+  
+  if (x$model.label == "GP") {
+    for (i in 1:n) {
+      rate <- d / (1 + (xconc[i]/e)^b) / omega
+      p <- 1 / (Nindtime[i] * omega + 1)
+      NcumulPred[, i] <- rnbinom(5000, Nindtime[i], p / rate)
+    }
+  }
+  if (x$model.label == "P") {
+    for (i in 1:n) {
+      ytheo <- d / (1 + (xconc[i]/e)^b)
+      nbtheo <- ytheo * Nindtime[i]
+      NcumulPred[, i] <- rpois(5000, nbtheo)
+    }
+  }
+  QNreproPred <- t(apply(NcumulPred, 2, quantile,
+                         probs = c(2.5, 50, 97.5) / 100))
+  tab <- data.frame(QNreproPred,
+                    Nindtime, NcumulObs,
+                    col = ifelse(QNreproPred[,"2.5%"] > NcumulObs | QNreproPred[,"97.5%"] < NcumulObs,
+                                 "red", "green"))
+  colnames(tab) <- c("P2.5", "P50", "P97.5", "Nindtime", "Obs", "col")
+  
+  return(tab)
+}
+
+PpcGeneric <- function(tab, xlab, ylab) {
+  plot(c(0, max(tab[, "P97.5"])),
+       c(0, max(tab[, "P97.5"])),
        type = "n",
        xaxt = "n",
        yaxt = "n",
        xlab = xlab,
        ylab = ylab)
   
-  points(tab[, "NsurvObs"], tab[, "P50"],
+  points(tab[, "Obs"], tab[, "P50"],
          pch = 16)
   
   abline(0, 1)
   
-  for (i in 1:length(tab[, "NsurvObs"])) {
-    arrows(tab[i, "NsurvObs"], tab[i, "P50"],
-           tab[i, "NsurvObs"], tab[i, "P2.5"],
-           angle = 90, length = 0.1,
-           col = if(tab[i, "P2.5"] > tab[i, "NsurvObs"] | tab[i, "P97.5"] < tab[i, "NsurvObs"]) { "red" } else {"green"})
-    arrows(NsurvObs[i], tab[i, "P50"],
-           NsurvObs[i], tab[i, "P97.5"],
-           angle = 90, length = 0.1,
-           col = if(tab[i, "P2.5"] > tab[i, "NsurvObs"] | tab[i, "P97.5"] < tab[i, "NsurvObs"]) { "red" } else {"green"})
+  for (i in 1:length(tab[, "Obs"])) {
+    arrows(tab[i, "Obs"], tab[i, "P50"],
+           tab[i, "Obs"], tab[i, "P2.5"],
+           angle = 90, length = 0.05,
+           col = if(tab[i, "P2.5"] > tab[i, "Obs"] | tab[i, "P97.5"] < tab[i, "Obs"]) { "red" } else {"green"})
+    arrows(tab[i, "Obs"], tab[i, "P50"],
+           tab[i, "Obs"], tab[i, "P97.5"],
+           angle = 90, length = 0.05,
+           col = if(tab[i, "P2.5"] > tab[i, "Obs"] | tab[i, "P97.5"] < tab[i, "Obs"]) { "red" } else {"green"})
   }
   
   # axis
-  axis(side = 1, at = pretty(c(0, max(Ninit))))
-  axis(side = 2, at = pretty(c(0, max(Ninit))))
+  axis(side = 1, at = pretty(c(0, max(tab[, "P97.5"]))))
+  axis(side = 2, at = pretty(c(0, max(tab[, "P97.5"]))))
 }
 
 #' @import ggplot2
 #' @import grid
-survPpcGG <- function(tab, xlab, ylab) {
-
-  ggplot(tab, aes(x = NsurvObs, y = P50)) +
+PpcGG <- function(tab, xlab, ylab) {
+  
+  ggplot(tab, aes(x = Obs, y = P50)) +
     geom_point() +
     geom_abline(intercept = 0, slope = 1) +
-    xlim(c(0, max(tab$Ninit))) +
-    ylim(c(0, max(tab$Ninit))) +
-    geom_segment(aes(x = NsurvObs, xend = NsurvObs,
+    xlim(c(0, max(tab[, "P97.5"]))) +
+    ylim(c(0, max(tab[, "P97.5"]))) +
+    geom_segment(aes(x = Obs, xend = Obs,
                      y = P50, yend = P2.5),
-                 arrow = arrow(length = unit(0.5, "cm"), angle = 90),
+                 arrow = arrow(length = unit(0.25, "cm"), angle = 90),
                  tab, color = tab$col) +
-    geom_segment(aes(x = NsurvObs, xend = NsurvObs,
+    geom_segment(aes(x = Obs, xend = Obs,
                      y = P50, yend = P97.5),
-                 arrow = arrow(length = unit(0.5, "cm"), angle = 90),
+                 arrow = arrow(length = unit(0.25, "cm"), angle = 90),
                  tab, color = tab$col) +
     labs(x = xlab, y = ylab) +
     theme_minimal()
@@ -82,76 +161,22 @@ survPpcGG <- function(tab, xlab, ylab) {
 #' 
 ppc <- function(x, style = "generic") {
   if (is(x, "survFitTT")) {
-    tot.mcmc <- do.call("rbind", x$mcmc)
-    
-    if (x$det.part == "loglogisticbinom_3") {
-      d <- tot.mcmc[1:5000, "d"]
-    }
-    b <- 10^tot.mcmc[1:5000, "log10b"]
-    e <- 10^tot.mcmc[1:5000, "log10e"]
-    
-    n <- x$jags.data$n
-    xconc <- x$jags.data$xconc
-    Ninit <- x$jags.data$Ninit
-    NsurvObs <- x$jags.data$Nsurv
-    NsurvPred <- matrix(NA, nrow = 5000, ncol = n)
-    
-    if (x$det.part == "loglogisticbinom_2") {
-      for (i in 1:n) {
-        p <- 1 / (1 + (xconc[i]/e)^b)
-        NsurvPred[, i] <- rbinom(5000, Ninit[i], p)
-      }
-    }
-    if (x$det.part == "loglogisticbinom_3") {
-      for (i in 1:n) {
-        p <- d / (1 + (xconc[i]/e)^b)
-        NsurvPred[, i] <- rbinom(5000, Ninit[i], p)
-      }
-    }
-    QNsurvPred <- t(apply(NsurvPred, 2, quantile,
-                          probs = c(2.5, 50, 97.5) / 100))
-    tab <- data.frame(QNsurvPred,
-                      Ninit, NsurvObs,
-                      col = ifelse(QNsurvPred[,"2.5%"] > NsurvObs | QNsurvPred[,"97.5%"] < NsurvObs,
-                                   "red", "green"))
-    colnames(tab) <- c("P2.5", "P50", "P97.5", "Ninit", "NsurvObs", "col")
-    
+    tab <- EvalsurvPpc(x)
     
     xlab <- "Observed Nbr. of survivor"
     ylab <- "Predicted Nbr. of survivor"
     
-    if (style == "generic") {
-      survPpcGeneric(tab, xlab, ylab)
-    }
-    else if (style == "ggplot") {
-      survPpcGG(tab, xlab, ylab)
-    }
-    else stop("Unknown style")
-  }
-  else if (is(x, "reproFitTT")) {
-    tot.mcmc <- do.call("rbind", x$mcmc)
+  } else if (is(x, "reproFitTT")) {
+    tab <- EvalreproPpc(x)
     
-    if (x$dmodel.label == "GP") {
-      omega <- 10^tot.mcmc[1:5000, "log10omega"]
-    }
-    b <- 10^tot.mcmc[1:5000, "log10b"]
-    d <- tot.mcmc[1:5000, "d"]
-    e <- 10^tot.mcmc[1:5000, "log10e"]
+    xlab <- "Observed Nbr. of cumulated offspring"
+    ylab <- "Predicted Nbr. of cumulated offspring"
     
-    n <- x$jags.data$n
-    xconc <- x$jags.data$xconc
-    Nindtime <- x$jags.data$Nindtime
-    NcumulObs <- x$jags.data$Ncumul
-    NcumulPred <- matrix(NA, nrow = 5000, ncol = n)
-    
-    if (x$model.label == "GP") {
-      for (i in 1:n) {
-        rate <- d / (1 + (xconc[i]/e)^b) / omega
-        p <- 1 / (Nindtime[i] * omega + 1)
-        NcumulPred[, i] ~ rnbinom(5000, Ninit[i], p, rate)
-      }
-    }
-    
-  }
-  else stop("x is not of class 'survFitTT' or 'reproFitTT' !")
+  } else stop("x is not of class 'survFitTT' or 'reproFitTT' !")
+  
+  if (style == "generic") {
+    PpcGeneric(tab, xlab, ylab)
+  } else if (style == "ggplot") {
+    PpcGG(tab, xlab, ylab)
+  } else stop("Unknown style")
 }
