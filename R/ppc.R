@@ -129,6 +129,28 @@ ppc <- function(x, style = "generic") {
     else stop("Unknown style")
   }
   else if (is(x, "reproFitTT")) {
+    tot.mcmc <- do.call("rbind", x$mcmc)
+    
+    if (x$dmodel.label == "GP") {
+      omega <- 10^tot.mcmc[1:5000, "log10omega"]
+    }
+    b <- 10^tot.mcmc[1:5000, "log10b"]
+    d <- tot.mcmc[1:5000, "d"]
+    e <- 10^tot.mcmc[1:5000, "log10e"]
+    
+    n <- x$jags.data$n
+    xconc <- x$jags.data$xconc
+    Nindtime <- x$jags.data$Nindtime
+    NcumulObs <- x$jags.data$Ncumul
+    NcumulPred <- matrix(NA, nrow = 5000, ncol = n)
+    
+    if (x$model.label == "GP") {
+      for (i in 1:n) {
+        rate <- d / (1 + (xconc[i]/e)^b) / omega
+        p <- 1 / (Nindtime[i] * omega + 1)
+        NcumulPred[, i] ~ rnbinom(5000, Ninit[i], p, rate)
+      }
+    }
     
   }
   else stop("x is not of class 'survFitTT' or 'reproFitTT' !")
