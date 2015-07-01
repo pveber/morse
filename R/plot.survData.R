@@ -45,9 +45,11 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
          ylim = c(0, max(x[, resp])),
          type = "n",
          col = 'white',
-         yaxt = 'n')
+         xaxt = "n",
+         yaxt = "n")
 
     # axis
+    axis(side = 1, at = sort(unique(x[, "time"])))
     axis(side = 2, at = sort(unique(x[, resp])))
 
     # lines and points
@@ -159,11 +161,14 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
     plot(x$conc, seq(0, max(x$Nsurv), length.out = length(x$conc)),
          type = "n",
          xaxt = "n",
+         yaxt = "n",
          xlab = xlab,
          ylab = ylab)
 
     axis(side = 1, at = unique(x$conc),
          labels = unique(x$conc))
+    axis(side = 2, at = unique(x$Nsurv),
+         labels = unique(x$Nsurv))
 
     # points
     if (length(unique(x$replicate)) == 1) {
@@ -273,7 +278,7 @@ dataPlotFixedConc <- function(x, resp,
       scale_color_hue("Replicate") +
       scale_x_continuous(breaks = unique(x$time),
                          labels = unique(x$time)) +
-      scale_y_continuous(breaks = unique(x$Nsurv))
+      scale_y_continuous(breaks = unique(x$response))
 
     if (addlegend) {# only if pool.replicate == FALSE
       fd
