@@ -197,7 +197,8 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
       labs(x = xlab,
            y = ylab) +
       scale_x_continuous(breaks = unique(x$conc),
-                         labels = unique(x$conc))
+                         labels = unique(x$conc)) +
+      scale_y_continuous(breaks = unique(x$Nsurv))
 
     # legend option
     if (addlegend) {
@@ -230,6 +231,8 @@ dataPlotFixedConc <- function(x, resp,
   if (style == "generic") {
     plot(x$time, x[,resp],
          type = "n",
+         xaxt = "n",
+         yaxt = "n",
          xlab = xlab,
          ylab = ylab)
 
@@ -242,6 +245,10 @@ dataPlotFixedConc <- function(x, resp,
                 pch = 16,
                 col = x$color)
        })
+    
+    # axis
+    axis(side = 2, at = sort(unique(x[, resp])))
+    axis(side = 1, at = sort(unique(x[, "time"])))
 
     if (addlegend) {
       legend(legend.position, legend = unique(x$replicate) ,
@@ -263,7 +270,10 @@ dataPlotFixedConc <- function(x, resp,
     fd <- df + geom_line() + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
-      scale_color_hue("Replicate")
+      scale_color_hue("Replicate") +
+      scale_x_continuous(breaks = unique(x$time),
+                         labels = unique(x$time)) +
+      scale_y_continuous(breaks = unique(x$Nsurv))
 
     if (addlegend) {# only if pool.replicate == FALSE
       fd
