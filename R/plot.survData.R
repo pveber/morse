@@ -48,7 +48,7 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
          yaxt = 'n')
 
     # axis
-    axis(side = 2, at = pretty(c(0,max(x[, resp]))))
+    axis(side = 2, at = sort(unique(x[, resp])))
 
     # lines and points
     by(x, x$replicate, function(y) {
@@ -111,7 +111,8 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    ylim(0, max(data$response)) + theme_minimal()
+    scale_y_continuous(breaks = unique(data$resp)) +
+    theme_minimal()
 
   # legend option
   if (addlegend){
