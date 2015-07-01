@@ -323,7 +323,7 @@ plot.survFitTT <- function(x,
                            cicol,
                            cilty,
                            cilwd,
-                           addlegend = TRUE,
+                           addlegend = FALSE,
                            log.scale = FALSE,
                            style = "generic",
                            ...) {
@@ -380,7 +380,7 @@ plot.survFitTT <- function(x,
   if (missing(main)) main = NULL
   
   # CI parameters
-  if (missing(cicol)) cicol <- "red"
+  if (missing(cicol)) cicol <- "black"
   if (missing(cilty)) cilty <- 2
   if (missing(cilwd)) cilwd <- 1
   
