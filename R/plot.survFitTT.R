@@ -20,7 +20,7 @@ survEvalFit <- function(fit, x) {
   }
 }
 
-survLlbinomCI <- function(x, log.scale) {
+survLlbinomCI <- function(x, log.scale, conf.level) {
   # create confidente interval on observed data for the log logistic
   # binomial model by a binomial test
   # INPUT:
@@ -33,7 +33,7 @@ survLlbinomCI <- function(x, log.scale) {
              Ninit = aggregate(Ninit ~ time + conc, x$dataTT, sum)$Ninit)
   
   ci <- apply(x, 1, function(x) {
-    binom.test(x["Nsurv"], x["Ninit"])$conf.int
+    binom.test(x["Nsurv"], x["Ninit"], conf.level = conf.level)$conf.int
   })
   rownames(ci) <- c("qinf95", "qsup95")
   colnames(ci) <- x$conc
@@ -329,6 +329,7 @@ plot.survFitTT <- function(x,
                            fitlty,
                            fitlwd,
                            ci = FALSE,
+                           conf.level,
                            cicol,
                            cilty,
                            cilwd,
@@ -346,6 +347,7 @@ plot.survFitTT <- function(x,
   # - fitlty : type line fitted curve
   # - fitlwd : width line fitted curve
   # - ci : credible interval, boolean
+  # - conf.level : binom.test conf.level
   # - cicol : color ci
   # - cilty : type line ci
   # - cilwd : width line ci
@@ -392,8 +394,9 @@ plot.survFitTT <- function(x,
   if (missing(cicol)) cicol <- "black"
   if (missing(cilty)) cilty <- 2
   if (missing(cilwd)) cilwd <- 1
+  if (missing(conf.level)) conf.level <- 0.95
   
-  CI <- if(ci) { survLlbinomCI(x, log.scale) } else NULL
+  CI <- if(ci) { survLlbinomCI(x, log.scale, conf.level) } else NULL
   
   if (style == "generic") {
     survFitPlotGeneric(x,
