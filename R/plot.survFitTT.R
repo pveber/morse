@@ -120,9 +120,13 @@ survFitPlotGenericCI <- function(x,
   points(transf_data_conc, data_resp, pch = 16)
   
   # segment CI
-  segments(transf_data_conc,
-           CI["qinf95",], transf_data_conc,
-           CI["qsup95", ], col = cicol, lty = cilty, lwd = cilwd)
+  arrows(transf_data_conc, data_resp,
+         transf_data_conc, CI["qsup95", ],
+         col = cicol, lty = cilty, lwd = cilwd, angle = 90, length = 0.1)
+  
+  arrows(transf_data_conc, data_resp,
+         transf_data_conc, CI["qinf95", ],
+         col = cicol, lty = cilty, lwd = cilwd, angle = 90, length = 0.1)
   
   # legend
   if (addlegend) {
@@ -186,7 +190,10 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
   
   plt_3 <- ggplot(data) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
-                     linetype = CI), data.three, color = valCols$cols3) +
+                     linetype = CI),
+                 arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
+                              ends = "both"), data.three,
+                 color = valCols$cols3) +
     scale_linetype_manual(values = cilty) + theme_minimal()
   
   # plot IC
@@ -196,6 +203,8 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
     geom_line(aes(conc, resp), curv, linetype = fitlty,
               size = fitlwd, color = valCols$cols2) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
+                 arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
+                               ends = "both"),
                  data.three, color = valCols$cols3, linetype = cilty,
                  size = cilwd) +
     scale_color_discrete(guide = "none") +
