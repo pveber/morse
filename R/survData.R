@@ -14,7 +14,7 @@
 #' expected requirements. Please run \code{\link{survDataCheck}} to ensure
 #' \code{data} is well-formed.
 #'
-#' @aliases survData print.survData summary.survData
+#' @aliases survData
 #'
 #' @param data a \code{data.frame} containing the following four columns:
 #' \itemize{
@@ -26,8 +26,6 @@
 #' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
 #' alive individuals at each time point for each concentration and each replicate
 #' }
-# FIXME @param x An object of class survData.
-# FIXME @param object An object of class survData.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @return A dataframe of class \code{survData}.
@@ -44,6 +42,8 @@
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #'
 #' @seealso \code{\link{survDataCheck}}
+#'
+#' @keywords transformation
 #'
 #' @examples
 #'

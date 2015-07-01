@@ -133,6 +133,7 @@ reproDataPlotReplicates <- function(x,
 #' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
+#' @keywords plot
 #'
 #' @examples
 #'

@@ -5,7 +5,7 @@
 #' \code{survData} function.
 #'
 #'
-#' @aliases survDataCheck print.survDataCheck
+#' @aliases survDataCheck
 #'
 #' @param data any object
 #' @param diagnosis.plot if \code{TRUE}, the function may produce diagnosis plots
