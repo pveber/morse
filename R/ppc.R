@@ -1,25 +1,26 @@
-survPpcGeneric <- function(Ninit, NsurvObs, QNsurvPred, xlab, ylab) {
-  plot(c(0, max(Ninit)),
-       c(0, max(Ninit)),
+survPpcGeneric <- function(tab, xlab, ylab) {
+  plot(c(0, max(tab[, "Ninit"])),
+       c(0, max(tab[, "Ninit"])),
        type = "n",
        xaxt = "n",
        yaxt = "n",
        xlab = xlab,
        ylab = ylab)
   
-  points(NsurvObs, QNsurvPred["50%",],
+  points(tab[, "NsurvObs"], tab[, "P50"],
          pch = 16)
+  
   abline(0, 1)
   
-  for (i in 1:length(NsurvObs)) {
-    arrows(NsurvObs[i], QNsurvPred["50%", i],
-           NsurvObs[i], QNsurvPred["2.5%", i],
+  for (i in 1:length(tab[, "NsurvObs"])) {
+    arrows(tab[i, "NsurvObs"], tab[i, "P50"],
+           tab[i, "NsurvObs"], tab[i, "P2.5"],
            angle = 90, length = 0.1,
-           col = if(QNsurvPred["2.5%", i] > NsurvObs[i] | QNsurvPred["97.5%", i] < NsurvObs[i]) { "red" } else {"green"})
-    arrows(NsurvObs[i], QNsurvPred["50%", i],
-           NsurvObs[i], QNsurvPred["97.5%", i],
+           col = if(tab[i, "P2.5"] > tab[i, "NsurvObs"] | tab[i, "P97.5"] < tab[i, "NsurvObs"]) { "red" } else {"green"})
+    arrows(NsurvObs[i], tab[i, "P50"],
+           NsurvObs[i], tab[i, "P97.5"],
            angle = 90, length = 0.1,
-           col = if(QNsurvPred["2.5%", i] > NsurvObs[i] | QNsurvPred["97.5%", i] < NsurvObs[i]) { "red" } else {"green"})
+           col = if(tab[i, "P2.5"] > tab[i, "NsurvObs"] | tab[i, "P97.5"] < tab[i, "NsurvObs"]) { "red" } else {"green"})
   }
   
   # axis
@@ -29,24 +30,19 @@ survPpcGeneric <- function(Ninit, NsurvObs, QNsurvPred, xlab, ylab) {
 
 #' @import ggplot2
 #' @import grid
-survPpcGG <- function(Ninit, NsurvObs, QNsurvPred, xlab, ylab) {
-  QNsurvPred <- t(QNsurvPred)
-  tab <- data.frame(QNsurvPred,
-                    Ninit, NsurvObs,
-                    col = ifelse(QNsurvPred[,"2.5%"] > NsurvObs | QNsurvPred[,"97.5%"] < NsurvObs,
-                                 "red", "green"))
-  
-  ggplot(tab, aes(x = NsurvObs, y = X50.)) +
+survPpcGG <- function(tab, xlab, ylab) {
+
+  ggplot(tab, aes(x = NsurvObs, y = P50)) +
     geom_point() +
     geom_abline(intercept = 0, slope = 1) +
-    xlim(c(0, max(Ninit))) +
-    ylim(c(0, max(Ninit))) +
+    xlim(c(0, max(tab$Ninit))) +
+    ylim(c(0, max(tab$Ninit))) +
     geom_segment(aes(x = NsurvObs, xend = NsurvObs,
-                     y = X50., yend = X2.5.),
+                     y = P50, yend = P2.5),
                  arrow = arrow(length = unit(0.5, "cm"), angle = 90),
                  tab, color = tab$col) +
     geom_segment(aes(x = NsurvObs, xend = NsurvObs,
-                     y = X50., yend = X97.5.),
+                     y = P50, yend = P97.5),
                  arrow = arrow(length = unit(0.5, "cm"), angle = 90),
                  tab, color = tab$col) +
     labs(x = xlab, y = ylab) +
@@ -112,17 +108,23 @@ ppc <- function(x, style = "generic") {
         NsurvPred[, i] <- rbinom(5000, Ninit[i], p)
       }
     }
-    QNsurvPred <- apply(NsurvPred, 2, quantile,
-                        probs = c(2.5, 50, 97.5) / 100)
+    QNsurvPred <- t(apply(NsurvPred, 2, quantile,
+                          probs = c(2.5, 50, 97.5) / 100))
+    tab <- data.frame(QNsurvPred,
+                      Ninit, NsurvObs,
+                      col = ifelse(QNsurvPred[,"2.5%"] > NsurvObs | QNsurvPred[,"97.5%"] < NsurvObs,
+                                   "red", "green"))
+    colnames(tab) <- c("P2.5", "P50", "P97.5", "Ninit", "NsurvObs", "col")
+    
     
     xlab <- "Observed Nbr. of survivor"
     ylab <- "Predicted Nbr. of survivor"
     
     if (style == "generic") {
-      survPpcGeneric(Ninit, NsurvObs, QNsurvPred, xlab, ylab)
+      survPpcGeneric(tab, xlab, ylab)
     }
     else if (style == "ggplot") {
-      survPpcGG(Ninit, NsurvObs, QNsurvPred, xlab, ylab)
+      survPpcGG(tab, xlab, ylab)
     }
     else stop("Unknown style")
   }
