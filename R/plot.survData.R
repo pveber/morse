@@ -125,7 +125,7 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
   return(fd)
 }
 
-dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = TRUE, ...) {
+dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = FALSE, ...) {
   if (style == "generic")
     dataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
   else if (style == "ggplot")
@@ -133,7 +133,7 @@ dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = 
   else stop("Unknown plot style")
 }
 
-survDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
+survDataPlotFull <- function(data, style = "generic", addlegend = FALSE, ...) {
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
   ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
@@ -219,7 +219,7 @@ dataPlotFixedConc <- function(x, resp,
                               concentration,
                               xlab, ylab,
                               style = "generic",
-                              addlegend = TRUE,
+                              addlegend = FALSE,
                               ...) {
 
   legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
@@ -293,7 +293,7 @@ dataPlotFixedConc <- function(x, resp,
 survDataPlotFixedConc <- function(x,
                                   concentration,
                                   style = "generic",
-                                  addlegend = TRUE,
+                                  addlegend = FALSE,
                                   ...) {
 
 opt_args <- list(...)
