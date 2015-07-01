@@ -127,10 +127,10 @@ survFitPlotGenericCI <- function(x,
   # legend
   if (addlegend) {
     legend("bottomleft", pch = c(16, NA, NA),
-           lty = c(NA, fitlty, cilty),
-           lwd = c(NA, fitlwd, cilwd),
-           col = c(1, fitcol, cicol),
-           legend = c("Observed values", x$det.part, "Confidence interval"),
+           lty = c(NA, cilty, fitlty),
+           lwd = c(NA, cilwd, fitlwd),
+           col = c(1, cicol, fitcol),
+           legend = c("Observed values", "Confidence interval", x$det.part),
            bty = "n")
   }
 }
@@ -266,7 +266,7 @@ survFitPlotGG <- function(x,
       plt_3 <- survFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
       mylegend_3 <- legendGgplotFit(plt_3)
-      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
+      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_3, mylegend_2,
                                       nrow = 6), ncol = 2,
                    widths = c(6, 2))
     }
