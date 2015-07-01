@@ -1,8 +1,8 @@
-reproDataPlotFull <- function(x, style, addlegend, ...) {
+reproDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
   ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  dataPlotFull(x, "Nreprocumul", xlab, ylab, style, addlegend, ...)
+  dataPlotFull(data, "Nreprocumul", xlab, ylab, style, addlegend, ...)
 }
 
 
@@ -173,8 +173,8 @@ plot.reproData <- function(x,
                            target.time = NULL,
                            concentration = NULL,
                            style = "generic",
-                           pool.replicate = FALSE,
                            addlegend = TRUE,
+                           pool.replicate = FALSE,
                            ...) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
