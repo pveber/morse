@@ -160,23 +160,31 @@ PpcGG <- function(tab, xlab, ylab) {
 #' @importFrom graphics plot
 #' 
 ppc <- function(x, style = "generic") {
+  
+  if (!is(x, "survFitTT") & !is(x, "reproFitTT"))
+    stop("x is not of class 'survFitTT' or 'reproFitTT' !")
+  
   if (is(x, "survFitTT")) {
     tab <- EvalsurvPpc(x)
-    
     xlab <- "Observed Nbr. of survivor"
     ylab <- "Predicted Nbr. of survivor"
     
-  } else if (is(x, "reproFitTT")) {
+    if (style == "generic")
+      PpcGeneric(tab, xlab, ylab)
+    else if (style == "ggplot")
+      PpcGG(tab, xlab, ylab)
+    else stop("Unknown style")
+  }
+  
+  else if (is(x, "reproFitTT")) {
     tab <- EvalreproPpc(x)
-    
     xlab <- "Observed Nbr. of cumulated offspring"
     ylab <- "Predicted Nbr. of cumulated offspring"
     
-  } else stop("x is not of class 'survFitTT' or 'reproFitTT' !")
-  
-  if (style == "generic") {
-    PpcGeneric(tab, xlab, ylab)
-  } else if (style == "ggplot") {
-    PpcGG(tab, xlab, ylab)
-  } else stop("Unknown style")
+    if (style == "generic")
+      PpcGeneric(tab, xlab, ylab)
+    else if (style == "ggplot")
+      PpcGG(tab, xlab, ylab)
+    else stop("Unknown style")
+  }
 }
