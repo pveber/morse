@@ -144,24 +144,17 @@ reproDataPlotReplicates <- function(x,
 #' cadmium1 <- reproData(cadmium1)
 #'
 #' # (2) Plot the reproduction data for a fixed time
-#' plot(cadmium1, target.time = 21, style = "generic", addlegend = FALSE)
+#' plot(cadmium1, target.time = 21)
 #'
-#' # (3) Plot the reproduction data for a fixed time with a ggplot type
-#' plot(cadmium1, target.time = 21, style = "ggplot", addlegend = FALSE)
+#' # (3) Plot the reproduction data for a fixed time with a ggplot style
+#' plot(cadmium1, target.time = 21, style = "ggplot")
 #'
 #' # (4) Plot the reproduction data for a fixed concentration
-#' plot(cadmium1, concentration = 4.36, style = "generic", addlegend = FALSE)
+#' plot(cadmium1, concentration = 4.36, style = "ggplot")
 #'
-#' # (5) Plot the reproduction data for a fixed concentration with a ggplot type
-#' plot(cadmium1, concentration = 4.36, style = "ggplot", addlegend = FALSE)
+#' # (5) Plot the reproduction data for a fixed concentration and target.time
+#' plot(cadmium1, target.time = 21, concentration = 0.86)
 #'
-#' # (6) Plot the reproduction data in function of replicates for one concentration at
-#' # one target.time with a generic type
-#' plot(cadmium1, style = "generic", target.time = 21, concentration = 0.86)
-#'
-#' # (7) Plot the reproduction data in function of replicates for one concentration at
-#' # one target.time with a ggplot type
-#' plot(cadmium1, style = "ggplot", target.time = 21, concentration = 0.86)
 #'
 #' @export
 #'
