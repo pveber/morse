@@ -379,7 +379,7 @@ plot.survFitTT <- function(x,
   
   # default axis parameters
   if (missing(xlab)) xlab <- "Concentrations"
-  if (missing(ylab)) ylab <- "Response"
+  if (missing(ylab)) ylab <- "Survival rate"
   
   # default legend parameters
   if (missing(fitcol)) fitcol <- "red"
