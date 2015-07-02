@@ -23,11 +23,6 @@
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @return An object of class \code{reproData}.
-#' Generic functions:
-#' \describe{
-#' \item{\code{summary}}{The summary provides information about the structure
-#' of the dataset and the experimental design.}
-#' \item{\code{print}}{Print a \code{reproData} object}}
 #'
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #'
@@ -42,7 +37,7 @@
 #' dat <- reproData(cadmium1)
 #' dat
 #' class(dat)
-#' 
+#'
 #' @export
 #'
 reproData <- function(x) {
