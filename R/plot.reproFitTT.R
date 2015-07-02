@@ -354,7 +354,7 @@ plot.reproFitTT <- function(x,
                             cicol,
                             cilty,
                             cilwd,
-                            addlegend = TRUE,
+                            addlegend = FALSE,
                             log.scale = FALSE,
                             style = "generic",
                             ...) {
