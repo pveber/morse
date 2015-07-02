@@ -321,19 +321,36 @@ dataPlotReplicates <- function(x,
     stop("The argument [concentration] should correspond to one of the tested concentrations")
 
   # select for concentration and target.time
-  x <- filter(x, conc == concentration & time == target.time)
+  xtt <- filter(x, conc == concentration & time == target.time)
+  control <- filter(x, conc == min(x$conc) & time == target.time)
 
   if (style == "generic") {
-    plot(as.numeric(x$replicate), x[,resp],
+    par(mfrow = c(1, 2))
+    
+    plot(as.numeric(control$replicate), control[,resp],
          xlab = xlab,
          ylab = ylab,
+         main = "Control",
          pch = 16,
          xaxt = "n",
          yaxt = "n")
     
     # axis
-    axis(side = 2, at = sort(unique(x[, resp])))
-    axis(side = 1, at = sort(unique(x[, "replicate"])))
+    axis(side = 2, at = sort(unique(control[, resp])))
+    axis(side = 1, at = sort(unique(control[, "replicate"])))
+    
+    # target.time
+    plot(as.numeric(xtt$replicate), xtt[,resp],
+         xlab = xlab,
+         ylab = ylab,
+         main = target.time,
+         pch = 16,
+         xaxt = "n",
+         yaxt = "n")
+    
+    # axis
+    axis(side = 2, at = sort(unique(xtt[, resp])))
+    axis(side = 1, at = sort(unique(xtt[, "replicate"])))
   }
 
   else if (style == "ggplot") {
