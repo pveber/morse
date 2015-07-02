@@ -133,7 +133,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
   # Plotting the theoretical curve
   # CI ribbon + lines
   polygon(c(curv_conc, rev(curv_conc)), c(CI[["qinf95"]], rev(CI[["qsup95"]])),
-          col = "pink1")
+          col = "pink1", border = NA)
   lines(curv_conc, CI[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
@@ -182,10 +182,12 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
 reproFitPlotGGNoCI <- function(data, curv, cols2,
                                fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
-    geom_point(data = data, aes(transf_conc, resp, color = Mortality)) +
+    geom_point(data = data, aes(transf_conc, resp, shape = Mortality),
+               size = 3) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     scale_color_discrete(guide = "none") +
+    scale_shape(guide = "none") +
     ylim(0, max(data$resp) + 1) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
@@ -216,8 +218,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
 
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp,
-                                color = Mortality)) +
-#    scale_color_manual(values = cols1) +
+                                shape = Mortality), size = 3) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     geom_line(data = cri, aes(conc, qinf95),
@@ -227,6 +228,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
                                 ymax = qsup95), fill = "pink", alpha = 0.4) +
     scale_color_discrete(guide = "none") +
+    scale_shape(guide = "none") +
     ylim(0, max(CI[["qsup95"]]) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
@@ -253,9 +255,6 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
   # colors
-  # points vector
-  cols1 <- c("#F8766D", "#00BFC4")
-  names(cols1) <- sort(unique(data$Mortality))
   # fitted curve
   cols2 <- fitcol
   names(cols2) <- "loglogistic"
@@ -263,8 +262,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   # points (to create the legend)
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(conc, resp,
-                                color = Mortality)) +
-    scale_color_manual(values = cols1) +
+                                shape = Mortality), size = 3) +
     theme_minimal()
   
   # curve (to create the legend)
