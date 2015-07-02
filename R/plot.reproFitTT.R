@@ -133,7 +133,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
   # Plotting the theoretical curve
   # CI ribbon + lines
   polygon(c(curv_conc, rev(curv_conc)), c(CI[["qinf95"]], rev(CI[["qsup95"]])),
-          col = "grey40")
+          col = "pink1")
   lines(curv_conc, CI[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
@@ -211,7 +211,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
     geom_line(data = cri, aes(conc, qsup95, color = CI),
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
-                                ymax = qsup95), alpha = 0.4) +
+                                ymax = qsup95), fill = "pink", alpha = 0.4) +
     scale_color_manual(values = cols3) + theme_minimal()
 
   plt_4 <- ggplot(data) +
@@ -225,7 +225,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
     geom_line(data = cri, aes(conc, qsup95),
               linetype = cilty, size = cilwd, color = cols3) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
-                                ymax = qsup95), alpha = 0.4) +
+                                ymax = qsup95), fill = "pink", alpha = 0.4) +
     scale_color_discrete(guide = "none") +
     ylim(0, max(CI[["qsup95"]]) + 0.2) +
     labs(x = xlab, y = ylab) +
@@ -400,7 +400,7 @@ plot.reproFitTT <- function(x,
   
   # default axis parameters
   if (missing(xlab)) xlab <- "Concentrations"
-  if(missing(ylab)) ylab <- "Response"
+  if(missing(ylab)) ylab <- "Nb. of offspring / NID"
   
   # default legend parameters	
   if (missing(fitcol)) fitcol <- "red"
