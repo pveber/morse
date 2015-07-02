@@ -339,11 +339,11 @@ dataPlotReplicates <- function(x,
     axis(side = 2, at = sort(unique(control[, resp])))
     axis(side = 1, at = sort(unique(control[, "replicate"])))
     
-    # target.time
+    # fixed concentration
     plot(as.numeric(xtt$replicate), xtt[,resp],
          xlab = xlab,
          ylab = ylab,
-         main = target.time,
+         main = paste("Concentration: ", concentration, sep = ""), 
          pch = 16,
          xaxt = "n",
          yaxt = "n")
@@ -354,11 +354,13 @@ dataPlotReplicates <- function(x,
   }
 
   else if (style == "ggplot") {
-    x$response <- x[,resp]
-    df <- ggplot(x, aes(x = replicate, y = response))
+    dataall <- rbind(control, xtt)
+    dataall$response <- dataall[,resp]
+    df <- ggplot(dataall, aes(x = replicate, y = response))
     df + geom_point() + labs(x = xlab, y = ylab) +
-      scale_x_discrete(breaks = x$replicate,
-                       labels = x$replicate) + theme_minimal()
+      scale_x_discrete(breaks = dataall$replicate,
+                       labels = dataall$replicate) +
+      facet_wrap(~conc)+ theme_minimal()
   }
   else stop("Unknown plot style")
 }
