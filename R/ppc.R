@@ -54,10 +54,10 @@ EvalreproPpc <- function(x) {
   
   if (x$model.label == "GP") {
     for (i in 1:n) {
-      rate <- d / (1 + (xconc[i]/e)^b) / omega
-      p <- 1 / (Nindtime[i] * omega + 1)
-      NcumulPred[, i] <- rnbinom(5000, Nindtime[i], p / rate)
+      theomean <- d / (1 + (xconc[i]/e)^b)
+      NcumulPred[, i] <- rgamma(n = 5000, shape = theomean / omega, rate = 1 / omega)
     }
+    
   }
   if (x$model.label == "P") {
     for (i in 1:n) {
