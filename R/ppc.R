@@ -117,12 +117,9 @@ PpcGG <- function(tab, xlab, ylab) {
     xlim(c(0, max(tab[, "P97.5"]))) +
     ylim(c(0, max(tab[, "P97.5"]))) +
     geom_segment(aes(x = Obs, xend = Obs,
-                     y = P50, yend = P2.5),
-                 arrow = arrow(length = unit(0.25, "cm"), angle = 90),
-                 tab, color = tab$col) +
-    geom_segment(aes(x = Obs, xend = Obs,
-                     y = P50, yend = P97.5),
-                 arrow = arrow(length = unit(0.25, "cm"), angle = 90),
+                     y = P2.5, yend = P97.5),
+                 arrow = arrow(length = unit(0.25, "cm"), angle = 90,
+                               ends = "both"),
                  tab, color = tab$col) +
     labs(x = xlab, y = ylab) +
     theme_minimal()
