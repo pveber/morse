@@ -102,8 +102,8 @@ PpcGeneric <- function(tab, xlab, ylab) {
          col = as.character(tab[, "col"]))
   
   # axis
-  axis(side = 1, at = pretty(c(0, max(tab[, "P97.5"]))))
-  axis(side = 2, at = pretty(c(0, max(tab[, "P97.5"]))))
+  axis(side = 1, at = c(0, unique(tab[, "Obs"])))
+  axis(side = 2, at = c(0, unique(tab[, "P50"])))
 }
 
 #' @import ggplot2
@@ -115,6 +115,8 @@ PpcGG <- function(tab, xlab, ylab) {
     geom_abline(intercept = 0, slope = 1) +
     xlim(c(0, max(tab[, "P97.5"]))) +
     ylim(c(0, max(tab[, "P97.5"]))) +
+    scale_x_continuous(breaks = c(0, unique(tab[, "Obs"]))) +
+    scale_y_continuous(breaks = c(0, unique(tab[, "P50"]))) +
     geom_segment(aes(x = Obs, xend = Obs,
                      y = P2.5, yend = P97.5),
                  arrow = arrow(length = unit(0.25, "cm"), angle = 90,
