@@ -92,16 +92,14 @@ PpcGeneric <- function(tab, xlab, ylab) {
   
   abline(0, 1)
   
-  for (i in 1:length(tab[, "Obs"])) {
-    arrows(tab[i, "Obs"], tab[i, "P50"],
-           tab[i, "Obs"], tab[i, "P2.5"],
-           angle = 90, length = 0.05,
-           col = if(tab[i, "P2.5"] > tab[i, "Obs"] | tab[i, "P97.5"] < tab[i, "Obs"]) { "red" } else {"green"})
-    arrows(tab[i, "Obs"], tab[i, "P50"],
-           tab[i, "Obs"], tab[i, "P97.5"],
-           angle = 90, length = 0.05,
-           col = if(tab[i, "P2.5"] > tab[i, "Obs"] | tab[i, "P97.5"] < tab[i, "Obs"]) { "red" } else {"green"})
-  }
+  arrows(tab[, "Obs"], tab[, "P50"],
+         tab[, "Obs"], tab[, "P2.5"],
+         angle = 90, length = 0.05,
+         col = as.character(tab[, "col"]))
+  arrows(tab[, "Obs"], tab[, "P50"],
+         tab[, "Obs"], tab[, "P97.5"],
+         angle = 90, length = 0.05,
+         col = as.character(tab[, "col"]))
   
   # axis
   axis(side = 1, at = pretty(c(0, max(tab[, "P97.5"]))))
