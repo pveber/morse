@@ -14,7 +14,7 @@
 \section{Survival assays}
 In a survival assay, subjects are exposed to a controlled dose of a pollutant for some time and the number of surviving individuals is measured at certain time points after exposition. In most standard bioassays, the dose is held constant throughout the whole experiment, which we will assume here. An experiment is generally replicated several times and also repeated for various levels of pollutant.
 
-In the case of endpoint assays, the mortality is measured only once, and the chosen time point is called \emph{target time}. Let us how this particular case is handled in MORSE.
+In the case of endpoint assays, the mortality is measured only once, and the chosen time point is called \emph{target time}. Let us see how this particular case is handled in MORSE.
 
 \subsection{Analysis of endpoint survival assays}
 
@@ -33,7 +33,9 @@ where $b$, $e$ and $d$ are (positive) parameters. In particular $d$ corresponds 
 
 \paragraph{Inference} A posteriori distributions for parameters $b$, $d$ and $e$ are estimated using JAGS. The likelihood is given by:
 
-$$\mathbb{P}[ D | b, d, e] = \prod_i \mbox{dbinom}(n_i, n_i^{init}, f_{b,d,e}(c_i)) $$
+$$\mathbb{P}[ D | b, d, e] = \prod_i f_{\mbox{binom}}(n_i, n_i^{init}, f_{b,d,e}(c_i)) $$
+
+where $f_{\mbox{binom}}$ is the density of the binomial distribution.
 
 \paragraph{Priors}
 
@@ -46,6 +48,57 @@ The prior on $d$ is chosen in a more \emph{ad hoc} way: if we observe no mortali
 
 
 \section{Reproduction assays}
+
+In a reproduction assay, we observe the number of offspring produced
+by a population of adult individuals subjected to a certain dose of a
+pollutant over a given period of time. The offspring (young
+individuals or eggs) are periodically counted and removed from the
+medium at each observation, so that the reproducing population cannot
+increase. It can decrease however, if some individuals die during the
+experiment. The same procedure is usually repeated with various
+concentrations of pollutant, in order to establish a quantitative
+relationship between the reproduction rate and the concentration of
+pollutant in the medium.
+
+As mentionned already, it is often the case that part of the
+individuals of an assay die during the observation period. In previous
+approaches, it was proposed to consider the cumulated number of
+reproduction outputs without accounting for
+mortality\footnote{\footnotesize OECD. 2004. Guidelines for testing of
+  chemicals n.220. \textit{Enchytraeid} reproduction test. Technical
+  report, Organisation for Economic Cooperation and Development,
+  Paris.}$^{,}$\footnote{\footnotesize OECD. 2008.Guidelines for
+  testing of chemicals n.226. Predatory mite (\textit{Hypoapsis
+    (Geolaelaps) aculeifer}) reproduction test in soil. Technical
+  report, Organisation for Economic Cooperation and Development,
+  Paris.}, or to exclude replicates where mortality
+occurred\footnote{\footnotesize OECD. 1998. Guidelines for testing of
+  chemicals n.211. \textit{Daphnia magna} reproduction test. Technical
+  report, Organisation for Economic Cooperation and
+  Development. Paris.}.  However, individuals may have reproduced
+before dying and thus contributed to the observed response. In
+addition, individuals dying the first are the most sensitive, so the
+information on reproduction of these prematurely dead individuals is
+valuable and ignoring it is likely to bias the results in a
+non-conservative way. This is particularly critical at high
+concentrations, when mortality may be very high.
+
+In bioassay, mortality is usually regularly recorded \textit{i.e}.,
+at each timepoint when reproduction outputs are counted.  Using these
+data, it is easy to estimate for each individual, the period it has
+stayed alive, corresponding to the period it may reproduce.  As
+commonly done in epidemiology for incidence rate calculations, we can
+then calculate, for one replicate, the total sum of the periods of
+observation of each individual before its death\footnote{\footnotesize
+  When an organism is staying alive a time $t_k$ but counted as dead
+  at time $t_{k+1}$, it is then assumed to be really dead at time
+  $\frac{t_{k+1}+t_k}{2}$.}. This sum can be expressed as a number of
+individual-days. Hence, reproduction can be evaluated through the
+number of outputs per individual-day.
+
+In the following, we denote $n_{ijk}$ and $m_{ijk}$ the number of
+outputs for concentration $c_i$ at time $t_j$ in replicate $k$.
+\subsection{Estimation of effective observation time}
 
 
 \end{document}
