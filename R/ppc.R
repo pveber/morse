@@ -109,7 +109,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
 }
 
 #' @import ggplot2
-#' @import grid
+#' @importFrom  grid arrow unit
 PpcGG <- function(tab, xlab, ylab) {
   
   ggplot(tab, aes(x = Obs, y = P50)) +
