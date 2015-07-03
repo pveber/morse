@@ -83,7 +83,7 @@ valuable and ignoring it is likely to bias the results in a
 non-conservative way. This is particularly critical at high
 concentrations, when mortality may be very high.
 
-In bioassay, mortality is usually regularly recorded \textit{i.e}.,
+In a bioassay, mortality is usually regularly recorded, \textit{i.e}.
 at each timepoint when reproduction outputs are counted.  Using these
 data, it is easy to estimate for each individual, the period it has
 stayed alive, corresponding to the period it may reproduce.  As
@@ -96,9 +96,30 @@ observation of each individual before its death\footnote{\footnotesize
 individual-days. Hence, reproduction can be evaluated through the
 number of outputs per individual-day.
 
-In the following, we denote $n_{ijk}$ and $m_{ijk}$ the number of
-outputs for concentration $c_i$ at time $t_j$ in replicate $k$.
+In the following, we denote $M_{ijk}$ the number of surviving
+individuals for concentration $c_i$ and replicate $j$ at time $t_k$
+(and $m_{ijk}$ the corresponding observed value). 
+
 \subsection{Estimation of effective observation time}
+
+We define the effective observation time as the sum for all
+individuals of the time they spent alive in the experiment. It is
+counted in individual-days and will be denoted $NID_{ij}$ for
+concentration $c_i$ and replicate $j$. As mentionned earlier,
+mortality is observed at particular time points only, so the real life
+time of an individual is unknown and in practice we use the following
+simple estimation: if an individual is alive at $t_k$
+but dead at $t_{k+1}$, its real life time is approximated as
+$\frac{t_{k+1}+t_k}{2}$. 
+
+With this assumption, the effective observation time for concentration
+$c_i$ and replicate $j$ is then given by:
+$$
+NID_{ij} =   \sum_k m_{ij(k+1)} (t_{k+1} - t_k)
+           + (m_{ijk} - m_{ij(k+1)})(\frac{t_{k+1}+t_k}{2} - t_k)
+$$
+
+\subsection{Analysis of endpoint reproduction assays}
 
 
 \end{document}
