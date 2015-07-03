@@ -50,7 +50,7 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
 
     # axis
     axis(side = 1, at = sort(unique(x[, "time"])))
-    axis(side = 2, at = sort(unique(x[, resp])))
+    axis(side = 2, at = c(0, sort(unique(x[, resp]))))
 
     # lines and points
     by(x, x$replicate, function(y) {
@@ -167,8 +167,8 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
 
     axis(side = 1, at = unique(x$conc),
          labels = unique(x$conc))
-    axis(side = 2, at = unique(x$Nsurv),
-         labels = unique(x$Nsurv))
+    axis(side = 2, at = c(0, unique(x$Nsurv)),
+         labels = c(0, unique(x$Nsurv)))
 
     # points
     if (length(unique(x$replicate)) == 1) {
@@ -253,7 +253,7 @@ dataPlotFixedConc <- function(x, resp,
        })
     
     # axis
-    axis(side = 2, at = sort(unique(x[, resp])))
+    axis(side = 2, at = c(0, sort(unique(x[, resp]))))
     axis(side = 1, at = sort(unique(x[, "time"])))
 
     if (addlegend) {
@@ -349,7 +349,7 @@ dataPlotReplicates <- function(x,
          yaxt = "n")
     
     # axis
-    axis(side = 2, at = sort(unique(xtt[, resp])))
+    axis(side = 2, at = c(0, sort(unique(xtt[, resp]))))
     axis(side = 1, at = sort(unique(xtt[, "replicate"])))
   }
 
