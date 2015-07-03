@@ -1,3 +1,30 @@
+#' @export
+#' @name survData
+summary.survData <- function(x) {
+  # matrix of number of replicate by time / conc
+  ans1 <- table(x[, c("conc", "time")])
+  
+  # matrix of number of survival (sum of all replicate) by time / conc
+  ans2 <- tapply(x$Nsurv, list(as.factor(x$conc), as.factor(x$time)), sum)
+  
+  # table of datapoints per concentration
+  ans3 <- table(x$conc)
+  
+  # table of datapoints per time
+  ans4 <- table(x$time)
+  
+  cat("Summary: \n\n")
+  cat("Raw data: \n\n")
+  cat("Number of replicate by time and concentration: \n")
+  print(ans1)
+  cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
+  print(ans2)
+  cat("\nNumber of datapoints per concentration: \n")
+  print(ans3)
+  cat("\nNumber of datapoints per time: \n")
+  print(ans4)
+}
+
 #' Creates a dataset for survival analysis
 #'
 #' This function creates a \code{survData} object from experimental data
@@ -27,6 +54,7 @@
 #' alive individuals at each time point for each concentration and each replicate
 #' }
 #' @param \dots Further arguments to be passed to generic methods.
+#' @param x An object of class survData
 #'
 #' @return A dataframe of class \code{survData}.
 #'
