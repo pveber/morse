@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage{fullpage}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 
@@ -31,20 +32,16 @@ f(c) = \frac{d}{1 + (\frac{c}{e})^b}
 $$
 where $b$, $e$ and $d$ are (positive) parameters. In particular $d$ corresponds to the survival rate in absence of pollutant and $e$ corresponds to the $LC_{50}$.
 
-\paragraph{Inference} A posteriori distributions for parameters $b$, $d$ and $e$ are estimated using JAGS. The likelihood is given by:
-
-$$\mathbb{P}[ D | b, d, e] = \prod_i f_{\mbox{binom}}(n_i, n_i^{init}, f_{b,d,e}(c_i)) $$
-
-where $f_{\mbox{binom}}$ is the density of the binomial distribution.
-
-\paragraph{Priors}
-
+\paragraph{Inference} A posteriori distributions for parameters $b$,
+$d$ and $e$ are estimated using JAGS with the following priors:
 \begin{align*}
 \log_{10} b & \sim \mathcal{U}(-2,2)\\
 \log_{10} e & \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})
 \end{align*}
 
-The prior on $d$ is chosen in a more \emph{ad hoc} way: if we observe no mortality in control experiments then we set $d = 1$, otherwise we assume a uniform prior for $d$ between 0 and 1.
+The prior on $d$ is chosen in a more \emph{ad hoc} way: if we observe
+no mortality in control experiments then we set $d = 1$, otherwise we
+assume a uniform prior for $d$ between 0 and 1.
 
 
 \section{Reproduction assays}
@@ -120,22 +117,93 @@ NID_{ij} =   \sum_k m_{ij(k+1)} (t_{k+1} - t_k)
 $$
 
 \subsection{Target time analysis}
-We assume here that the effect of the considered pollutant on the
-reproduction rate does not depend on exposure time, but only on the
-concentration of the pollutant. We can then define $F_{ij}$ the
-reproduction rate for concentration $c_i$ and replicate $j$. Note that
-$F_{ij}$ is a random variable, as the effect of the pollutant varies
-from one individual to another. Now the number of reproduction outputs
-$N_{ij}$ at concentration $c_i$ in replicate $j$ can be modeled using
-a Poisson distribution:
+In this paragraph, we describe our so-called ``target time analysis'',
+where we model the cumulated number of offspring up to a target time
+as a function of the effective observation time in this period
+(cumulated life times of all individuals in the experiment, as
+described above). The data will therefore correspond to a set
+$\{(nid_{ij}, n_{ij})\}$ of pairs supposed to be drawn independently
+from a distribution that is a function of the level of pollutant
+$c_i$.
+
+
+\paragraph{Modelling} We assume here that the effect of the considered
+pollutant on the reproduction rate does not depend on exposure time,
+but only on the concentration of the pollutant. More precisely, the
+mean reproduction rate in an experiment with a concentration $c_i$ of
+pollutant is modelled by a three-parameter log-logistic model, that
+writes as follows::
+\[
+f(c_i;\theta)=\frac{d}{1+(c_i/e)^b} \quad \textrm{with} \quad \theta=(e,b,d)
+\].
+
+Here $d$ corresponds to the reproduction rate in absence of
+contaminant (control condition), and $e$ to the value of the
+$EC_{50}$, that is the concentration dividing the average number of
+offspring by two with respect to the control condition.  Now the
+number of reproduction outputs $N_{ij}$ at concentration $c_i$ in
+replicate $j$ can be modelled using a Poisson distribution:
+$$
+N_{ij} \sim Poisson(f(c_i ; \theta) \times NID_{ij})
+$$
+This model is later referenced as ``Poisson model''.  In case there
+are non-negligible random variations of the reproduction rate between
+two replicates, we propose a second model, named ``gamma-Poisson
+model'', stating that:
 $$
 N_{ij} \sim Poisson(F_{ij} \times NID_{ij})
 $$
+where the reproduction rate $F_{ij}$ for concentration $c_i$ and
+replicate $j$ is a random variable following a gamma
+distribution. Introducting a dispersion parameter $\omega$, we pose
+that:
+$$
+F_{ij} \sim gamma(\frac{f(c_i;\theta)}{\omega}, \frac{1}{\omega})
+$$
+Note that a gamma distribution of parameters
+$\alpha$ and $\beta$ has mean $\frac{\alpha}{\beta}$ and variance
+$\frac{\alpha}{\beta^2}$, that is here $f(c_i;\theta)$ and $\omega
+f(c_i;\theta)$ respectively.
 
-Finally, we assume that the reproduction rate follows a gamma
-distribution:
-$$
-F_{ij} \sim gamma(\frac{f(c_i)}{\omega}, \frac{1}{\omega})
-$$
-where $\omega$ is a dispersion parameter. 
+
+\paragraph{Inference} A posteriori distributions for parameters $b$,
+$d$ and $e$ are estimated using JAGS with the following priors:
+\begin{itemize}
+\item we assume the range of tested concentrations in an
+  experiment is chosen to contain the $EC_{50}$ with high
+  probability. More formally, we chose:
+  $$\log_{10} e \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})$$
+  and $e$ has a probability slightly higher than 0.95 to lie between
+  the minimum and the maximum tested concentration.
+\item we chose a quasi non-informative prior distribution for the
+  shape parameter $b$:
+  $$\log_{10} b \sim \mathcal{U}(-2,2)$$
+  
+\item
+  as $d$ corresponds to the reproduction rate without contaminant, we
+  set a normal prior $\mathcal{N}(\mu_d,\sigma_d)$ using the data:
+  \begin{align*}
+    \mu_d & = \frac{1}{r_0} \sum_j \frac{n_{0j}}{nid_{0j}}\\
+    \sigma_d & = \frac{1}{\sqrt{r_0}(r_0 - 1)} \sum_j (\frac{n_{0j}}{nid_{0j}} - \mu_d)^2\\
+  \end{align*}
+  where $r_0$ is the number of replicates in the control
+  condition. Note that since they are used to estimate a prior
+  distribution, the data for the control condition are not used in the
+  fitting phase.
+  
+\item we chose a quasi non-informative prior distribution for the
+  $\omega$ parameter of the gamma-Poisson model:
+$$log_{10}(\omega) \sim U(-4,4)$$
+\end{itemize}
+\begin{align*}
+\end{align*}
+
+% \paragraph{Inference} As shown in (FIXME papier ML), the gamma-Poisson
+% model described above is equivalent to the following negative binomial
+% model:
+% $$
+% N_{ij} \sim \mbox{Negbin}(\frac{1}{1 + \omega \times NID_{ij}}, \frac{f(c_i ; \theta)}{\omega})
+% $$
+% of mean $\omega \times NID_{ij}$ and variance 
+
 \end{document}
