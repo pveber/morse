@@ -278,9 +278,34 @@ survFitPlotGG <- function(x,
   }
 }
 
-#' @export
+#' Plotting method for reproFitTT objects
+#' 
+#' @param x An object of class \code{survFitTT}.
+#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Response}.
+#' @param main A main title for the plot.
+#' @param fitcol A single color to plot the fitted curve, by default
+#' \code{red}.
+#' @param fitlty A single line type to plot the fitted curve, by default
+#' \code{1}.
+#' @param fitlwd A single numeric which controls the width of the fitted curve,
+#' by default \code{1}.
+#' @param ci If \code{TRUE}, the 95 \% confidente interval on observed data are
+#' plotted.
+#' @param cicol A single color to plot the 95 \% confidente interval, by default
+#' \code{red}.
+#' @param cilty A single line type to plot 95 \% confidente interval, by default
+#' \code{1}.
+#' @param cilwd A single numeric which controls the width of the 95 \% confidente
+#' interval, by default \code{2}.
+#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
+#' @param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
+#' @param style Graphical method: \code{generic} or \code{ggplot}.
+#' @param \dots Further arguments to be passed to generic methods.
+#' 
+#' @keywords plot 
 #'
-#' @name survFitTT
+#' @export
 #'
 #' @import grDevices
 #' @import ggplot2
