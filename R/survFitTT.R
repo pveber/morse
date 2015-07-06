@@ -142,57 +142,28 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #'
 #'
 #'
-#' Two deterministic parts are proposed: the log-logistic binomial function with two or three parameters in
-#' order to take into account the mortality in the control.
-#' \describe{
-#' \item{"loglogisticbinom_2" deterministic part:}{ this model must
-#' be chosen when there is no mortality in the control at the target-time.  The
-#' survival rate at concentration \eqn{C_{i}}{C_{i}} was described by:
-#' \deqn{f(C_{i}) = \frac{1}{ 1 + (\frac{C_{i}}{e})^b}}{f(C_{i}) = 1 / (1 +
-#' (C_{i} / e)^b)} where \eqn{e} is the 50 \% lethal concentration
-#' (\eqn{LC_{50}}{LC50}) and \eqn{b} is a slope parameter. For parameter
-#' \eqn{e}, the function assumed that the experimental design was defined from
-#' a prior knowledge on the \eqn{LC_{50}}{LC50}, with a probability of 95 \%
-#' for the expected value to lie between the smallest and the highest tested
-#' concentrations. Hence, a log-normal distribution for \eqn{e} was calibrated
-#' from that prior knowledge. The number of survivor at concentration \eqn{i}
-#' and replicate \eqn{j} was described by a Binomial distribution:
-#' \deqn{Nsurv_{ij} \sim Binomial(f(C_{i}), Ninit_{ij})}{Nsurv_{ij} ~
-#' Binomial(f(C_{i}), Ninit_{ij})} where \eqn{Ninit_{ij}}{Ninit_{ij}} is the
-#' initial number of offspring at the beginning of bioassay. The slope
-#' parameter \eqn{b} was characterized by a prior log-uniform distribution
-#' between -2 and 2 in decimal logarithm.} \item{"loglogisticbinom_3"
-#' deterministic part:}{ this model must be chosen when there is mortality in
-#' the control at the target-time.  The survival rate at concentration
-#' \eqn{C_{i}}{C_{i}} was described by: \deqn{f(C_{i}) = \frac{d}{ 1 +
-#' (\frac{C_{i}}{e})^b}}{f(C_{i}) = d / (1 + (C_{i} / e)^b)} where \eqn{d}
-#' stands for survival rate in the control when this one is not equal to one.
-#' The parameter \eqn{d} was characterized by a prior uniform distribution
-#' between 0 and 1.}
-#' }
-#'
-#' Credible limits: For 100 values of concentrations regularly spread within
-#' the range of tested concentrations the joint posterior distribution of
-#' parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
-#' offspring per individual-day for various replicates. For each concentration,
-#' 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
-#' there is a point estimate and a 95 \% credible interval (Delignette-Muller
-#' et al., 2014).
-#'
-#' DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
-#' al. (2002) is provided by the \code{dic.samples} function. The DIC is a
-#' goodness-of-fit criterion penalized by the complexity of the model
-#' (Delignette-Muller et al., 2014).
-#'
-#' Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
-#' control diagnostic based on a criterion that calculates the appropriate
-#' number of iterations required to accurately estimate the parameter
-#' quantiles. The Raftery and Lewis's diagnostic value used in the
-#' \code{surFitTT} function is the \code{resmatrix} object. See the
-#' \code{\link[coda]{raftery.diag}} help for more details.
-#'
-#' @aliases survFitTT plot.survFitTT
-#'
+# \describe{
+# FIXME
+# Credible limits: For 100 values of concentrations regularly spread within
+# the range of tested concentrations the joint posterior distribution of
+# parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
+# offspring per individual-day for various replicates. For each concentration,
+# 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
+# there is a point estimate and a 95 \% credible interval (Delignette-Muller
+# et al., 2014).
+#
+# DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
+# al. (2002) is provided by the \code{dic.samples} function. The DIC is a
+# goodness-of-fit criterion penalized by the complexity of the model
+# (Delignette-Muller et al., 2014).
+#
+# Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
+# control diagnostic based on a criterion that calculates the appropriate
+# number of iterations required to accurately estimate the parameter
+# quantiles. The Raftery and Lewis's diagnostic value used in the
+# \code{surFitTT} function is the \code{resmatrix} object. See the
+# \code{\link[coda]{raftery.diag}} help for more details.
+#
 #' @param data An object of class \code{survData}.
 #' @param target.time The chosen endpoint to evaluate the effect of a given
 #' concentration of pollutant. By default the last time point available for
@@ -202,31 +173,9 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #' is 2.
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
 #' JAGS compilation.
-#' @param x An object of class \code{survFitTT}.
-#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Response}.
-#' @param main A main title for the plot.
-#' @param fitcol A single color to plot the fitted curve, by default
-#' \code{red}.
-#' @param fitlty A single line type to plot the fitted curve, by default
-#' \code{1}.
-#' @param fitlwd A single numeric which controls the width of the fitted curve,
-#' by default \code{1}.
-#' @param ci If \code{TRUE}, the 95 \% confidente interval on observed data are
-#' plotted.
-#' @param cicol A single color to plot the 95 \% confidente interval, by default
-#' \code{red}.
-#' @param cilty A single line type to plot 95 \% confidente interval, by default
-#' \code{1}.
-#' @param cilwd A single numeric which controls the width of the 95 \% confidente
-#' interval, by default \code{2}.
-#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' @param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
-#' @param style Graphical method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
 #'
-#' @return The function returns an object of class \code{survFitTT}. A list
-#' of 13 objects:
+#' @return The function returns an object of class \code{survFitTT}, which is list containing
+#' the following objects:
 #' \item{DIC}{DIC value of the selected model.}
 #' \item{estim.LCx}{A table of the estimated 5, 10, 20 and 50 \% lethal
 #' concentrations and their 95 \% credible intervals.}
@@ -246,26 +195,24 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #' function. This object is intended for the case when the user wishes to use
 #' the \code{\link[rjags]{rjags}} package instead of the automatied estimation
 #' function.}
-#' \item{transformed.data}{The \code{survData} object.
-#' See \code{\link{survData}} for details.}
-#' \item{dataTT}{The subset of transformed.data at target time.}
 #'
 #' @author Marie Laure Delignette-Muller
 #' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
 #' <philippe.ruiz@@univ-lyon1.fr>
 #'
-#' @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-#' \code{\link[rjags]{dic.samples}}, 
-#' \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
-#' \code{\link[ggplot2]{ggplot}}
-#'
-#' @references Plummer, M. (2013) JAGS Version 3.4.0 user manual.
-#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
-#'
-#' Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
-#' measures of model complexity and fit (with discussion).  \emph{Journal of
-#' the Royal Statistical Society}, Series B 64, 583-639.
-#'
+# FIXME
+# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
+# \code{\link[rjags]{dic.samples}}, 
+# \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
+# \code{\link[ggplot2]{ggplot}}
+#
+# @references Plummer, M. (2013) JAGS Version 3.4.0 user manual.
+# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
+#
+# Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
+# measures of model complexity and fit (with discussion).  \emph{Journal of
+# the Royal Statistical Society}, Series B 64, 583-639.
+#
 #' @keywords estimation
 #
 #' @examples
