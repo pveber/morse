@@ -45,10 +45,12 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
          ylim = c(0, max(x[, resp])),
          type = "n",
          col = 'white',
-         yaxt = 'n')
+         xaxt = "n",
+         yaxt = "n")
 
     # axis
-    axis(side = 2, at = pretty(c(0,max(x[, resp]))))
+    axis(side = 1, at = sort(unique(x[, "time"])))
+    axis(side = 2, at = c(0, sort(unique(x[, resp]))))
 
     # lines and points
     by(x, x$replicate, function(y) {
@@ -111,7 +113,8 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    ylim(0, max(data$response)) + theme_minimal()
+    scale_y_continuous(breaks = unique(data$resp)) +
+    theme_minimal()
 
   # legend option
   if (addlegend){
@@ -122,7 +125,7 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
   return(fd)
 }
 
-dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = TRUE, ...) {
+dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = FALSE, ...) {
   if (style == "generic")
     dataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
   else if (style == "ggplot")
@@ -130,7 +133,7 @@ dataPlotFull <- function(data, resp, xlab, ylab, style = "generic", addlegend = 
   else stop("Unknown plot style")
 }
 
-survDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
+survDataPlotFull <- function(data, style = "generic", addlegend = FALSE, ...) {
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
   ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
@@ -158,11 +161,14 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
     plot(x$conc, seq(0, max(x$Nsurv), length.out = length(x$conc)),
          type = "n",
          xaxt = "n",
+         yaxt = "n",
          xlab = xlab,
          ylab = ylab)
 
     axis(side = 1, at = unique(x$conc),
          labels = unique(x$conc))
+    axis(side = 2, at = c(0, unique(x$Nsurv)),
+         labels = c(0, unique(x$Nsurv)))
 
     # points
     if (length(unique(x$replicate)) == 1) {
@@ -184,7 +190,7 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
       }
     }
   }
-  if (style == "ggplot") {
+  else if (style == "ggplot") {
     if (length(unique(x$replicate)) == 1) {
       df <- ggplot(x, aes(x = conc, y = Nsurv))
     } else {
@@ -196,7 +202,8 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
       labs(x = xlab,
            y = ylab) +
       scale_x_continuous(breaks = unique(x$conc),
-                         labels = unique(x$conc))
+                         labels = unique(x$conc)) +
+      scale_y_continuous(breaks = unique(x$Nsurv))
 
     # legend option
     if (addlegend) {
@@ -205,13 +212,14 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
       fd + theme(legend.position = "none") # remove legend
     }
   }
+  else stop("Unknown plot style")
 }
 
 dataPlotFixedConc <- function(x, resp,
                               concentration,
                               xlab, ylab,
                               style = "generic",
-                              addlegend = TRUE,
+                              addlegend = FALSE,
                               ...) {
 
   legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
@@ -229,6 +237,8 @@ dataPlotFixedConc <- function(x, resp,
   if (style == "generic") {
     plot(x$time, x[,resp],
          type = "n",
+         xaxt = "n",
+         yaxt = "n",
          xlab = xlab,
          ylab = ylab)
 
@@ -241,6 +251,10 @@ dataPlotFixedConc <- function(x, resp,
                 pch = 16,
                 col = x$color)
        })
+    
+    # axis
+    axis(side = 2, at = c(0, sort(unique(x[, resp]))))
+    axis(side = 1, at = sort(unique(x[, "time"])))
 
     if (addlegend) {
       legend(legend.position, legend = unique(x$replicate) ,
@@ -249,7 +263,7 @@ dataPlotFixedConc <- function(x, resp,
              lty = 1)
     }
   }
-  if (style == "ggplot") {
+  else if (style == "ggplot") {
     x$response <- x[,resp]
 
     if (length(unique(x$replicate)) == 1) {
@@ -262,7 +276,10 @@ dataPlotFixedConc <- function(x, resp,
     fd <- df + geom_line() + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
-      scale_color_hue("Replicate")
+      scale_color_hue("Replicate") +
+      scale_x_continuous(breaks = unique(x$time),
+                         labels = unique(x$time)) +
+      scale_y_continuous(breaks = unique(x$response))
 
     if (addlegend) {# only if pool.replicate == FALSE
       fd
@@ -270,12 +287,13 @@ dataPlotFixedConc <- function(x, resp,
       fd + theme(legend.position = "none") # remove legend
     }
   }
+  else stop("Unknown plot style")
 }
 
 survDataPlotFixedConc <- function(x,
                                   concentration,
                                   style = "generic",
-                                  addlegend = TRUE,
+                                  addlegend = FALSE,
                                   ...) {
 
 opt_args <- list(...)
@@ -303,20 +321,48 @@ dataPlotReplicates <- function(x,
     stop("The argument [concentration] should correspond to one of the tested concentrations")
 
   # select for concentration and target.time
-  x <- filter(x, conc == concentration & time == target.time)
+  xtt <- filter(x, conc == concentration & time == target.time)
+  control <- filter(x, conc == min(x$conc) & time == target.time)
 
   if (style == "generic") {
-    plot(factor(x$replicate), x[,resp],
-         type = "n",
+    par(mfrow = c(1, 2))
+    
+    plot(as.numeric(control$replicate), control[,resp],
          xlab = xlab,
-         ylab = ylab)
+         ylab = ylab,
+         main = "Control",
+         pch = 16,
+         xaxt = "n",
+         yaxt = "n")
+    
+    # axis
+    axis(side = 2, at = sort(unique(control[, resp])))
+    axis(side = 1, at = sort(unique(control[, "replicate"])))
+    
+    # fixed concentration
+    plot(as.numeric(xtt$replicate), xtt[,resp],
+         xlab = xlab,
+         ylab = ylab,
+         main = paste("Concentration: ", concentration, sep = ""), 
+         pch = 16,
+         xaxt = "n",
+         yaxt = "n")
+    
+    # axis
+    axis(side = 2, at = c(0, sort(unique(xtt[, resp]))))
+    axis(side = 1, at = sort(unique(xtt[, "replicate"])))
   }
 
-  if (style == "ggplot") {
-    x$response <- x[,resp]
-    df <- ggplot(x, aes(x = replicate, y = response))
-    df + geom_point() + labs(x = xlab, y = ylab) + theme_minimal()
+  else if (style == "ggplot") {
+    dataall <- rbind(control, xtt)
+    dataall$response <- dataall[,resp]
+    df <- ggplot(dataall, aes(x = replicate, y = response))
+    df + geom_point() + labs(x = xlab, y = ylab) +
+      scale_x_discrete(breaks = dataall$replicate,
+                       labels = dataall$replicate) +
+      facet_wrap(~conc)+ theme_minimal()
   }
+  else stop("Unknown plot style")
 }
 
 survDataPlotReplicates <- function(x,
