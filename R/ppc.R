@@ -54,9 +54,9 @@ EvalreproPpc <- function(x) {
   
   if (x$model.label == "GP") {
     for (i in 1:n) {
-      theomean <- d / (1 + (xconc[i]/e)^b)
-      nbtheo <- theomean * Nindtime[i]
-      NcumulPred[, i] <- rgamma(n = 5000, shape = nbtheo / omega, rate = 1 / omega)
+      popmean <- d / (1 + (xconc[i]/e)^b)
+      indmean <- rgamma(n = 5000, shape = popmean / omega, rate = 1 / omega)
+      NcumulPred[, i] <- rpois(5000, indmean * Nindtime[i])
     }
     
   }
