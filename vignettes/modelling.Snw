@@ -119,7 +119,23 @@ NID_{ij} =   \sum_k m_{ij(k+1)} (t_{k+1} - t_k)
            + (m_{ijk} - m_{ij(k+1)})(\frac{t_{k+1}+t_k}{2} - t_k)
 $$
 
-\subsection{Analysis of endpoint reproduction assays}
+\subsection{Target time analysis}
+We assume here that the effect of the considered pollutant on the
+reproduction rate does not depend on exposure time, but only on the
+concentration of the pollutant. We can then define $F_{ij}$ the
+reproduction rate for concentration $c_i$ and replicate $j$. Note that
+$F_{ij}$ is a random variable, as the effect of the pollutant varies
+from one individual to another. Now the number of reproduction outputs
+$N_{ij}$ at concentration $c_i$ in replicate $j$ can be modeled using
+a Poisson distribution:
+$$
+N_{ij} \sim Poisson(F_{ij} \times NID_{ij})
+$$
 
-
+Finally, we assume that the reproduction rate follows a gamma
+distribution:
+$$
+F_{ij} \sim gamma(\frac{f(c_i)}{\omega}, \frac{1}{\omega})
+$$
+where $\omega$ is a dispersion parameter. 
 \end{document}
