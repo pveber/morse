@@ -82,8 +82,6 @@ PpcGeneric <- function(tab, xlab, ylab) {
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
        type = "n",
-       xaxt = "n",
-       yaxt = "n",
        xlab = xlab,
        ylab = ylab)
   
@@ -100,12 +98,6 @@ PpcGeneric <- function(tab, xlab, ylab) {
          tab[, "Obs"], tab[, "P97.5"],
          angle = 90, length = 0.05,
          col = as.character(tab[, "col"]))
-  
-  # axis
-  axis(side = 1, at = c(0, unique(tab[, "Obs"])))
-  axis(side = 2, at = c(0, unique(tab[, "P50"]),
-                        unique(tab[, "P97.5"]),
-                        unique(tab[, "P2.5"])))
 }
 
 #' @import ggplot2
@@ -115,15 +107,13 @@ PpcGG <- function(tab, xlab, ylab) {
   ggplot(tab, aes(x = Obs, y = P50)) +
     geom_point() +
     geom_abline(intercept = 0, slope = 1) +
-    scale_x_discrete(breaks = c(0, unique(tab[, "Obs"]))) +
-    scale_y_discrete(breaks = c(0, unique(tab[, "P50"]),
-                                  unique(tab[, "P97.5"]),
-                                  unique(tab[, "P2.5"]))) +
     geom_segment(aes(x = Obs, xend = Obs,
                      y = P2.5, yend = P97.5),
                  arrow = arrow(length = unit(0.25, "cm"), angle = 90,
                                ends = "both"),
                  tab, color = tab$col) +
+    xlim(0, max(tab[, "P97.5"])) +
+    ylim(0, max(tab[, "P97.5"])) +
     labs(x = xlab, y = ylab) +
     theme_minimal()
 }
