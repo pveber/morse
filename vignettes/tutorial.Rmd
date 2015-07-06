@@ -91,7 +91,7 @@ summary(dat1)
 
 * Step four, fit an exposure-response model to the reproduction data at target time
 
-Now the dataset with reproduction data at target time is created it is possible
+Now the dataset with reproduction data at target time is created and it is possible
 to estimate the parameters of the log-logistic exposure-response model with the `reproFitTT()` function.
 This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
 
@@ -178,12 +178,16 @@ summary(dat2)
 
 * Step four, fit an exposure-response model to the survival data at final time
 
+Now the dataset with survival data at target time is created and it is possible
+to estimate the parameters of the log-logistic exposure-response model with the `survFitTT()` function.
+This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
+
 ```{r, results="hide", cache=TRUE}
 out2 <- survFitTT(dat2,
                   lcx = c(10, 20, 30, 40, 50))
 ```
 
-The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $LC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% confidente interval on observed data.
+The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $LC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% confidence interval on observed data.
 
 ```{r, cache=TRUE}
 summary(out2)
