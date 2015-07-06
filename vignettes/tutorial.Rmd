@@ -1,0 +1,197 @@
+---
+title: "Library tutorial"
+author: "Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller,
+Sandrine Charles"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+self_contained: no
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+  
+---
+
+```{r,include=FALSE, echo=FALSE}
+
+knitr::opts_chunk$set(fig.width = 5, 
+                      fig.height = 4, 
+                      cache = TRUE)
+
+```
+
+
+```{r, echo=FALSE, cache=TRUE, results='hide'}
+library(morsedev)
+```
+
+# Introduction
+
+# Species Sensitivity Distribution - SSD
+
+# Reproduction data analyses
+  
+Before analyse bioassay reproduction data some stages are required. The following example shows all these stages to pass from a raw bioassay dataset to the estimate values of $EC_x$ and parameters. The example is based on the `cadmium1` dataset,
+a reproduction and survival dataset of chronic laboratory bioassays with
+\emph{Daphnia magna} freshwater invertebrate exposed to five concentrations of
+one metal contaminant (cadmium) during 21 days.
+  
+* Step one, check the structure and the dataset integrity
+  
+```{r, cache=TRUE}
+data(cadmium1)
+reproDataCheck(cadmium1, diagnosis.plot = TRUE)
+```
+
+The function `reproDataCheck()` performs several tests on the integrity of the
+dataset and returns explicit error messages (if necessary). If no error was
+detected in the dataset an object of class `reproData` can be created.
+If the `reproDataCheck()` function finds an increase of alive individuals with time and if the `diagnosis.plot` argument is `TRUE`, the function plots the number of survivor in function of time per concentration and replicate.
+  
+* Step two, create a `reproData` object
+  
+```{r, cache=TRUE}
+dat1 <- reproData(cadmium1)
+```
+
+The new object contains all the required informations to execute all the reproduction analyses: graphical analyses of data, analyses of reproduction data at all time points.
+    
+* Step three, plot the `reproData` object
+  
+`plot()` plots the cmulated number of offsprings depending on the time for all concentrations and replicates.
+
+```{r, cache=TRUE}
+plot(dat1)
+```
+
+`plot(, target.time)` plots the cumulated number of offsprings depending on the concentration for a fixed time point.
+  
+```{r, cache=TRUE}
+plot(dat1, target.time = 21, addlegend = TRUE)
+```
+
+`plot(, concentration)` plots the cumulated number of offsprings depending on the time for a fixed concentration.
+
+```{r, cache=TRUE}
+plot(dat1, concentration = 4.36, addlegend = TRUE)
+```
+
+and `plot(, conctration, target.time)` compares the cumulated number of offsprings of each replicate for a fixed concentration and a fixed time to the control at the same time.
+
+```{r, cache=TRUE}
+plot(dat1, concentration = 4.36, target.time = 21)
+```
+
+The `summary()` provides informations on the experimental design.
+
+```{r, cache=TRUE}
+dat1
+summary(dat1)
+```
+
+* Step four, fit an exposure-response model to the reproduction data at target time
+
+Now the dataset with reproduction data at target time is created it is possible
+to estimate the parameters of the log-logistic exposure-response model with the `reproFitTT()` function.
+This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
+
+By choosing the `bestfit` option for the `stoc.part` argument we let the function
+choose the best stochastic part of the model.
+
+```{r, results="hide", cache=TRUE}
+out <- reproFitTT(dat1, stoc.part = "bestfit",
+                  ecx = c(10, 20, 30, 40, 50))
+```
+
+The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $EC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% credible limits superimposed to experimental data at target-time.
+
+```{r, cache=TRUE}
+summary(out)
+plot(out, log.scale = TRUE, ci = TRUE)
+```
+
+* Step five, check the obseved versus predicted values
+  
+The function `ppc()` plots the observed versus predicted values with the 95 \% 
+credible intervale for each predicted values.
+
+```{r, cache=TRUE}
+ppc(out)
+```
+
+# Survival data analyses
+
+In this example we fit an exposure-response curve on survival data at final
+time.
+
+The two first parts are the sames as the reproduction analysis.
+
+* Step one, check the structure and the dataset integrity
+   
+```{r, cache=TRUE}
+data(cadmium1)
+survDataCheck(cadmium1, diagnosis.plot = TRUE)
+```
+
+* Step two, create a `survData` object
+  
+```{r, cache=TRUE}
+dat2 <- survData(cadmium1)
+dat2
+```
+
+* Step three, plot the `survData` object
+  
+`plot()` plots the number of surviving individuals depending on the time for all
+concentrations and replicates.
+
+```{r, cache=TRUE}
+plot(dat2)
+```
+
+`plot(, target.time)` plots the number of surviving individuals depending on the
+concentration for a fixed time point.
+  
+```{r, cache=TRUE}
+plot(dat2, target.time = 21, addlegend = TRUE)
+```
+
+`plot(, concentration)` plots the number of surviving individuals depending on the time for a fixed concentration.
+
+```{r, cache=TRUE}
+plot(dat2, concentration = 4.36, addlegend = TRUE)
+```
+
+and `plot(, conctration, target.time)` compares the number of surviving individuals of each replicate for a fixed concentration and a fixed time to the control at the same time.
+
+```{r, cache=TRUE}
+plot(dat2, concentration = 4.36, target.time = 21)
+```
+
+The `summary()` provides informations on the experimental design.
+
+```{r, cache=TRUE}
+dat2
+summary(dat2)
+```
+
+
+* Step four, fit an exposure-response model to the survival data at final time
+
+```{r, results="hide", cache=TRUE}
+out2 <- survFitTT(dat2,
+                  lcx = c(10, 20, 30, 40, 50))
+```
+
+The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $LC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% confidente interval on observed data.
+
+```{r, cache=TRUE}
+summary(out2)
+plot(out2, log.scale = TRUE, ci = TRUE)
+```
+  
+* Step five, check the obseved versus predicted values
+  
+```{r,cache=TRUE}
+ppc(out2)
+```
