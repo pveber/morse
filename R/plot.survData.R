@@ -328,32 +328,36 @@ dataPlotReplicates <- function(x,
   control <- filter(x, conc == min(x$conc) & time == target.time)
 
   if (style == "generic") {
-    par(mfrow = c(1, 2))
+    par(mfrow = c(1, ifelse(concentration == 0, 1, 2)))
     
     plot(as.numeric(control$replicate), control[,resp],
          xlab = xlab,
          ylab = ylab,
          main = "Control",
          pch = 16,
+         ylim = c(0, max(control[, resp])),
          xaxt = "n",
          yaxt = "n")
     
     # axis
-    axis(side = 2, at = sort(unique(control[, resp])))
+    axis(side = 2, at = c(0, sort(unique(control[, resp]))))
     axis(side = 1, at = sort(unique(control[, "replicate"])))
     
     # fixed concentration
-    plot(as.numeric(xtt$replicate), xtt[,resp],
-         xlab = xlab,
-         ylab = ylab,
-         main = paste("Concentration: ", concentration, sep = ""), 
-         pch = 16,
-         xaxt = "n",
-         yaxt = "n")
-    
-    # axis
-    axis(side = 2, at = c(0, sort(unique(xtt[, resp]))))
-    axis(side = 1, at = sort(unique(xtt[, "replicate"])))
+    if (! concentration == 0) {
+      plot(as.numeric(xtt$replicate), xtt[,resp],
+           xlab = xlab,
+           ylab = ylab,
+           main = paste("Concentration: ", concentration, sep = ""),
+           pch = 16,
+           ylim = c(0, max(xtt[, resp])),
+           xaxt = "n",
+           yaxt = "n")
+      
+      # axis
+      axis(side = 2, at = c(0, sort(unique(xtt[, resp]))))
+      axis(side = 1, at = sort(unique(xtt[, "replicate"])))
+    }
   }
 
   else if (style == "ggplot") {
@@ -363,7 +367,9 @@ dataPlotReplicates <- function(x,
     df + geom_point() + labs(x = xlab, y = ylab) +
       scale_x_discrete(breaks = dataall$replicate,
                        labels = dataall$replicate) +
-      facet_wrap(~conc)+ theme_minimal()
+      scale_y_discrete(breaks = c(0, unique(dataall$response))) +
+      expand_limits(x = 0, y = 0) +
+      facet_wrap(~conc) + theme_minimal()
   }
   else stop("Unknown plot style")
 }
