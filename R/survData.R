@@ -1,5 +1,32 @@
+#' Summarize of survData object
+#' 
+#' @aliases survData
+#' 
+#' The generic \code{summary} S3 method for the \code{survData} class provides
+#' information about the structure of the dataset and the experimental design:
+#' the number of replicate per time and concentration,
+#' the number of survival (sum of replicate) per time and concentration,
+#' the number of datapoints per concentration and the number of datapoints per
+#' time.
+#' 
+#' @param x An object of class \code{survData}
+#' 
+#' @seealso \code{\link{survData}}
+#' 
+#' @examples
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a survData object
+#' cadmium1 <- survData(cadmium1)
+#' 
+#' # (3) Summarize the dataset
+#' summary(cadmium1)
+#' 
+#' @keywords summary
+#' 
 #' @export
-#' @name survData
+#' 
 summary.survData <- function(x) {
   # matrix of number of replicate by time / conc
   ans1 <- table(x[, c("conc", "time")])
@@ -15,7 +42,7 @@ summary.survData <- function(x) {
   
   cat("Summary: \n\n")
   cat("Raw data: \n\n")
-  cat("Number of replicate by time and concentration: \n")
+  cat("Number of replicate per time and concentration: \n")
   print(ans1)
   cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
   print(ans2)
@@ -57,15 +84,6 @@ summary.survData <- function(x) {
 #' @param x An object of class survData
 #'
 #' @return A dataframe of class \code{survData}.
-#'
-#' Generic functions:
-#' \describe{
-#' \item{\code{summary}}{The summary provides information about the structure
-#' of the dataset and the experimental design:
-#' the number of datapoints per replicate, concentration and time both for the
-#' raw dataset and the transformed dataset.}
-#' \item{\code{print}}{Print of a \code{survData} object with the transformed
-#' dataframe.}}
 #'
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #'
