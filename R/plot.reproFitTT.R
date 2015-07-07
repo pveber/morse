@@ -133,7 +133,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
   # Plotting the theoretical curve
   # CI ribbon + lines
   polygon(c(curv_conc, rev(curv_conc)), c(CI[["qinf95"]], rev(CI[["qsup95"]])),
-          col = "pink1", border = NA)
+          col = "grey40")
   lines(curv_conc, CI[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
@@ -182,9 +182,7 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
 reproFitPlotGGNoCI <- function(data, curv, cols2,
                                fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
-    geom_point(data = data, aes(transf_conc, resp, shape = Mortality),
-               size = 3) +
-    scale_shape_identity() +
+    geom_point(data = data, aes(transf_conc, resp, color = Mortality)) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     scale_color_discrete(guide = "none") +
@@ -213,13 +211,13 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
     geom_line(data = cri, aes(conc, qsup95, color = CI),
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
-                                ymax = qsup95), fill = "pink", alpha = 0.4) +
+                                ymax = qsup95), alpha = 0.4) +
     scale_color_manual(values = cols3) + theme_minimal()
 
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp,
-                                shape = Mortality), size = 3) +
-    scale_shape_identity() +
+                                color = Mortality)) +
+#    scale_color_manual(values = cols1) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     geom_line(data = cri, aes(conc, qinf95),
@@ -227,9 +225,8 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
     geom_line(data = cri, aes(conc, qsup95),
               linetype = cilty, size = cilwd, color = cols3) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
-                                ymax = qsup95), fill = "pink", alpha = 0.4) +
+                                ymax = qsup95), alpha = 0.4) +
     scale_color_discrete(guide = "none") +
-    scale_shape(guide = "none") +
     ylim(0, max(CI[["qsup95"]]) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
@@ -255,7 +252,6 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                      resp = data_resp, Mortality = mortality)
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
-  # colors
   # fitted curve
   cols2 <- fitcol
   names(cols2) <- "loglogistic"
@@ -263,8 +259,8 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   # points (to create the legend)
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(conc, resp,
-                                shape = Mortality), size = 3) +
-    scale_shape_identity() +
+                                 = Mortality)) +
+    scale_color_manual(values = cols1) +
     theme_minimal()
   
   # curve (to create the legend)
@@ -356,7 +352,7 @@ plot.reproFitTT <- function(x,
                             cicol,
                             cilty,
                             cilwd,
-                            addlegend = FALSE,
+                            addlegend = TRUE,
                             log.scale = FALSE,
                             style = "generic",
                             ...) {
@@ -400,7 +396,7 @@ plot.reproFitTT <- function(x,
   
   # default axis parameters
   if (missing(xlab)) xlab <- "Concentrations"
-  if(missing(ylab)) ylab <- "Nb of offspring per ind.day"
+  if(missing(ylab)) ylab <- "Response"
   
   # default legend parameters	
   if (missing(fitcol)) fitcol <- "red"
@@ -426,6 +422,7 @@ plot.reproFitTT <- function(x,
     mortality[which(mortality == 0)] <- "No"
     mortality[which(mortality == 1)] <- "Yes"
   }
+#  mortality[which(mortality == 0)] <- 19
   
   CI <- if (ci) { CI <- reproLlmCI(x, display.conc) } else NULL
   
