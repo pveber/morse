@@ -25,10 +25,6 @@ knitr::opts_chunk$set(fig.width = 5,
 library(morsedev)
 ```
 
-# Introduction
-
-# Species Sensitivity Distribution - SSD
-
 # Reproduction data analyses
   
 The following example shows all the stages to pass from a raw bioassay dataset with reproduction data to the estimate values of $EC_x$ and parameters.
