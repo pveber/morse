@@ -31,10 +31,8 @@ library(morsedev)
 
 # Reproduction data analyses
   
-Before analyse bioassay reproduction data some stages are required. The following example shows all these stages to pass from a raw bioassay dataset to the estimate values of $EC_x$ and parameters. The example is based on the `cadmium1` dataset,
-a reproduction and survival dataset of chronic laboratory bioassays with
-\emph{Daphnia magna} freshwater invertebrate exposed to five concentrations of
-one metal contaminant (cadmium) during 21 days.
+The following example shows all the stages to pass from a raw bioassay dataset with reproduction data to the estimate values of $EC_x$ and parameters.
+The example is based on the `cadmium1` dataset, a reproduction and survival dataset of chronic laboratory bioassays with \emph{Daphnia magna} freshwater invertebrate exposed to five concentrations of one metal contaminant (cadmium) during 21 days.
   
 * Step one, check the structure and the dataset integrity
   
@@ -54,7 +52,7 @@ If the `reproDataCheck()` function finds an increase of alive individuals with t
 dat1 <- reproData(cadmium1)
 ```
 
-The new object contains all the required informations to execute all the reproduction analyses: graphical analyses of data, analyses of reproduction data at all time points.
+The new object contains the reorder dataframe with new datas (see the modelling vignette for more details).
     
 * Step three, plot the `reproData` object
   
@@ -64,7 +62,7 @@ The new object contains all the required informations to execute all the reprodu
 plot(dat1)
 ```
 
-`plot(, target.time)` plots the cumulated number of offsprings depending on the concentration for a fixed time point.
+`plot(, target.time)` plots the cumulated number of offsprings depending on the concentration for a fixed target time.
   
 ```{r, cache=TRUE}
 plot(dat1, target.time = 21, addlegend = TRUE)
@@ -91,8 +89,7 @@ summary(dat1)
 
 * Step four, fit an exposure-response model to the reproduction data at target time
 
-Now the dataset with reproduction data at target time is created and it is possible
-to estimate the parameters of the log-logistic exposure-response model with the `reproFitTT()` function.
+Now it is possible to estimate the parameters of the log-logistic exposure-response model with the `reproFitTT()` function.
 This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
 
 By choosing the `bestfit` option for the `stoc.part` argument we let the function
@@ -122,7 +119,7 @@ ppc(out)
 # Survival data analyses
 
 In this example we fit an exposure-response curve on survival data at final
-time.
+time. We use the same dataset as the survival analyse.
 
 The two first parts are the sames as the reproduction analysis.
 
@@ -140,7 +137,7 @@ dat2 <- survData(cadmium1)
 dat2
 ```
 
-* Step three, plot the `survData` object
+* Step three, plot the `survData` object to analyse the data
   
 `plot()` plots the number of surviving individuals depending on the time for all
 concentrations and replicates.
@@ -178,8 +175,7 @@ summary(dat2)
 
 * Step four, fit an exposure-response model to the survival data at final time
 
-Now the dataset with survival data at target time is created and it is possible
-to estimate the parameters of the log-logistic exposure-response model with the `survFitTT()` function.
+Now it is possible to estimate the parameters of the log-logistic exposure-response model with the `survFitTT()` function.
 This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
 
 ```{r, results="hide", cache=TRUE}
