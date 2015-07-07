@@ -85,7 +85,6 @@ survFitPlotGenericNoCI <- function(x,
   }
 }
 
-#' @importFrom plotrix plotCI
 survFitPlotGenericCI <- function(x,
                                  data_conc, transf_data_conc, data_resp,
                                  curv_conc, curv_resp,
@@ -121,13 +120,26 @@ survFitPlotGenericCI <- function(x,
   points(transf_data_conc, data_resp, pch = 16)
   
   # segment CI
-  arrows(transf_data_conc, data_resp,
-         transf_data_conc, CI["qsup95", ],
-         col = cicol, lty = cilty, lwd = cilwd, angle = 90, length = 0.1)
   
-  arrows(transf_data_conc, data_resp,
-         transf_data_conc, CI["qinf95", ],
-         col = cicol, lty = cilty, lwd = cilwd, angle = 90, length = 0.1)
+  segments(transf_data_conc, data_resp,
+           transf_data_conc, CI["qsup95", ],
+           col = cicol, lty = cilty, lwd = cilwd)
+  
+  segments(transf_data_conc - 0.1,
+           CI["qsup95", ],
+           transf_data_conc + 0.1,
+           CI["qsup95", ],
+           col = cicol, lty = cilty, lwd = cilwd)
+  
+  segments(transf_data_conc, data_resp,
+           transf_data_conc, CI["qinf95", ],
+           col = cicol, lty = cilty, lwd = cilwd)
+  
+  segments(transf_data_conc - 0.1,
+           CI["qinf95", ],
+           transf_data_conc + 0.1,
+           CI["qinf95", ],
+           col = cicol, lty = cilty, lwd = cilwd)
   
   # legend
   if (addlegend) {
