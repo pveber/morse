@@ -101,7 +101,7 @@ survFitPlotGenericCI <- function(x,
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(CI["qsup95",]) + 0.2),
+       ylim = c(0, max(CI["qsup95",]) + 0.01),
        type = "n",
        ...)
   
@@ -110,14 +110,6 @@ survFitPlotGenericCI <- function(x,
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
-  
-  # Plotting the theoretical curve
-  
-  # fitted curve
-  lines(curv_conc, curv_resp, col = fitcol,
-        lty = fitlty, lwd = fitlwd, type = "l")
-  # points
-  points(transf_data_conc, data_resp, pch = 16)
   
   # segment CI
   
@@ -140,6 +132,13 @@ survFitPlotGenericCI <- function(x,
            transf_data_conc + 0.1,
            CI["qinf95", ],
            col = cicol, lty = cilty, lwd = cilwd)
+
+  # points
+  points(transf_data_conc, data_resp, pch = 16)
+  # fitted curve
+  lines(curv_conc, curv_resp, col = fitcol,
+        lty = fitlty, lwd = fitlwd, type = "l")
+  
   
   # legend
   if (addlegend) {
@@ -193,7 +192,7 @@ survFitPlotGGNoCI <- function(data, curv, valCols,
   return(plt_4)
 }
 
-#' @importFrom grid arrow
+#' @importFrom grid arrow unit
 survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
@@ -213,16 +212,16 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
   # plot IC
   # final plot
   plt_4 <- ggplot(data) +
-    geom_point(data = data, aes(transf_conc, resp)) +
-    geom_line(aes(conc, resp), curv, linetype = fitlty,
-              size = fitlwd, color = valCols$cols2) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                                ends = "both"),
                  data.three, color = valCols$cols3, linetype = cilty,
                  size = cilwd) +
+    geom_point(data = data, aes(transf_conc, resp)) +
+    geom_line(aes(conc, resp), curv, linetype = fitlty,
+              size = fitlwd, color = valCols$cols2) +
     scale_color_discrete(guide = "none") +
-    ylim(0, max(CI["qsup95",]) + 0.2) +
+    ylim(0, 1) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
   
@@ -406,7 +405,7 @@ plot.survFitTT <- function(x,
   
   # CI parameters
   if (missing(cicol)) cicol <- "black"
-  if (missing(cilty)) cilty <- 2
+  if (missing(cilty)) cilty <- 1
   if (missing(cilwd)) cilwd <- 1
   if (missing(conf.level)) conf.level <- 0.95
   
@@ -428,7 +427,7 @@ plot.survFitTT <- function(x,
                   CI,
                   xlab, ylab, fitcol, fitlty, fitlwd,
                   main, addlegend,
-                  cicol, cilty, cilwd, ...)
+                  cicol, cilty, cilwd / 2, ...)
   }
   else stop("Unknown style")
 }
