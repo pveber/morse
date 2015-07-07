@@ -22,7 +22,7 @@ knitr::opts_chunk$set(fig.width = 5,
 
 
 ```{r, echo=FALSE, cache=TRUE, results='hide'}
-library(morsedev)
+library(morse)
 ```
 
 # Reproduction data analyses
