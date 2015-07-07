@@ -311,15 +311,39 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   }
 }
 
-#' @export
+#' Plotting method for reproFitTT objects
 #' 
-#' @name reproFitTT
+#' @param x An object of class \code{reproFitTT}.
+#' @param xlab A label for the \eqn{X}-label, by default \code{Concentrations}.
+#' @param ylab A label for the \eqn{Y}-label, by default \code{Response}.
+#' @param main A main title for the plot.
+#' @param fitcol A single color to plot the fitted curve, by default
+#' \code{red}.
+#' @param fitlty A single line type to plot the fitted curve, by default
+#' \code{1}.
+#' @param fitlwd A single numeric which controls the width of the fitted curve,
+#' by default \code{1}.
+#' @param ci If \code{TRUE}, the 95 \% credible limits are draw for the model.
+#' @param cicol A single color to plot the 95 \% credible limits, by default
+#' \code{blue}.
+#' @param cilty A single line type to plot 95 \% credible limits, by default
+#' \code{1}.
+#' @param cilwd A single numeric which controls the width of the 95 \% credible
+#' limits, by default \code{2}.
+#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
+#' @param log.scale Log option for the \eqn{X}-axis.
+#' @param style Graphical package method: \code{generic} or \code{ggplot}.
+#' @param \dots Further arguments to be passed to generic methods.
+#' 
+#' @export
 #' 
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
+#' 
+#' @keywords plot 
 #' 
 plot.reproFitTT <- function(x,
                             xlab,

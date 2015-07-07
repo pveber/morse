@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage{fullpage}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 
@@ -14,7 +15,7 @@
 \section{Survival assays}
 In a survival assay, subjects are exposed to a controlled dose of a pollutant for some time and the number of surviving individuals is measured at certain time points after exposition. In most standard bioassays, the dose is held constant throughout the whole experiment, which we will assume here. An experiment is generally replicated several times and also repeated for various levels of pollutant.
 
-In the case of endpoint assays, the mortality is measured only once, and the chosen time point is called \emph{target time}. Let us how this particular case is handled in MORSE.
+In the case of endpoint assays, the mortality is measured only once, and the chosen time point is called \emph{target time}. Let us see how this particular case is handled in MORSE.
 
 \subsection{Analysis of endpoint survival assays}
 
@@ -31,21 +32,178 @@ f(c) = \frac{d}{1 + (\frac{c}{e})^b}
 $$
 where $b$, $e$ and $d$ are (positive) parameters. In particular $d$ corresponds to the survival rate in absence of pollutant and $e$ corresponds to the $LC_{50}$.
 
-\paragraph{Inference} A posteriori distributions for parameters $b$, $d$ and $e$ are estimated using JAGS. The likelihood is given by:
-
-$$\mathbb{P}[ D | b, d, e] = \prod_i \mbox{dbinom}(n_i, n_i^{init}, f_{b,d,e}(c_i)) $$
-
-\paragraph{Priors}
-
+\paragraph{Inference} A posteriori distributions for parameters $b$,
+$d$ and $e$ are estimated using JAGS with the following priors:
 \begin{align*}
 \log_{10} b & \sim \mathcal{U}(-2,2)\\
 \log_{10} e & \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})
 \end{align*}
 
-The prior on $d$ is chosen in a more \emph{ad hoc} way: if we observe no mortality in control experiments then we set $d = 1$, otherwise we assume a uniform prior for $d$ between 0 and 1.
+The prior on $d$ is chosen in a more \emph{ad hoc} way: if we observe
+no mortality in control experiments then we set $d = 1$, otherwise we
+assume a uniform prior for $d$ between 0 and 1.
 
 
 \section{Reproduction assays}
 
+In a reproduction assay, we observe the number of offspring produced
+by a population of adult individuals subjected to a certain dose of a
+pollutant over a given period of time. The offspring (young
+individuals or eggs) are periodically counted and removed from the
+medium at each observation, so that the reproducing population cannot
+increase. It can decrease however, if some individuals die during the
+experiment. The same procedure is usually repeated with various
+concentrations of pollutant, in order to establish a quantitative
+relationship between the reproduction rate and the concentration of
+pollutant in the medium.
+
+As mentionned already, it is often the case that part of the
+individuals of an assay die during the observation period. In previous
+approaches, it was proposed to consider the cumulated number of
+reproduction outputs without accounting for
+mortality\footnote{\footnotesize OECD. 2004. Guidelines for testing of
+  chemicals n.220. \textit{Enchytraeid} reproduction test. Technical
+  report, Organisation for Economic Cooperation and Development,
+  Paris.}$^{,}$\footnote{\footnotesize OECD. 2008.Guidelines for
+  testing of chemicals n.226. Predatory mite (\textit{Hypoapsis
+    (Geolaelaps) aculeifer}) reproduction test in soil. Technical
+  report, Organisation for Economic Cooperation and Development,
+  Paris.}, or to exclude replicates where mortality
+occurred\footnote{\footnotesize OECD. 1998. Guidelines for testing of
+  chemicals n.211. \textit{Daphnia magna} reproduction test. Technical
+  report, Organisation for Economic Cooperation and
+  Development. Paris.}.  However, individuals may have reproduced
+before dying and thus contributed to the observed response. In
+addition, individuals dying the first are the most sensitive, so the
+information on reproduction of these prematurely dead individuals is
+valuable and ignoring it is likely to bias the results in a
+non-conservative way. This is particularly critical at high
+concentrations, when mortality may be very high.
+
+In a bioassay, mortality is usually regularly recorded, \textit{i.e}.
+at each timepoint when reproduction outputs are counted.  Using these
+data, it is easy to estimate for each individual, the period it has
+stayed alive, corresponding to the period it may reproduce.  As
+commonly done in epidemiology for incidence rate calculations, we can
+then calculate, for one replicate, the total sum of the periods of
+observation of each individual before its death\footnote{\footnotesize
+  When an organism is staying alive a time $t_k$ but counted as dead
+  at time $t_{k+1}$, it is then assumed to be really dead at time
+  $\frac{t_{k+1}+t_k}{2}$.}. This sum can be expressed as a number of
+individual-days. Hence, reproduction can be evaluated through the
+number of outputs per individual-day.
+
+In the following, we denote $M_{ijk}$ the number of surviving
+individuals for concentration $c_i$ and replicate $j$ at time $t_k$
+(and $m_{ijk}$ the corresponding observed value). 
+
+\subsection{Estimation of effective observation time}
+
+We define the effective observation time as the sum for all
+individuals of the time they spent alive in the experiment. It is
+counted in individual-days and will be denoted $NID_{ij}$ for
+concentration $c_i$ and replicate $j$. As mentionned earlier,
+mortality is observed at particular time points only, so the real life
+time of an individual is unknown and in practice we use the following
+simple estimation: if an individual is alive at $t_k$
+but dead at $t_{k+1}$, its real life time is approximated as
+$\frac{t_{k+1}+t_k}{2}$. 
+
+With this assumption, the effective observation time for concentration
+$c_i$ and replicate $j$ is then given by:
+$$
+NID_{ij} =   \sum_k m_{ij(k+1)} (t_{k+1} - t_k)
+           + (m_{ijk} - m_{ij(k+1)})(\frac{t_{k+1}+t_k}{2} - t_k)
+$$
+
+\subsection{Target time analysis}
+In this paragraph, we describe our so-called ``target time analysis'',
+where we model the cumulated number of offspring up to a target time
+as a function of the effective observation time in this period
+(cumulated life times of all individuals in the experiment, as
+described above). The data will therefore correspond to a set
+$\{(nid_{ij}, n_{ij})\}$ of pairs supposed to be drawn independently
+from a distribution that is a function of the level of pollutant
+$c_i$.
+
+
+\paragraph{Modelling} We assume here that the effect of the considered
+pollutant on the reproduction rate does not depend on exposure time,
+but only on the concentration of the pollutant. More precisely, the
+mean reproduction rate in an experiment with a concentration $c_i$ of
+pollutant is modelled by a three-parameter log-logistic model, that
+writes as follows::
+\[
+f(c_i;\theta)=\frac{d}{1+(c_i/e)^b} \quad \textrm{with} \quad \theta=(e,b,d)
+\].
+
+Here $d$ corresponds to the reproduction rate in absence of
+contaminant (control condition), and $e$ to the value of the
+$EC_{50}$, that is the concentration dividing the average number of
+offspring by two with respect to the control condition.  Now the
+number of reproduction outputs $N_{ij}$ at concentration $c_i$ in
+replicate $j$ can be modelled using a Poisson distribution:
+$$
+N_{ij} \sim Poisson(f(c_i ; \theta) \times NID_{ij})
+$$
+This model is later referenced as ``Poisson model''.  In case there
+are non-negligible random variations of the reproduction rate between
+two replicates, we propose a second model, named ``gamma-Poisson
+model'', stating that:
+$$
+N_{ij} \sim Poisson(F_{ij} \times NID_{ij})
+$$
+where the reproduction rate $F_{ij}$ for concentration $c_i$ and
+replicate $j$ is a random variable following a gamma
+distribution. Introducting a dispersion parameter $\omega$, we pose
+that:
+$$
+F_{ij} \sim gamma(\frac{f(c_i;\theta)}{\omega}, \frac{1}{\omega})
+$$
+Note that a gamma distribution of parameters
+$\alpha$ and $\beta$ has mean $\frac{\alpha}{\beta}$ and variance
+$\frac{\alpha}{\beta^2}$, that is here $f(c_i;\theta)$ and $\omega
+f(c_i;\theta)$ respectively.
+
+
+\paragraph{Inference} A posteriori distributions for parameters $b$,
+$d$ and $e$ are estimated using JAGS with the following priors:
+\begin{itemize}
+\item we assume the range of tested concentrations in an
+  experiment is chosen to contain the $EC_{50}$ with high
+  probability. More formally, we chose:
+  $$\log_{10} e \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})$$
+  and $e$ has a probability slightly higher than 0.95 to lie between
+  the minimum and the maximum tested concentration.
+\item we chose a quasi non-informative prior distribution for the
+  shape parameter $b$:
+  $$\log_{10} b \sim \mathcal{U}(-2,2)$$
+  
+\item
+  as $d$ corresponds to the reproduction rate without contaminant, we
+  set a normal prior $\mathcal{N}(\mu_d,\sigma_d)$ using the data:
+  \begin{align*}
+    \mu_d & = \frac{1}{r_0} \sum_j \frac{n_{0j}}{nid_{0j}}\\
+    \sigma_d & = \frac{1}{\sqrt{r_0}(r_0 - 1)} \sum_j (\frac{n_{0j}}{nid_{0j}} - \mu_d)^2\\
+  \end{align*}
+  where $r_0$ is the number of replicates in the control
+  condition. Note that since they are used to estimate a prior
+  distribution, the data for the control condition are not used in the
+  fitting phase.
+  
+\item we chose a quasi non-informative prior distribution for the
+  $\omega$ parameter of the gamma-Poisson model:
+$$log_{10}(\omega) \sim U(-4,4)$$
+\end{itemize}
+\begin{align*}
+\end{align*}
+
+% \paragraph{Inference} As shown in (FIXME papier ML), the gamma-Poisson
+% model described above is equivalent to the following negative binomial
+% model:
+% $$
+% N_{ij} \sim \mbox{Negbin}(\frac{1}{1 + \omega \times NID_{ij}}, \frac{f(c_i ; \theta)}{\omega})
+% $$
+% of mean $\omega \times NID_{ij}$ and variance 
 
 \end{document}

@@ -178,146 +178,36 @@ llm.poisson.model.text <- "\nmodel # Loglogistic Poisson model\n{\n#\nfor (j in 
 llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\nfor (j in 1:n) # loop on replicates\n{\n# Explicit writting of a gamma-Poisson law for each replicate\n# the mean is given by a gamma law centered on the theoretical curve\nrate[j] <- d / (1 + pow(xconc[j]/e, b)) / omega\np[j] <- 1 / (Nindtime[j] * omega + 1)\nNcumul[j] ~ dnegbin(p[j], rate[j])\n}\n# Prior distributions\nd ~ dnorm(meand, taud)T(0,)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\nlog10omega ~ dunif(log10omegamin, log10omegamax)\n\nomega <- pow(10,log10omega)\nb <- pow(10,log10b)\ne <- pow(10,log10e)\n}\n"
 
 
-#' Fit an exposure-response model to reproduction data taking mortality into
-#' account within the Bayesian framework
+#' Fit a Bayesian exposure-response model for endpoint reproduction analysis
 #' 
-#' The \code{reproFitTT} function estimates the parameters of an exposure-response
-#' model to reproduction data using Bayesian inference. One deterministic part
-#' is proposed: the log-logistic function. Two stochastic parts may be chosen in
-#' order to take into account the nature of reproduction data and the inter-
-#' replicate variability (Delignette-Muller et al., 2014).
-#' The function returns parameter estimates of the exposure-response model and
-#' estimates of \eqn{x} \% effective concentration for \eqn{x} = 5, 10, 20 and
-#' 50 by default. The \code{reproParfitTt} function does the same thing as
-#' \code{reproFitTT}, but chains are run on parallel workers, so that
-#' computations can be faster for long MCMC runs. The function calls the
-#' \code{\link[rjags]{rjags}} package (Plummer, 2013) and the \code{dclone}
-#' package for parallelization of chains. Generic methods are \code{print},
-#' \code{plot} and \code{summary}.
-#' 
-#' \describe{
-#' \item{"log-logistic" deterministic part:}{ the reproduction rate (expressed
-#' in number of offspring per individual-day) at concentration
-#' \eqn{C_{i}}{C_{i}} was described by:
-#' \deqn{f(C_{ij}) = \frac{d}{ 1 + (\frac{C_{ij}}{e})^b}}{f(C_{ij}) = d / (1 +
-#' (C_{ij} / e)^b)} where \eqn{d} stands for the expected number of offspring per
-#' individual-day in the control, \eqn{e} is the 50 \% effective concentration
-#' (\eqn{EC_{50}}{EC50}) and \eqn{b} is a slope parameter.  The number of offspring
-#' at concentration \eqn{i} and replicate \eqn{j} was described by a Poisson
-#' distribution of mean equal to the product of the number of individual-days
-#' \eqn{Nindtime_{ij}}{Nindtime_{ij}} by a term \eqn{f(C_{ij})}{f(C_{ij})}
-#' differing between the two stochastic parts.  For parameter \eqn{e}, the
-#' function assumed that the experimental design was defined from a prior
-#' knowledge on the \eqn{EC_{50}}{EC50}, with a probability of 95 \% for the
-#' expected value to lie between the smallest and the highest tested
-#' concentrations. Hence, a log-normal distribution for \eqn{e} was calibrated
-#' from that prior knowledge.  The parameter \eqn{d} was characterized by a
-#' prior normal distribution with two parameters: \deqn{\mu =
-#' \overline{(\frac{Nreprocumul_{j}}{Nindtime_{j}})}}{mu = mean(Nreprocumul_{j}
-#' / Nindtime_{j})} and \deqn{\tau = \frac{1}{{\sigma_{d}}^2}}{tau = 1 /
-#' sigma_{d}^2} where \deqn{\sigma_{d} =
-#' \frac{sd(\frac{Nreprocumul_{j}}{Nindtime_{j}})}{\sqrt{N}}}{sigma_{d} =
-#' sd(Nreprocumul_{j} / Nindtime_{j}) / sqrt(N)} for the control concentration,
-#' \eqn{Nreprocumul} is the cumulative number of offsrping, \eqn{Nindtime} is
-#' the number of individual-days and \eqn{N} is the number of replicates.  The
-#' slope parameter \eqn{b} was characterized by a prior log-uniform
-#' distribution between -2 and 2 in decimal logarithm (Delignette-Muller et
-#' al., 2014).  Note: Here, the cumululative number of offspring and the number
-#' of individual-days of the control are only used to calculate the prior
-#' parameters of \eqn{d}. They are not used in the inference.}
-#' 
-#' \item{"poisson" stochastic part:}{\eqn{f(C_{ij})} only depends on the
-#' concentration and \deqn{N_{ij} \sim Poisson(f(C_{ij}) \times
-#' Nindtime_{ij})}{N_{ij} ~ Poisson(f(C_{ij}) * Nindtime_{ij})} with
-#' \eqn{Nindtime_{ij}} the number of individual-days at the target time for
-#' each replicate and each concentration.}
-#' \item{"gammapoisson" stochastic part:}{\eqn{f_{ij}} is assummed to be
-#' variable between replicates at a same concentration and to follow a gamma
-#' distribution: \deqn{N_{ij} \sim Negbin(\frac{1}{1+\omega \times
-#' Nindtime_{ij}},\frac{f(C_{ij})}{\omega})}{N_{ij} ~ Negbin(1 / (1 + omega *
-#' Nindtime_{ij}), f(C_{ij}) / \omega)} with \eqn{\omega}{omega} the
-#' overdispersion parameter.  Prior on \eqn{\omega}{omega} is described by a
-#' log-uniform distribution between -4 and 4 in decimal logarithm.}
-#' }
-#' 
-#' Credible limits: For 100 values of concentrations regularly spread within
-#' the range of tested concentrations the joint posterior distribution of
-#' parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
-#' offspring per individual-day for various replicates. For each concentration,
-#' 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
-#' there is a point estimate and a 95 \% credible interval (Delignette-Muller
-#' et al., 2014).
-#' 
-#' DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
-#' al. (2002) is provided by the \code{dic.samples} function. The DIC is a
-#' goodness-of-fit criterion penalized by the complexity of the model
-#' (Delignette-Muller et al., 2014).
-#' 
-#' Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
-#' control diagnostic based on a criterion that calculates the appropriate
-#' number of iterations required to accurately estimate the parameter
-#' quantiles. The Raftery and Lewis's diagnostic value used in the
-#' \code{reproFitTT} function is the \code{resmatrix} object. See the
-#' \code{\link[coda]{raftery.diag}} help for more details.
-#' 
-#' Model selection: When \code{stoc.part = "bestfit"}, the \code{reproFitTT}
-#' function chooses itself between the Poisson and the Gamma-Poisson model
-#' depending on the number of MCMC samples and on the DIC values.  The minimum
-#' number of MCMC samples for the pilot run is provided by the Raftery and
-#' Lewis's diagnostic (Raftery and Lewis 1992). If this number is less than 100
-#' 000 for the Poisson and the Gamma-Poisson model and if the DIC difference
-#' between Poisson and Gamma-poisson models is small (typically less than 10),
-#' then the Poisson model is selected. If this number is more than 100 000 for
-#' only one model, the other one is selected.
-#' 
-#' @aliases reproFitTT plot.reproFitTT
+#' In this model, the reproduction rate in a population is modeled as a function of the
+#' pollutant's concentration. The actual cumulated number of offspring produced during a given
+#' period (called target time) is then modeled as a stochastic function of the reproduction rate.
+#' The \code{reproFitTT} fits two variants of this model: the Poisson model assumes the
+#' reproduction rate is strictly constant given a concentration of pollutant; the gamma-Poisson
+#' introduces stochastic variability of the reproduction rate between two replicates, at the
+#' expense of an additional parameter. Details of the two models are presented in the vignette
+#' accompanying the package.
 #' 
 #' @param data An object of class \code{reproData}.
-#' @param stoc.part Stochastic part of the model.
-#' @param target.time The chosen time to calculate the estimation. The time at
-#' which the number of individual-days and the cumulative number of offspring
-#' from the beginning of the bioassay are calculated. By default the last time
-#' point.
+#' @param stoc.part Stochastic part of the model. Possible values are \code{"bestfit"},
+#' \code{"poisson"} and \code{"gammapoisson"}, 
+#' @param target.time Defines the observation period. By default the last time point.
 #' @param ecx Values of \eqn{x} to calculate desired \eqn{EC_{x}}{ECx}.
-#' @param n.chains Number of MCMC chains. The minimum required number of chains
-#' is 2.
+#' @param n.chains Number of MCMC chains. The minimum required number of chains is 2.
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
 #' JAGS compilation.
-#' @param x An object of class \code{reproFitTT}.
-#' @param xlab A label for the \eqn{X}-label, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-label, by default \code{Response}.
-#' @param main A main title for the plot.
-#' @param fitcol A single color to plot the fitted curve, by default
-#' \code{red}.
-#' @param fitlty A single line type to plot the fitted curve, by default
-#' \code{1}.
-#' @param fitlwd A single numeric which controls the width of the fitted curve,
-#' by default \code{1}.
-#' @param ci If \code{TRUE}, the 95 \% credible limits are draw for the model.
-#' @param cicol A single color to plot the 95 \% credible limits, by default
-#' \code{blue}.
-#' @param cilty A single line type to plot 95 \% credible limits, by default
-#' \code{1}.
-#' @param cilwd A single numeric which controls the width of the 95 \% credible
-#' limits, by default \code{2}.
-#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' @param log.scale Log option for the \eqn{X}-axis.
-#' @param style Graphical package method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
 #' 
-#' @return The function returns an object of class \code{reproFitTT}. A list
-#' of 14 objects:
+#' 
+#' @return The function returns an object of class \code{reproFitTT} which is a list
+#' of the following objects:
 #' \item{DIC}{DIC value of the selected model.}
 #' \item{estim.ECx}{A table of the estimated 5, 10, 20 and 50 \% effective
 #' concentrations (by default) and their 95 \% credible intervals.}
 #' \item{estim.par}{A table of the estimated parameters as medians and 95 \%
 #' credible intervals.}
-#' \item{det.part}{A character string of the name of the deterministic part of
-#' the model.}
-#' \item{mcmc}{An object of class
-#' \code{mcmc.list} with the posterior distributions.}
+#' \item{mcmc}{An object of class \code{mcmc.list} with the posterior distributions.}
 #' \item{model}{A JAGS model object.}
-#' \item{model.label}{An undocumented value for internal use only.} 
 #' \item{parameters}{A list of the parameters names used in the model.}
 #' \item{n.chains}{An integer value corresponding to the number of chains used
 #' for the MCMC computation.}
@@ -328,32 +218,64 @@ llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\
 #' \code{\link[rjags]{jags.model}} function. This object is intended for the
 #' case when the user wishes to use the \code{\link[rjags]{rjags}} package
 #' instead of the automatied estimation function.}
-#' \item{transformed.data}{The dataframe of the \code{\link{survData}} object.}
-#' \item{dataTT}{The subset of transformed.data at target time.}
 #' 
 #' @author Marie Laure Delignette-Muller
 #' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
 #' <philippe.ruiz@@univ-lyon1.fr>
 #' 
-#' @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-#' \code{\link[rjags]{dic.samples}}, \code{\link[coda]{raftery.diag}}
-#' and \code{\link[ggplot2]{ggplot}}
-#' 
-#' @references Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
-#' (2014) Statistical handling of reproduction data for exposure-response
-#' modelling.
-#' \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
-#' 
-#' Plummer, M. (2013) JAGS Version 3.4.0 user manual.
-#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
-#' 
-#' Raftery A.E. and Lewis, S.M. (1992) One long run with diagnostics:
-#' Implementation strategies for Markov chain Monte Carlo. \emph{Statistical
-#' Science}, 7, 493-497.
-#' 
-#' Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
-#' measures of model complexity and fit (with discussion).  \emph{Journal of
-#' the Royal Statistical Society}, Series B 64, 583-639.
+# FIXME
+# \describe{
+# 
+# Credible limits: For 100 values of concentrations regularly spread within
+# the range of tested concentrations the joint posterior distribution of
+# parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
+# offspring per individual-day for various replicates. For each concentration,
+# 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
+# there is a point estimate and a 95 \% credible interval (Delignette-Muller
+# et al., 2014).
+# 
+# DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
+# al. (2002) is provided by the \code{dic.samples} function. The DIC is a
+# goodness-of-fit criterion penalized by the complexity of the model
+# (Delignette-Muller et al., 2014).
+# 
+# Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
+# control diagnostic based on a criterion that calculates the appropriate
+# number of iterations required to accurately estimate the parameter
+# quantiles. The Raftery and Lewis's diagnostic value used in the
+# \code{reproFitTT} function is the \code{resmatrix} object. See the
+# \code{\link[coda]{raftery.diag}} help for more details.
+# 
+# Model selection: When \code{stoc.part = "bestfit"}, the \code{reproFitTT}
+# function chooses itself between the Poisson and the Gamma-Poisson model
+# depending on the number of MCMC samples and on the DIC values.  The minimum
+# number of MCMC samples for the pilot run is provided by the Raftery and
+# Lewis's diagnostic (Raftery and Lewis 1992). If this number is less than 100
+# 000 for the Poisson and the Gamma-Poisson model and if the DIC difference
+# between Poisson and Gamma-poisson models is small (typically less than 10),
+# then the Poisson model is selected. If this number is more than 100 000 for
+# only one model, the other one is selected.
+# }
+# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
+# \code{\link[rjags]{dic.samples}}, \code{\link[coda]{raftery.diag}}
+# and \code{\link[ggplot2]{ggplot}}
+# 
+# @references Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
+# (2014) Statistical handling of reproduction data for exposure-response
+# modelling.
+# \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
+# 
+# Plummer, M. (2013) JAGS Version 3.4.0 user manual.
+# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
+# 
+# Raftery A.E. and Lewis, S.M. (1992) One long run with diagnostics:
+# Implementation strategies for Markov chain Monte Carlo. \emph{Statistical
+# Science}, 7, 493-497.
+# 
+# Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
+# measures of model complexity and fit (with discussion).  \emph{Journal of
+# the Royal Statistical Society}, Series B 64, 583-639.
+# 
 #' 
 #' @keywords estimation
 #' 
