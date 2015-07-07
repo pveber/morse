@@ -235,10 +235,12 @@ dataPlotFixedConc <- function(x, resp,
   x$color <- as.numeric(as.factor(x$replicate))
 
   if (style == "generic") {
-    plot(x$time, x[,resp],
+    plot(x$time, x[, resp],
          type = "n",
          xaxt = "n",
          yaxt = "n",
+         xlim = range(x$time),
+         ylim = c(0, max(x[, resp])),
          xlab = xlab,
          ylab = ylab)
 
