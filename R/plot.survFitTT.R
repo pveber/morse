@@ -85,6 +85,7 @@ survFitPlotGenericNoCI <- function(x,
   }
 }
 
+#' @importFrom plotrix plotCI
 survFitPlotGenericCI <- function(x,
                                  data_conc, transf_data_conc, data_resp,
                                  curv_conc, curv_resp,
@@ -180,6 +181,7 @@ survFitPlotGGNoCI <- function(data, curv, valCols,
   return(plt_4)
 }
 
+#' @importFrom grid arrow
 survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
