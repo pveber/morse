@@ -184,10 +184,10 @@ reproFitPlotGGNoCI <- function(data, curv, cols2,
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp, shape = Mortality),
                size = 3) +
+    scale_shape_identity() +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     scale_color_discrete(guide = "none") +
-    scale_shape(guide = "none") +
     ylim(0, max(data$resp) + 1) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
@@ -219,6 +219,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp,
                                 shape = Mortality), size = 3) +
+    scale_shape_identity() +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     geom_line(data = cri, aes(conc, qinf95),
@@ -263,6 +264,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(conc, resp,
                                 shape = Mortality), size = 3) +
+    scale_shape_identity() +
     theme_minimal()
   
   # curve (to create the legend)
