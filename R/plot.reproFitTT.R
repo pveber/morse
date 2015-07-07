@@ -400,7 +400,7 @@ plot.reproFitTT <- function(x,
   
   # default axis parameters
   if (missing(xlab)) xlab <- "Concentrations"
-  if(missing(ylab)) ylab <- "Nb. of offspring / NID"
+  if(missing(ylab)) ylab <- "Nb of offspring per ind.day"
   
   # default legend parameters	
   if (missing(fitcol)) fitcol <- "red"
