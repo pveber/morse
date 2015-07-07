@@ -281,7 +281,8 @@ dataPlotFixedConc <- function(x, resp,
       scale_color_hue("Replicate") +
       scale_x_continuous(breaks = unique(x$time),
                          labels = unique(x$time)) +
-      scale_y_continuous(breaks = unique(x$response))
+      scale_y_continuous(breaks = c(0, unique(x$response))) +
+      expand_limits(x = 0, y = 0)
 
     if (addlegend) {# only if pool.replicate == FALSE
       fd
