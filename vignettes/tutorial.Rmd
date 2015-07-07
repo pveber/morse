@@ -23,6 +23,7 @@ knitr::opts_chunk$set(fig.width = 5,
 
 ```{r, echo=FALSE, cache=TRUE, results='hide'}
 library(morse)
+library(ggplot2)
 ```
 
 # Reproduction data analyses
@@ -52,28 +53,30 @@ The new object contains the reorder dataframe with new datas (see the modelling 
     
 * Step three, plot the `reproData` object
   
-`plot()` plots the cmulated number of offsprings depending on the time for all concentrations and replicates.
+`plot()` is an S3 method for the `reproData` class and plots the cmulated number of offsprings depending on the time for all concentrations and replicates. Two graphical styles are available, `"generic"` for standar `R` plots or `"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`is `TRUE` the observed datapoints for a same replicat are pooled together and the mean of the replicate is plotted.
 
 ```{r, cache=TRUE}
-plot(dat1)
+plot(dat1, style = "ggplot", pool.replicate = FALSE)
 ```
 
 `plot(, target.time)` plots the cumulated number of offsprings depending on the concentration for a fixed target time.
   
 ```{r, cache=TRUE}
-plot(dat1, target.time = 21, addlegend = TRUE)
+plot(dat1, target.time = 21, addlegend = TRUE, style = "ggplot",
+     pool.replicate = FALSE)
 ```
 
 `plot(, concentration)` plots the cumulated number of offsprings depending on the time for a fixed concentration.
 
 ```{r, cache=TRUE}
-plot(dat1, concentration = 4.36, addlegend = TRUE)
+plot(dat1, concentration = 4.36, addlegend = TRUE, style = "ggplot",
+     pool.replicate = FALSE)
 ```
 
 and `plot(, conctration, target.time)` compares the cumulated number of offsprings of each replicate for a fixed concentration and a fixed time to the control at the same time.
 
 ```{r, cache=TRUE}
-plot(dat1, concentration = 4.36, target.time = 21)
+plot(dat1, concentration = 4.36, target.time = 21, style = "ggplot")
 ```
 
 The `summary()` provides informations on the experimental design.
@@ -100,7 +103,8 @@ The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated paramete
 
 ```{r, cache=TRUE}
 summary(out)
-plot(out, log.scale = TRUE, ci = TRUE)
+plot(out, log.scale = TRUE, ci = TRUE, style = "ggplot",
+     pool.replicate = FALSE, addlegend = TRUE)
 ```
 
 * Step five, check the obseved versus predicted values
@@ -109,7 +113,7 @@ The function `ppc()` plots the observed versus predicted values with the 95 \%
 credible intervale for each predicted values.
 
 ```{r, cache=TRUE}
-ppc(out)
+ppc(out, style = "ggplot")
 ```
 
 # Survival data analyses
@@ -139,20 +143,22 @@ dat2
 concentrations and replicates.
 
 ```{r, cache=TRUE}
-plot(dat2)
+plot(dat2, style = "ggplot", pool.replicate = FALSE)
 ```
 
 `plot(, target.time)` plots the number of surviving individuals depending on the
 concentration for a fixed time point.
   
 ```{r, cache=TRUE}
-plot(dat2, target.time = 21, addlegend = TRUE)
+plot(dat2, target.time = 21, pool.replicate = FALSE, style = "ggplot",
+     addlegend = TRUE)
 ```
 
 `plot(, concentration)` plots the number of surviving individuals depending on the time for a fixed concentration.
 
 ```{r, cache=TRUE}
-plot(dat2, concentration = 4.36, addlegend = TRUE)
+plot(dat2, concentration = 4.36, addlegend = TRUE,
+     pool.replicate = FALSE, style = "ggplot")
 ```
 
 and `plot(, conctration, target.time)` compares the number of surviving individuals of each replicate for a fixed concentration and a fixed time to the control at the same time.
@@ -183,11 +189,12 @@ The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated paramete
 
 ```{r, cache=TRUE}
 summary(out2)
-plot(out2, log.scale = TRUE, ci = TRUE)
+plot(out2, log.scale = TRUE, ci = TRUE, style = "ggplot",
+     addlegend = TRUE)
 ```
   
 * Step five, check the obseved versus predicted values
   
 ```{r,cache=TRUE}
-ppc(out2)
+ppc(out2, style = "ggplot")
 ```
