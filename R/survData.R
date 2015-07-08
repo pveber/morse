@@ -1,3 +1,49 @@
+#' Summarize of survData object
+#' 
+#' The generic \code{summary} S3 method for the \code{survData} class provides
+#' information about the structure of the dataset and the experimental design.
+#' 
+#' @param x An object of class \code{survData}
+#' 
+#' @seealso \code{\link{survData}}
+#' 
+#' @examples
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a survData object
+#' cadmium1 <- survData(cadmium1)
+#' 
+#' # (3) Summarize the dataset
+#' summary(cadmium1)
+#' 
+#' @keywords summary
+#' 
+#' @export
+#' 
+summary.survData <- function(x) {
+  # matrix of number of replicate by time / conc
+  ans1 <- table(x[, c("conc", "time")])
+  
+  # matrix of number of survival (sum of all replicate) by time / conc
+  ans2 <- tapply(x$Nsurv, list(as.factor(x$conc), as.factor(x$time)), sum)
+  
+  # table of datapoints per concentration
+  ans3 <- table(x$conc)
+  
+  # table of datapoints per time
+  ans4 <- table(x$time)
+  
+  cat("Number of replicate per time and concentration: \n")
+  print(ans1)
+  cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
+  print(ans2)
+  cat("\nNumber of datapoints per concentration: \n")
+  print(ans3)
+  cat("\nNumber of datapoints per time: \n")
+  print(ans4)
+}
+
 #' Creates a dataset for survival analysis
 #'
 #' This function creates a \code{survData} object from experimental data
@@ -27,17 +73,9 @@
 #' alive individuals at each time point for each concentration and each replicate
 #' }
 #' @param \dots Further arguments to be passed to generic methods.
+#' @param x An object of class survData
 #'
 #' @return A dataframe of class \code{survData}.
-#'
-#' Generic functions:
-#' \describe{
-#' \item{\code{summary}}{The summary provides information about the structure
-#' of the dataset and the experimental design:
-#' the number of datapoints per replicate, concentration and time both for the
-#' raw dataset and the transformed dataset.}
-#' \item{\code{print}}{Print of a \code{survData} object with the transformed
-#' dataframe.}}
 #'
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #'
