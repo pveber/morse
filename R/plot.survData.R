@@ -50,12 +50,7 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
 
     # axis
     axis(side = 1, at = sort(unique(x[, "time"])))
-    axis(side = 2, at = if (length(unique(x[, resp])) < 5) {
-      pretty(c(0, max(x[, resp])),
-             n = length(unique(x[, resp])))
-      } else {
-        pretty(c(0, max(x[, resp])), n = 10)
-        })
+    axis(side = 2)
 
 
     # lines and points
@@ -106,8 +101,6 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
 #' @import ggplot2
 dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
 
-  time = NULL
-  Nsurv = NULL
   title.legend <- "Replicate"
 
   data$response <- data[,resp]
@@ -119,7 +112,7 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, nrow = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
-    scale_y_continuous(breaks = unique(data$resp)) +
+    ylim(c(0, max(x[, resp]))) +
     theme_minimal()
 
   # legend option
