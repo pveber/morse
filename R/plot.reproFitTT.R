@@ -124,7 +124,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(CI[["qsup95"]]) + 0.2),
+       ylim = c(0, max(c(data_resp, CI[["qsup95"]])) + 0.01),
        type = "n",
        ...)
   
@@ -157,7 +157,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
            lwd = c(1, 1, fitlwd, cilwd),
            col = c(1, 1, fitcol, cicol),
            legend = c("No mortality", "Mortality",
-                      "loglogistic", "Credible limits of loglogistic"),
+                      "loglogistic", "95% Credible limits"),
            bty = "n")
 }
 
@@ -189,10 +189,9 @@ reproFitPlotGGNoCI <- function(data, curv, valCols,
     geom_point(data = data, aes(transf_conc, resp, fill = Mortality),
                pch = 21,
                size = 3) +
-    scale_fill_manual(values = valCols$cols1) +
+    scale_fill_manual(values = valCols$cols1, guide = "none") +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
-    scale_color_discrete(guide = "none") +
     ylim(0, max(data$resp) + 1) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
@@ -206,7 +205,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
   cri <- data.frame(conc = curv$conc,
                            qinf95 = CI[["qinf95"]],
                            qsup95 = CI[["qsup95"]],
-                           CI = "Credible limits of loglogistic")
+                           CI = "Credible limits")
   
   plt_3 <- ggplot(data) +
     geom_line(data = cri, aes(conc, qinf95, color = CI),
@@ -217,11 +216,13 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
                                 ymax = qsup95), fill = "pink", alpha = 0.4) +
     scale_color_manual(values = valCols$cols3) + theme_minimal()
 
+  # plot IC
+  # final plot
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp,
                                 fill = Mortality),
                pch = 21, size = 3) +
-    scale_fill_manual(values = valCols$cols1) +
+    scale_fill_manual(values = valCols$cols1, guide = "none") +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     geom_line(data = cri, aes(conc, qinf95),
@@ -230,8 +231,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
               linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
                                 ymax = qsup95), fill = "pink", alpha = 0.4) +
-    scale_color_discrete(guide = "none") +
-    ylim(0, max(CI[["qsup95"]]) + 0.2) +
+    ylim(0, max(c(data[,"resp"], CI[["qsup95"]])) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
 
@@ -256,14 +256,6 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                      resp = data_resp, Mortality = mortality)
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
-#   # colors
-#   # points vector
-#   cols1 <- c("black", "white")
-#   names(cols1) <- sort(unique(data$Mortality))
-#   # fitted curve
-#   cols2 <- fitcol
-#   names(cols2) <- "loglogistic"
-  
   # colors
   valCols <- fCols(data, x, fitcol, cicol, "repro")
   
@@ -271,8 +263,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(conc, resp,
                                 fill = Mortality),
-               pch = 21,
-               size = 3) +
+               pch = 21, size = 3) +
     scale_fill_manual(values = valCols$cols1) +
     theme_minimal()
   

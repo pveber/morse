@@ -237,7 +237,7 @@ fCols <- function(data, x, fitcol, cicol, analyse) {
     names(cols2) <- "loglogistic"
     # CI
     cols3 <- cicol
-    names(cols3) <- "Credible limits of loglogistic"
+    names(cols3) <- "Credible limits"
     }
     return(list(cols1 = cols1,
                 cols2 = cols2,
