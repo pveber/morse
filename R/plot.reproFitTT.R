@@ -252,10 +252,6 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                      resp = data_resp, Mortality = mortality)
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
-  # colors
-  # points vector
-  cols1 <- c("#F8766D", "#00BFC4")
-  names(cols1) <- sort(unique(data$Mortality))
   # fitted curve
   cols2 <- fitcol
   names(cols2) <- "loglogistic"
@@ -263,7 +259,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   # points (to create the legend)
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(conc, resp,
-                                color = Mortality)) +
+                                 = Mortality)) +
     scale_color_manual(values = cols1) +
     theme_minimal()
   
@@ -426,6 +422,7 @@ plot.reproFitTT <- function(x,
     mortality[which(mortality == 0)] <- "No"
     mortality[which(mortality == 1)] <- "Yes"
   }
+#  mortality[which(mortality == 0)] <- 19
   
   CI <- if (ci) { CI <- reproLlmCI(x, display.conc) } else NULL
   
