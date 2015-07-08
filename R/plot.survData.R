@@ -50,13 +50,7 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
 
     # axis
     axis(side = 1, at = sort(unique(x[, "time"])))
-    axis(side = 2, at = if (length(unique(x[, resp])) < 5) {
-      pretty(c(0, max(x[, resp])),
-             n = length(unique(x[, resp])))
-      } else {
-        pretty(c(0, max(x[, resp])), n = 10)
-        })
-
+    axis(side = 2, at = c(0, sort(unique(x[, resp]))))
 
     # lines and points
     by(x, x$replicate, function(y) {
