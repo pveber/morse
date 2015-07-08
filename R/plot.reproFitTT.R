@@ -183,15 +183,15 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
   }
 }
 
-reproFitPlotGGNoCI <- function(data, curv, cols1, cols2,
+reproFitPlotGGNoCI <- function(data, curv, valCols,
                                fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp, fill = Mortality),
                pch = 21,
                size = 3) +
-    scale_fill_manual(values = cols1) +
+    scale_fill_manual(values = valCols$cols1) +
     geom_line(aes(conc, resp), curv,
-              linetype = fitlty, size = fitlwd, color = cols2) +
+              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     scale_color_discrete(guide = "none") +
     ylim(0, max(data$resp) + 1) +
     labs(x = xlab, y = ylab) +
@@ -201,16 +201,12 @@ reproFitPlotGGNoCI <- function(data, curv, cols1, cols2,
 }
 
 reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
-                             cols1, cols2, fitlty, fitlwd, xlab, ylab, main) {
+                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   cri <- data.frame(conc = curv$conc,
                            qinf95 = CI[["qinf95"]],
                            qsup95 = CI[["qsup95"]],
                            CI = "Credible limits of loglogistic")
-  
-  # colors 
-  cols3 <- cicol
-  names(cols3) <- "Credible limits of loglogistic"
   
   plt_3 <- ggplot(data) +
     geom_line(data = cri, aes(conc, qinf95, color = CI),
@@ -219,19 +215,19 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
                                 ymax = qsup95), fill = "pink", alpha = 0.4) +
-    scale_color_manual(values = cols3) + theme_minimal()
+    scale_color_manual(values = valCols$cols3) + theme_minimal()
 
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp,
                                 fill = Mortality),
                pch = 21, size = 3) +
-    scale_fill_manual(values = cols1) +
+    scale_fill_manual(values = valCols$cols1) +
     geom_line(aes(conc, resp), curv,
-              linetype = fitlty, size = fitlwd, color = cols2) +
+              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     geom_line(data = cri, aes(conc, qinf95),
-              linetype = cilty, size = cilwd, color = cols3) +
+              linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_line(data = cri, aes(conc, qsup95),
-              linetype = cilty, size = cilwd, color = cols3) +
+              linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
                                 ymax = qsup95), fill = "pink", alpha = 0.4) +
     scale_color_discrete(guide = "none") +
@@ -260,13 +256,16 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                      resp = data_resp, Mortality = mortality)
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
+#   # colors
+#   # points vector
+#   cols1 <- c("black", "white")
+#   names(cols1) <- sort(unique(data$Mortality))
+#   # fitted curve
+#   cols2 <- fitcol
+#   names(cols2) <- "loglogistic"
+  
   # colors
-  # points vector
-  cols1 <- c("black", "white")
-  names(cols1) <- sort(unique(data$Mortality))
-  # fitted curve
-  cols2 <- fitcol
-  names(cols2) <- "loglogistic"
+  valCols <- fCols(data, x, fitcol, cicol, "repro")
   
   # points (to create the legend)
   plt_1 <- ggplot(data) +
@@ -274,22 +273,22 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                                 fill = Mortality),
                pch = 21,
                size = 3) +
-    scale_fill_manual(values = cols1) +
+    scale_fill_manual(values = valCols$cols1) +
     theme_minimal()
   
   # curve (to create the legend)
   plt_2 <- ggplot(data) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
-    scale_color_manual(values = cols2) +
+    scale_color_manual(values = valCols$cols2) +
     theme_minimal()
   
   plt_4 <-
     if (! is.null(CI)) {
       reproFitPlotGGCI(data, curv, CI, cicol, cilty, cilwd,
-                       cols2, fitlty, fitlwd, xlab, ylab, main)$plt_4
+                       valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
-      reproFitPlotGGNoCI(data, curv, cols1, cols2, fitlty, fitlwd,
+      reproFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
                          xlab, ylab, main)
     }
   
@@ -307,7 +306,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
     }
     else {
       plt_3 <- reproFitPlotGGCI(data, curv, CI, cicol, cilty, cilwd,
-                                cols2, fitlty, fitlwd, xlab, ylab, main)$plt_3
+                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
       mylegend_3 <- legendGgplotFit(plt_3)
       grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
                                       nrow = 6), ncol = 2,

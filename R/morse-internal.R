@@ -223,14 +223,21 @@ fCols <- function(data, x, fitcol, cicol, analyse) {
     names(cols1) <- unique(data$Points)
     # curve
     cols2 <- fitcol
-    names(cols2) <- c(x$det.part)
-    # CI curve
+    names(cols2) <- "loglogistic"
+    # CI
     cols3 <- cicol
-    names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " "))
+    names(cols3) <- "Confidence interval"
     }
   else if (analyse == "repro") {
-      #points
-    
+    #points
+    cols1 <- c("black", "white")
+    names(cols1) <- sort(unique(data$Mortality))
+    # fitted curve
+    cols2 <- fitcol
+    names(cols2) <- "loglogistic"
+    # CI
+    cols3 <- cicol
+    names(cols3) <- "Credible limits of loglogistic"
     }
     return(list(cols1 = cols1,
                 cols2 = cols2,
