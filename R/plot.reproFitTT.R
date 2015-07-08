@@ -186,12 +186,12 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
 reproFitPlotGGNoCI <- function(data, curv, valCols,
                                fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
-    geom_line(aes(conc, resp), curv,
-              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     geom_point(data = data, aes(transf_conc, resp, fill = Mortality),
                pch = 21,
                size = 3) +
     scale_fill_manual(values = valCols$cols1, guide = "none") +
+    geom_line(aes(conc, resp), curv,
+              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     ylim(0, max(data$resp) + 1) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
@@ -219,8 +219,6 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
   # plot IC
   # final plot
   plt_4 <- ggplot(data) +
-    geom_line(aes(conc, resp), curv,
-              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     geom_line(data = cri, aes(conc, qinf95),
               linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_line(data = cri, aes(conc, qsup95),
@@ -231,6 +229,8 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
                                 fill = Mortality),
                pch = 21, size = 3) +
     scale_fill_manual(values = valCols$cols1, guide = "none") +
+    geom_line(aes(conc, resp), curv,
+              linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     ylim(0, max(c(data[,"resp"], CI[["qsup95"]])) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
