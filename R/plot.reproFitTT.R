@@ -84,11 +84,15 @@ reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
        xaxt = "n",
        yaxt = "n",
        ylim = c(0, max(data_resp) + 0.2),
+       type = "n",
        ...)
   # axis
   axis(side = 2, at = pretty(c(0, max(data_resp))))
   axis(side = 1, at = transf_data_conc,
        labels = data_conc)
+  
+  # points
+  points(transf_data_conc, data_resp, pch = mortality)
   
   # fitted curve
   lines(curv_conc, curv_resp, col = fitcol,
@@ -139,12 +143,12 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
   lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   
+  # points
+  points(transf_data_conc, data_resp, pch = mortality)
+  
   # fitted curve
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
-  
-  # points
-  points(transf_data_conc, data_resp, pch = mortality)
   
   # legend
   if(addlegend)
@@ -179,10 +183,13 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
   }
 }
 
-reproFitPlotGGNoCI <- function(data, curv, cols2,
+reproFitPlotGGNoCI <- function(data, curv, cols1, cols2,
                                fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
-    geom_point(data = data, aes(transf_conc, resp, color = Mortality)) +
+    geom_point(data = data, aes(transf_conc, resp, fill = Mortality),
+               pch = 21,
+               size = 3) +
+    scale_fill_manual(values = cols1) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     scale_color_discrete(guide = "none") +
@@ -194,7 +201,7 @@ reproFitPlotGGNoCI <- function(data, curv, cols2,
 }
 
 reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
-                             cols2, fitlty, fitlwd, xlab, ylab, main) {
+                             cols1, cols2, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   cri <- data.frame(conc = curv$conc,
                            qinf95 = CI[["qinf95"]],
@@ -216,8 +223,9 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
 
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp,
-                                color = Mortality)) +
-#    scale_color_manual(values = cols1) +
+                                fill = Mortality),
+               pch = 21, size = 3) +
+    scale_fill_manual(values = cols1) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = cols2) +
     geom_line(data = cri, aes(conc, qinf95),
@@ -254,7 +262,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   
   # colors
   # points vector
-  cols1 <- c("#F8766D", "#00BFC4")
+  cols1 <- c("black", "white")
   names(cols1) <- sort(unique(data$Mortality))
   # fitted curve
   cols2 <- fitcol
@@ -263,8 +271,10 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   # points (to create the legend)
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(conc, resp,
-                                color = Mortality)) +
-    scale_color_manual(values = cols1) +
+                                fill = Mortality),
+               pch = 21,
+               size = 3) +
+    scale_fill_manual(values = cols1) +
     theme_minimal()
   
   # curve (to create the legend)
@@ -279,7 +289,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
       reproFitPlotGGCI(data, curv, CI, cicol, cilty, cilwd,
                        cols2, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
-      reproFitPlotGGNoCI(data, curv, cols2, fitlty, fitlwd,
+      reproFitPlotGGNoCI(data, curv, cols1, cols2, fitlty, fitlwd,
                          xlab, ylab, main)
     }
   
