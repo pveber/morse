@@ -349,7 +349,7 @@ dataPlotReplicates <- function(x,
            ylab = ylab,
            main = paste("Concentration: ", concentration, sep = ""),
            pch = 16,
-           ylim = c(0, max(xtt[, resp])),
+           ylim = c(0, max(control[, resp])),
            xaxt = "n",
            yaxt = "n")
       
