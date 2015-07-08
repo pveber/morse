@@ -215,19 +215,31 @@ legendGgplotFit <- function(a.gplot) {
   return(legend)
 }
 
-fCols <- function(data, x, fitcol, cicol) {
+fCols <- function(data, x, fitcol, cicol, analyse) {
   
-  #points
-  cols1 <- "black"
-  names(cols1) <- unique(data$Points)
-  # curve
-  cols2 <- fitcol
-  names(cols2) <- c(x$det.part)
-  # CI curve
-  cols3 <- cicol
-  names(cols3) <- c(paste("Credible limits of", x$det.part, sep = " ")) 
-  
-  return(list(cols1 = cols1,
-              cols2 = cols2,
-              cols3 = cols3))
+  if (analyse == "surv") {
+    #points
+    cols1 <- "black"
+    names(cols1) <- unique(data$Points)
+    # curve
+    cols2 <- fitcol
+    names(cols2) <- "loglogistic"
+    # CI
+    cols3 <- cicol
+    names(cols3) <- "Confidence interval"
+    }
+  else if (analyse == "repro") {
+    #points
+    cols1 <- c("black", "white")
+    names(cols1) <- sort(unique(data$Mortality))
+    # fitted curve
+    cols2 <- fitcol
+    names(cols2) <- "loglogistic"
+    # CI
+    cols3 <- cicol
+    names(cols3) <- "Credible limits"
+    }
+    return(list(cols1 = cols1,
+                cols2 = cols2,
+                cols3 = cols3))
 }

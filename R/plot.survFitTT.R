@@ -249,7 +249,7 @@ survFitPlotGG <- function(x,
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
   
   # colors
-  valCols <- fCols(data, x, fitcol, cicol)
+  valCols <- fCols(data, x, fitcol, cicol, "surv")
   
   # points (to create the legend)
   plt_1 <- ggplot(data) +
