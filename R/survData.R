@@ -1,13 +1,7 @@
 #' Summarize of survData object
 #' 
-#' @aliases survData
-#' 
 #' The generic \code{summary} S3 method for the \code{survData} class provides
-#' information about the structure of the dataset and the experimental design:
-#' the number of replicate per time and concentration,
-#' the number of survival (sum of replicate) per time and concentration,
-#' the number of datapoints per concentration and the number of datapoints per
-#' time.
+#' information about the structure of the dataset and the experimental design.
 #' 
 #' @param x An object of class \code{survData}
 #' 
@@ -40,8 +34,6 @@ summary.survData <- function(x) {
   # table of datapoints per time
   ans4 <- table(x$time)
   
-  cat("Summary: \n\n")
-  cat("Raw data: \n\n")
   cat("Number of replicate per time and concentration: \n")
   print(ans1)
   cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
