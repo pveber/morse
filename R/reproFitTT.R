@@ -223,6 +223,112 @@ print.reproFitTT <- function(x, ...) {
       (x$n.iter[["end"]] - x$n.iter[["start"]]) / x$n.thin + 1, "\n")
 }
 
+#' Summary of reproFitTT object
+#' 
+#' The summary shows the quantiles of priors and posteriors on parameters
+#' and the quantiles of estimated ECx.
+#' 
+#' @param object An object of class reproFitTT
+#' @param quiet If \code{TRUE}, make silent all prints
+#' 
+#' @seealso reproFitTT
+#' 
+#' @examples
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a reproData object
+#' cadmium1 <- reproData(cadmium1)
+#' 
+#' \dontrun{
+#' # (3) Run the reproFitTT function with the log-logistic
+#' # model
+#' out <- reproFitTT(dat, ecx = c(5, 10, 15, 20, 30, 50, 80),
+#' quiet = TRUE)
+#' 
+#' # (4) summarize the reproFitTT object
+#' summary(out)
+#' }
+#' 
+#' @keywords summary
+#' 
+#' @export
+#' 
+summary.reproFitTT <- function(object, quiet = FALSE) {
+  
+  # generate distribution for priors parameters
+  set.seed(1234)
+  n.iter <- object$n.iter$end - object$n.iter$start
+  # d
+  sumdistd <- rnorm(n = n.iter,
+                    mean = object$jags.data$meand,
+                    sd = 1 / sqrt(object$jags.data$taud))
+  
+  # b
+  sumdistlog10b <- runif(n = n.iter,
+                         min = object$jags.data$log10bmin,
+                         max = object$jags.data$log10bmax)
+  sumdistb <- 10^sumdistlog10b
+  
+  # e
+  sumdistlog10e <- rnorm(n = n.iter,
+                         mean = object$jags.data$meanlog10e,
+                         sd = 1 / sqrt(object$jags.data$taulog10e))
+  sumdiste <- 10^sumdistlog10e
+  
+  if (object$model.label == "P") {
+    res <- cbind(sumdistb, sumdistd, sumdiste)
+    res.names <- c("b", "d", "e")
+  }
+  if (object$model.label == "GP") {
+    # omega
+    sumdistlog10omega <- runif(n = n.iter,
+                               min = object$jags.data$log10omegamin,
+                               max = object$jags.data$log10omegamax)
+    sumdistomega <- 10^sumdistlog10omega
+    
+    res <- cbind(sumdistb, sumdistd, sumdiste, sumdistomega)
+    res.names <- c("b", "d", "e", "omega")
+  }
+  
+  res <- list(res = res, res.names = res.names)	
+  
+  # quantile
+  med <- apply(res$res, 2, function(x) quantile(x, probs = 0.5))
+  Q2.5 <- apply(res$res, 2, function(x) quantile(x, probs = 0.025))
+  Q97.5 <- apply(res$res, 2, function(x) quantile(x, probs = 0.975))
+  
+  ans1 <-  round(data.frame(med, Q2.5, Q97.5,
+                            row.names = res$res.names), digits = 3)
+  colnames(ans1) <- c("50%", "2.5%", "97.5%")
+  
+  # quantiles of estimated model parameters
+  ans2 <- round(object$estim.par, digits = 3)
+  colnames(ans2) <- c("50%", "2.5%", "97.5%")
+  
+  # estimated ECx and their CIs 95%
+  ans3 <- round(object$estim.ECx, digits = 3)
+  colnames(ans3) <- c("50%", "2.5%", "97.5%")
+  
+  if (! quiet) {
+    cat("Summary: \n\n")
+    if (object$model.label == "GP")
+      cat("The ", object$det.part, " model with a Gamma Poisson stochastic part was used !\n\n")
+    if(object$model.label == "P")
+      cat("The ", object$det.part, " model with a Poisson stochastic part was used !\n\n")
+    cat("Quantiles of priors on parameters: \n\n")
+    print(ans1)
+    cat("\nQuantiles of posteriors on parameters: \n\n")
+    print(ans2)
+    cat("\nQuantiles of the estimated ECx:\n\n")
+    print(ans3)
+  }
+  
+  invisible(list(Qpriors = ans1,
+                 Qpost = ans2,
+                 QECx = ans3))
+}
+
 #' Fit a Bayesian exposure-response model for endpoint reproduction analysis
 #' 
 #' In this model, the reproduction rate in a population is modeled as a function of the
