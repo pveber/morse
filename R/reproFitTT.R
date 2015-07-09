@@ -177,6 +177,51 @@ llm.poisson.model.text <- "\nmodel # Loglogistic Poisson model\n{\n#\nfor (j in 
 
 llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\nfor (j in 1:n) # loop on replicates\n{\n# Explicit writting of a gamma-Poisson law for each replicate\n# the mean is given by a gamma law centered on the theoretical curve\nrate[j] <- d / (1 + pow(xconc[j]/e, b)) / omega\np[j] <- 1 / (Nindtime[j] * omega + 1)\nNcumul[j] ~ dnegbin(p[j], rate[j])\n}\n# Prior distributions\nd ~ dnorm(meand, taud)T(0,)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\nlog10omega ~ dunif(log10omegamin, log10omegamax)\n\nomega <- pow(10,log10omega)\nb <- pow(10,log10b)\ne <- pow(10,log10e)\n}\n"
 
+#' Print of reproFitTT object
+#' 
+#' The generic \code{print} S3 method for the \code{reproFitTT} class provides
+#' the model text and the computation information of the bayesian estimation.
+#' 
+#' @param x An object of class \code{reproFitTT}
+#' 
+#' @seealso \code{\link{reproFitTT}}
+#' 
+#' @examples
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a reproData object
+#' cadmium1 <- reproData(cadmium1)
+#' 
+#' \dontrun{
+#' # (3) Run the reproFitTT function with the log-logistic
+#' # model
+#' out <- reproFitTT(dat, ecx = c(5, 10, 15, 20, 30, 50, 80),
+#' quiet = TRUE)
+#' 
+#' # (4) Print the reproFitTT object
+#' out
+#' }
+#' 
+#' @keywords print
+#' 
+#' @export
+#' 
+print.reproFitTT <- function(x, ...) {
+  # print the model text and the Jags Computing information
+  # for an object of class reproFitTT
+  
+  # M.C.M.C. informations
+  cat("Model:\n")
+  print(x$model)
+  cat("\nComputing information:\n\n")
+  cat("\n", "Iterations = ", x$n.iter[["start"]], ":",
+      x$n.iter[["end"]], "\n", sep = "")
+  cat("Thinning interval =", x$n.thin, "\n")
+  cat("Number of chains =", x$n.chains, "\n")
+  cat("Sample size per chain =",
+      (x$n.iter[["end"]] - x$n.iter[["start"]]) / x$n.thin + 1, "\n")
+}
 
 #' Fit a Bayesian exposure-response model for endpoint reproduction analysis
 #' 
