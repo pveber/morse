@@ -123,6 +123,51 @@ llbinom3.model.text <- "\nmodel # Loglogistic binomial model with 3 parameters\n
 
 llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- 1/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
 
+#' Print of survFitTT object
+#' 
+#' The generic \code{print} S3 method for the \code{survFitTT} class provides
+#' the model text and the computation information of the bayesian estimation.
+#' 
+#' @param x An object of class \code{survFitTT}
+#' 
+#' @seealso \code{\link{survFitTT}}
+#' 
+#' @examples
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a survData object
+#' cadmium1 <- survData(cadmium1)
+#' 
+#' \dontrun{
+#' # (3) Run the survFitTT function with the log-logistic
+#' # binomial model
+#' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
+#' quiet = TRUE)
+#' 
+#' # (4) Print the survFitTT object
+#' out
+#' }
+#' 
+#' @keywords print
+#' 
+#' @export
+#' 
+print.survFitTT <- function(x, ...) {
+  # print the model text and the Jags Computing information
+  # for an object of class survFitTT
+  
+  # M.C.M.C. informations
+  cat("Model:\n")
+  print(x$model)
+  cat("\nComputing information:\n\n")
+  cat("\n", "Iterations = ", x$n.iter[["start"]], ":",
+      x$n.iter[["end"]], "\n", sep = "")
+  cat("Thinning interval =", x$n.thin, "\n")
+  cat("Number of chains =", x$n.chains, "\n")
+  cat("Sample size per chain =",
+      (x$n.iter[["end"]] - x$n.iter[["start"]]) / x$n.thin + 1, "\n")
+}
 
 #' Fit a Bayesian exposure-response model for endpoint survival analysis
 #'
