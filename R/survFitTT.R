@@ -169,6 +169,106 @@ print.survFitTT <- function(x, ...) {
       (x$n.iter[["end"]] - x$n.iter[["start"]]) / x$n.thin + 1, "\n")
 }
 
+#' Summary of survFitTT object
+#' 
+#' The summary shows the quantiles of priors and posteriors on parameters
+#' and the quantiles of estimated LCx.
+#' 
+#' @param object An object of class survFitTT
+#' @param quiet If \code{TRUE}, make silent all prints
+#' 
+#' @seealso survFitTT
+#' 
+#' @examples
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a survData object
+#' cadmium1 <- survData(cadmium1)
+#' 
+#' \dontrun{
+#' # (3) Run the survFitTT function with the log-logistic
+#' # binomial model
+#' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
+#' quiet = TRUE)
+#' 
+#' # (4) summarize the survFitTT object
+#' summary(out)
+#' }
+#' 
+#' @keywords summary
+#' 
+#' @export
+#' 
+summary.survFitTT <- function(object, quiet = FALSE) {
+  
+  # generate distribution for priors parameters
+  set.seed(1234)
+  n.iter <- object$n.iter$end - object$n.iter$start
+  
+  # b
+  sumdistlog10b <- runif(n = n.iter,
+                         min = object$jags.data$log10bmin,
+                         max = object$jags.data$log10bmax)
+  
+  sumdistb <- 10^sumdistlog10b
+  
+  # e
+  sumdistlog10e <- rnorm(n = n.iter,
+                         mean = object$jags.data$meanlog10e,
+                         sd = 1 / sqrt(object$jags.data$taulog10e))
+  
+  sumdiste <- 10^sumdistlog10e
+  
+  # d
+  if (object$det.part == "loglogisticbinom_3") {
+    sumdistd <- runif(n = n.iter,
+                      min = object$jags.data$dmin,
+                      max = object$jags.data$dmax)
+    
+    res <- cbind(sumdistb, sumdistd, sumdiste)
+    res.names <- c("b", "d", "e")
+  } else {
+    res <- cbind(sumdistb, sumdiste)
+    res.names <- c("b", "e")
+  }
+  
+  res <- list(res = res, res.names = res.names)
+  
+  # quantile
+  med <- apply(res$res, 2, function(x) quantile(x, probs = 0.5))
+  Q2.5 <- apply(res$res, 2, function(x) quantile(x, probs = 0.025))
+  Q97.5 <- apply(res$res, 2, function(x) quantile(x, probs = 0.975))
+  
+  ans1 <-  round(data.frame(med, Q2.5, Q97.5,
+                            row.names = res$res.names), digits = 3)
+  colnames(ans1) <- c("50%", "2.5%", "97.5%")
+  
+  # quantiles of estimated model parameters
+  ans2 <- round(object$estim.par, digits = 3)
+  colnames(ans2) <- c("50%", "2.5%", "97.5%")
+  
+  # estimated ECx and their CIs 95%
+  ans3 <- round(object$estim.LCx, digits = 3)
+  colnames(ans3) <- c("50%", "2.5%", "97.5%")
+  
+  # print
+  if (! quiet) {
+    cat("Summary: \n\n")
+    cat("The ", object$det.part, " model with a binomial stochastic part was used !\n\n")
+    cat("Quantiles of priors on parameters: \n\n")
+    print(ans1)
+    cat("\nQuantiles of posteriors on parameters: \n\n")
+    print(ans2)
+    cat("\nQuantiles of the estimated LCx: \n\n")
+    print(ans3)
+  }
+  
+  invisible(list(Qpriors = ans1,
+                 Qpost = ans2,
+                 QECx = ans3))
+}
+
 #' Fit a Bayesian exposure-response model for endpoint survival analysis
 #'
 #' The \code{survFitTT} function estimates the parameters of an exposure-response
