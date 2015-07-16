@@ -48,7 +48,6 @@ summary.reproData <- function(x) {
   cat("\nNumber of datapoints per time: \n")
   print(ans5)
   
-  
   invisible(list(ans1, ans2, ans3, ans4, ans5))
 }
 
