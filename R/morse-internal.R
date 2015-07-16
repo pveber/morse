@@ -126,13 +126,12 @@ estimXCX <- function(mcmc, xcx, varx) {
   # Calculation XCx median and quantiles
   XCx <- sapply(xcx, function(x) {e * ((100 / (100 - x)) - 1)^(1 / b)})
 
-  q50 <- apply(XCx, 2, function(XCx) {quantile(XCx, probs = 0.5)})
-  qinf95 <- apply(XCx, 2, function(XCx) {quantile(XCx, probs = 0.025)})
-  qsup95 <- apply(XCx, 2, function(XCx) {quantile(XCx, probs = 0.975)})
+  q50 <- apply(XCx, 2, function(x) {quantile(x, probs = 0.5)})
+  qinf95 <- apply(XCx, 2, function(x) {quantile(x, probs = 0.025)})
+  qsup95 <- apply(XCx, 2, function(x) {quantile(x, probs = 0.975)})
 
   # defining names
   XCname <- sapply(xcx, function(x) {paste(varx, x, sep = '')})
-  colnames(XCx) <- XCname
 
   # create the dataframe with ECx median and quantiles
   res <- data.frame(median = q50, Q2.5 = qinf95, Q97.5 = qsup95,
