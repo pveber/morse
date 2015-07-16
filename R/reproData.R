@@ -47,6 +47,9 @@ summary.reproData <- function(x) {
   print(ans4)
   cat("\nNumber of datapoints per time: \n")
   print(ans5)
+  
+  
+  invisible(list(ans1, ans2, ans3, ans4, ans5))
 }
 
 #' Creates a dataset for reproduction toxicity analysis
