@@ -4,6 +4,7 @@
 #' information about the structure of the dataset and the experimental design.
 #' 
 #' @param x An object of class \code{reproData}
+#' @param quiet If \code{TRUE}, make silent all prints
 #' 
 #' @seealso \code{\link{reproData}}
 #' 
@@ -21,7 +22,7 @@
 #' 
 #' @export
 #' 
-summary.reproData <- function(x) {
+summary.reproData <- function(x, quiet = FALSE) {
   # matrix of number of replicate by time / conc
   ans1 <- table(x[, c("conc", "time")])
   
@@ -37,18 +38,24 @@ summary.reproData <- function(x) {
   # table of datapoints per time
   ans5 <- table(x$time)
   
-  cat("Number of replicate per time and concentration: \n")
-  print(ans1)
-  cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
-  print(ans2)
-  cat("\nNumber of offspring (sum of replicate) per time and concentration: \n")
-  print(ans3)
-  cat("\nNumber of datapoints per concentration: \n")
-  print(ans4)
-  cat("\nNumber of datapoints per time: \n")
-  print(ans5)
+  if (! quiet) {
+    cat("Number of replicate per time and concentration: \n")
+    print(ans1)
+    cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
+    print(ans2)
+    cat("\nNumber of offspring (sum of replicate) per time and concentration: \n")
+    print(ans3)
+    cat("\nNumber of datapoints per concentration: \n")
+    print(ans4)
+    cat("\nNumber of datapoints per time: \n")
+    print(ans5)
+  }
   
-  invisible(list(ans1, ans2, ans3, ans4, ans5))
+  invisible(list(NbrepTimeConc = ans1,
+                 NbsurvTimeConc = ans2,
+                 NboffTimeConc = ans3,
+                 NbdataConc = ans4,
+                 NbdataTime = ans5))
 }
 
 #' Creates a dataset for reproduction toxicity analysis
