@@ -42,6 +42,8 @@ summary.survData <- function(x) {
   print(ans3)
   cat("\nNumber of datapoints per time: \n")
   print(ans4)
+  
+  invisible(list(ans1, ans2, ans3, ans4))
 }
 
 #' Creates a dataset for survival analysis
