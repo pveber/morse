@@ -168,7 +168,7 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #' @param target.time The chosen endpoint to evaluate the effect of a given
 #' concentration of pollutant. By default the last time point available for
 #' all concentrations.
-#' @param lcx Values of \eqn{x} to calculate desired \eqn{LC_{x}}{LCx}.
+#' @param lcx Desired values of \eqn{x} (in percent) to compute \eqn{LC_{x}}{LCx}.
 #' @param n.chains Number of MCMC chains. The minimum required number of chains
 #' is 2.
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
