@@ -70,16 +70,18 @@ reproDataPlotTargetTime <- function(x,
 
   #ggplot2
   if (style == "ggplot") {
-    df <- data.frame(x, mortality = mortality)
+    df <- data.frame(x, Mortality = mortality)
 
     # plot
-    gp <- ggplot(df, aes(conc, Nreprocumul, colour = factor(mortality))) +
-      geom_point(size = 2.5) +
+    gp <- ggplot(df, aes(conc, Nreprocumul, fill = Mortality)) +
+      geom_point(size = 3, pch = 21) +
+      scale_fill_manual(values = c("black", "white")) +
       labs(x = xlab, y = ylab) +
       theme_minimal() +
       scale_colour_hue(legend.title, breaks = c("No","Yes"),
                        labels = c(legend.name.no, legend.name.yes)) +
       scale_x_continuous(breaks = unique(df$conc))
+    
     if (addlegend) {
       return(gp)
     } else {
