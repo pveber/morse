@@ -27,7 +27,7 @@ reproDataPlotTargetTime <- function(x,
   xf <- filter(x, x$time == target.time)
 
   # Selection of datapoints that can be displayed given the type of scale
-  sel <- if(log.scale) x$conc > 0 else TRUE
+  sel <- if(log.scale) xf$conc > 0 else TRUE
   x <- xf[sel, ]
   transf_data_conc <- optLogTransform(log.scale, x$conc)
   
@@ -83,17 +83,22 @@ reproDataPlotTargetTime <- function(x,
 
   #ggplot2
   if (style == "ggplot") {
-    df <- data.frame(x, Mortality = mortality)
+    df <- data.frame(x,
+                     transf_data_conc,
+                     display.conc,
+                     Mortality = mortality)
 
     # plot
-    gp <- ggplot(df, aes(conc, Nreprocumul, fill = Mortality)) +
+    gp <- ggplot(df, aes(transf_data_conc, Nreprocumul,
+                         fill = Mortality)) +
       geom_point(size = 3, pch = 21) +
       scale_fill_manual(values = c("black", "white")) +
       labs(x = xlab, y = ylab) +
       theme_minimal() +
       scale_colour_hue(legend.title, breaks = c("No","Yes"),
                        labels = c(legend.name.no, legend.name.yes)) +
-      scale_x_continuous(breaks = unique(df$conc))
+      scale_x_continuous(breaks = df$transf_data_conc,
+                         labels = df$display.conc)
     
     if (addlegend) {
       return(gp)
