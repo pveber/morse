@@ -4,6 +4,7 @@
 #' information about the structure of the dataset and the experimental design.
 #' 
 #' @param x An object of class \code{survData}
+#' @param quiet If \code{TRUE}, make silent all prints.
 #' 
 #' @seealso \code{\link{survData}}
 #' 
@@ -21,7 +22,7 @@
 #' 
 #' @export
 #' 
-summary.survData <- function(x) {
+summary.survData <- function(x, quiet = FALSE) {
   # matrix of number of replicate by time / conc
   ans1 <- table(x[, c("conc", "time")])
   
@@ -34,14 +35,21 @@ summary.survData <- function(x) {
   # table of datapoints per time
   ans4 <- table(x$time)
   
-  cat("Number of replicate per time and concentration: \n")
-  print(ans1)
-  cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
-  print(ans2)
-  cat("\nNumber of datapoints per concentration: \n")
-  print(ans3)
-  cat("\nNumber of datapoints per time: \n")
-  print(ans4)
+  if (! quiet) {
+    cat("Number of replicate per time and concentration: \n")
+    print(ans1)
+    cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
+    print(ans2)
+    cat("\nNumber of datapoints per concentration: \n")
+    print(ans3)
+    cat("\nNumber of datapoints per time: \n")
+    print(ans4)
+  }
+  
+  invisible(list(NbrepTimeConc = ans1,
+                 NbsurvTimeConc = ans2,
+                 NbdataConc = ans3,
+                 NbdataTime = ans4))
 }
 
 #' Creates a dataset for survival analysis
