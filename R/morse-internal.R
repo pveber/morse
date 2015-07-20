@@ -141,69 +141,8 @@ estimXCX <- function(mcmc, xcx, varx) {
   return(res)
 }
 
-logTransXaxisFit <- function(log.scale, concentrations) {
-  # remove concentrations 0 in log.scale if needed
-  # INPUT :
-  # - log.scale: booleen
-  # - concentrations: vector of concentrations
-  # OUTPUT
-  # - X: new vector of concentration of length 100
-  
-  if (log.scale && any(concentrations == 0)) { # log.scale yes
-    # 0 in the concentrations
-    X <- seq(min(unique(concentrations)[-1]), max(concentrations),
-             length = 100)
-  } else { # no 0 in the concentrations
-    X <- seq(min(concentrations), max(concentrations), length = 100)
-  }
-  return(X)
-}
-
 optLogTransform <- function(log.scale, x) {
   if(log.scale) log(x) else x
-}
-  
-logTransConcFit <- function(log.scale, X, x, concentrations, val) {
-  # transform vector conccentration in log.scale if needed
-  # X axis log.scale value
-  
-  # select non 0 values
-  sel <- if (log.scale) {
-    X > 0
-  } else {
-    rep(TRUE, length(X))
-  }
-  
-  if (log.scale) {
-    X[sel] <- log(X[sel])
-  } else {
-    X[sel] <- X[sel]
-  }
-  
-  # log transform concentrations values
-  sel2 <- if (log.scale) {
-    x$dataTT$conc > 0
-  } else {
-    rep(TRUE, length(x$dataTT$conc))
-  }
-  if (log.scale) {
-    concentrations[sel2] <- log(concentrations[sel2])
-  } else {
-    concentrations[sel2] <- concentrations[sel2]
-  }
-  
-  if (val == "sel") {
-    return(sel)
-  }
-  if (val == "X") {
-    return(X)
-  }
-  if (val == "sel2") {
-    return(sel2)
-  }
-  if (val == "conc") {
-    return(concentrations)
-  }
 }
 
 legendGgplotFit <- function(a.gplot) {
