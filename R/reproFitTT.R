@@ -256,50 +256,43 @@ print.reproFitTT <- function(x, ...) {
 #' 
 summary.reproFitTT <- function(object, quiet = FALSE) {
   
-  # generate distribution for priors parameters
-  set.seed(1234)
+  # quantiles of priors parameters
   n.iter <- object$n.iter$end - object$n.iter$start
-  # d
-  sumdistd <- rnorm(n = n.iter,
-                    mean = object$jags.data$meand,
-                    sd = 1 / sqrt(object$jags.data$taud))
   
   # b
-  sumdistlog10b <- runif(n = n.iter,
-                         min = object$jags.data$log10bmin,
-                         max = object$jags.data$log10bmax)
-  sumdistb <- 10^sumdistlog10b
+  log10b <- qunif(p = c(0.5, 0.025, 0.975),
+                  min = object$jags.data$log10bmin,
+                  max = object$jags.data$log10bmax)
+  
+  b <- 10^log10b
+  
+  # d
+  d <- qnorm(p = c(0.5, 0.025, 0.975),
+                  mean = object$jags.data$meand,
+                  sd = 1 / sqrt(object$jags.data$taud))
   
   # e
-  sumdistlog10e <- rnorm(n = n.iter,
-                         mean = object$jags.data$meanlog10e,
-                         sd = 1 / sqrt(object$jags.data$taulog10e))
-  sumdiste <- 10^sumdistlog10e
+  log10e <- qnorm(p = c(0.5, 0.025, 0.975),
+                  mean = object$jags.data$meanlog10e,
+                  sd = 1 / sqrt(object$jags.data$taulog10e))
+  
+  e <- 10^log10e
   
   if (object$model.label == "P") {
-    res <- cbind(sumdistb, sumdistd, sumdiste)
-    res.names <- c("b", "d", "e")
+    res <- rbind(b, d, e)
   }
   if (object$model.label == "GP") {
     # omega
-    sumdistlog10omega <- runif(n = n.iter,
-                               min = object$jags.data$log10omegamin,
-                               max = object$jags.data$log10omegamax)
-    sumdistomega <- 10^sumdistlog10omega
+    log10omega <- qunif(p = c(0.5, 0.025, 0.975),
+                    min = object$jags.data$log10omegamin,
+                    max = object$jags.data$log10omegamax)
     
-    res <- cbind(sumdistb, sumdistd, sumdiste, sumdistomega)
-    res.names <- c("b", "d", "e", "omega")
+    omega <- 10^log10omega
+    
+    res <- rbind(b, d, e, omega)
   }
   
-  res <- list(res = res, res.names = res.names)	
-  
-  # quantile
-  med <- apply(res$res, 2, function(x) quantile(x, probs = 0.5))
-  Q2.5 <- apply(res$res, 2, function(x) quantile(x, probs = 0.025))
-  Q97.5 <- apply(res$res, 2, function(x) quantile(x, probs = 0.975))
-  
-  ans1 <-  round(data.frame(med, Q2.5, Q97.5,
-                            row.names = res$res.names), digits = 3)
+  ans1 <-  round(data.frame(res), digits = 3)
   colnames(ans1) <- c("50%", "2.5%", "97.5%")
   
   # quantiles of estimated model parameters
