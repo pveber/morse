@@ -11,6 +11,7 @@ reproDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
 reproDataPlotTargetTime <- function(x,
                                     target.time,
                                     style,
+                                    log.scale,
                                     addlegend, ...) {
   # plot of cumulated number of offspring as a funtion of concentration
   # for a fixed time
@@ -23,8 +24,19 @@ reproDataPlotTargetTime <- function(x,
     stop("[target.time] is not one of the possible time !")
 
   # select the target.time
-  x <- filter(x, x$time == target.time)
+  xf <- filter(x, x$time == target.time)
 
+  # Selection of datapoints that can be displayed given the type of scale
+  sel <- if(log.scale) xf$conc > 0 else TRUE
+  x <- xf[sel, ]
+  transf_data_conc <- optLogTransform(log.scale, x$conc)
+  
+  # Concentration values used for display in linear scale
+  display.conc <- (function() {
+    x <- optLogTransform(log.scale, x$conc)
+    if(log.scale) exp(x) else x
+  })()
+  
   # Define visual parameters
   mortality <- c(0, 1) # code 0/1 mortality
   nomortality <- match(x$Nsurv == x$Ninit, c(TRUE, FALSE))
@@ -49,7 +61,7 @@ reproDataPlotTargetTime <- function(x,
 
   # generic
   if (style == "generic") {
-    plot(x$conc,
+    plot(transf_data_conc,
          x$Nreprocumul,
          xlab = xlab,
          ylab = ylab,
@@ -59,7 +71,8 @@ reproDataPlotTargetTime <- function(x,
          ...)
     # axis
     axis(side = 2, at = pretty(c(0, max(x$Nreprocumul))))
-    axis(side = 1, at = unique(x$conc), labels = unique(x$conc))
+    axis(side = 1, at = transf_data_conc,
+         labels = display.conc)
 
     # legend
     if (addlegend) {
@@ -70,17 +83,22 @@ reproDataPlotTargetTime <- function(x,
 
   #ggplot2
   if (style == "ggplot") {
-    df <- data.frame(x, Mortality = mortality)
+    df <- data.frame(x,
+                     transf_data_conc,
+                     display.conc,
+                     Mortality = mortality)
 
     # plot
-    gp <- ggplot(df, aes(conc, Nreprocumul, fill = Mortality)) +
+    gp <- ggplot(df, aes(transf_data_conc, Nreprocumul,
+                         fill = Mortality)) +
       geom_point(size = 3, pch = 21) +
       scale_fill_manual(values = c("black", "white")) +
       labs(x = xlab, y = ylab) +
       theme_minimal() +
       scale_colour_hue(legend.title, breaks = c("No","Yes"),
                        labels = c(legend.name.no, legend.name.yes)) +
-      scale_x_continuous(breaks = unique(df$conc))
+      scale_x_continuous(breaks = df$transf_data_conc,
+                         labels = df$display.conc)
     
     if (addlegend) {
       return(gp)
@@ -129,9 +147,10 @@ reproDataPlotReplicates <- function(x,
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or
 #' \code{'ggplot'}
-#' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
+#' @param log.scale Log option for the \eqn{X}-axis.
+#' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -169,6 +188,7 @@ plot.reproData <- function(x,
                            concentration = NULL,
                            style = "generic",
                            pool.replicate = FALSE,
+                           log.scale = FALSE,
                            addlegend = FALSE,
                            ...) {
   if(! is(x, "reproData"))
@@ -183,7 +203,7 @@ plot.reproData <- function(x,
   if (is.null(target.time) && is.null(concentration))
     reproDataPlotFull(x, style, addlegend, ...)
   else if (! is.null(target.time) && is.null(concentration))
-    reproDataPlotTargetTime(x, target.time, style, addlegend, ...)
+    reproDataPlotTargetTime(x, target.time, style, log.scale, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
     reproDataPlotFixedConc(x, concentration, style, addlegend, ...)
   else
