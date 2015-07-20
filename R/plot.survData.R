@@ -143,7 +143,7 @@ survDataPlotFull <- function(data, style = "generic", addlegend = FALSE, ...) {
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
+survDataPlotTargetTime <- function(x, target.time, style, log.scale, addlegend, ...) {
 
   opt_args <- list(...)
   xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
@@ -153,31 +153,43 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
       stop("[target.time] is not one of the possible time !")
 
   # select the target.time
-  x <- filter(x, x$time == target.time)
+  xf <- filter(x, x$time == target.time)
 
+  # Selection of datapoints that can be displayed given the type of scale
+  sel <- if(log.scale) xf$conc > 0 else TRUE
+  x <- xf[sel, ]
+  transf_data_conc <- optLogTransform(log.scale, x$conc)
+  
+  # Concentration values used for display in linear scale
+  display.conc <- (function() {
+    x <- optLogTransform(log.scale, x$conc)
+    if(log.scale) exp(x) else x
+  })()
+  
   # vector color
   x$color <- as.numeric(as.factor(x$replicate))
 
   if (style == "generic") {
-    plot(x$conc, seq(0, max(x$Nsurv), length.out = length(x$conc)),
+    plot(transf_data_conc, seq(0, max(x$Nsurv),
+                               length.out = length(transf_data_conc)),
          type = "n",
          xaxt = "n",
          yaxt = "n",
          xlab = xlab,
          ylab = ylab)
 
-    axis(side = 1, at = unique(x$conc),
-         labels = unique(x$conc))
+    axis(side = 1, at = transf_data_conc,
+         labels = display.conc)
     axis(side = 2, at = unique(round(pretty(c(0, max(x$Nsurv))))),
          labels = unique(round(pretty(c(0, max(x$Nsurv))))))
 
     # points
     if (length(unique(x$replicate)) == 1) {
       # points
-      points(x$conc, x$Nsurv,
+      points(transf_data_conc, x$Nsurv,
              pch = 16)
     } else {
-      tt <- xyTable(x$conc, x$Nsurv)
+      tt <- xyTable(transf_data_conc, x$Nsurv)
       points(tt$x, tt$y,
              cex = (tt$number) / 3,
              pch = 16)
@@ -192,18 +204,23 @@ survDataPlotTargetTime <- function(x, target.time, style, addlegend, ...) {
     }
   }
   else if (style == "ggplot") {
-    if (length(unique(x$replicate)) == 1) {
-      df <- ggplot(x, aes(x = conc, y = Nsurv))
+    df <- data.frame(x,
+                     transf_data_conc,
+                     display.conc)
+    
+    if (length(unique(df$replicate)) == 1) {
+      gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv))
     } else {
-      df <- ggplot(x, aes(x = conc, y = Nsurv)) +
+      gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv)) +
         stat_sum(aes(size = factor(..n..))) +
         scale_size_discrete("Replicate")
     }
-    fd <- df + geom_point() + theme_minimal() +
+    fd <- gp + geom_point() + theme_minimal() +
       labs(x = xlab,
            y = ylab) +
-      scale_x_continuous(breaks = unique(x$conc)) +
-      scale_y_continuous(breaks = unique(round(pretty(c(0, max(x$Nsurv))))))
+      scale_x_continuous(breaks = df$transf_data_conc,
+                         labels = df$display.conc) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$Nsurv))))))
 
     # legend option
     if (addlegend) {
@@ -399,9 +416,10 @@ survDataPlotReplicates <- function(x,
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
+#' @param log.scale Log option for the \eqn{X}-axis.
+#' @param addlegend if \code{TRUE}, a default legend is added to the plot
 #' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -440,8 +458,9 @@ plot.survData <- function(x,
                           target.time = NULL,
                           concentration = NULL,
                           style = "generic",
-                          addlegend = FALSE,
                           pool.replicate = FALSE,
+                          log.scale = FALSE,
+                          addlegend = FALSE,
                           ...) {
 
   if(! is(x,"survData"))
@@ -456,7 +475,7 @@ plot.survData <- function(x,
   if (is.null(target.time) && is.null(concentration))
     survDataPlotFull(x, style, addlegend, ...)
   else if (! is.null(target.time) && is.null(concentration))
-    survDataPlotTargetTime(x, target.time, style, addlegend, ...)
+    survDataPlotTargetTime(x, target.time, style, log.scale, addlegend, ...)
   else if (is.null(target.time) && ! is.null(concentration))
     survDataPlotFixedConc(x, concentration, style, addlegend, ...)
   else
