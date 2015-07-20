@@ -2,7 +2,8 @@
 # of dplyr::{rename, filter}. R is such a sad language.
 if(getRversion() >= "2.15.1")  utils::globalVariables(c(
   "response", "Nreprocumul", "resp", "Mortality", "qinf95", "qsup95",
-  "transf_conc", "obs", "pred", "..n..", "Points", "conc", "Line", "Nsurv"
+  "transf_conc", "obs", "pred", "..n..", "Points", "conc", "Line", "Nsurv",
+  "time"
 ))
 
 
