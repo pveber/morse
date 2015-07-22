@@ -1,7 +1,5 @@
 reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
                               addlegend = TRUE) {
-  if (missing(xlab)) xlab <- "Time"
-  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
   dataPlotFull(data, "Nreprocumul", xlab, ylab, style, addlegend)
 }
 
@@ -17,9 +15,6 @@ reproDataPlotTargetTime <- function(x,
                                     addlegend) {
   # plot of cumulated number of offspring as a funtion of concentration
   # for a fixed time
-
-  if (missing(xlab)) xlab <-"Concentration"
-  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
 
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
@@ -115,9 +110,6 @@ reproDataPlotFixedConc <- function(x,
                                    concentration,
                                    style = "generic",
                                    addlegend = FALSE) {
-
-  if (missing(xlab)) xlab <- "Time"
-  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
   dataPlotFixedConc(x, xlab, ylab, "Nreprocumul", concentration, style, addlegend)
 }
 
@@ -128,9 +120,6 @@ reproDataPlotReplicates <- function(x,
                                     concentration,
                                     style,
                                     addlegend) {
-
-  if (missing(xlab)) xlab <- "Replicate"
-  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
   dataPlotReplicates(x, xlab, ylab, "Nreprocumul", target.time, concentration,
                      style, addlegend)
 }
@@ -204,14 +193,26 @@ plot.reproData <- function(x,
                replicate = 1)
   }
 
-  if (is.null(target.time) && is.null(concentration))
+  if (is.null(target.time) && is.null(concentration)) {
+    if (missing(xlab)) xlab <- "Time"
+    if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
     reproDataPlotFull(x, xlab, ylab, style, addlegend)
-  else if (! is.null(target.time) && is.null(concentration))
+  }
+  else if (! is.null(target.time) && is.null(concentration)) {
+    if (missing(xlab)) xlab <-"Concentration"
+    if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
     reproDataPlotTargetTime(x, xlab, ylab, target.time, style, log.scale,
                             addlegend)
-  else if (is.null(target.time) && ! is.null(concentration))
+  }
+  else if (is.null(target.time) && ! is.null(concentration)) {
+    if (missing(xlab)) xlab <- "Time"
+    if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
     reproDataPlotFixedConc(x, xlab, ylab, concentration, style, addlegend)
-  else
+  }
+  else {
+    if (missing(xlab)) xlab <- "Replicate"
+    if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
     reproDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
                             addlegend)
+  }
 }

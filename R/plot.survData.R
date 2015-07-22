@@ -28,7 +28,7 @@ plotMatrixGeometry <- function(nblevels) {
 
 # General full plot: one subplot for each concentration, and one color for
 # each replicate (for generic graphics)
-dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
+dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend) {
   replicate.index <- ReplicateIndex(data)
 
   # creation of a vector of colors
@@ -98,7 +98,7 @@ dataPlotFullGeneric <- function(data, resp, xlab, ylab, addlegend) {
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
+dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
 
   time = NULL
   Nsurv = NULL
@@ -125,12 +125,12 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
   return(fd)
 }
 
-dataPlotFull <- function(data, resp, xlab, ylab, style = "generic",
+dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
                          addlegend = FALSE) {
   if (style == "generic")
-    dataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
+    dataPlotFullGeneric(data, xlab, ylab, resp, addlegend)
   else if (style == "ggplot")
-    dataPlotFullGG(data, resp, xlab, ylab, addlegend)
+    dataPlotFullGG(data, xlab, ylab, resp, addlegend)
   else stop("Unknown plot style")
 }
 
@@ -225,9 +225,11 @@ survDataPlotTargetTime <- function(x, target.time, style, log.scale, addlegend) 
   else stop("Unknown plot style")
 }
 
-dataPlotFixedConc <- function(x, resp,
+dataPlotFixedConc <- function(x,
+                              xlab,
+                              ylab,
+                              resp,
                               concentration,
-                              xlab, ylab,
                               style = "generic",
                               addlegend = FALSE) {
 
