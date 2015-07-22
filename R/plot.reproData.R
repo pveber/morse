@@ -1,24 +1,25 @@
-reproDataPlotFull <- function(data, style = "generic", addlegend = TRUE, ...) {
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  dataPlotFull(data, "Nreprocumul", xlab, ylab, style, addlegend, ...)
+reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
+                              addlegend = TRUE) {
+  if (missing(xlab)) xlab <- "Time"
+  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
+  dataPlotFull(data, "Nreprocumul", xlab, ylab, style, addlegend)
 }
 
 
 #' @import ggplot2
 #' @importFrom dplyr filter
 reproDataPlotTargetTime <- function(x,
+                                    xlab,
+                                    ylab,
                                     target.time,
                                     style,
                                     log.scale,
-                                    addlegend, ...) {
+                                    addlegend) {
   # plot of cumulated number of offspring as a funtion of concentration
   # for a fixed time
 
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
+  if (missing(xlab)) xlab <-"Concentration"
+  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
 
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
@@ -67,8 +68,7 @@ reproDataPlotTargetTime <- function(x,
          ylab = ylab,
          pch = mortality,
          yaxt = "n",
-         xaxt = "n",
-         ...)
+         xaxt = "n")
     # axis
     axis(side = 2, at = pretty(c(0, max(x$Nreprocumul))))
     axis(side = 1, at = transf_data_conc,
@@ -110,28 +110,29 @@ reproDataPlotTargetTime <- function(x,
 }
 
 reproDataPlotFixedConc <- function(x,
+                                   xlab,
+                                   ylab,
                                    concentration,
                                    style = "generic",
-                                   addlegend = FALSE,
-                                   ...) {
+                                   addlegend = FALSE) {
 
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  dataPlotFixedConc(x, "Nreprocumul", concentration, xlab, ylab, style, addlegend, ...)
+  if (missing(xlab)) xlab <- "Time"
+  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
+  dataPlotFixedConc(x, xlab, ylab, "Nreprocumul", concentration, style, addlegend)
 }
 
 reproDataPlotReplicates <- function(x,
-                                   target.time,
-                                   concentration,
-                                   style,
-                                   addlegend,
-                                   ...) {
+                                    xlab,
+                                    ylab,
+                                    target.time,
+                                    concentration,
+                                    style,
+                                    addlegend) {
 
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Cumulated Number of offsprings"
-  dataPlotReplicates(x, "Nreprocumul", target.time, concentration, xlab, ylab, style, addlegend)
+  if (missing(xlab)) xlab <- "Replicate"
+  if (missing(ylab)) ylab <- "Cumulated Number of offsprings"
+  dataPlotReplicates(x, xlab, ylab, "Nreprocumul", target.time, concentration,
+                     style, addlegend)
 }
 
 #' Plotting method for reproData objects
@@ -143,6 +144,9 @@ reproDataPlotReplicates <- function(x,
 #' the experimental values for the minimum available concentration.
 #'
 #' @param x an object of class \code{reproData}
+#' @param xlab A label for the \eqn{X}-axis, by default depends of arguments.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Cumulated Number
+#' of offsprings}.
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or
@@ -151,7 +155,6 @@ reproDataPlotReplicates <- function(x,
 #' summed for a same concentration
 #' @param log.scale display \eqn{X}-axis in log-scale
 #' @param addlegend add a default legend to the plot if \code{TRUE}, 
-#' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' @keywords plot
@@ -184,13 +187,14 @@ reproDataPlotReplicates <- function(x,
 #' @importFrom graphics plot
 #'
 plot.reproData <- function(x,
+                           xlab,
+                           ylab,
                            target.time = NULL,
                            concentration = NULL,
                            style = "generic",
                            pool.replicate = FALSE,
                            log.scale = FALSE,
-                           addlegend = FALSE,
-                           ...) {
+                           addlegend = FALSE) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
 
@@ -201,12 +205,13 @@ plot.reproData <- function(x,
   }
 
   if (is.null(target.time) && is.null(concentration))
-    reproDataPlotFull(x, style, addlegend, ...)
+    reproDataPlotFull(x, xlab, ylab, style, addlegend)
   else if (! is.null(target.time) && is.null(concentration))
-    reproDataPlotTargetTime(x, target.time, style, log.scale, addlegend, ...)
+    reproDataPlotTargetTime(x, xlab, ylab, target.time, style, log.scale,
+                            addlegend)
   else if (is.null(target.time) && ! is.null(concentration))
-    reproDataPlotFixedConc(x, concentration, style, addlegend, ...)
+    reproDataPlotFixedConc(x, xlab, ylab, concentration, style, addlegend)
   else
-    reproDataPlotReplicates(x, target.time, concentration, style,
-                            addlegend, ...)
+    reproDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
+                            addlegend)
 }
