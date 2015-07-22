@@ -126,7 +126,7 @@ dataPlotFullGG <- function(data, resp, xlab, ylab, addlegend) {
 }
 
 dataPlotFull <- function(data, resp, xlab, ylab, style = "generic",
-                         addlegend = FALSE, ...) {
+                         addlegend = FALSE) {
   if (style == "generic")
     dataPlotFullGeneric(data, resp, xlab, ylab, addlegend)
   else if (style == "ggplot")
@@ -134,23 +134,22 @@ dataPlotFull <- function(data, resp, xlab, ylab, style = "generic",
   else stop("Unknown plot style")
 }
 
-survDataPlotFull <- function(data, style = "generic", addlegend = FALSE, ...) {
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-  dataPlotFull(data, "Nsurv", xlab, ylab, style, addlegend, ...)
+survDataPlotFull <- function(data, xlab, ylab, style = "generic",
+                             addlegend = FALSE) {
+  if (missing(xlab)) xlab <- "Time"
+  if (missing(ylab)) ylab <- "Number of surviving individuals"
+  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend)
 }
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotTargetTime <- function(x, target.time, style, log.scale, addlegend, ...) {
+survDataPlotTargetTime <- function(x, target.time, style, log.scale, addlegend) {
 
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Concentration"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
+  if (missing(xlab)) xlab <- "Concentration"
+  if (missing(ylab)) ylab <- "Number of surviving individuals"
 
-    if (!target.time %in% x$time)
-      stop("[target.time] is not one of the possible time !")
+  if (!target.time %in% x$time)
+    stop("[target.time] is not one of the possible time !")
 
   # select the target.time
   xf <- filter(x, x$time == target.time)
@@ -236,8 +235,7 @@ dataPlotFixedConc <- function(x, resp,
                               concentration,
                               xlab, ylab,
                               style = "generic",
-                              addlegend = FALSE,
-                              ...) {
+                              addlegend = FALSE) {
 
   legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
 
@@ -310,27 +308,29 @@ dataPlotFixedConc <- function(x, resp,
 }
 
 survDataPlotFixedConc <- function(x,
+                                  xlab,
+                                  ylab,
                                   concentration,
                                   style = "generic",
-                                  addlegend = FALSE,
-                                  ...) {
+                                  addlegend = FALSE) {
 
-opt_args <- list(...)
-xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Time"
-ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-dataPlotFixedConc(x, "Nsurv", concentration, xlab, ylab, style, addlegend, ...)
+
+  if (missing(xlab)) xlab <- "Time"
+  if (missing(ylab)) ylab <- "Number of surviving individuals"
+  dataPlotFixedConc(x, xlab, ylab, "Nsurv", concentration, style, addlegend)
 }
 
 #' @importFrom dplyr %>% filter
 dataPlotReplicates <- function(x,
+                               xlab,
+                               ylab,
                                resp,
                                target.time,
                                concentration,
                                xlab,
                                ylab,
                                style,
-                               addlegend,
-                               ...) {
+                               addlegend) {
 
   # check [target.time] and [concentration]
   if (!target.time %in% x$time)
@@ -391,16 +391,17 @@ dataPlotReplicates <- function(x,
 }
 
 survDataPlotReplicates <- function(x,
+                                   xlab,
+                                   ylab,
                                    target.time,
                                    concentration,
                                    style,
-                                   addlegend,
-                                   ...) {
+                                   addlegend) {
 
-  opt_args <- list(...)
-  xlab <- if("xlab" %in% names(opt_args)) opt_args[["xlab"]] else "Replicate"
-  ylab <- if("ylab" %in% names(opt_args)) opt_args[["ylab"]] else "Number of surviving individuals"
-  dataPlotReplicates(x, "Nsurv", target.time, concentration, xlab, ylab, style, addlegend)
+  if (missing(xlab)) xlab <- "Replicate"
+  if (missing(ylab)) ylab <- "Number of surviving individuals"
+  dataPlotReplicates(x, xlab, ylab, "Nsurv", target.time, concentration, style,
+                     addlegend)
 }
 
 
@@ -413,6 +414,8 @@ survDataPlotReplicates <- function(x,
 #' the experimental values for the minimum available concentration.
 #'
 #' @param x an object of class \code{survData}
+#' @param xlab A label for the \eqn{X}-axis, by default depends of arguments.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param graphical backend, can be \code{'generic'} or \code{'ggplot'}
@@ -455,13 +458,14 @@ survDataPlotReplicates <- function(x,
 #' @importFrom graphics plot
 #'
 plot.survData <- function(x,
+                          xlab,
+                          ylab,
                           target.time = NULL,
                           concentration = NULL,
                           style = "generic",
                           pool.replicate = FALSE,
                           log.scale = FALSE,
-                          addlegend = FALSE,
-                          ...) {
+                          addlegend = FALSE) {
 
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
@@ -473,11 +477,12 @@ plot.survData <- function(x,
   }
 
   if (is.null(target.time) && is.null(concentration))
-    survDataPlotFull(x, style, addlegend, ...)
+    survDataPlotFull(x, xlab, ylab, style, addlegend)
   else if (! is.null(target.time) && is.null(concentration))
-    survDataPlotTargetTime(x, target.time, style, log.scale, addlegend, ...)
+    survDataPlotTargetTime(x, xlab, ylab, target.time, style, log.scale, addlegend)
   else if (is.null(target.time) && ! is.null(concentration))
-    survDataPlotFixedConc(x, concentration, style, addlegend, ...)
+    survDataPlotFixedConc(x, xlab, ylab, concentration, style, addlegend)
   else
-    survDataPlotReplicates(x, target.time, concentration, style, addlegend, ...)
+    survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
+                           addlegend)
 }
