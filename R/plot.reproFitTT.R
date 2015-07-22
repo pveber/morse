@@ -313,7 +313,8 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
 #' 
 #' @param x An object of class \code{reproFitTT}.
 #' @param xlab A label for the \eqn{X}-label, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-label, by default \code{Response}.
+#' @param ylab A label for the \eqn{Y}-label, by default \code{Nb of offspring
+#' per ind.day}.
 #' @param main A main title for the plot.
 #' @param fitcol A single color to plot the fitted curve, by default
 #' \code{red}.
