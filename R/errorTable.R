@@ -1,5 +1,5 @@
 errorTableCreate <- function() {
-  t <- data.frame(stringsAsFactors = FALSE)
+  t <- data.frame(id = character(0), msg = character(0), stringsAsFactors = FALSE)
   class(t) <- c("errorTable", "data.frame")
   t
 }
