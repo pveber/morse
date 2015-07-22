@@ -72,7 +72,7 @@ reproLlmCI <- function(fit, x) {
 reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
                                     curv_conc, curv_resp, mortality,
                                     xlab, ylab, fitcol, fitlty, fitlwd,
-                                    main, addlegend, ...) {
+                                    main, addlegend) {
   # plot the fitted curve estimated by reproFitTT
   # with generic style without credible interval
   
@@ -84,8 +84,7 @@ reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
        xaxt = "n",
        yaxt = "n",
        ylim = c(0, max(data_resp) + 0.2),
-       type = "n",
-       ...)
+       type = "n")
   # axis
   axis(side = 2, at = pretty(c(0, max(data_resp))))
   axis(side = 1, at = transf_data_conc,
@@ -114,7 +113,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
                                   CI, mortality,
                                   xlab, ylab, fitcol, fitlty, fitlwd,
                                   main, addlegend,
-                                  cicol, cilty, cilwd, ...) {
+                                  cicol, cilty, cilwd) {
   # plot the fitted curve estimated by reproFitTT
   # with generic style with credible interval
   
@@ -125,8 +124,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
        xaxt = "n",
        yaxt = "n",
        ylim = c(0, max(c(data_resp, CI[["qsup95"]])) + 0.01),
-       type = "n",
-       ...)
+       type = "n")
   
   # axis
   axis(side = 2, at = pretty(c(0, max(CI[["qsup95"]]))))
@@ -166,7 +164,7 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
                                 CI, mortality,
                                 xlab, ylab, fitcol, fitlty, fitlwd,
                                 main, addlegend,
-                                cicol, cilty, cilwd, ...) {
+                                cicol, cilty, cilwd) {
   
   if(!is.null(CI)) reproFitPlotGenericCI(data_conc, transf_data_conc,
                                          data_resp,
@@ -174,12 +172,12 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
                                          CI, mortality,
                                          xlab, ylab, fitcol, fitlty, fitlwd,
                                          main, addlegend,
-                                         cicol, cilty, cilwd, ...)
+                                         cicol, cilty, cilwd)
   else {
     reproFitPlotGenericNoCI(data_conc, transf_data_conc, data_resp,
                             curv_conc, curv_resp, mortality,
                             xlab, ylab, fitcol, fitlty, fitlwd,
-                            main, addlegend, ...)
+                            main, addlegend)
   }
 }
 
@@ -244,7 +242,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                            CI, mortality,
                            xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend,
-                           cicol, cilty, cilwd, ...) {
+                           cicol, cilty, cilwd) {
   
   if (Sys.getenv("RSTUDIO") == "") {
     dev.new() # create a new page plot
@@ -333,7 +331,6 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
 #' @param log.scale Log option for the \eqn{X}-axis.
 #' @param style Graphical package method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @export
 #' 
@@ -358,8 +355,7 @@ plot.reproFitTT <- function(x,
                             cilwd,
                             addlegend = FALSE,
                             log.scale = FALSE,
-                            style = "generic",
-                            ...) {
+                            style = "generic") {
   # plot the fitted curve estimated by reproFitTT
   # INPUTS
   # - x:  reproFitTT object
@@ -435,7 +431,7 @@ plot.reproFitTT <- function(x,
                         CI, mortality,
                         xlab, ylab, fitcol, fitlty, fitlwd,
                         main, addlegend,
-                        cicol, cilty, cilwd, ...)
+                        cicol, cilty, cilwd)
   }
   else if (style == "ggplot") {
     reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
@@ -443,7 +439,7 @@ plot.reproFitTT <- function(x,
                    CI, mortality,
                    xlab, ylab, fitcol, fitlty, fitlwd,
                    main, addlegend,
-                   cicol, cilty, cilwd, ...)
+                   cicol, cilty, cilwd)
   }
   else stop("Unknown style")
 }
