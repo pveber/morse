@@ -141,7 +141,7 @@ survDataPlotFull <- function(data, xlab, ylab, style = "generic",
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotTargetTime <- function(x, target.time, style, log.scale, addlegend) {
+survDataPlotTargetTime <- function(x, xlab, ylab, target.time, style, log.scale, addlegend) {
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
 
