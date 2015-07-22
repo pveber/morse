@@ -1,6 +1,6 @@
 reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
                               addlegend = TRUE) {
-  dataPlotFull(data, "Nreprocumul", xlab, ylab, style, addlegend)
+  dataPlotFull(data, xlab, ylab, "Nreprocumul", style, addlegend)
 }
 
 
