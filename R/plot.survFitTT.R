@@ -302,7 +302,7 @@ survFitPlotGG <- function(x,
 #' 
 #' @param x An object of class \code{survFitTT}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Response}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
 #' @param fitcol A single color to plot the fitted curve, by default
 #' \code{red}.
