@@ -127,6 +127,9 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
                          addlegend = FALSE) {
+
+  if (missing(xlab)) xlab <- "Time"
+
   if (style == "generic")
     dataPlotFullGeneric(data, xlab, ylab, resp, addlegend)
   else if (style == "ggplot")
@@ -142,6 +145,8 @@ survDataPlotFull <- function(data, xlab, ylab, style = "generic",
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(x, xlab, ylab, target.time, style, log.scale, addlegend) {
+  if (missing(xlab)) xlab <-"Concentration"
+
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
 
@@ -233,6 +238,8 @@ dataPlotFixedConc <- function(x,
                               style = "generic",
                               addlegend = FALSE) {
 
+  if (missing(xlab)) xlab <- "Time"
+
   legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
 
   # check concentration value
@@ -322,6 +329,8 @@ dataPlotReplicates <- function(x,
                                concentration,
                                style,
                                addlegend) {
+
+  if (missing(xlab)) xlab <- "Replicate"
 
   # check [target.time] and [concentration]
   if (!target.time %in% x$time)
@@ -464,24 +473,18 @@ plot.survData <- function(x,
                   replicate = 1)
   }
 
+  if (missing(ylab)) ylab <- "Number of surviving individuals"
+
   if (is.null(target.time) && is.null(concentration)) {
-    if (missing(xlab)) xlab <- "Time"
-    if (missing(ylab)) ylab <- "Number of surviving individuals"
     survDataPlotFull(x, xlab, ylab, style, addlegend)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
-    if (missing(xlab)) xlab <- "Concentration"
-    if (missing(ylab)) ylab <- "Number of surviving individuals"
     survDataPlotTargetTime(x, xlab, ylab, target.time, style, log.scale, addlegend)
   }
   else if (is.null(target.time) && ! is.null(concentration)) {
-    if (missing(xlab)) xlab <- "Time"
-    if (missing(ylab)) ylab <- "Number of surviving individuals"
     survDataPlotFixedConc(x, xlab, ylab, concentration, style, addlegend)
   }
   else {
-    if (missing(xlab)) xlab <- "Replicate"
-    if (missing(ylab)) ylab <- "Number of surviving individuals"
     survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
                            addlegend)
   }
