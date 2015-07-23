@@ -255,7 +255,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
   # colors
-  valCols <- fCols(data, x, fitcol, cicol, "repro")
+  valCols <- fCols(data, fitcol, cicol, "repro")
   
   # points (to create the legend)
   plt_1 <- ggplot(data) +
