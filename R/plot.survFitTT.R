@@ -48,7 +48,7 @@ survFitPlotGenericNoCI <- function(x,
                                    data_conc, transf_data_conc, data_resp,
                                    curv_conc, curv_resp,
                                    xlab, ylab, fitcol, fitlty, fitlwd,
-                                   main, addlegend, ...)
+                                   main, addlegend)
 {
   # plot the fitted curve estimated by survFitTT
   # with generic style without credible interval
@@ -60,8 +60,7 @@ survFitPlotGenericNoCI <- function(x,
        pch  = 16,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, 1.05),
-       ...)
+       ylim = c(0, 1.05))
   
   # axis
   axis(side = 2, at = pretty(c(0, 1)))
@@ -91,7 +90,7 @@ survFitPlotGenericCI <- function(x,
                                  CI,
                                  xlab, ylab, fitcol, fitlty, fitlwd,
                                  main, addlegend,
-                                 cicol, cilty, cilwd, ...)
+                                 cicol, cilty, cilwd)
 {
   # plot the fitted curve estimated by survFitTT
   # with generic style with credible interval
@@ -102,8 +101,7 @@ survFitPlotGenericCI <- function(x,
        xaxt = "n",
        yaxt = "n",
        ylim = c(0, max(CI["qsup95",]) + 0.01),
-       type = "n",
-       ...)
+       type = "n")
   
   # axis
   axis(side = 2, at = pretty(c(0, max(CI["qsup95",]))))
@@ -158,7 +156,7 @@ survFitPlotGeneric <- function(x,
                                CI,
                                xlab, ylab, fitcol, fitlty, fitlwd,
                                main, addlegend,
-                               cicol, cilty, cilwd, ...) {
+                               cicol, cilty, cilwd) {
   
   
   if(!is.null(CI)) survFitPlotGenericCI(x,
@@ -167,13 +165,13 @@ survFitPlotGeneric <- function(x,
                                         CI,
                                         xlab, ylab, fitcol, fitlty, fitlwd,
                                         main, addlegend,
-                                        cicol, cilty, cilwd, ...)
+                                        cicol, cilty, cilwd)
   else {
     survFitPlotGenericNoCI(x,
                            data_conc, transf_data_conc, data_resp,
                            curv_conc, curv_resp,
                            xlab, ylab, fitcol, fitlty, fitlwd,
-                           main, addlegend, ...)
+                           main, addlegend)
   }
 }
 
@@ -235,7 +233,7 @@ survFitPlotGG <- function(x,
                           CI,
                           xlab, ylab, fitcol, fitlty, fitlwd,
                           main, addlegend,
-                          cicol, cilty, cilwd, ...) {
+                          cicol, cilty, cilwd) {
   
   
   if (Sys.getenv("RSTUDIO") == "") {
@@ -304,7 +302,7 @@ survFitPlotGG <- function(x,
 #' 
 #' @param x An object of class \code{survFitTT}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Response}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
 #' @param fitcol A single color to plot the fitted curve, by default
 #' \code{red}.
@@ -323,7 +321,6 @@ survFitPlotGG <- function(x,
 #' @param addlegend If \code{TRUE}, a default legend is added to the plot.
 #' @param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @keywords plot 
 #'
@@ -348,8 +345,7 @@ plot.survFitTT <- function(x,
                            cilwd,
                            addlegend = FALSE,
                            log.scale = FALSE,
-                           style = "generic",
-                           ...) {
+                           style = "generic") {
   # plot the fitted curve estimated by survFitTT
   # INPUTS
   # - x:  survFitTt object
@@ -418,7 +414,7 @@ plot.survFitTT <- function(x,
                        CI,
                        xlab, ylab, fitcol, fitlty, fitlwd,
                        main, addlegend,
-                       cicol, cilty, cilwd, ...)
+                       cicol, cilty, cilwd)
   }
   else if (style == "ggplot") {
     survFitPlotGG(x,
@@ -427,7 +423,7 @@ plot.survFitTT <- function(x,
                   CI,
                   xlab, ylab, fitcol, fitlty, fitlwd,
                   main, addlegend,
-                  cicol, cilty, cilwd / 2, ...)
+                  cicol, cilty, cilwd / 2)
   }
   else stop("Unknown style")
 }
