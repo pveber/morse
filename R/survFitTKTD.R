@@ -166,6 +166,7 @@ survTKTDPARAMS <- function(mcmc) {
   return(res)
 }
 
+#' @import coda
 coda.samples.dic <- function (model, variable.names = NULL, n.iter, thin = 1, ...)
 {
   load.module('dic') # necessary for pD and deviance monitor
@@ -316,19 +317,22 @@ survFitTKTD <- function(data,
   
   # Define model
   if (distr == "norm") {
-    model <- morse:::survLoadModel(model.program = modelTKTDNorm,
-                                   data = jags.data, n.chains,
-                                   Nadapt = 3000, quiet)
+    model <- survLoadModel(model.program = modelTKTDNorm,
+                           data = jags.data, n.chains,
+                           Nadapt = 3000, quiet)
   } else if (distr == "unif") {
-    model <- morse:::survLoadModel(model.program = modelTKTDUnif,
-                                   data = jags.data, n.chains,
-                                   Nadapt = 3000, quiet)
+    model <- survLoadModel(model.program = modelTKTDUnif,
+                           data = jags.data, n.chains,
+                           Nadapt = 3000, quiet)
   }
   
   # Determine sampling parameters
   parameters <- c("lke", "lNEC","lks", "lm0")
-  sampling.parameters <- morse:::modelSamplingParameters(model,
-                                                         parameters, n.chains, quiet)
+  sampling.parameters <- modelSamplingParameters(model,
+                                                 parameters, n.chains, quiet)
+  
+#   if (sampling.parameters$niter > 100000)
+#     stop("The model needs too many iterations to provide reliable parameter estimates !")
   
   # Sampling
   prog.b <- ifelse(quiet == TRUE, "none", "text")

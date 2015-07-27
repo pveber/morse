@@ -108,6 +108,6 @@ plot.survFitTKTD <- function(x,
       labs(x = xlab, y = ylab) + ggtitle(main) +
       geom_point() + geom_line(data = data$dtheo) + theme_minimal()
     
-    return(plt1)
+    plt1
   }
 }
