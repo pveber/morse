@@ -51,6 +51,15 @@ survFitPlotDataTKTD <- function(x) {
               dobs = dobs))
 }
 
+#' Plotting method for survFitTKTD objects
+#' 
+#' @param x An object of class \code{survFitTKTD}.
+#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
+#' @param main A main title for the plot.
+#' @param style Graphical method: \code{generic} or \code{ggplot}.
+#' 
+#' @keywords plot 
 #' @export
 #' 
 #' @import ggplot2
