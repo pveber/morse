@@ -53,8 +53,6 @@ survFitPlotDataTKTD <- function(x) {
 
 #' @export
 #' 
-#' @name survFitTT
-#' 
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom gridExtra grid.arrange arrangeGrob
