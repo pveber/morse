@@ -12,20 +12,49 @@
 
 \maketitle
 
-\section{Survival assays}
-In a survival assay, subjects are exposed to a controlled dose of a pollutant for some time and the number of surviving individuals is measured at certain time points after exposition. In most standard bioassays, the dose is held constant throughout the whole experiment, which we will assume here. An experiment is generally replicated several times and also repeated for various levels of pollutant.
+This document describes the probabilistic models used in MORSE to
+analyze survival and reproduction data, and as such serves as a
+mathematical specification of the package. For a more practical
+introduction, please consult the ``Tutorial'' vignette; for
+information on the structure and contents of the library, please
+consult the reference manual.
 
-In the case of endpoint assays, the mortality is measured only once, and the chosen time point is called \emph{target time}. Let us see how this particular case is handled in MORSE.
+Model parameters are estimated using standard Bayesian inference,
+where \emph{a posteriori} distributions are computed from the
+likelihood of observed data and prior distributions on the
+parameters. These priors are specified after each model description.
+
+\section{Survival assays}
+In a survival assay, subjects are exposed to a controlled dose of a
+pollutant for some time and the number of surviving individuals is
+measured at certain time points after exposition. In most standard
+bioassays, the dose is held constant throughout the whole experiment,
+which we will assume here. An experiment is generally replicated
+several times and also repeated for various levels of pollutant.
+
+In the case of endpoint assays, the mortality is measured only once,
+and the chosen time point is called \emph{target time}. Let us see how
+this particular case is handled in MORSE.
 
 \subsection{Analysis of endpoint survival assays}
 
-A dataset from an endpoint survival assay is a collection $D = \{ (c_i, n_i^{init}, n_i) \}_i$ of experiments, where $c_i$ is the tested concentration, $n_i^{init}$ the initial number of individuals and $n_i$ the number of individuals at the target time. Triplets s.t. $c_i = 0$ correspond to control experiments.
+A dataset from an endpoint survival assay is a collection $D = \{
+(c_i, n_i^{init}, n_i) \}_i$ of experiments, where $c_i$ is the tested
+concentration, $n_i^{init}$ the initial number of individuals and
+$n_i$ the number of individuals at the target time. Triplets s.t. $c_i
+= 0$ correspond to control experiments.
 
-\paragraph{Modelling} In the particular case of endpoint assays, the model used in MORSE is defined as follows. Let $t$ be the target time in days. We suppose the \emph{mean survival rate after $t$ days} is given by a function $f$ of the pollutant level $c$. We also suppose that the death of two individuals are two independent events. Hence, given an initial number $n^{init}$ of individuals in the assay, we obtain that the number $N$ of surviving individuals follows a binomial distribution:
+\paragraph{Modelling} In the particular case of endpoint assays, the
+model used in MORSE is defined as follows. Let $t$ be the target time
+in days. We suppose the \emph{mean survival rate after $t$ days} is
+given by a function $f$ of the pollutant level $c$. We also suppose
+that the death of two individuals are two independent events. Hence,
+given an initial number $n^{init}$ of individuals in the assay, we
+obtain that the number $N$ of surviving individuals follows a binomial
+distribution:
 $$
 N \sim \mathcal{B}(n^{init}, f(c))
 $$
-
 There may be various possibilities for $f$. In MORSE we assume:
 $$
 f(c) = \frac{d}{1 + (\frac{c}{e})^b}
@@ -82,20 +111,19 @@ concentrations, when mortality may be very high.
 
 In a bioassay, mortality is usually regularly recorded, \textit{i.e}.
 at each timepoint when reproduction outputs are counted.  Using these
-data, it is easy to estimate for each individual, the period it has
-stayed alive, corresponding to the period it may reproduce.  As
-commonly done in epidemiology for incidence rate calculations, we can
-then calculate, for one replicate, the total sum of the periods of
-observation of each individual before its death\footnote{\footnotesize
-  When an organism is staying alive a time $t_k$ but counted as dead
-  at time $t_{k+1}$, it is then assumed to be really dead at time
-  $\frac{t_{k+1}+t_k}{2}$.}. This sum can be expressed as a number of
-individual-days. Hence, reproduction can be evaluated through the
-number of outputs per individual-day.
+data, we can approximately estimate for each individual the period it
+has stayed alive (which we assume coincides with the period it may
+reproduce).  As commonly done in epidemiology for incidence rate
+calculations, we can then calculate, for one replicate, the total sum
+of the periods of observation of each individual before its
+death\footnote{\footnotesize When an organism was alive at time
+  $t_k$ but counted as dead at time $t_{k+1}$, it is then assumed to
+  be really dead at time $\frac{t_{k+1}+t_k}{2}$.}. This sum can be
+expressed as a number of individual-days. Hence, reproduction can be
+evaluated through the number of outputs per individual-day.
 
-In the following, we denote $M_{ijk}$ the number of surviving
-individuals for concentration $c_i$ and replicate $j$ at time $t_k$
-(and $m_{ijk}$ the corresponding observed value). 
+In the following, we denote $m_{ijk}$ the observed number of surviving
+individuals for concentration $c_i$ and replicate $j$ at time $t_k$.
 
 \subsection{Estimation of effective observation time}
 
@@ -121,10 +149,11 @@ In this paragraph, we describe our so-called ``target time analysis'',
 where we model the cumulated number of offspring up to a target time
 as a function of the effective observation time in this period
 (cumulated life times of all individuals in the experiment, as
-described above). The data will therefore correspond to a set
-$\{(nid_{ij}, n_{ij})\}$ of pairs supposed to be drawn independently
-from a distribution that is a function of the level of pollutant
-$c_i$.
+described above). We keep the convention that the index $i$ is used
+for concentration levels and $j$ for the replicates. The data will
+therefore correspond to a set $\{(nid_{ij}, n_{ij})\}$ of pairs
+supposed to be drawn independently from a distribution that is a
+function of the level of pollutant $c_i$.
 
 
 \paragraph{Modelling} We assume here that the effect of the considered
@@ -132,11 +161,10 @@ pollutant on the reproduction rate does not depend on exposure time,
 but only on the concentration of the pollutant. More precisely, the
 mean reproduction rate in an experiment with a concentration $c_i$ of
 pollutant is modelled by a three-parameter log-logistic model, that
-writes as follows::
+writes as follows:
 \[
 f(c_i;\theta)=\frac{d}{1+(c_i/e)^b} \quad \textrm{with} \quad \theta=(e,b,d)
-\].
-
+\]
 Here $d$ corresponds to the reproduction rate in absence of
 contaminant (control condition), and $e$ to the value of the
 $EC_{50}$, that is the concentration dividing the average number of
@@ -146,7 +174,7 @@ replicate $j$ can be modelled using a Poisson distribution:
 $$
 N_{ij} \sim Poisson(f(c_i ; \theta) \times NID_{ij})
 $$
-This model is later referenced as ``Poisson model''.  In case there
+This model is later referenced to as ``Poisson model''.  In case there
 are non-negligible random variations of the reproduction rate between
 two replicates, we propose a second model, named ``gamma-Poisson
 model'', stating that:
@@ -155,7 +183,7 @@ N_{ij} \sim Poisson(F_{ij} \times NID_{ij})
 $$
 where the reproduction rate $F_{ij}$ for concentration $c_i$ and
 replicate $j$ is a random variable following a gamma
-distribution. Introducting a dispersion parameter $\omega$, we pose
+distribution. Introducing a dispersion parameter $\omega$, we pose
 that:
 $$
 F_{ij} \sim gamma(\frac{f(c_i;\theta)}{\omega}, \frac{1}{\omega})
@@ -198,12 +226,14 @@ $$log_{10}(\omega) \sim U(-4,4)$$
 \begin{align*}
 \end{align*}
 
-% \paragraph{Inference} As shown in (FIXME papier ML), the gamma-Poisson
-% model described above is equivalent to the following negative binomial
-% model:
-% $$
-% N_{ij} \sim \mbox{Negbin}(\frac{1}{1 + \omega \times NID_{ij}}, \frac{f(c_i ; \theta)}{\omega})
-% $$
-% of mean $\omega \times NID_{ij}$ and variance 
+For a given dataset, the procedure implemented in MORSE will fit the
+two models (Poisson and gamma-Poisson), and use an information
+criterion known as Deviance Information Criterion (DIC) to choose the
+most appropriate. In situations where overdispersion (that is
+inter-replicate variability) is negligible, using the Poisson model
+will provide more reliable estimates. That is why a Poisson model is
+preferred unless the gamma-Poisson model has a significantly lower
+DIC (in practice we require a difference of 10).
+
 
 \end{document}
