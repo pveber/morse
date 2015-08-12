@@ -90,18 +90,8 @@ As mentionned already, it is often the case that part of the
 individuals of an assay die during the observation period. In previous
 approaches, it was proposed to consider the cumulated number of
 reproduction outputs without accounting for
-mortality\footnote{\footnotesize OECD. 2004. Guidelines for testing of
-  chemicals n.220. \textit{Enchytraeid} reproduction test. Technical
-  report, Organisation for Economic Cooperation and Development,
-  Paris.}$^{,}$\footnote{\footnotesize OECD. 2008.Guidelines for
-  testing of chemicals n.226. Predatory mite (\textit{Hypoapsis
-    (Geolaelaps) aculeifer}) reproduction test in soil. Technical
-  report, Organisation for Economic Cooperation and Development,
-  Paris.}, or to exclude replicates where mortality
-occurred\footnote{\footnotesize OECD. 1998. Guidelines for testing of
-  chemicals n.211. \textit{Daphnia magna} reproduction test. Technical
-  report, Organisation for Economic Cooperation and
-  Development. Paris.}.  However, individuals may have reproduced
+mortality~\cite{OECD2004,OECD2008}, or to exclude replicates where mortality
+occurred~\cite{OECD1998}.  However, individuals may have reproduced
 before dying and thus contributed to the observed response. In
 addition, individuals dying the first are the most sensitive, so the
 information on reproduction of these prematurely dead individuals is
@@ -149,11 +139,14 @@ In this paragraph, we describe our so-called ``target time analysis'',
 where we model the cumulated number of offspring up to a target time
 as a function of the effective observation time in this period
 (cumulated life times of all individuals in the experiment, as
-described above). We keep the convention that the index $i$ is used
-for concentration levels and $j$ for the replicates. The data will
-therefore correspond to a set $\{(nid_{ij}, n_{ij})\}$ of pairs
-supposed to be drawn independently from a distribution that is a
-function of the level of pollutant $c_i$.
+described above). A more detailed presentation can be found in
+\cite{delignette2014}.
+
+We keep the convention that the index $i$ is used for concentration
+levels and $j$ for the replicates. The data will therefore correspond
+to a set $\{(nid_{ij}, n_{ij})\}$ of pairs supposed to be drawn
+independently from a distribution that is a function of the level of
+pollutant $c_i$.
 
 
 \paragraph{Modelling} We assume here that the effect of the considered
@@ -235,5 +228,6 @@ will provide more reliable estimates. That is why a Poisson model is
 preferred unless the gamma-Poisson model has a significantly lower
 DIC (in practice we require a difference of 10).
 
-
+\bibliographystyle{plain}
+\bibliography{biblio}
 \end{document}
