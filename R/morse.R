@@ -99,25 +99,6 @@ NULL
 #' value of dynamic modelling in predictive ecotoxicology, \emph{Ecotoxicology
 #' and Environmental Safety}, 75, 80-86.
 #' @keywords datasets
-#' 
-#' @examples
-#'
-#' # (1) Load the data
-#' data(cadmium1)
-#'
-#' # (2) Create an object of class "reproData"
-#' dat <- reproData(cadmium1)
-#'
-#' # (3) Plot the cummulated number of offspring in function of time
-#' plot(dat)
-#'
-#' # (4) Plot the cummulated number of offspring for a fixed concentration
-#' plot(dat, concentration = 4.36)
-#'
-#' # (5) Plot the cumulated number of offspring for a fixed time
-#' plot(dat, target.time = 21)
-#'
-#'
 NULL
 
 
@@ -149,25 +130,6 @@ NULL
 #' number of offspring at each time point for each concentration and each
 #' replicate.} }
 #' @keywords datasets
-#' 
-#' @examples
-#'
-#' # (1) Load the data
-#' data(cadmium2)
-#'
-#' # (2) Create an object of class "reproData"
-#' dat <- reproData(cadmium2)
-#'
-#' # (3) Plot the cummulated number of offspring in function of time
-#' plot(dat)
-#'
-#' # (4) Plot the cummulated number of offspring for a fixed concentration
-#' plot(dat, concentration = 284)
-#'
-#' # (5) Plot the cumulated number of offspring for a fixed time
-#' plot(dat, target.time = 56)
-#'
-#'
 NULL
 
 
@@ -202,25 +164,6 @@ NULL
 #' and bioaccumulation of chlordan in Daphnia magna, \emph{Environmental
 #' Toxicology and Chemistry}, 28, 2150-2159.
 #' @keywords datasets
-#' 
-#' @examples
-#'
-#' # (1) Load the data
-#' data(chlordan)
-#'
-#' # (2) Create an object of class "reproData"
-#' dat <- reproData(chlordan)
-#'
-#' # (3) Plot the cummulated number of offspring in function of time
-#' plot(dat)
-#'
-#' # (4) Plot the cummulated number of offspring for a fixed concentration
-#' plot(dat, concentration = 7)
-#'
-#' # (5) Plot the cumulated number of offspring for a fixed time
-#' plot(dat, target.time = 21)
-#'
-#'
 NULL
 
 
@@ -255,25 +198,6 @@ NULL
 #' Charles, S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords datasets
-#' 
-#' @examples
-#'
-#' # (1) Load the data
-#' data(copper)
-#'
-#' # (2) Create an object of class "reproData"
-#' dat <- reproData(copper)
-#'
-#' # (3) Plot the cummulated number of offspring in function of time
-#' plot(dat)
-#'
-#' # (4) Plot the cummulated number of offspring for a fixed concentration
-#' plot(dat, concentration = 10)
-#'
-#' # (5) Plot the cumulated number of offspring for a fixed time
-#' plot(dat, target.time = 21)
-#'
-#'
 NULL
 
 
@@ -312,26 +236,4 @@ NULL
 #' Charles S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords datasets
-#' 
-#' @examples
-#'
-#' # (1) Load the data
-#' data(zinc)
-#'
-#' # (2) Create an object of class "reproData"
-#' dat <- reproData(zinc)
-#'
-#' # (3) Plot the cummulated number of offspring in function of time
-#' plot(dat)
-#'
-#' # (4) Plot the cummulated number of offspring for a fixed concentration
-#' plot(dat, concentration = 0.660)
-#'
-#' # (5) Plot the cumulated number of offspring for a fixed time
-#' plot(dat, target.time = 21)
-#'
-#'
 NULL
-
-
-
