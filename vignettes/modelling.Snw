@@ -20,7 +20,7 @@ information on the structure and contents of the library, please
 consult the reference manual.
 
 Model parameters are estimated using standard Bayesian inference,
-where \emph{a posteriori} distributions are computed from the
+where posterior distributions are computed from the
 likelihood of observed data and prior distributions on the
 parameters. These priors are specified after each model description.
 
@@ -41,8 +41,8 @@ this particular case is handled in MORSE.
 A dataset from an endpoint survival assay is a collection $D = \{
 (c_i, n_i^{init}, n_i) \}_i$ of experiments, where $c_i$ is the tested
 concentration, $n_i^{init}$ the initial number of individuals and
-$n_i$ the number of individuals at the target time. Triplets s.t. $c_i
-= 0$ correspond to control experiments.
+$n_i$ the number of individuals at the target time. Triplets such that
+$c_i = 0$ correspond to control experiments.
 
 \paragraph{Modelling} In the particular case of endpoint assays, the
 model used in MORSE is defined as follows. Let $t$ be the target time
@@ -61,14 +61,24 @@ f(c) = \frac{d}{1 + (\frac{c}{e})^b}
 $$
 where $b$, $e$ and $d$ are (positive) parameters. In particular $d$ corresponds to the survival rate in absence of pollutant and $e$ corresponds to the $LC_{50}$.
 
-\paragraph{Inference} A posteriori distributions for parameters $b$,
+\paragraph{Inference} Posterior distributions for parameters $b$,
 $d$ and $e$ are estimated using JAGS with the following priors:
+\begin{itemize}
+\item we assume the range of tested concentrations in an
+  experiment is chosen to contain the $LC_{50}$ with high
+  probability. More formally, we chose:
+  $$\log_{10} e \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})$$
+  which implies $e$ has a probability slightly higher than 0.95 to lie
+  between the minimum and the maximum tested concentration.
+\item we chose a quasi non-informative prior distribution for the
+  shape parameter $b$:
+  $$\log_{10} b \sim \mathcal{U}(-2,2)$$
+\end{itemize}
+
 \begin{align*}
-\log_{10} b & \sim \mathcal{U}(-2,2)\\
-\log_{10} e & \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})
 \end{align*}
 
-The prior on $d$ is chosen in a more \emph{ad hoc} way: if we observe
+The prior on $d$ is chosen as follows: if we observe
 no mortality in control experiments then we set $d = 1$, otherwise we
 assume a uniform prior for $d$ between 0 and 1.
 
@@ -130,7 +140,7 @@ $\frac{t_{k+1}+t_k}{2}$.
 With this assumption, the effective observation time for concentration
 $c_i$ and replicate $j$ is then given by:
 $$
-NID_{ij} =   \sum_k m_{ij(k+1)} (t_{k+1} - t_k)
+nid_{ij} =   \sum_k m_{ij(k+1)} (t_{k+1} - t_k)
            + (m_{ijk} - m_{ij(k+1)})(\frac{t_{k+1}+t_k}{2} - t_k)
 $$
 
@@ -144,16 +154,19 @@ described above). A more detailed presentation can be found in
 
 We keep the convention that the index $i$ is used for concentration
 levels and $j$ for the replicates. The data will therefore correspond
-to a set $\{(nid_{ij}, n_{ij})\}$ of pairs supposed to be drawn
-independently from a distribution that is a function of the level of
-pollutant $c_i$.
+to a set $\{(nid_{ij}, n_{ij})\}$ of pairs, where $nid_{ij}$ denotes
+the effective observation time and $n_{ij}$ the number of
+offspring. These observations are supposed to be drawn independently
+from a distribution that is a function of the level of pollutant
+$c_i$.
 
 
 \paragraph{Modelling} We assume here that the effect of the considered
-pollutant on the reproduction rate does not depend on exposure time,
-but only on the concentration of the pollutant. More precisely, the
-mean reproduction rate in an experiment with a concentration $c_i$ of
-pollutant is modelled by a three-parameter log-logistic model, that
+pollutant on the reproduction rate\footnote{that is, the number of
+  reproduction outputs per individual-day} does not depend on exposure
+time, but only on the concentration of the pollutant. More precisely,
+the mean reproduction rate in an experiment with a concentration $c_i$
+of pollutant is modelled by a three-parameter log-logistic model, that
 writes as follows:
 \[
 f(c_i;\theta)=\frac{d}{1+(c_i/e)^b} \quad \textrm{with} \quad \theta=(e,b,d)
@@ -181,21 +194,23 @@ that:
 $$
 F_{ij} \sim gamma(\frac{f(c_i;\theta)}{\omega}, \frac{1}{\omega})
 $$
-Note that a gamma distribution of parameters
-$\alpha$ and $\beta$ has mean $\frac{\alpha}{\beta}$ and variance
-$\frac{\alpha}{\beta^2}$, that is here $f(c_i;\theta)$ and $\omega
-f(c_i;\theta)$ respectively.
+Note that a gamma distribution of parameters $\alpha$ and $\beta$ has
+mean $\frac{\alpha}{\beta}$ and variance $\frac{\alpha}{\beta^2}$,
+that is here $f(c_i;\theta)$ and $\omega f(c_i;\theta)$
+respectively. Hence $\omega$ can be considered as an overdispersion
+parameter (the greater its value, the greater the inter-replicate
+variance)
 
 
-\paragraph{Inference} A posteriori distributions for parameters $b$,
+\paragraph{Inference} Posterior distributions for parameters $b$,
 $d$ and $e$ are estimated using JAGS with the following priors:
 \begin{itemize}
 \item we assume the range of tested concentrations in an
   experiment is chosen to contain the $EC_{50}$ with high
   probability. More formally, we chose:
   $$\log_{10} e \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})$$
-  and $e$ has a probability slightly higher than 0.95 to lie between
-  the minimum and the maximum tested concentration.
+  which implies $e$ has a probability slightly higher than 0.95 to lie
+  between the minimum and the maximum tested concentration.
 \item we chose a quasi non-informative prior distribution for the
   shape parameter $b$:
   $$\log_{10} b \sim \mathcal{U}(-2,2)$$
@@ -205,7 +220,7 @@ $d$ and $e$ are estimated using JAGS with the following priors:
   set a normal prior $\mathcal{N}(\mu_d,\sigma_d)$ using the data:
   \begin{align*}
     \mu_d & = \frac{1}{r_0} \sum_j \frac{n_{0j}}{nid_{0j}}\\
-    \sigma_d & = \frac{1}{\sqrt{r_0}(r_0 - 1)} \sum_j (\frac{n_{0j}}{nid_{0j}} - \mu_d)^2\\
+    \sigma_d & = \sqrt{\frac{\sum_j (\frac{n_{0j}}{nid_{0j}} - \mu_d)^2}{r_0(r_0 - 1)}}\\
   \end{align*}
   where $r_0$ is the number of replicates in the control
   condition. Note that since they are used to estimate a prior
