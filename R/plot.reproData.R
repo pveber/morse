@@ -127,7 +127,7 @@ reproDataPlotReplicates <- function(x,
                      style, addlegend)
 }
 
-#' Plotting method for reproData objects
+#' Plotting method for \code{reproData} objects
 #'
 #' Plots the cumulated number of offspring as a
 #' function of either time and concentration, time only (for a fixed
@@ -140,8 +140,7 @@ reproDataPlotReplicates <- function(x,
 #' @param ylab a title for the \eqn{y}-axis (optional)
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
-#' @param style graphical backend, can be \code{'generic'} or
-#' \code{'ggplot'}
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale

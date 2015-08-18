@@ -309,29 +309,22 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   }
 }
 
-#' Plotting method for reproFitTT objects
+#' Plotting method for \code{reproFitTT} objects
 #' 
-#' @param x An object of class \code{reproFitTT}.
-#' @param xlab A label for the \eqn{X}-label, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-label, by default \code{Nb of offspring
-#' per ind.day}.
-#' @param main A main title for the plot.
-#' @param fitcol A single color to plot the fitted curve, by default
-#' \code{red}.
-#' @param fitlty A single line type to plot the fitted curve, by default
-#' \code{1}.
-#' @param fitlwd A single numeric which controls the width of the fitted curve,
-#' by default \code{1}.
-#' @param ci If \code{TRUE}, the 95 \% credible limits are draw for the model.
-#' @param cicol A single color to plot the 95 \% credible limits, by default
-#' \code{blue}.
-#' @param cilty A single line type to plot 95 \% credible limits, by default
-#' \code{1}.
-#' @param cilwd A single numeric which controls the width of the 95 \% credible
-#' limits, by default \code{2}.
-#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' @param log.scale Log option for the \eqn{X}-axis.
-#' @param style Graphical package method: \code{generic} or \code{ggplot}.
+#' @param x an object of class \code{reproFitTT}
+#' @param xlab a title for the \eqn{x}-label
+#' @param ylab a title for the \eqn{y}-label
+#' @param main main title for the plot
+#' @param fitcol color used for the fitted curve
+#' @param fitlty line type for the fitted curve
+#' @param fitlwd width of the fitted curve
+#' @param ci if \code{TRUE}, draws the 95 \% credible limits of the fitted curve
+#' @param cicol color for the 95 \% credible limits of the fitted curve
+#' @param cilty line type for the 95 \% credible limits of the fitted curve
+#' @param cilwd width of the 95 \% credible limits of the fitted curve
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' 
 #' @export
 #' 
@@ -344,16 +337,16 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
 #' @keywords plot 
 #' 
 plot.reproFitTT <- function(x,
-                            xlab,
-                            ylab,
-                            main,
-                            fitcol,
-                            fitlty,
-                            fitlwd,
+                            xlab = "Concentrations",
+                            ylab = "Nb of offspring per ind.day",
+                            main = NULL,
+                            fitcol = "red",
+                            fitlty = 1,
+                            fitlwd = 1,
                             ci = FALSE,
-                            cicol,
-                            cilty,
-                            cilwd,
+                            cicol = "red",
+                            cilty = 2,
+                            cilwd = 1,
                             addlegend = FALSE,
                             log.scale = FALSE,
                             style = "generic") {
@@ -394,22 +387,6 @@ plot.reproFitTT <- function(x,
   curv_conc <- optLogTransform(log.scale, display.conc)
   
   curv_resp <- reproEvalFit(x, display.conc)
-  
-  # default axis parameters
-  if (missing(xlab)) xlab <- "Concentrations"
-  if(missing(ylab)) ylab <- "Nb of offspring per ind.day"
-  
-  # default legend parameters	
-  if (missing(fitcol)) fitcol <- "red"
-  if (missing(fitlty)) fitlty <- 1
-  if (missing(fitlwd)) fitlwd <- 1
-  
-  if (missing(main)) main = NULL
-  
-  # IC parameters
-  if (missing(cicol)) cicol <- "red"
-  if (missing(cilty)) cilty <- 2
-  if(missing(cilwd)) cilwd <- 1
   
   # Define visual parameters
   mortality <- c(0, 1) # code 0/1 mortality
