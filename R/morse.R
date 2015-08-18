@@ -1,27 +1,44 @@
 #' MOdelling tools for Reproduction and Survival data in Ecotoxicology
 #'
-#' The package offers tools for ecotoxicologists and regulators based on
-#' advanced and innovative methods for a valuable quantitative environmental
-#' risk assessment. The package allows the analysis of bioassay reproduction
-#' data accounting for mortality all along the bioassay.  Such data are
-#' commonly used to estimate Effective Concentration (\eqn{EC_{x}}) values from
-#' chronic toxicity tests. The aim is to fit an exposure-response curve to
-#' reproduction data by Bayesian inference while taking into account mortality
-#' among parents without loosing valuable data (Delignette-Muller et al.,
-#' 2014). Models are characterized by a deterministic log-logistic part
-#' associated with a stochastic part. Two different stochastic parts can be
-#' chosen: Poisson or Gamma-Poisson. The package also allows the analysis of
-#' bioassay survival data at the final time. Such data are commonly used to
-#' estimate Lethal Concentration (\eqn{LC_{x}}) values from chronic toxicity
-#' tests. The aim is to fit an exposure-response curve to survival data by
-#' Bayesian inference. Models are characterized by a deterministic log-logistic
-#' part with 2 or 3 parameters associated with a binomial stochastic part. The
-#' number of parameters depending on the mortality in the control at the final
-#' time. The package uses the \code{rjags} package (Plummer, 2013), an
-#' interface from R to the JAGS library for Bayesian data analysis. Note that
-#' the \code{rjags} package does not include a copy of the JAGS library: you
-#' must install it separately. For instructions on downloading JAGS, see the
-#' home page at \url{http://mcmc-jags.sourceforge.net}.
+#' This package provides tools for the analysis of survival/reproduction
+#' bioassay data in quantitative environmental risk assessment. It can be
+#' used to explore/visualize experimental data, and to perform an estimation
+#' of \eqn{LC_{x}} (Lethal Concentration for x\% of individuals) or
+#' \eqn{EC_{x}} (x\% Effect Concentration) values by fitting exposure-response
+#' curves. The \eqn{LC_{x}}/\eqn{EC_{x}} and parameters of the curve are 
+#' provided along with an indication of the uncertainty of the estimation.
+#' 
+#' Estimation procedures in MORSE can be used without a deep knowledge of 
+#' their underlying probabilistic model or inference methods. Rather, they
+#' were designed to behave as well as possible without requiring a user to
+#' provide values for some obscure parameters. That said, MORSE models can also
+#' be used as a first step to tailor new models for more specific situations.
+#' 
+#' The package currently handles survival and reproduction data. Functions
+#' dedicated to survival (resp. reproduction) analysis start with a
+#' \code{surv} (resp. \code{repro}) prefix. MORSE provides a similar
+#' workflow in both cases:
+#' \enumerate{
+#' \item create and validate a dataset
+#' \item explore a dataset
+#' \item plot a dataset
+#' \item fit a model on a dataset and output the expected estimates
+#' }
+#' Those steps are presented in more details in the "Tutorial" vignette, while 
+#' a more formal description of the estimation procedures are provided in the 
+#' vignette called "Models in MORSE package". Please refer to these documents 
+#' for further introduction to the use of MORSE.
+#' 
+#' This reference manual is a detailed description of the functions exposed in
+#' the package.
+#' 
+#' \strong{Getting started} The package uses the \code{rjags} package
+#' (Plummer, 2013), an R interface to the JAGS library for Bayesian model
+#' estimation. Note that the \code{rjags} package does not include a copy 
+#' of the JAGS library: you need to install it separately. For instructions
+#' on downloading JAGS, see the home page at
+#' \url{http://mcmc-jags.sourceforge.net}. Once done, simply follow the steps
+#' described in the tutorial vignette.
 #'
 #' \tabular{ll}{ Package: \tab morse\cr Type: \tab Package\cr Version: \tab
 #' 2.0.0\cr Date: \tab 2015-06-23\cr License: \tab GPL (>=2)\cr }
@@ -50,58 +67,7 @@
 #' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}.
 #' @keywords package
 #' 
-#' @examples
-#' 
-#' # Survival analyses
-#' 
-#' # (1) Load the data
-#' data(cadmium1)
-#' 
-#' # (2) Create a survData object
-#' dats <- survData(cadmium1)
-#' 
-#' # (3) Explore the raw data
-#' # in function of time
-#' plot(dats)
-#' # for a fixed concentration
-#' plot(dats, concentration = 4.36)
-#' # for a fixed time
-#' plot(dats, target.time = 21)
-#' 
-#' \dontrun{
-#' # (4) Run the survFitTT function
-#' outs <- survFitTT(dats)
-#' 
-#' # (5) Plot the fitted curve
-#' plot(outs)
-#' }
-#' 
-#'# Reproduction analyses
-#' 
-#' # (1) Load the data
-#' data(cadmium2)
-#' 
-#' # (2) Create a repro object
-#' datr <- reproData(cadmium2)
-#' 
-#' # (3) Explore the raw data
-#' # in function of time
-#' plot(datr)
-#' # for a fixed concentration
-#' plot(datr, concentration = 284)
-#' # for a fixed time
-#' plot(datr, target.time = 56)
-#' 
-#' \dontrun{
-#' # (4) Run the reproFitTT function
-#' outr <- reproFitTT(datr)
-#' 
-#' # (5) Plot the fitted curve
-#' plot(outr)
-#' }
-#' 
 NULL
-
 
 #' Reproduction and survival datasets for \emph{Daphnia magna} exposed to
 #' cadmium during 21 days
