@@ -136,17 +136,16 @@ reproDataPlotReplicates <- function(x,
 #' the experimental values for the minimum available concentration.
 #'
 #' @param x an object of class \code{reproData}
-#' @param xlab A label for the \eqn{X}-axis, by default depends of arguments.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Cumulated Number
-#' of offsprings}.
+#' @param xlab a title for the \eqn{x}-axis (optional)
+#' @param ylab a title for the \eqn{y}-axis (optional)
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or
 #' \code{'ggplot'}
-#' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
+#' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
-#' @param log.scale display \eqn{X}-axis in log-scale
-#' @param addlegend add a default legend to the plot if \code{TRUE}, 
+#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' @keywords plot
@@ -159,8 +158,8 @@ reproDataPlotReplicates <- function(x,
 #' data(cadmium1)
 #' cadmium1 <- reproData(cadmium1)
 #'
-#' # (2) Plot the reproduction data for a fixed time
-#' plot(cadmium1, target.time = 21)
+#' # (2) Plot the reproduction data
+#' plot(cadmium1)
 #'
 #' # (3) Plot the reproduction data for a fixed time with a ggplot style
 #' plot(cadmium1, target.time = 21, style = "ggplot")
