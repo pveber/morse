@@ -402,7 +402,7 @@ survDataPlotReplicates <- function(x,
 }
 
 
-#' Plotting method for survData objects
+#' Plotting method for \code{survData} objects
 #'
 #' Plots the number of survivors as a
 #' function of either time and concentration, time only (for a fixed
@@ -411,16 +411,15 @@ survDataPlotReplicates <- function(x,
 #' the experimental values for the minimum available concentration.
 #'
 #' @param x an object of class \code{survData}
-#' @param xlab A label for the \eqn{X}-axis, by default depends of arguments.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
+#' @param xlab a title for the \eqn{x}-axis (optional)
+#' @param ylab a label for the \eqn{y}-axis (optional)
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
-#' @param graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param pool.replicate If \code{TRUE}, the datapoints of each replicate are
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
-#' @param log.scale display \eqn{X}-axis in log scale
-#' @param addlegend add a default legend to the plot if \code{TRUE}
-#' @param \dots further arguments to be passed to generic methods (xlab, ylab, ...).
+#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #'
@@ -434,17 +433,17 @@ survDataPlotReplicates <- function(x,
 #' data(zinc)
 #' zinc <- survData(zinc)
 #'
-#' # (2) Plot the survival data
+#' # (2) Plot survival data
 #' plot(zinc, addlegend = TRUE)
 #'
-#' # (3) Plot the survival data with a ggplot style
+#' # (3) Plot survival data with a ggplot style
 #' plot(zinc, style = "ggplot")
 #'
 #' # (4) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
 #'
-#' # (5) Plot survival rate for a fixed concentration and
+#' # (5) Plot survival data for a fixed concentration and
 #' # target.time with ggplot style
 #' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
 #'
