@@ -4,7 +4,7 @@
 #' containing data from a reproduction toxicity assay meets the expectations
 #' of the function \code{\link{reproData}}.
 #'
-#' As in MORSE, reproduction datasets are a special case of survival datasets,
+#' Since in MORSE reproduction datasets are a special case of survival datasets,
 #' \code{reproDataCheck} performs the same verifications than
 #' \code{\link{survDataCheck}} plus additional ones that are specific to
 #' reproduction data.

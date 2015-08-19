@@ -80,8 +80,6 @@ summary.reproData <- function(x, quiet = FALSE) {
 #' values only. This column should
 #' provide the number of offspring produced since the last observation.
 #'
-#' @param \dots Further arguments to be passed to generic methods.
-#'
 #' @return An object of class \code{reproData}.
 #'
 #' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
