@@ -123,10 +123,11 @@ llbinom3.model.text <- "\nmodel # Loglogistic binomial model with 3 parameters\n
 
 llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- 1/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
 
-#' Print of survFitTT object
+#' Print of \code{survFitTT} object
 #' 
-#' The generic \code{print} S3 method for the \code{survFitTT} class provides
-#' the model text and the computation information of the bayesian estimation.
+#' This is the generic \code{print} S3 method for the \code{survFitTT} class.
+#' It prints the underlying JAGS model and some information on the Bayesian 
+#' inference procedure.
 #' 
 #' @param x An object of class \code{survFitTT}
 #' 

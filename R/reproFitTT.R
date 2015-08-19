@@ -177,10 +177,11 @@ llm.poisson.model.text <- "\nmodel # Loglogistic Poisson model\n{\n#\nfor (j in 
 
 llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\nfor (j in 1:n) # loop on replicates\n{\n# Explicit writting of a gamma-Poisson law for each replicate\n# the mean is given by a gamma law centered on the theoretical curve\nrate[j] <- d / (1 + pow(xconc[j]/e, b)) / omega\np[j] <- 1 / (Nindtime[j] * omega + 1)\nNcumul[j] ~ dnegbin(p[j], rate[j])\n}\n# Prior distributions\nd ~ dnorm(meand, taud)T(0,)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\nlog10omega ~ dunif(log10omegamin, log10omegamax)\n\nomega <- pow(10,log10omega)\nb <- pow(10,log10b)\ne <- pow(10,log10e)\n}\n"
 
-#' Print of reproFitTT object
+#' Print of \code{reproFitTT} object
 #' 
-#' The generic \code{print} S3 method for the \code{reproFitTT} class provides
-#' the model text and the computation information of the bayesian estimation.
+#' This is the generic \code{print} S3 method for the \code{survFitTT} class.
+#' It prints the underlying JAGS model and some information on the Bayesian 
+#' inference procedure.
 #' 
 #' @param x An object of class \code{reproFitTT}
 #' 
