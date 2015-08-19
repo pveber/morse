@@ -298,29 +298,36 @@ survFitPlotGG <- function(x,
   }
 }
 
-#' Plotting method for reproFitTT objects
+#' Plotting method for \code{survFitTT} objects
 #' 
-#' @param x An object of class \code{survFitTT}.
-#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
-#' @param main A main title for the plot.
-#' @param fitcol A single color to plot the fitted curve, by default
-#' \code{red}.
-#' @param fitlty A single line type to plot the fitted curve, by default
-#' \code{1}.
-#' @param fitlwd A single numeric which controls the width of the fitted curve,
-#' by default \code{1}.
-#' @param ci If \code{TRUE}, the 95 \% confidente interval on observed data are
-#' plotted.
-#' @param cicol A single color to plot the 95 \% confidente interval, by default
-#' \code{red}.
-#' @param cilty A single line type to plot 95 \% confidente interval, by default
-#' \code{1}.
-#' @param cilwd A single numeric which controls the width of the 95 \% confidente
-#' interval, by default \code{2}.
-#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' @param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
-#' @param style Graphical method: \code{generic} or \code{ggplot}.
+#' This function plots exposure-response fits for target time survival
+#' analysis (a.k.a. \code{survFitTT} objects).
+#' 
+#' The fitted curve represents the \strong{estimated mean survival rate} after
+#' the target time has passed as a function of the concentration of pollutant; 
+#' the black dots depict the \strong{observed mean survival rate}. When 
+#' \code{ci = TRUE}, the function plots both credible intervals for the 
+#' estimated mean (by default the red area around the fitted curve) and
+#' confidence intervals for the observed mean (as black error bars). Both types
+#' of intervals are taken at the same level. Typically a good fit is expected
+#' to display a large overlap between the two intervals.
+#' 
+#' @param x an object of class \code{survFitTT}
+#' @param xlab a title for the \eqn{x}-axis
+#' @param ylab a title for the \eqn{y}-axis
+#' @param main main title for the plot
+#' @param fitcol color of the fitted curve
+#' @param fitlty line type of the fitted curve
+#' @param fitlwd width of the fitted curve
+#' @param ci if \code{TRUE}, draws the 95 \% confidence interval on observed data
+#' @param cicol color of the 95 \% confidence interval limits
+#' @param cilty line type for the 95 \% confidence interval limits
+#' @param cilwd width of the 95 \% confidence interval limits
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @note When \code{style = "ggplot"}, the function calls package
+#' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' 
 #' @keywords plot 
 #'
