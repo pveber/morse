@@ -176,7 +176,7 @@ print.survFitTT <- function(x, ...) {
 #' and the quantiles of estimated LCx.
 #' 
 #' @param object An object of class survFitTT
-#' @param quiet If \code{TRUE}, make silent all prints
+#' @param quiet when \code{FALSE}, prints summary on standard output
 #' 
 #' @seealso survFitTT
 #' 

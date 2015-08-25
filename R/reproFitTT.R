@@ -230,7 +230,7 @@ print.reproFitTT <- function(x, ...) {
 #' and the quantiles of estimated ECx.
 #' 
 #' @param object an object of class \code{reproFitTT}
-#' @param quiet if \code{TRUE}, does no print
+#' @param quiet when \code{FALSE}, prints summary on standard output
 #' 
 #' @return The function returns a list with the following fields:
 #' \item{Qpriors}{quantiles for the model's prior}
