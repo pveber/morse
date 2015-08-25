@@ -265,15 +265,14 @@ summary.survFitTT <- function(object, quiet = FALSE) {
                  QLCx = ans3))
 }
 
-#' Fit a Bayesian exposure-response model for endpoint survival analysis
+#' Fits a Bayesian exposure-response model for target-time survival analysis
 #'
 #' The \code{survFitTT} function estimates the parameters of an exposure-response
-#' model for endpoint survival analysis using Bayesian inference. In this model,
+#' model for target-time survival analysis using Bayesian inference. In this model,
 #' the survival rate of individuals after some time (called target time) is modeled
-#' as a function of the pollutant's concentration, called deterministic part. The
-#' actual number of
+#' as a function of the pollutant's concentration. The actual number of
 #' surviving individuals is then modeled as a stochastic function of the survival
-#' rate, called the stochastic part. Details of the model are presented in the
+#' rate. Details of the model are presented in the
 #' vignette accompanying the package.
 #'
 #' The function returns
@@ -305,61 +304,34 @@ summary.survFitTT <- function(object, quiet = FALSE) {
 # \code{surFitTT} function is the \code{resmatrix} object. See the
 # \code{\link[coda]{raftery.diag}} help for more details.
 #
-#' @param data An object of class \code{survData}.
-#' @param target.time The chosen endpoint to evaluate the effect of a given
-#' concentration of pollutant. By default the last time point available for
-#' all concentrations.
-#' @param lcx Desired values of \eqn{x} (in percent) for which to compute
+#' @param data an object of class \code{survData}
+#' @param target.time the chosen endpoint to evaluate the effect of a given
+#' concentration of pollutant, by default the last time point available for
+#' all concentrations
+#' @param lcx desired values of \eqn{x} (in percent) for which to compute
 #' \eqn{LC_{x}}{LCx} (default is c(5, 10, 20, 50))
-#' @param n.chains Number of MCMC chains. The minimum required number of chains
-#' is 2.
-#' @param quiet If \code{TRUE}, make silent all prints and progress bars of
-#' JAGS compilation.
-#' @param x An object of class \code{survFitTT}.
-#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Response}.
-#' @param main A main title for the plot.
-#' @param fitcol A single color to plot the fitted curve, by default
-#' \code{red}.
-#' @param fitlty A single line type to plot the fitted curve, by default
-#' \code{1}.
-#' @param fitlwd A single numeric which controls the width of the fitted curve,
-#' by default \code{1}.
-#' @param ci If \code{TRUE}, the 95 \% confidente interval on observed data are
-#' plotted.
-#' @param conf.level : binom.test confidence level
-#' @param cicol A single color to plot the 95 \% confidente interval, by default
-#' \code{red}.
-#' @param cilty A single line type to plot 95 \% confidente interval, by default
-#' \code{1}.
-#' @param cilwd A single numeric which controls the width of the 95 \% confidente
-#' interval, by default \code{2}.
-#' @param addlegend If \code{TRUE}, a default legend is added to the plot.
-#' @param log.scale If \code{TRUE}, a log-scale is used on the \eqn{X}-axis.
-#' @param style Graphical method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param n.chains number of MCMC chains, the minimum required number of chains
+#' is 2
+#' @param quiet if \code{TRUE}, does not print messages and progress bars from
+#' JAGS
 #'
-#' @return The function returns an object of class \code{survFitTT}, which is list containing
-#' the following objects:
-#' \item{DIC}{DIC value of the selected model.}
-#' \item{estim.LCx}{A table of the estimated 5, 10, 20 and 50 \% lethal
-#' concentrations and their 95 \% credible intervals.}
-#' \item{estim.par}{A table of the estimated parameters as medians and 95 \%
-#' credible intervals.}
-#' \item{det.part}{The name of the deterministic part of the used model.}
-#' \item{mcmc}{An object of class \code{mcmc.list} with the posterior
-#' distributions.}
-#' \item{model}{A JAGS model object.}
-#' \item{parameters}{A list of the parameters names used in the model.}
-#' \item{n.chains}{An integer value corresponding to the number of chains used
-#' for the MCMC computation.}
-#' \item{n.iter}{A list of two numerical value corresponding to the beginning
-#' and the end of monitored iterations.}
-#' \item{n.thin}{A numerical value corresponding to the thinning interval.}
-#' \item{jags.data}{A list of data used by the internal \code{\link[rjags]{jags.model}}
-#' function. This object is intended for the case when the user wishes to use
-#' the \code{\link[rjags]{rjags}} package instead of the automatied estimation
-#' function.}
+#' @return The function returns an object of class \code{survFitTT}, which is a
+#' list with the following fields:
+#' \item{DIC}{DIC value of the selected model}
+#' \item{estim.LCx}{a table of the estimated LCX along with their 95 \% 
+#' credible intervals}
+#' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
+#' credible intervals}
+#' \item{det.part}{the name of the deterministic part of the used model}
+#' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
+#' distributions}
+#' \item{model}{a JAGS model object}
+#' \item{parameters}{a list of the parameters names used in the model}
+#' \item{n.chains}{an integer value corresponding to the number of chains used
+#' for the MCMC computation}
+#' \item{n.iter}{a list of two indices indicating the beginning and end of 
+#' monitored iterations}
+#' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #'
 #' @author Marie Laure Delignette-Muller
 #' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
@@ -390,9 +362,9 @@ summary.survFitTT <- function(object, quiet = FALSE) {
 #'
 #' \dontrun{
 #' # (3) Run the survFitTT function with the log-logistic
-#' # binomial model
+#' #     binomial model
 #' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
-#' quiet = TRUE)
+#'                  quiet = TRUE)
 #'
 #' # (4) Summary look the estimated values (LCx and parameters)
 #' out$estim.LCx
@@ -404,12 +376,12 @@ summary.survFitTT <- function(object, quiet = FALSE) {
 #' # (6) Plot the fitted curve with ggplot style
 #' require(ggplot2)
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#' fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
+#'      fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
 #'
 #' # (7) Add a specific legend with generic type
 #' plot(out, addlegend = FALSE)
-#' legend("left", legend = c("Without mortality", "With mortality"),
-#' pch = c(19,1))
+#'      legend("left", legend = c("Without mortality", "With mortality"),
+#'      pch = c(19,1))
 #' }
 #'
 #' @export
