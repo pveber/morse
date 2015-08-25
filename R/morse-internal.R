@@ -154,7 +154,7 @@ legendGgplotFit <- function(a.gplot) {
   return(legend)
 }
 
-fCols <- function(data, x, fitcol, cicol, analyse) {
+fCols <- function(data, fitcol, cicol, analyse) {
   
   if (analyse == "surv") {
     #points
