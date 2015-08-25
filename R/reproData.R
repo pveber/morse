@@ -6,14 +6,11 @@
 #' @param x an object of class \code{reproData}
 #' @param quiet if \code{TRUE}, does no prints
 #' 
-#' @return The function returns a list with the following fields:
-#' \item{NbrepTimeConc}{nb of replicates for all concentrations and time points}
-#' \item{NbsurvTimeConc}{nb of surviving ind. for all concentrations and time points}
+#' @return The function returns a list with the same fields than 
+#' \code{\link{summary.survData}} plus an additional one:
 #' \item{NboffTimeConc}{nb of offspring for all concentrations and time points}
-#' \item{NbdataConc}{nb of datapoints per concentration}
-#' \item{NbdataTime}{nb of datapoints per time}
 #' 
-#' @seealso \code{\link{reproData}}
+#' @seealso \code{\link{reproData}}, \code{\link{summary.survData}}
 #' 
 #' @examples
 #' # (1) Load the data
