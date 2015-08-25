@@ -182,7 +182,7 @@ N_{ij} \sim Poisson(f(c_i ; \theta) \times NID_{ij})
 $$
 This model is later referenced to as ``Poisson model''.  In case there
 are non-negligible random variations of the reproduction rate between
-two replicates, we propose a second model, named ``gamma-Poisson
+two individuals, we propose a second model, named ``gamma-Poisson
 model'', stating that:
 $$
 N_{ij} \sim Poisson(F_{ij} \times NID_{ij})
