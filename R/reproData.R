@@ -1,10 +1,17 @@
-#' Summarize of reproData object
+#' Summary for reproData objects
 #' 
 #' The generic \code{summary} S3 method for the \code{reproData} class provides
 #' information about the structure of the dataset and the experimental design.
 #' 
-#' @param x An object of class \code{reproData}
-#' @param quiet If \code{TRUE}, make silent all prints
+#' @param x an object of class \code{reproData}
+#' @param quiet if \code{TRUE}, does no prints
+#' 
+#' @return The function returns a list with the following fields:
+#' \item{NbrepTimeConc}{nb of replicates for all concentrations and time points}
+#' \item{NbsurvTimeConc}{nb of surviving ind. for all concentrations and time points}
+#' \item{NboffTimeConc}{nb of offspring for all concentrations and time points}
+#' \item{NbdataConc}{nb of datapoints per concentration}
+#' \item{NbdataTime}{nb of datapoints per time}
 #' 
 #' @seealso \code{\link{reproData}}
 #' 
