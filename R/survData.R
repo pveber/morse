@@ -74,8 +74,6 @@ summary.survData <- function(x, quiet = FALSE) {
 #' expected requirements. Please run \code{\link{survDataCheck}} to ensure
 #' \code{data} is well-formed.
 #'
-#' @aliases survData
-#'
 #' @param data a \code{data.frame} containing the following four columns:
 #' \itemize{
 #' \item \code{replicate}: a vector of class \code{integer} or factor for replicate
@@ -86,8 +84,6 @@ summary.survData <- function(x, quiet = FALSE) {
 #' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
 #' alive individuals at each time point for each concentration and each replicate
 #' }
-#' @param \dots Further arguments to be passed to generic methods.
-#' @param x An object of class survData
 #'
 #' @return A dataframe of class \code{survData}.
 #'
