@@ -1,11 +1,17 @@
-#' Summarize of survData object
+#' Summary for survData objects
 #' 
 #' The generic \code{summary} S3 method for the \code{survData} class provides
 #' information about the structure of the dataset and the experimental design.
 #' 
-#' @param x An object of class \code{survData}
-#' @param quiet If \code{TRUE}, make silent all prints.
+#' @param x an object of class \code{survData}
+#' @param quiet when \code{FALSE}, prints summary on standard output
 #' 
+#' @return The function returns a list with the following fields:
+#' \item{NbrepTimeConc}{nb of replicates for all concentrations and time points}
+#' \item{NbsurvTimeConc}{nb of surviving ind. for all concentrations and time points}
+#' \item{NbdataConc}{nb of datapoints per concentration}
+#' \item{NbdataTime}{nb of datapoints per time}
+
 #' @seealso \code{\link{survData}}
 #' 
 #' @examples
