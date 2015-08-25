@@ -224,13 +224,18 @@ print.reproFitTT <- function(x, ...) {
       (x$n.iter[["end"]] - x$n.iter[["start"]]) / x$n.thin + 1, "\n")
 }
 
-#' Summary of reproFitTT object
+#' Summary for reproFitTT objects
 #' 
 #' The summary shows the quantiles of priors and posteriors on parameters
 #' and the quantiles of estimated ECx.
 #' 
-#' @param object An object of class reproFitTT
-#' @param quiet If \code{TRUE}, make silent all prints
+#' @param object an object of class \code{reproFitTT}
+#' @param quiet if \code{TRUE}, does no print
+#' 
+#' @return The function returns a list with the following fields:
+#' \item{Qpriors}{quantiles for the model's prior}
+#' \item{Qposteriors}{quantiles for the model's posteriors}
+#' \item{QECx}{quantiles for ECx values}
 #' 
 #' @seealso reproFitTT
 #' 
@@ -319,7 +324,7 @@ summary.reproFitTT <- function(object, quiet = FALSE) {
   }
   
   invisible(list(Qpriors = ans1,
-                 Qpost = ans2,
+                 Qposteriors = ans2,
                  QECx = ans3))
 }
 
