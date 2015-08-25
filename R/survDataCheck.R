@@ -29,7 +29,8 @@
 #' }
 #'
 #' @note If an error of type \code{dataframeExpected} or \code{missingColumn} is
-#' detected, the function \code{suvDataCheck} is stopped.
+#' detected, the function \code{survDataCheck} is stopped before looking for
+#' other errors.
 #'
 #' @seealso \code{\link{survData}}
 #'
