@@ -323,46 +323,49 @@ summary.reproFitTT <- function(object, quiet = FALSE) {
                  QECx = ans3))
 }
 
-#' Fit a Bayesian exposure-response model for endpoint reproduction analysis
+#' Fits a Bayesian exposure-response model for target-time reproduction analysis
 #' 
-#' In this model, the reproduction rate in a population is modeled as a function of the
-#' pollutant's concentration. The actual cumulated number of offspring produced during a given
-#' period (called target time) is then modeled as a stochastic function of the reproduction rate.
-#' The \code{reproFitTT} fits two variants of this model: the Poisson model assumes the
-#' reproduction rate is strictly constant given a concentration of pollutant; the gamma-Poisson
-#' introduces stochastic variability of the reproduction rate between two replicates, at the
-#' expense of an additional parameter. Details of the two models are presented in the vignette
-#' accompanying the package.
+#' This function estimates a model of the cumulated reproduction outputs of a 
+#' population in a given time period in presence of mortality.
 #' 
-#' @param data An object of class \code{reproData}.
-#' @param stoc.part Stochastic part of the model. Possible values are \code{"bestfit"},
-#' \code{"poisson"} and \code{"gammapoisson"}, 
-#' @param target.time Defines the observation period. By default the last time point.
-#' @param ecx Values of \eqn{x} to calculate desired \eqn{EC_{x}}{ECx}.
-#' @param n.chains Number of MCMC chains. The minimum required number of chains is 2.
-#' @param quiet If \code{TRUE}, make silent all prints and progress bars of
-#' JAGS compilation.
+#' Because some individuals may die during the observation period, the 
+#' reproduction rate alone is not sufficient to account for the observed number
+#' of offspring. In addition, we need the time individuals have stayed alive
+#' during the experiment. The \code{reproFitTT} function estimates the number 
+#' of individual-days in an experiment between its start and the target time. 
+#' This covariable is then used to estimate a relation between the toxicant
+#' concentration and the reproduction rate \emph{per individual-day}.
+#' 
+#' The \code{reproFitTT} function fits two models, one where inter-individual 
+#' variability is neglected ("Poisson" model) and one where it is taken into
+#' account ("gamma-Poisson" model). When setting \code{stoc.part} to 
+#' \code{"bestfit"}, a model comparison procedure is used to choose between
+#' them. More details are presented in the vignette accompanying the package. 
+#' 
+#' @param data an object of class \code{reproData}
+#' @param stoc.part stochastic part of the model. Possible values are \code{"bestfit"},
+#' \code{"poisson"} and \code{"gammapoisson"}
+#' @param target.time defines the observation period. By default the last time point
+#' @param ecx values of \eqn{x} to calculate a desired \eqn{EC_{x}}{ECx}
+#' @param n.chains number of MCMC chains. The minimum required number of chains is 
+#' @param quiet if \code{TRUE}, does not print messages and progress bars from JAGS
 #' 
 #' 
 #' @return The function returns an object of class \code{reproFitTT} which is a list
 #' of the following objects:
-#' \item{DIC}{DIC value of the selected model.}
-#' \item{estim.ECx}{A table of the estimated 5, 10, 20 and 50 \% effective
-#' concentrations (by default) and their 95 \% credible intervals.}
-#' \item{estim.par}{A table of the estimated parameters as medians and 95 \%
-#' credible intervals.}
-#' \item{mcmc}{An object of class \code{mcmc.list} with the posterior distributions.}
-#' \item{model}{A JAGS model object.}
-#' \item{parameters}{A list of the parameters names used in the model.}
-#' \item{n.chains}{An integer value corresponding to the number of chains used
+#' \item{DIC}{DIC value of the selected model}
+#' \item{estim.ECx}{a table of the estimated 5, 10, 20 and 50 \% effective
+#' concentrations (by default) and their 95 \% credible intervals}
+#' \item{estim.par}{a table of the estimated parameters as medians and 95 \%
+#' credible intervals}
+#' \item{mcmc}{an object of class \code{mcmc.list} with the posterior distributions}
+#' \item{model}{a JAGS model object}
+#' \item{parameters}{a list of the parameters names used in the model}
+#' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation.}
-#' \item{n.iter}{A list of two numerical value corresponding to the beginning and
-#' the end of monitored iterations.}
-#' \item{n.thin}{A numerical value corresponding to the thinning interval.}
-#' \item{jags.data}{A list of data used by the internal
-#' \code{\link[rjags]{jags.model}} function. This object is intended for the
-#' case when the user wishes to use the \code{\link[rjags]{rjags}} package
-#' instead of the automatied estimation function.}
+#' \item{n.iter}{a list of two indices indicating the beginning and
+#' the end of monitored iterations}
+#' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #' 
 #' @author Marie Laure Delignette-Muller
 #' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
@@ -435,7 +438,7 @@ summary.reproFitTT <- function(object, quiet = FALSE) {
 #' \dontrun{
 #' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
 #' out <- reproFitTT(dat, stoc.part = "gammapoisson", 
-#' ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
+#'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #' 
 #' # (4) Summary look the estimated values (ECx and parameters)
 #' out$estim.ECx
@@ -443,13 +446,13 @@ summary.reproFitTT <- function(object, quiet = FALSE) {
 #' 
 #' # (5) Plot the fitted curve with credible limits
 #' plot(out, log.scale = TRUE, ci = TRUE,
-#' main = "log-logistic gamma-poisson model")
+#'      main = "log-logistic gamma-poisson model")
 #' 
 #' # (6) Plot the fitted curve with ggplot style
 #' require("ggplot2")
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#' fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
-#' main = "log-logistic gamma-poisson model")
+#'      fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
+#'      main = "Log-logistic response to concentration")
 #' 
 #' # (7) Add a specific legend with generic type
 #' plot(out, addlegend = FALSE)
