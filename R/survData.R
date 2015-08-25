@@ -42,14 +42,14 @@ summary.survData <- function(x, quiet = FALSE) {
   ans4 <- table(x$time)
   
   if (! quiet) {
-    cat("Number of replicate per time and concentration: \n")
-    print(ans1)
-    cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
-    print(ans2)
-    cat("\nNumber of datapoints per concentration: \n")
+    cat("Number of datapoints per concentration: \n")
     print(ans3)
     cat("\nNumber of datapoints per time: \n")
     print(ans4)
+    cat("\nNumber of replicate per time and concentration: \n")
+    print(ans1)
+    cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
+    print(ans2)
   }
   
   invisible(list(NbrepTimeConc = ans1,

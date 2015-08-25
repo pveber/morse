@@ -30,39 +30,17 @@
 #' @export
 #' 
 summary.reproData <- function(x, quiet = FALSE) {
-  # matrix of number of replicate by time / conc
-  ans1 <- table(x[, c("conc", "time")])
-  
-  # matrix of number of survival (sum of all replicate) by time / conc
-  ans2 <- tapply(x$Nsurv, list(as.factor(x$conc), as.factor(x$time)), sum)
-  
+  res <- summary.survData(x, quiet = quiet)
+
   # matrix of number of offspring (sum of all replicate) by time / conc
   ans3 <- tapply(x$Nrepro, list(as.factor(x$conc), as.factor(x$time)), sum)
   
-  # table of datapoints per concentration
-  ans4 <- table(x$conc)
-  
-  # table of datapoints per time
-  ans5 <- table(x$time)
-  
   if (! quiet) {
-    cat("Number of replicate per time and concentration: \n")
-    print(ans1)
-    cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
-    print(ans2)
     cat("\nNumber of offspring (sum of replicate) per time and concentration: \n")
     print(ans3)
-    cat("\nNumber of datapoints per concentration: \n")
-    print(ans4)
-    cat("\nNumber of datapoints per time: \n")
-    print(ans5)
   }
   
-  invisible(list(NbrepTimeConc = ans1,
-                 NbsurvTimeConc = ans2,
-                 NboffTimeConc = ans3,
-                 NbdataConc = ans4,
-                 NbdataTime = ans5))
+  invisible(c(res, list(NboffTimeConc = ans3)))
 }
 
 #' Creates a dataset for reproduction toxicity analysis
