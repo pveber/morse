@@ -170,14 +170,19 @@ print.survFitTT <- function(x, ...) {
       (x$n.iter[["end"]] - x$n.iter[["start"]]) / x$n.thin + 1, "\n")
 }
 
-#' Summary of survFitTT object
+#' Summary for survFitTT objects
 #' 
 #' The summary shows the quantiles of priors and posteriors on parameters
 #' and the quantiles of estimated LCx.
 #' 
-#' @param object An object of class survFitTT
+#' @param object an object of class \code{survFitTT}
 #' @param quiet when \code{FALSE}, prints summary on standard output
 #' 
+#' @return The function returns a list with the following fields:
+#' \item{Qpriors}{quantiles for the model's prior}
+#' \item{Qposteriors}{quantiles for the model's posteriors}
+#' \item{QLCx}{quantiles for LCx values}
+#'
 #' @seealso survFitTT
 #' 
 #' @examples
@@ -257,7 +262,7 @@ summary.survFitTT <- function(object, quiet = FALSE) {
   
   invisible(list(Qpriors = ans1,
                  Qpost = ans2,
-                 QECx = ans3))
+                 QLCx = ans3))
 }
 
 #' Fit a Bayesian exposure-response model for endpoint survival analysis
