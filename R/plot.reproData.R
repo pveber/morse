@@ -9,6 +9,7 @@ reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
 reproDataPlotTargetTime <- function(x,
                                     xlab,
                                     ylab,
+                                    main,
                                     target.time,
                                     style,
                                     log.scale,
@@ -64,6 +65,7 @@ reproDataPlotTargetTime <- function(x,
          x$Nreprocumul,
          xlab = xlab,
          ylab = ylab,
+         main = main,
          pch = mortality,
          yaxt = "n",
          xaxt = "n")
@@ -92,6 +94,7 @@ reproDataPlotTargetTime <- function(x,
       geom_point(size = 3, pch = 21) +
       scale_fill_manual(values = c("black", "white")) +
       labs(x = xlab, y = ylab) +
+      ggtitle(main) +
       theme_minimal() +
       scale_colour_hue(legend.title, breaks = c("No","Yes"),
                        labels = c(legend.name.no, legend.name.yes)) +
@@ -110,10 +113,12 @@ reproDataPlotTargetTime <- function(x,
 reproDataPlotFixedConc <- function(x,
                                    xlab,
                                    ylab,
+                                   main,
                                    concentration,
                                    style = "generic",
                                    addlegend = FALSE) {
-  dataPlotFixedConc(x, xlab, ylab, "Nreprocumul", concentration, style, addlegend)
+  dataPlotFixedConc(x, xlab, ylab, main, "Nreprocumul",
+                    concentration, style, addlegend)
 }
 
 reproDataPlotReplicates <- function(x,
@@ -123,8 +128,8 @@ reproDataPlotReplicates <- function(x,
                                     concentration,
                                     style,
                                     addlegend) {
-  dataPlotReplicates(x, xlab, ylab, "Nreprocumul", target.time, concentration,
-                     style, addlegend)
+  dataPlotReplicates(x, xlab, ylab, "Nreprocumul", target.time,
+                     concentration, style, addlegend)
 }
 
 #' Plotting method for \code{reproData} objects
@@ -138,6 +143,7 @@ reproDataPlotReplicates <- function(x,
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a title for the \eqn{y}-axis (optional)
+#' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
@@ -179,6 +185,7 @@ reproDataPlotReplicates <- function(x,
 plot.reproData <- function(x,
                            xlab,
                            ylab,
+                           main,
                            target.time = NULL,
                            concentration = NULL,
                            style = "generic",
@@ -195,17 +202,21 @@ plot.reproData <- function(x,
   }
 
   if (missing(ylab)) ylab <- "Cumulated Number of offspring"
+  
+  if (missing(main)) main = NULL
 
   if (is.null(target.time) && is.null(concentration)) {
     reproDataPlotFull(x, xlab, ylab, style, addlegend)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
-    reproDataPlotTargetTime(x, xlab, ylab, target.time, style, log.scale, addlegend)
+    reproDataPlotTargetTime(x, xlab, ylab, main, target.time,
+                            style, log.scale, addlegend)
   }
   else if (is.null(target.time) && ! is.null(concentration)) {
-    reproDataPlotFixedConc(x, xlab, ylab, concentration, style, addlegend)
+    reproDataPlotFixedConc(x, xlab, ylab, main, concentration, style, addlegend)
   }
   else {
-    reproDataPlotReplicates(x, xlab, ylab, target.time, concentration, style, addlegend)
+    reproDataPlotReplicates(x, xlab, ylab, target.time, concentration,
+                            style, addlegend)
   }
 }
