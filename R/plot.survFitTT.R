@@ -87,7 +87,7 @@ survFitPlotGenericNoCI <- function(x,
 survFitPlotGenericCI <- function(x,
                                  data_conc, transf_data_conc, data_resp,
                                  curv_conc, curv_resp,
-                                 CI,
+                                 CI, log.scale,
                                  xlab, ylab, fitcol, fitlty, fitlwd,
                                  main, addlegend,
                                  cicol, cilty, cilwd)
@@ -115,9 +115,15 @@ survFitPlotGenericCI <- function(x,
            transf_data_conc, CI["qsup95", ],
            col = cicol, lty = cilty, lwd = cilwd)
   
-  segments(transf_data_conc - 0.1,
+  Bond <- if (log.scale) {
+    0.03 * (max(transf_data_conc) - min(transf_data_conc))
+  } else {
+    0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
+  }
+  
+  segments(transf_data_conc - Bond,
            CI["qsup95", ],
-           transf_data_conc + 0.1,
+           transf_data_conc + Bond,
            CI["qsup95", ],
            col = cicol, lty = cilty, lwd = cilwd)
   
@@ -125,9 +131,9 @@ survFitPlotGenericCI <- function(x,
            transf_data_conc, CI["qinf95", ],
            col = cicol, lty = cilty, lwd = cilwd)
   
-  segments(transf_data_conc - 0.1,
+  segments(transf_data_conc - Bond,
            CI["qinf95", ],
-           transf_data_conc + 0.1,
+           transf_data_conc + Bond,
            CI["qinf95", ],
            col = cicol, lty = cilty, lwd = cilwd)
 
@@ -153,7 +159,7 @@ survFitPlotGenericCI <- function(x,
 survFitPlotGeneric <- function(x,
                                data_conc, transf_data_conc, data_resp,
                                curv_conc, curv_resp,
-                               CI,
+                               CI, log.scale,
                                xlab, ylab, fitcol, fitlty, fitlwd,
                                main, addlegend,
                                cicol, cilty, cilwd) {
@@ -162,7 +168,7 @@ survFitPlotGeneric <- function(x,
   if(!is.null(CI)) survFitPlotGenericCI(x,
                                         data_conc, transf_data_conc, data_resp,
                                         curv_conc, curv_resp,
-                                        CI,
+                                        CI, log.scale,
                                         xlab, ylab, fitcol, fitlty, fitlwd,
                                         main, addlegend,
                                         cicol, cilty, cilwd)
@@ -418,7 +424,7 @@ plot.survFitTT <- function(x,
     survFitPlotGeneric(x,
                        dataTT$conc, transf_data_conc, dataTT$resp,
                        curv_conc, curv_resp,
-                       CI,
+                       CI, log.scale,
                        xlab, ylab, fitcol, fitlty, fitlwd,
                        main, addlegend,
                        cicol, cilty, cilwd)
