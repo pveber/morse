@@ -49,7 +49,7 @@ reproLlmCI <- function(fit, x) {
   }
   
   # gamma poisson
-  if (fit$model.label == "GP") {
+  else if (fit$model.label == "GP") {
     # parameters
     log10omega2 <- mctot[, "log10omega"]
     omega2 <- 10^(log10omega2)
