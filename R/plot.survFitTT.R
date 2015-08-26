@@ -43,6 +43,51 @@ survLlbinomCI <- function(x, log.scale) {
   return(ci)
 }
 
+survLlbinomCI2 <- function(fit, x) {
+  # create the parameters for credible interval for the log logistic binomial
+  # model
+  # INPUT:
+  # - fit : object of class survFitTT
+  # - x : vector of concentrations values (x axis)
+  # OUTPUT:
+  # - ci : credible limit
+  
+  mctot <- do.call("rbind", fit$mcmc)
+  k <- nrow(mctot)
+  # parameters
+  if (fit$det.part == "loglogisticbinom_3") {
+    d2 <- mctot[, "d"]
+  }
+  log10b2 <- mctot[, "log10b"]
+  b2 <- 10^log10b2
+  log10e2 <- mctot[, "log10e"]
+  e2 <- 10^log10e2
+  
+  # quantiles
+  qinf95 = NULL
+  qsup95 = NULL
+  
+  for (i in 1:length(x)) {
+    # llbinom 2 parameters
+    if (fit$det.part == "loglogisticbinom_2") {
+      theomean <- 1 / (1 + (x[i] / e2)^(b2)) # mean curve
+    }
+    
+    # llbinom 3 parameters
+    else if (fit$det.part == "loglogisticbinom_3") {
+      theomean <- d2 / (1 + (x[i] / e2)^(b2)) # mean curve
+    }
+    # IC 95%
+    qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
+    qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
+  }
+  
+  # values for CI
+  ci <- list(qinf95 = qinf95,
+             qsup95 = qsup95)
+  
+  return(ci)
+}
 
 survFitPlotGenericNoCI <- function(x,
                                    data_conc, transf_data_conc, data_resp,
@@ -87,7 +132,7 @@ survFitPlotGenericNoCI <- function(x,
 survFitPlotGenericCI <- function(x,
                                  data_conc, transf_data_conc, data_resp,
                                  curv_conc, curv_resp,
-                                 CI, log.scale,
+                                 CI, CI2, log.scale,
                                  xlab, ylab, fitcol, fitlty, fitlwd,
                                  main, addlegend,
                                  cicol, cilty, cilwd)
@@ -108,6 +153,15 @@ survFitPlotGenericCI <- function(x,
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
+  
+  # Plotting the theoretical curve
+  # CI ribbon + lines
+  polygon(c(curv_conc, rev(curv_conc)), c(CI2[["qinf95"]], rev(CI2[["qsup95"]])),
+          col = "pink1")
+  lines(curv_conc, CI2[["qsup95"]], type = "l", col = cicol, lty = cilty,
+        lwd = cilwd)
+  lines(curv_conc, CI2[["qinf95"]], type = "l", col = cicol, lty = cilty,
+        lwd = cilwd)
   
   # segment CI
   
@@ -143,7 +197,6 @@ survFitPlotGenericCI <- function(x,
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
   
-  
   # legend
   if (addlegend) {
     legend("bottomleft", pch = c(16, NA, NA),
@@ -159,7 +212,7 @@ survFitPlotGenericCI <- function(x,
 survFitPlotGeneric <- function(x,
                                data_conc, transf_data_conc, data_resp,
                                curv_conc, curv_resp,
-                               CI, log.scale,
+                               CI, CI2, log.scale,
                                xlab, ylab, fitcol, fitlty, fitlwd,
                                main, addlegend,
                                cicol, cilty, cilwd) {
@@ -168,7 +221,7 @@ survFitPlotGeneric <- function(x,
   if(!is.null(CI)) survFitPlotGenericCI(x,
                                         data_conc, transf_data_conc, data_resp,
                                         curv_conc, curv_resp,
-                                        CI, log.scale,
+                                        CI, CI2, log.scale,
                                         xlab, ylab, fitcol, fitlty, fitlwd,
                                         main, addlegend,
                                         cicol, cilty, cilwd)
@@ -197,13 +250,17 @@ survFitPlotGGNoCI <- function(data, curv, valCols,
 }
 
 #' @importFrom grid arrow unit
-survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
+survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
                             valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   data.three <- data.frame(conc = data$transf_conc,
                            qinf95 = CI["qinf95",],
                            qsup95 = CI["qsup95",],
                            CI = "Confidence interval")
+  data.four <- data.frame(conc = curv$conc,
+                          qinf95 = CI2[["qinf95"]],
+                          qsup95 = CI2[["qsup95"]],
+                          CI = "Credible limits")
   
   plt_3 <- ggplot(data) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
@@ -211,7 +268,15 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                               ends = "both"), data.three,
                  color = valCols$cols3) +
-    scale_linetype_manual(values = cilty) + theme_minimal()
+    scale_linetype_manual(values = cilty) +
+    geom_line(data = data.four, aes(conc, qinf95, color = CI),
+              linetype = cilty, size = cilwd) +
+    geom_line(data = data.four, aes(conc, qsup95, color = CI),
+              linetype = cilty, size = cilwd) +
+    geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
+                                       ymax = qsup95),
+                fill = "pink", alpha = 0.4) +
+    theme_minimal()
   
   # plot IC
   # final plot
@@ -221,6 +286,13 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
                                ends = "both"),
                  data.three, color = valCols$cols3, linetype = cilty,
                  size = cilwd) +
+    geom_line(data = data.four, aes(conc, qinf95, color = CI),
+              linetype = cilty, size = cilwd) +
+    geom_line(data = data.four, aes(conc, qsup95, color = CI),
+              linetype = cilty, size = cilwd) +
+    geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
+                                      ymax = qsup95),
+                fill = "pink", alpha = 0.4) +
     geom_point(data = data, aes(transf_conc, resp)) +
     geom_line(aes(conc, resp), curv, linetype = fitlty,
               size = fitlwd, color = valCols$cols2) +
@@ -236,7 +308,7 @@ survFitPlotGGCI <- function(x, data, curv, CI, cilty, cilwd,
 survFitPlotGG <- function(x,
                           data_conc, transf_data_conc, data_resp,
                           curv_conc, curv_resp,
-                          CI,
+                          CI, CI2,
                           xlab, ylab, fitcol, fitlty, fitlwd,
                           main, addlegend,
                           cicol, cilty, cilwd) {
@@ -269,7 +341,7 @@ survFitPlotGG <- function(x,
   
   plt_4 <-
     if (! is.null(CI)) {
-      survFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
+      survFitPlotGGCI(x, data, curv, CI, CI2, cilty, cilwd,
                       valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
       survFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
@@ -289,7 +361,7 @@ survFitPlotGG <- function(x,
                    ncol = 2, widths = c(6, 2))
     }
     else {
-      plt_3 <- survFitPlotGGCI(x, data, curv, CI, cilty, cilwd,
+      plt_3 <- survFitPlotGGCI(x, data, curv, CI, CI2, cilty, cilwd,
                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
       mylegend_3 <- legendGgplotFit(plt_3)
       grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_3, mylegend_2,
@@ -417,12 +489,13 @@ plot.survFitTT <- function(x,
   if (missing(cilwd)) cilwd <- 1
   
   CI <- if(ci) { survLlbinomCI(x, log.scale) } else NULL
+  CI2 <- if(ci) { survLlbinomCI2(x, display.conc) } else NULL
   
   if (style == "generic") {
     survFitPlotGeneric(x,
                        dataTT$conc, transf_data_conc, dataTT$resp,
                        curv_conc, curv_resp,
-                       CI, log.scale,
+                       CI, CI2, log.scale,
                        xlab, ylab, fitcol, fitlty, fitlwd,
                        main, addlegend,
                        cicol, cilty, cilwd)
@@ -431,7 +504,7 @@ plot.survFitTT <- function(x,
     survFitPlotGG(x,
                   dataTT$conc, transf_data_conc, dataTT$resp,
                   curv_conc, curv_resp,
-                  CI,
+                  CI, CI2,
                   xlab, ylab, fitcol, fitlty, fitlwd,
                   main, addlegend,
                   cicol, cilty, cilwd / 2)
