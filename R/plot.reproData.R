@@ -142,7 +142,7 @@ reproDataPlotReplicates <- function(x,
 #'
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
-#' @param ylab a title for the \eqn{y}-axis (optional)
+#' @param ylab a title for the \eqn{y}-axis
 #' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
@@ -184,8 +184,8 @@ reproDataPlotReplicates <- function(x,
 #'
 plot.reproData <- function(x,
                            xlab,
-                           ylab,
-                           main,
+                           ylab = "Cumulated Number of offspring",
+                           main = NULL,
                            target.time = NULL,
                            concentration = NULL,
                            style = "generic",
@@ -200,10 +200,6 @@ plot.reproData <- function(x,
     x <- cbind(aggregate(Nreprocumul ~ time + conc, x, sum),
                replicate = 1)
   }
-
-  if (missing(ylab)) ylab <- "Cumulated Number of offspring"
-  
-  if (missing(main)) main = NULL
 
   if (is.null(target.time) && is.null(concentration)) {
     reproDataPlotFull(x, xlab, ylab, style, addlegend)
