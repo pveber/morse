@@ -144,7 +144,8 @@ survDataPlotFull <- function(data, xlab, ylab, style = "generic",
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
-survDataPlotTargetTime <- function(x, xlab, ylab, target.time, style, log.scale, addlegend) {
+survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
+                                   style, log.scale, addlegend) {
   if (missing(xlab)) xlab <-"Concentration"
 
   if (!target.time %in% x$time)
@@ -173,6 +174,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, target.time, style, log.scale,
          type = "n",
          xaxt = "n",
          yaxt = "n",
+         main = main,
          xlab = xlab,
          ylab = ylab)
 
@@ -213,7 +215,8 @@ survDataPlotTargetTime <- function(x, xlab, ylab, target.time, style, log.scale,
         stat_sum(aes(size = factor(..n..))) +
         scale_size_discrete("Replicate")
     }
-    fd <- gp + geom_point() + theme_minimal() +
+    fd <- gp + geom_point() + ggtitle(main) +
+      theme_minimal() +
       labs(x = xlab,
            y = ylab) +
       scale_x_continuous(breaks = df$transf_data_conc,
@@ -233,6 +236,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, target.time, style, log.scale,
 dataPlotFixedConc <- function(x,
                               xlab,
                               ylab,
+                              main,
                               resp,
                               concentration,
                               style = "generic",
@@ -257,6 +261,7 @@ dataPlotFixedConc <- function(x,
          type = "n",
          xaxt = "n",
          yaxt = "n",
+         main = main,
          xlim = range(x$time),
          ylim = c(0, max(x[, resp])),
          xlab = xlab,
@@ -293,7 +298,8 @@ dataPlotFixedConc <- function(x,
                           color = factor(replicate),
                           group = replicate))
     }
-    fd <- df + geom_line() + geom_point() + theme_minimal() +
+    fd <- df + geom_line() + geom_point() + ggtitle(main) +
+      theme_minimal() +
       labs(x = xlab,
            y = ylab) +
       scale_color_hue("Replicate") +
@@ -313,11 +319,13 @@ dataPlotFixedConc <- function(x,
 survDataPlotFixedConc <- function(x,
                                   xlab,
                                   ylab,
+                                  main,
                                   concentration,
                                   style = "generic",
                                   addlegend = FALSE) {
 
-  dataPlotFixedConc(x, xlab, ylab, "Nsurv", concentration, style, addlegend)
+  dataPlotFixedConc(x, xlab, ylab, main, "Nsurv", concentration,
+                    style, addlegend)
 }
 
 #' @importFrom dplyr %>% filter
@@ -413,6 +421,7 @@ survDataPlotReplicates <- function(x,
 #' @param x an object of class \code{survData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a label for the \eqn{y}-axis (optional)
+#' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
@@ -456,6 +465,7 @@ survDataPlotReplicates <- function(x,
 plot.survData <- function(x,
                           xlab,
                           ylab,
+                          main,
                           target.time = NULL,
                           concentration = NULL,
                           style = "generic",
@@ -474,14 +484,18 @@ plot.survData <- function(x,
 
   if (missing(ylab)) ylab <- "Number of surviving individuals"
 
+  if (missing(main)) main = NULL
+  
   if (is.null(target.time) && is.null(concentration)) {
     survDataPlotFull(x, xlab, ylab, style, addlegend)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
-    survDataPlotTargetTime(x, xlab, ylab, target.time, style, log.scale, addlegend)
+    survDataPlotTargetTime(x, xlab, ylab, main, target.time,
+                           style, log.scale, addlegend)
   }
   else if (is.null(target.time) && ! is.null(concentration)) {
-    survDataPlotFixedConc(x, xlab, ylab, concentration, style, addlegend)
+    survDataPlotFixedConc(x, xlab, ylab, main, concentration,
+                          style, addlegend)
   }
   else {
     survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
