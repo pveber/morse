@@ -164,10 +164,18 @@ fCols <- function(data, fitcol, cicol, analyse) {
     cols2 <- fitcol
     names(cols2) <- "loglogistic"
     # CI
-    cols3 <- cicol
+    cols3 <- "black"
     names(cols3) <- "Confidence interval"
-    }
-  else if (analyse == "repro") {
+    # CI2
+    cols4 <- cicol
+    names(cols4) <- "Credible limits"
+    
+    return(list(cols1 = cols1,
+                cols2 = cols2,
+                cols3 = cols3,
+                cols4 = cols4))
+           
+    } else if (analyse == "repro") {
     #points
     cols1 <- c("black", "white")
     names(cols1) <- sort(unique(data$Mortality))
@@ -177,8 +185,9 @@ fCols <- function(data, fitcol, cicol, analyse) {
     # CI
     cols3 <- cicol
     names(cols3) <- "Credible limits"
-    }
+    
     return(list(cols1 = cols1,
                 cols2 = cols2,
                 cols3 = cols3))
+    }
 }
