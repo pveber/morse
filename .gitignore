@@ -22,3 +22,16 @@ r-mosaic.Rproj
 
 # some generated files
 man/*.Rd
+NAMESPACE
+vignettes/*.log
+vignettes/*.pdf
+vignettes/*.html
+vignettes/*.blg
+vignettes/*.bbl
+vignettes/*.aux
+vignettes/*.tex
+vignettes/*.R
+vignettes/*_cache
+vignettes/*_files
+
+*.Rproj
