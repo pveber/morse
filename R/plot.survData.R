@@ -420,7 +420,7 @@ survDataPlotReplicates <- function(x,
 #'
 #' @param x an object of class \code{survData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
-#' @param ylab a label for the \eqn{y}-axis (optional)
+#' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
@@ -464,8 +464,8 @@ survDataPlotReplicates <- function(x,
 #'
 plot.survData <- function(x,
                           xlab,
-                          ylab,
-                          main,
+                          ylab = "Number of surviving individuals",
+                          main = NULL,
                           target.time = NULL,
                           concentration = NULL,
                           style = "generic",
@@ -482,10 +482,6 @@ plot.survData <- function(x,
                   replicate = 1)
   }
 
-  if (missing(ylab)) ylab <- "Number of surviving individuals"
-
-  if (missing(main)) main = NULL
-  
   if (is.null(target.time) && is.null(concentration)) {
     survDataPlotFull(x, xlab, ylab, style, addlegend)
   }
