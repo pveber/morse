@@ -265,7 +265,10 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                               ends = "both"), data.three,
                  color = valCols$cols3) +
-    scale_linetype_manual(values = cilty) +
+#    scale_linetype_manual(values = cilty) +
+    theme_minimal()
+  
+  plt_32 <- ggplot(data) +
     geom_line(data = data.four, aes(conc, qinf95, color = CI),
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = CI),
@@ -273,6 +276,7 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                        ymax = qsup95),
                 fill = "pink", alpha = 0.4) +
+    scale_color_manual(values = valCols$cols4) +
     theme_minimal()
   
   # plot IC
@@ -299,6 +303,7 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
     ggtitle(main) + theme_minimal()
   
   return(list(plt_3 = plt_3,
+              plt_32 = plt_32,
               plt_4 = plt_4))
 }
 
@@ -319,7 +324,7 @@ survFitPlotGG <- function(x,
   # dataframes points (data) and curve (curv)
   data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
                      resp = data_resp, Points = "Observed values")
-  curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = x$det.part)
+  curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
   
   # colors
   valCols <- fCols(data, fitcol, cicol, "surv")
@@ -360,9 +365,12 @@ survFitPlotGG <- function(x,
     else {
       plt_3 <- survFitPlotGGCI(x, data, curv, CI, CI2, cilty, cilwd,
                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
+      plt_32 <- survFitPlotGGCI(x, data, curv, CI, CI2, cilty, cilwd,
+                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_32
       mylegend_3 <- legendGgplotFit(plt_3)
-      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_3, mylegend_2,
-                                      nrow = 6), ncol = 2,
+      mylegend_32 <- legendGgplotFit(plt_32)
+      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_3, mylegend_32,
+                                      mylegend_2, nrow = 6), ncol = 2,
                    widths = c(6, 2))
     }
   }
@@ -423,7 +431,7 @@ plot.survFitTT <- function(x,
                            fitlwd = 1,
                            ci = FALSE,
                            cicol = "red",
-                           cilty = 2,
+                           cilty = 1,
                            cilwd = 1,
                            addlegend = FALSE,
                            log.scale = FALSE,
