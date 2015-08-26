@@ -1,7 +1,6 @@
 ---
-title: "Library tutorial"
-author: "Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller,
-Sandrine Charles"
+title: "MORSE tutorial"
+author: "Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 self_contained: no
@@ -26,100 +25,14 @@ library(morse)
 library(ggplot2)
 ```
 
-# Reproduction data analyses
-  
-The following example shows all the stages to pass from a raw bioassay dataset with reproduction data to the estimate values of $EC_x$ and parameters.
-The example is based on the `cadmium1` dataset, a reproduction and survival dataset of chronic laboratory bioassays with \emph{Daphnia magna} freshwater invertebrate exposed to five concentrations of one metal contaminant (cadmium) during 21 days.
-  
-* Step one, check the structure and the dataset integrity
-  
-```{r, cache=TRUE}
-data(cadmium1)
-reproDataCheck(cadmium1, diagnosis.plot = TRUE)
-```
+# Survival data analysis
 
-The function `reproDataCheck()` performs several tests on the integrity of the
-dataset and returns explicit error messages (if necessary). If no error was
-detected in the dataset an object of class `reproData` can be created.
-If the `reproDataCheck()` function finds an increase of alive individuals with time and if the `diagnosis.plot` argument is `TRUE`, the function plots the number of survivor in function of time per concentration and replicate.
-  
-* Step two, create a `reproData` object
-  
-```{r, cache=TRUE}
-dat1 <- reproData(cadmium1)
-```
+The following example shows all the stages to perform survival analysis on
+standard bioassay data and produce estimate values of the $LC_x$.
+We will use a dataset of the library named `cadmium1`, which contains both
+survival and reproduction data from a chronic laboratory bioassay with
+\emph{Daphnia magna} freshwater invertebrate exposed to five concentrations of one metal contaminant (cadmium) during 21 days.
 
-The new object contains the reorder dataframe with new datas (see the modelling vignette for more details).
-    
-* Step three, plot the `reproData` object
-  
-`plot()` is an S3 method for the `reproData` class and plots the cmulated number of offsprings depending on the time for all concentrations and replicates. Two graphical styles are available, `"generic"` for standar `R` plots or `"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`is `TRUE` the observed datapoints for a same replicat are pooled together and the mean of the replicate is plotted.
-
-```{r, cache=TRUE}
-plot(dat1, style = "ggplot", pool.replicate = FALSE)
-```
-
-`plot(, target.time)` plots the cumulated number of offsprings depending on the concentration for a fixed target time.
-  
-```{r, cache=TRUE}
-plot(dat1, target.time = 21, addlegend = TRUE, style = "ggplot",
-     pool.replicate = FALSE)
-```
-
-`plot(, concentration)` plots the cumulated number of offsprings depending on the time for a fixed concentration.
-
-```{r, cache=TRUE}
-plot(dat1, concentration = 4.36, addlegend = TRUE, style = "ggplot",
-     pool.replicate = FALSE)
-```
-
-and `plot(, conctration, target.time)` compares the cumulated number of offsprings of each replicate for a fixed concentration and a fixed time to the control at the same time.
-
-```{r, cache=TRUE}
-plot(dat1, concentration = 4.36, target.time = 21, style = "ggplot")
-```
-
-The `summary()` provides informations on the experimental design.
-
-```{r, cache=TRUE}
-dat1
-summary(dat1)
-```
-
-* Step four, fit an exposure-response model to the reproduction data at target time
-
-Now it is possible to estimate the parameters of the log-logistic exposure-response model with the `reproFitTT()` function.
-This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
-
-By choosing the `bestfit` option for the `stoc.part` argument we let the function
-choose the best stochastic part of the model.
-
-```{r, results="hide", cache=TRUE}
-out <- reproFitTT(dat1, stoc.part = "bestfit",
-                  ecx = c(10, 20, 30, 40, 50))
-```
-
-The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $EC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% credible limits superimposed to experimental data at target-time.
-
-```{r, cache=TRUE}
-summary(out)
-plot(out, log.scale = TRUE, ci = TRUE, style = "ggplot",
-     pool.replicate = FALSE, addlegend = TRUE)
-```
-
-* Step five, check the obseved versus predicted values
-  
-The function `ppc()` plots the observed versus predicted values with the 95 \% 
-credible intervale for each predicted values.
-
-```{r, cache=TRUE}
-ppc(out, style = "ggplot")
-```
-
-# Survival data analyses
-
-In this example we fit an exposure-response curve on survival data at final
-time. We use the same dataset as the survival analyse.
 
 The two first parts are the sames as the reproduction analysis.
 
@@ -193,8 +106,104 @@ plot(out2, log.scale = TRUE, ci = TRUE, style = "ggplot",
      addlegend = TRUE)
 ```
   
+<!--
 * Step five, check the obseved versus predicted values
   
-```{r,cache=TRUE}
+```{r,cache=TRUE, eval=FALSE}
 ppc(out2, style = "ggplot")
 ```
+-->
+
+# Reproduction data analyses
+  
+In this example we fit an exposure-response curve on survival data at final
+time. We use the same dataset as the survival analyse.
+  
+* Step one, check the structure and the dataset integrity
+  
+```{r, cache=TRUE}
+data(cadmium1)
+reproDataCheck(cadmium1, diagnosis.plot = TRUE)
+```
+
+The function `reproDataCheck()` performs several tests on the integrity of the
+dataset and returns explicit error messages (if necessary). If no error was
+detected in the dataset an object of class `reproData` can be created.
+If the `reproDataCheck()` function finds an increase of alive individuals with time and if the `diagnosis.plot` argument is `TRUE`, the function plots the number of survivor in function of time per concentration and replicate.
+  
+* Step two, create a `reproData` object
+  
+```{r, cache=TRUE}
+dat1 <- reproData(cadmium1)
+```
+
+The new object contains the reorder dataframe with new datas (see the modelling vignette for more details).
+    
+* Step three, plot the `reproData` object
+  
+`plot()` is an S3 method for the `reproData` class and plots the cmulated number of offsprings depending on the time for all concentrations and replicates. Two graphical styles are available, `"generic"` for standar `R` plots or `"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`is `TRUE` the observed datapoints for a same replicat are pooled together and the mean of the replicate is plotted.
+
+```{r, cache=TRUE}
+plot(dat1, style = "ggplot", pool.replicate = FALSE)
+```
+
+`plot(, target.time)` plots the cumulated number of offsprings depending on the concentration for a fixed target time.
+  
+```{r, cache=TRUE}
+plot(dat1, target.time = 21, addlegend = TRUE, style = "ggplot",
+     pool.replicate = FALSE)
+```
+
+`plot(, concentration)` plots the cumulated number of offsprings depending on the time for a fixed concentration.
+
+```{r, cache=TRUE}
+plot(dat1, concentration = 4.36, addlegend = TRUE, style = "ggplot",
+     pool.replicate = FALSE)
+```
+
+and `plot(, conctration, target.time)` compares the cumulated number of offsprings of each replicate for a fixed concentration and a fixed time to the control at the same time.
+
+```{r, cache=TRUE}
+plot(dat1, concentration = 4.36, target.time = 21, style = "ggplot")
+```
+
+The `summary()` provides informations on the experimental design.
+
+```{r, cache=TRUE}
+dat1
+summary(dat1)
+```
+
+* Step four, fit an exposure-response model to the reproduction data at target time
+
+Now it is possible to estimate the parameters of the log-logistic exposure-response model with the `reproFitTT()` function.
+This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
+
+By choosing the `bestfit` option for the `stoc.part` argument we let the function
+choose the best stochastic part of the model.
+
+```{r, results="hide", cache=TRUE}
+out <- reproFitTT(dat1, stoc.part = "bestfit",
+                  ecx = c(10, 20, 30, 40, 50))
+```
+
+The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $EC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% credible limits superimposed to experimental data at target-time.
+
+```{r, cache=TRUE}
+summary(out)
+plot(out, log.scale = TRUE, ci = TRUE, 
+     style = "ggplot", addlegend = TRUE)
+```
+
+<!--
+* Step five, check the obseved versus predicted values
+  
+The function `ppc()` plots the observed versus predicted values with the 95 \% 
+credible intervale for each predicted values.
+
+```{r, cache=TRUE, eval=FALSE}
+ppc(out, style = "ggplot")
+```
+
+-->
+
