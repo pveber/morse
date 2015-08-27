@@ -117,7 +117,7 @@ survData <- function(data) {
   # - Ninit: number of initial individuals for the corresponding time series
 
   # test the integrity of the data with survDataCheck
-  if (dim(survDataCheck(data))[1] > 0)
+  if (dim(survDataCheck(data, diagnosis.plot = FALSE))[1] > 0)
     stop("The [data] argument is not well-formed, please use [survDataCheck] for details.")
 
   data <- data[order(data$replicate, data$conc, data$time), ]
