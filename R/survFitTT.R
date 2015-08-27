@@ -130,6 +130,7 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #' inference procedure.
 #' 
 #' @param x An object of class \code{survFitTT}
+#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @seealso \code{\link{survFitTT}}
 #' 
@@ -177,6 +178,7 @@ print.survFitTT <- function(x, ...) {
 #' 
 #' @param object an object of class \code{survFitTT}
 #' @param quiet when \code{FALSE}, prints summary on standard output
+#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @return The function returns a list with the following fields:
 #' \item{Qpriors}{quantiles for the model's prior}
@@ -206,7 +208,7 @@ print.survFitTT <- function(x, ...) {
 #' 
 #' @export
 #' 
-summary.survFitTT <- function(object, quiet = FALSE) {
+summary.survFitTT <- function(object, quiet = FALSE, ...) {
   
   # quantiles of priors parameters
   n.iter <- object$n.iter$end - object$n.iter$start

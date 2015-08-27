@@ -3,8 +3,9 @@
 #' The generic \code{summary} S3 method for the \code{survData} class provides
 #' information about the structure of the dataset and the experimental design.
 #' 
-#' @param x an object of class \code{survData}
+#' @param object an object of class \code{survData}
 #' @param quiet when \code{FALSE}, prints summary on standard output
+#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @return The function returns a list with the following fields:
 #' \item{NbrepTimeConc}{nb of replicates for all concentrations and time points}
@@ -28,18 +29,19 @@
 #' 
 #' @export
 #' 
-summary.survData <- function(x, quiet = FALSE) {
+summary.survData <- function(object, quiet = FALSE, ...) {
   # matrix of number of replicate by time / conc
-  ans1 <- table(x[, c("conc", "time")])
+  ans1 <- table(object[, c("conc", "time")])
   
   # matrix of number of survival (sum of all replicate) by time / conc
-  ans2 <- tapply(x$Nsurv, list(as.factor(x$conc), as.factor(x$time)), sum)
+  ans2 <- tapply(object$Nsurv, list(as.factor(object$conc),
+                                    as.factor(object$time)), sum)
   
   # table of datapoints per concentration
-  ans3 <- table(x$conc)
+  ans3 <- table(object$conc)
   
   # table of datapoints per time
-  ans4 <- table(x$time)
+  ans4 <- table(object$time)
   
   if (! quiet) {
     cat("Number of datapoints per concentration: \n")

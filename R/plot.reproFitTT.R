@@ -329,6 +329,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
@@ -356,7 +357,7 @@ plot.reproFitTT <- function(x,
                             cilwd = 1,
                             addlegend = FALSE,
                             log.scale = FALSE,
-                            style = "generic") {
+                            style = "generic", ...) {
   # plot the fitted curve estimated by reproFitTT
   # INPUTS
   # - x:  reproFitTT object
