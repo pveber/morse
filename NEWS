@@ -1,0 +1,52 @@
+=== morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
+
+Version 2.0.0
+=============
+
+NEW FEATURES
+- new package structure and function's name.
+- the repro.data function is now called reproData and creates an object of class
+  reproData without specific target time.
+- the repro.check.data function is now called reproDataCheck.
+- the repro.fullsurvplot and repro.cumulplot functions are replaced by the generic
+  plot S3 method for the class reproData.
+- the repro.survplot function now depends of the plot S3 metod for the new class
+  survData.
+- the repro.fit function is now called reproFitTT with the associate class
+  reproFitTT, with the argument target.time.
+- add of new arguments for the reproFitTT function:
+  - "stoc.part" to choose the stochastic part of the model.
+  - "ecx" to choose the value of ECx estimated by the function.
+  - the deterministic part name are now in the legend of the plot function.
+  - When stoc.part = "bestfit" is choosen the model "gammapoisson" was choose if
+    the DIC of gamma-poisson model was smaller than DIC of poisson model of 10
+    (1 in the previous version).
+- upgrade the informations in the summary of the reproData class.
+- upgrade the informations in the summary of the reproFitTT function, and values
+  of parameters are expressed in untransformed values.
+- the credible interval in plot.reproFitTT are now a ribbon.
+- add a new group of functions to analyze survival data:
+  - the survDataCheck function checks the integrity of the dataset.
+  - the survData function with associated S3 method creates survData object.
+  - the survFitTT function run the bayesian estimation to fit an exposure-response
+    model for survival data with the associated specific S3 method: print, plot
+    and summary.
+- the lattice graphics was suppressed.
+- the repro.convergence function was suppressed.
+
+BUGS FIXES
+- new selection rules for the "bestfit" method in the function reproFitTT.
+- in log scale the points at concentration = 0 are not drawn (ggplot).
+
+Version 1.0.2
+=============
+
+BUG FIXES
+- correction of points color in the legend for the plot.repro.fit function (ggplot).
+- change the ylim range for the plot.repro.fit function (generic). 
+- correction of the log.scale option for the repro.survplot function.
+
+Version 1.0.1
+=============
+
+- Initial release.
