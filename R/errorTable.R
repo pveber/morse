@@ -19,11 +19,15 @@ errorTableSingleton <- function(id, msg) {
   errorTableAdd(errorTableCreate(), id, msg)
 }
 
+errorTableIsEmpty <- function(x)
+  dim(x)[1] == 0
+  
 #' @export
 print.errorTable <- function(x, ...) {
-  if (dim(x)[1] == 0) {
+  if (errorTableIsEmpty(x)) {
     cat("No error detected.\n")
-  } else {
+  }
+  else {
     cat("Error(s):\n")
     for (m in x$msg) {
       cat(paste("\t",m,"\n",sep=""))
