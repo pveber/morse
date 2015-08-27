@@ -111,7 +111,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
     geom_point() +
     geom_line() +
     labs(x = xlab, y = ylab) +
-    facet_wrap(~conc, nrow = 2) +
+    facet_wrap(~conc, ncol = 2) +
     scale_x_continuous(breaks = unique(data$time)) +
     scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
     theme_minimal()
