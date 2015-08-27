@@ -83,7 +83,7 @@ summary.reproData <- function(x, quiet = FALSE) {
 reproData <- function(x) {
 
   # test the integrity of the data with reproDataCheck
-  if (dim(reproDataCheck(x))[1] > 0)
+  if (dim(reproDataCheck(x, diagnosis.plot = FALSE))[1] > 0)
     stop("The [x] argument is not well-formed, please use [reproDataCheck] for details.")
 
   x <- survData(x)
