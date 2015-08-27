@@ -4,7 +4,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 
-%\VignetteIndexEntry{Modelling}
+%\VignetteIndexEntry{Models}
 \title{Models in MORSE package}
 
 \begin{document}
