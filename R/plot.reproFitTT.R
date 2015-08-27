@@ -49,7 +49,7 @@ reproLlmCI <- function(fit, x) {
   }
   
   # gamma poisson
-  if (fit$model.label == "GP") {
+  else if (fit$model.label == "GP") {
     # parameters
     log10omega2 <- mctot[, "log10omega"]
     omega2 <- 10^(log10omega2)
@@ -135,7 +135,7 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
   # Plotting the theoretical curve
   # CI ribbon + lines
   polygon(c(curv_conc, rev(curv_conc)), c(CI[["qinf95"]], rev(CI[["qsup95"]])),
-          col = "pink1")
+          col = cicol)
   lines(curv_conc, CI[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
@@ -211,7 +211,9 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
     geom_line(data = cri, aes(conc, qsup95, color = CI),
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
-                                ymax = qsup95), fill = "pink", alpha = 0.4) +
+                                ymax = qsup95), fill = valCols$cols3,
+                col = valCols$cols3,
+                alpha = 0.4) +
     scale_color_manual(values = valCols$cols3) + theme_minimal()
 
   # plot IC
@@ -222,7 +224,9 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
     geom_line(data = cri, aes(conc, qsup95),
               linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
-                                ymax = qsup95), fill = "pink", alpha = 0.4) +
+                                ymax = qsup95), fill = valCols$cols3,
+                col = valCols$cols3,
+                alpha = 0.4) +
     geom_point(data = data, aes(transf_conc, resp,
                                 fill = Mortality),
                pch = 21, size = 3) +
@@ -347,8 +351,8 @@ plot.reproFitTT <- function(x,
                             fitlty = 1,
                             fitlwd = 1,
                             ci = FALSE,
-                            cicol = "red",
-                            cilty = 2,
+                            cicol = "pink1",
+                            cilty = 1,
                             cilwd = 1,
                             addlegend = FALSE,
                             log.scale = FALSE,
