@@ -247,7 +247,7 @@ survFitPlotGGNoCredInt <- function(data, curv, valCols,
 }
 
 #' @importFrom grid arrow unit
-survFitPlotGGCredInt <- function(x, data, curv, cred.int, conf.int, cilty, cilwd,
+survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd,
                                  valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   data.three <- data.frame(conc = data$transf_conc,
