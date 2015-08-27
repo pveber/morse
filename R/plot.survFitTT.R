@@ -157,7 +157,7 @@ survFitPlotGenericCI <- function(x,
   # Plotting the theoretical curve
   # CI ribbon + lines
   polygon(c(curv_conc, rev(curv_conc)), c(CI2[["qinf95"]], rev(CI2[["qsup95"]])),
-          col = "pink1")
+          col = cicol)
   lines(curv_conc, CI2[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, CI2[["qinf95"]], type = "l", col = cicol, lty = cilty,
@@ -265,7 +265,6 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                               ends = "both"), data.three,
                  color = valCols$cols3) +
-#    scale_linetype_manual(values = cilty) +
     theme_minimal()
   
   plt_32 <- ggplot(data) +
@@ -273,10 +272,10 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = CI),
               linetype = cilty, size = cilwd) +
-    geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
-                                       ymax = qsup95),
-                fill = "pink", alpha = 0.4) +
     scale_color_manual(values = valCols$cols4) +
+    geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
+                                      ymax = qsup95),
+                fill = valCols$cols4, col = valCols$cols4, alpha = 0.4) +
     theme_minimal()
   
   # plot IC
@@ -293,7 +292,8 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                       ymax = qsup95),
-                fill = "pink", alpha = 0.4) +
+                fill = valCols$cols4, 
+                col = valCols$cols4, alpha = 0.4) +
     geom_point(data = data, aes(transf_conc, resp)) +
     geom_line(aes(conc, resp), curv, linetype = fitlty,
               size = fitlwd, color = valCols$cols2) +
@@ -430,7 +430,7 @@ plot.survFitTT <- function(x,
                            fitlty = 1,
                            fitlwd = 1,
                            ci = FALSE,
-                           cicol = "red",
+                           cicol = "pink1",
                            cilty = 1,
                            cilwd = 1,
                            addlegend = FALSE,
