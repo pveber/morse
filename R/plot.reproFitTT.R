@@ -212,6 +212,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
                                 ymax = qsup95), fill = valCols$cols3,
+                col = valCols$cols3,
                 alpha = 0.4) +
     scale_color_manual(values = valCols$cols3) + theme_minimal()
 
@@ -224,6 +225,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
               linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_ribbon(data = cri, aes(x = conc, ymin = qinf95,
                                 ymax = qsup95), fill = valCols$cols3,
+                col = valCols$cols3,
                 alpha = 0.4) +
     geom_point(data = data, aes(transf_conc, resp,
                                 fill = Mortality),
