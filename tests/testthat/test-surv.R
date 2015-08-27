@@ -21,11 +21,10 @@ test_that("survDataCheck", {
   lapply(d, function(x) {
     dat <- survDataCheck(x)
     expect_equal(dim(dat)[1], 0)
-    expect_equal(dim(dat)[2], 0)
+    expect_equal(dim(dat)[2], 2)
     expect_is(dat, c("errorTable",
                      "data.frame"))
-    expect_null(dat$id)
-    expect_null(dat$msg)
+    expect_true(morse:::errorTableIsEmpty(dat))
   })
 
   # error dataset
