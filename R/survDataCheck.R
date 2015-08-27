@@ -182,7 +182,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
-    survDataPlotFull(data)
+    survDataPlotFull(data, ylab = "Number of surviving individuals")
   }
   return(errors)
 }

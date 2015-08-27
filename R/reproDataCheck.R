@@ -118,7 +118,7 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   errors <- errorTableAppend(errors, consistency.errors)
 
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
-    survDataPlotFull(data)
+    survDataPlotFull(data, ylab = "Number of surviving individuals")
       }
 
   return(errors)
