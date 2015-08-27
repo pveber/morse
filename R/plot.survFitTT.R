@@ -20,7 +20,7 @@ survEvalFit <- function(fit, x) {
   }
 }
 
-survLlbinomCI <- function(x, log.scale) {
+survLlbinomConfInt <- function(x, log.scale) {
   # create confidente interval on observed data for the log logistic
   # binomial model by a binomial test
   # INPUT:
@@ -43,7 +43,7 @@ survLlbinomCI <- function(x, log.scale) {
   return(ci)
 }
 
-survLlbinomCI2 <- function(fit, x) {
+survMeanCredInt <- function(fit, x) {
   # create the parameters for credible interval for the log logistic binomial
   # model
   # INPUT:
@@ -89,7 +89,7 @@ survLlbinomCI2 <- function(fit, x) {
   return(ci)
 }
 
-survFitPlotGenericNoCI <- function(x,
+survFitPlotGenericNoCredInt <- function(x,
                                    data_conc, transf_data_conc, data_resp,
                                    curv_conc, curv_resp,
                                    xlab, ylab, fitcol, fitlty, fitlwd,
@@ -129,10 +129,10 @@ survFitPlotGenericNoCI <- function(x,
   }
 }
 
-survFitPlotGenericCI <- function(x,
+survFitPlotGenericCredInt <- function(x,
                                  data_conc, transf_data_conc, data_resp,
                                  curv_conc, curv_resp,
-                                 CI, CI2, log.scale,
+                                 conf.int, cred.int, log.scale,
                                  xlab, ylab, fitcol, fitlty, fitlwd,
                                  main, addlegend,
                                  cicol, cilty, cilwd)
@@ -145,28 +145,28 @@ survFitPlotGenericCI <- function(x,
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(CI["qsup95",]) + 0.01),
+       ylim = c(0, max(conf.int["qsup95",]) + 0.01),
        type = "n")
   
   # axis
-  axis(side = 2, at = pretty(c(0, max(CI["qsup95",]))))
+  axis(side = 2, at = pretty(c(0, max(conf.int["qsup95",]))))
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
   
   # Plotting the theoretical curve
   # CI ribbon + lines
-  polygon(c(curv_conc, rev(curv_conc)), c(CI2[["qinf95"]], rev(CI2[["qsup95"]])),
+  polygon(c(curv_conc, rev(curv_conc)), c(cred.int[["qinf95"]], rev(cred.int[["qsup95"]])),
           col = cicol)
-  lines(curv_conc, CI2[["qsup95"]], type = "l", col = cicol, lty = cilty,
+  lines(curv_conc, cred.int[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
-  lines(curv_conc, CI2[["qinf95"]], type = "l", col = cicol, lty = cilty,
+  lines(curv_conc, cred.int[["qinf95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   
   # segment CI
   
   segments(transf_data_conc, data_resp,
-           transf_data_conc, CI["qsup95", ])
+           transf_data_conc, conf.int["qsup95", ])
   
   Bond <- if (log.scale) {
     0.03 * (max(transf_data_conc) - min(transf_data_conc))
@@ -175,17 +175,17 @@ survFitPlotGenericCI <- function(x,
   }
   
   segments(transf_data_conc - Bond,
-           CI["qsup95", ],
+           conf.int["qsup95", ],
            transf_data_conc + Bond,
-           CI["qsup95", ])
+           conf.int["qsup95", ])
   
   segments(transf_data_conc, data_resp,
-           transf_data_conc, CI["qinf95", ])
+           transf_data_conc, conf.int["qinf95", ])
   
   segments(transf_data_conc - Bond,
-           CI["qinf95", ],
+           conf.int["qinf95", ],
            transf_data_conc + Bond,
-           CI["qinf95", ])
+           conf.int["qinf95", ])
 
   # points
   points(transf_data_conc, data_resp, pch = 16)
@@ -209,31 +209,31 @@ survFitPlotGenericCI <- function(x,
 survFitPlotGeneric <- function(x,
                                data_conc, transf_data_conc, data_resp,
                                curv_conc, curv_resp,
-                               CI, CI2, log.scale,
+                               conf.int, cred.int, log.scale,
                                xlab, ylab, fitcol, fitlty, fitlwd,
                                main, addlegend,
                                cicol, cilty, cilwd) {
   
   
-  if(!is.null(CI)) survFitPlotGenericCI(x,
-                                        data_conc, transf_data_conc, data_resp,
-                                        curv_conc, curv_resp,
-                                        CI, CI2, log.scale,
-                                        xlab, ylab, fitcol, fitlty, fitlwd,
-                                        main, addlegend,
-                                        cicol, cilty, cilwd)
+  if(!is.null(conf.int)) survFitPlotGenericCredInt(x,
+                                             data_conc, transf_data_conc, data_resp,
+                                             curv_conc, curv_resp,
+                                             conf.int, cred.int, log.scale,
+                                             xlab, ylab, fitcol, fitlty, fitlwd,
+                                             main, addlegend,
+                                             cicol, cilty, cilwd)
   else {
-    survFitPlotGenericNoCI(x,
-                           data_conc, transf_data_conc, data_resp,
-                           curv_conc, curv_resp,
-                           xlab, ylab, fitcol, fitlty, fitlwd,
-                           main, addlegend)
+    survFitPlotGenericNoCredInt(x,
+                                data_conc, transf_data_conc, data_resp,
+                                curv_conc, curv_resp,
+                                xlab, ylab, fitcol, fitlty, fitlwd,
+                                main, addlegend)
   }
 }
 
 
-survFitPlotGGNoCI <- function(data, curv, valCols,
-                              fitlty, fitlwd, xlab, ylab, main) {
+survFitPlotGGNoCredInt <- function(data, curv, valCols,
+                                   fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp)) +
     geom_line(aes(conc, resp), curv,
@@ -247,30 +247,30 @@ survFitPlotGGNoCI <- function(data, curv, valCols,
 }
 
 #' @importFrom grid arrow unit
-survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
-                            valCols, fitlty, fitlwd, xlab, ylab, main) {
+survFitPlotGGCredInt <- function(x, data, curv, cred.int, conf.int, cilty, cilwd,
+                                 valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   data.three <- data.frame(conc = data$transf_conc,
-                           qinf95 = CI["qinf95",],
-                           qsup95 = CI["qsup95",],
-                           CI = "Confidence interval")
+                           qinf95 = conf.int["qinf95",],
+                           qsup95 = conf.int["qsup95",],
+                           conf.int = "Confidence interval")
   data.four <- data.frame(conc = curv$conc,
-                          qinf95 = CI2[["qinf95"]],
-                          qsup95 = CI2[["qsup95"]],
-                          CI = "Credible limits")
+                          qinf95 = cred.int[["qinf95"]],
+                          qsup95 = cred.int[["qsup95"]],
+                          conf.int = "Credible limits")
   
   plt_3 <- ggplot(data) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
-                     linetype = CI),
+                     linetype = conf.int),
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                               ends = "both"), data.three,
                  color = valCols$cols3) +
     theme_minimal()
   
   plt_32 <- ggplot(data) +
-    geom_line(data = data.four, aes(conc, qinf95, color = CI),
+    geom_line(data = data.four, aes(conc, qinf95, color = conf.int),
               linetype = cilty, size = cilwd) +
-    geom_line(data = data.four, aes(conc, qsup95, color = CI),
+    geom_line(data = data.four, aes(conc, qsup95, color = conf.int),
               linetype = cilty, size = cilwd) +
     scale_color_manual(values = valCols$cols4) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
@@ -286,9 +286,9 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
                                ends = "both"),
                  data.three, color = valCols$cols3, linetype = cilty,
                  size = cilwd) +
-    geom_line(data = data.four, aes(conc, qinf95, color = CI),
+    geom_line(data = data.four, aes(conc, qinf95, color = conf.int),
               linetype = cilty, size = cilwd) +
-    geom_line(data = data.four, aes(conc, qsup95, color = CI),
+    geom_line(data = data.four, aes(conc, qsup95, color = conf.int),
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                       ymax = qsup95),
@@ -310,7 +310,7 @@ survFitPlotGGCI <- function(x, data, curv, CI, CI2, cilty, cilwd,
 survFitPlotGG <- function(x,
                           data_conc, transf_data_conc, data_resp,
                           curv_conc, curv_resp,
-                          CI, CI2,
+                          conf.int, cred.int,
                           xlab, ylab, fitcol, fitlty, fitlwd,
                           main, addlegend,
                           cicol, cilty, cilwd) {
@@ -342,11 +342,11 @@ survFitPlotGG <- function(x,
     scale_color_manual(values = valCols$cols2) + theme_minimal()
   
   plt_4 <-
-    if (! is.null(CI)) {
-      survFitPlotGGCI(x, data, curv, CI, CI2, cilty, cilwd,
+    if (! is.null(conf.int)) {
+      survFitPlotGGCredInt(x, data, curv, conf.int, cred.int, cilty, cilwd,
                       valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
-      survFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
+      survFitPlotGGNoCredInt(data, curv, valCols, fitlty, fitlwd,
                         xlab, ylab, main)
     }
   
@@ -358,14 +358,14 @@ survFitPlotGG <- function(x,
     plt_5 <- plt_4 + scale_x_continuous(breaks = data$transf_conc,
                                         labels = data$conc)
     
-    if (is.null(CI)) {
+    if (is.null(conf.int)) {
       grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, nrow = 6),
                    ncol = 2, widths = c(6, 2))
     }
     else {
-      plt_3 <- survFitPlotGGCI(x, data, curv, CI, CI2, cilty, cilwd,
+      plt_3 <- survFitPlotGGCredInt(x, data, curv, conf.int, cred.int, cilty, cilwd,
                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
-      plt_32 <- survFitPlotGGCI(x, data, curv, CI, CI2, cilty, cilwd,
+      plt_32 <- survFitPlotGGCredInt(x, data, curv, conf.int, cred.int, cilty, cilwd,
                                 valCols, fitlty, fitlwd, xlab, ylab, main)$plt_32
       mylegend_3 <- legendGgplotFit(plt_3)
       mylegend_32 <- legendGgplotFit(plt_32)
@@ -477,14 +477,14 @@ plot.survFitTT <- function(x,
   
   curv_resp <- survEvalFit(x, display.conc)
   
-  CI <- if(ci) { survLlbinomCI(x, log.scale) } else NULL
-  CI2 <- if(ci) { survLlbinomCI2(x, display.conc) } else NULL
+  conf.int <- if(ci) { survLlbinomConfInt(x, log.scale) } else NULL
+  cred.int <- if(ci) { survMeanCredInt(x, display.conc) } else NULL
   
   if (style == "generic") {
     survFitPlotGeneric(x,
                        dataTT$conc, transf_data_conc, dataTT$resp,
                        curv_conc, curv_resp,
-                       CI, CI2, log.scale,
+                       conf.int, cred.int, log.scale,
                        xlab, ylab, fitcol, fitlty, fitlwd,
                        main, addlegend,
                        cicol, cilty, cilwd)
@@ -493,7 +493,7 @@ plot.survFitTT <- function(x,
     survFitPlotGG(x,
                   dataTT$conc, transf_data_conc, dataTT$resp,
                   curv_conc, curv_resp,
-                  CI, CI2,
+                  conf.int, cred.int,
                   xlab, ylab, fitcol, fitlty, fitlwd,
                   main, addlegend,
                   cicol, cilty, cilwd / 2)
