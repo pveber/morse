@@ -21,7 +21,7 @@ errorTableSingleton <- function(id, msg) {
 
 #' @export
 print.errorTable <- function(x, ...) {
-  if (is.null(x$id)) {
+  if (dim(x)[1] == 0) {
     cat("No error detected.\n")
   } else {
     cat("Error(s):\n")
