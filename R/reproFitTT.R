@@ -184,6 +184,7 @@ llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\
 #' inference procedure.
 #' 
 #' @param x An object of class \code{reproFitTT}
+#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @seealso \code{\link{reproFitTT}}
 #' 
@@ -231,6 +232,7 @@ print.reproFitTT <- function(x, ...) {
 #' 
 #' @param object an object of class \code{reproFitTT}
 #' @param quiet when \code{FALSE}, prints summary on standard output
+#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @return The function returns a list with the following fields:
 #' \item{Qpriors}{quantiles for the model's prior}
@@ -260,7 +262,7 @@ print.reproFitTT <- function(x, ...) {
 #' 
 #' @export
 #' 
-summary.reproFitTT <- function(object, quiet = FALSE) {
+summary.reproFitTT <- function(object, quiet = FALSE, ...) {
   
   # quantiles of priors parameters
   n.iter <- object$n.iter$end - object$n.iter$start
