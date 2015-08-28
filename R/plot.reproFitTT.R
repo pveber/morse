@@ -1,3 +1,121 @@
+#' Plotting method for \code{reproFitTT} objects
+#' 
+#' @param x an object of class \code{reproFitTT}
+#' @param xlab a title for the \eqn{x}-label
+#' @param ylab a title for the \eqn{y}-label
+#' @param main main title for the plot
+#' @param fitcol color used for the fitted curve
+#' @param fitlty line type for the fitted curve
+#' @param fitlwd width of the fitted curve
+#' @param ci if \code{TRUE}, draws the 95 \% credible limits of the fitted curve
+#' @param cicol color for the 95 \% credible limits of the fitted curve
+#' @param cilty line type for the 95 \% credible limits of the fitted curve
+#' @param cilwd width of the 95 \% credible limits of the fitted curve
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param \dots Further arguments to be passed to generic methods.
+#' @note When \code{style = "ggplot"}, the function calls package
+#' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
+#' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
+#' 
+#' @export
+#' 
+#' @import ggplot2
+#' @import grDevices
+#' @importFrom gridExtra grid.arrange arrangeGrob
+#' @importFrom grid grid.rect gpar
+#' @importFrom graphics plot
+#' 
+#' @keywords plot 
+#' 
+plot.reproFitTT <- function(x,
+                            xlab = "Concentrations",
+                            ylab = "Nb of offspring per ind.day",
+                            main = NULL,
+                            fitcol = "red",
+                            fitlty = 1,
+                            fitlwd = 1,
+                            ci = FALSE,
+                            cicol = "pink1",
+                            cilty = 1,
+                            cilwd = 1,
+                            addlegend = FALSE,
+                            log.scale = FALSE,
+                            style = "generic", ...) {
+  # plot the fitted curve estimated by reproFitTT
+  # INPUTS
+  # - x:  reproFitTT object
+  # - xlab : label x
+  # - ylab : label y
+  # - main : main title
+  # - fitcol : color fitted curve
+  # - fitlty : type line fitted curve
+  # - fitlwd : width line fitted curve
+  # - ci : credible interval, boolean
+  # - cicol : color ci
+  # - cilty : type line ci
+  # - cilwd : width line ci
+  # - addlegend : boolean
+  # - log.scale : x log option
+  # - style : generic ou ggplot
+  # OUTPUT:
+  # - plot of fitted regression
+  
+  # Selection of datapoints that can be displayed given the type of scale
+  sel <- if(log.scale) x$dataTT$conc > 0 else TRUE
+  
+  dataTT <- x$dataTT[sel, ]
+  dataTT$resp <- dataTT$Nreprocumul / dataTT$Nindtime
+  transf_data_conc <- optLogTransform(log.scale, dataTT$conc)
+  
+  # Concentration values used for display in linear scale
+  display.conc <- (function() {
+    x <- optLogTransform(log.scale, dataTT$conc)
+    s <- seq(min(x),max(x), length = 100)
+    if(log.scale) exp(s) else s
+  })()
+  
+  # Possibly log transformed concentration values for display
+  curv_conc <- optLogTransform(log.scale, display.conc)
+  
+  curv_resp <- reproEvalFit(x, display.conc)
+  
+  # Define visual parameters
+  mortality <- c(0, 1) # code 0/1 mortality
+  # valid if at least one replicat
+  mortality <- mortality[match(dataTT$Nsurv == dataTT$Ninit,
+                               c(TRUE, FALSE))] # vector of 0 and 1
+  
+  # encodes mortality empty dots (1) and not mortality solid dots (19)
+  if (style == "generic")  mortality[which(mortality == 0)] <- 19
+  else if (style == "ggplot") {
+    mortality[which(mortality == 0)] <- "No"
+    mortality[which(mortality == 1)] <- "Yes"
+  }
+  
+  CI <- if (ci) { CI <- reproLlmCI(x, display.conc) } else NULL
+  
+  if (style == "generic") {
+    reproFitPlotGeneric(dataTT$conc, transf_data_conc, dataTT$resp,
+                        curv_conc, curv_resp,
+                        CI, mortality,
+                        xlab, ylab, fitcol, fitlty, fitlwd,
+                        main, addlegend,
+                        cicol, cilty, cilwd)
+  }
+  else if (style == "ggplot") {
+    reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
+                   curv_conc, curv_resp,
+                   CI, mortality,
+                   xlab, ylab, fitcol, fitlty, fitlwd,
+                   main, addlegend,
+                   cicol, cilty, cilwd)
+  }
+  else stop("Unknown style")
+}
+
+
 reproEvalFit <- function(fit, x) {
   # eval the fitted function on x
   # INPUT :
@@ -313,119 +431,3 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   }
 }
 
-#' Plotting method for \code{reproFitTT} objects
-#' 
-#' @param x an object of class \code{reproFitTT}
-#' @param xlab a title for the \eqn{x}-label
-#' @param ylab a title for the \eqn{y}-label
-#' @param main main title for the plot
-#' @param fitcol color used for the fitted curve
-#' @param fitlty line type for the fitted curve
-#' @param fitlwd width of the fitted curve
-#' @param ci if \code{TRUE}, draws the 95 \% credible limits of the fitted curve
-#' @param cicol color for the 95 \% credible limits of the fitted curve
-#' @param cilty line type for the 95 \% credible limits of the fitted curve
-#' @param cilwd width of the 95 \% credible limits of the fitted curve
-#' @param addlegend if \code{TRUE}, adds a default legend to the plot
-#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param \dots Further arguments to be passed to generic methods.
-#' @note When \code{style = "ggplot"}, the function calls package
-#' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
-#' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
-#' 
-#' @export
-#' 
-#' @import ggplot2
-#' @import grDevices
-#' @importFrom gridExtra grid.arrange arrangeGrob
-#' @importFrom grid grid.rect gpar
-#' @importFrom graphics plot
-#' 
-#' @keywords plot 
-#' 
-plot.reproFitTT <- function(x,
-                            xlab = "Concentrations",
-                            ylab = "Nb of offspring per ind.day",
-                            main = NULL,
-                            fitcol = "red",
-                            fitlty = 1,
-                            fitlwd = 1,
-                            ci = FALSE,
-                            cicol = "pink1",
-                            cilty = 1,
-                            cilwd = 1,
-                            addlegend = FALSE,
-                            log.scale = FALSE,
-                            style = "generic", ...) {
-  # plot the fitted curve estimated by reproFitTT
-  # INPUTS
-  # - x:  reproFitTT object
-  # - xlab : label x
-  # - ylab : label y
-  # - main : main title
-  # - fitcol : color fitted curve
-  # - fitlty : type line fitted curve
-  # - fitlwd : width line fitted curve
-  # - ci : credible interval, boolean
-  # - cicol : color ci
-  # - cilty : type line ci
-  # - cilwd : width line ci
-  # - addlegend : boolean
-  # - log.scale : x log option
-  # - style : generic ou ggplot
-  # OUTPUT:
-  # - plot of fitted regression
-  
-  # Selection of datapoints that can be displayed given the type of scale
-  sel <- if(log.scale) x$dataTT$conc > 0 else TRUE
-  
-  dataTT <- x$dataTT[sel, ]
-  dataTT$resp <- dataTT$Nreprocumul / dataTT$Nindtime
-  transf_data_conc <- optLogTransform(log.scale, dataTT$conc)
-  
-  # Concentration values used for display in linear scale
-  display.conc <- (function() {
-    x <- optLogTransform(log.scale, dataTT$conc)
-    s <- seq(min(x),max(x), length = 100)
-    if(log.scale) exp(s) else s
-  })()
-  
-  # Possibly log transformed concentration values for display
-  curv_conc <- optLogTransform(log.scale, display.conc)
-  
-  curv_resp <- reproEvalFit(x, display.conc)
-  
-  # Define visual parameters
-  mortality <- c(0, 1) # code 0/1 mortality
-  # valid if at least one replicat
-  mortality <- mortality[match(dataTT$Nsurv == dataTT$Ninit,
-                               c(TRUE, FALSE))] # vector of 0 and 1
-  
-  # encodes mortality empty dots (1) and not mortality solid dots (19)
-  if (style == "generic")  mortality[which(mortality == 0)] <- 19
-  else if (style == "ggplot") {
-    mortality[which(mortality == 0)] <- "No"
-    mortality[which(mortality == 1)] <- "Yes"
-  }
-  
-  CI <- if (ci) { CI <- reproLlmCI(x, display.conc) } else NULL
-  
-  if (style == "generic") {
-    reproFitPlotGeneric(dataTT$conc, transf_data_conc, dataTT$resp,
-                        curv_conc, curv_resp,
-                        CI, mortality,
-                        xlab, ylab, fitcol, fitlty, fitlwd,
-                        main, addlegend,
-                        cicol, cilty, cilwd)
-  }
-  else if (style == "ggplot") {
-    reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
-                   curv_conc, curv_resp,
-                   CI, mortality,
-                   xlab, ylab, fitcol, fitlty, fitlwd,
-                   main, addlegend,
-                   cicol, cilty, cilwd)
-  }
-  else stop("Unknown style")
-}

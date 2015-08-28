@@ -1,3 +1,352 @@
+#' Fits a Bayesian exposure-response model for target-time reproduction analysis
+#' 
+#' This function estimates a model of the cumulated reproduction outputs of a 
+#' population in a given time period in presence of mortality.
+#' 
+#' Because some individuals may die during the observation period, the 
+#' reproduction rate alone is not sufficient to account for the observed number
+#' of offspring. In addition, we need the time individuals have stayed alive
+#' during the experiment. The \code{reproFitTT} function estimates the number 
+#' of individual-days in an experiment between its start and the target time. 
+#' This covariable is then used to estimate a relation between the toxicant
+#' concentration and the reproduction rate \emph{per individual-day}.
+#' 
+#' The \code{reproFitTT} function fits two models, one where inter-individual 
+#' variability is neglected ("Poisson" model) and one where it is taken into
+#' account ("gamma-Poisson" model). When setting \code{stoc.part} to 
+#' \code{"bestfit"}, a model comparison procedure is used to choose between
+#' them. More details are presented in the vignette accompanying the package. 
+#' 
+#' @param data an object of class \code{reproData}
+#' @param stoc.part stochastic part of the model. Possible values are \code{"bestfit"},
+#' \code{"poisson"} and \code{"gammapoisson"}
+#' @param target.time defines the observation period. By default the last time point
+#' @param ecx values of \eqn{x} to calculate a desired \eqn{EC_{x}}{ECx}
+#' @param n.chains number of MCMC chains. The minimum required number of chains is 
+#' @param quiet if \code{TRUE}, does not print messages and progress bars from JAGS
+#' 
+#' 
+#' @return The function returns an object of class \code{reproFitTT} which is a list
+#' of the following objects:
+#' \item{DIC}{DIC value of the selected model}
+#' \item{estim.ECx}{a table of the estimated 5, 10, 20 and 50 \% effective
+#' concentrations (by default) and their 95 \% credible intervals}
+#' \item{estim.par}{a table of the estimated parameters as medians and 95 \%
+#' credible intervals}
+#' \item{mcmc}{an object of class \code{mcmc.list} with the posterior distributions}
+#' \item{model}{a JAGS model object}
+#' \item{parameters}{a list of the parameters names used in the model}
+#' \item{n.chains}{an integer value corresponding to the number of chains used
+#' for the MCMC computation.}
+#' \item{n.iter}{a list of two indices indicating the beginning and
+#' the end of monitored iterations}
+#' \item{n.thin}{a numerical value corresponding to the thinning interval}
+#' 
+#' @author Marie Laure Delignette-Muller
+#' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
+#' <philippe.ruiz@@univ-lyon1.fr>
+#' 
+# FIXME
+# \describe{
+# 
+# Credible limits: For 100 values of concentrations regularly spread within
+# the range of tested concentrations the joint posterior distribution of
+# parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
+# offspring per individual-day for various replicates. For each concentration,
+# 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
+# there is a point estimate and a 95 \% credible interval (Delignette-Muller
+# et al., 2014).
+# 
+# DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
+# al. (2002) is provided by the \code{dic.samples} function. The DIC is a
+# goodness-of-fit criterion penalized by the complexity of the model
+# (Delignette-Muller et al., 2014).
+# 
+# Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
+# control diagnostic based on a criterion that calculates the appropriate
+# number of iterations required to accurately estimate the parameter
+# quantiles. The Raftery and Lewis's diagnostic value used in the
+# \code{reproFitTT} function is the \code{resmatrix} object. See the
+# \code{\link[coda]{raftery.diag}} help for more details.
+# 
+# Model selection: When \code{stoc.part = "bestfit"}, the \code{reproFitTT}
+# function chooses itself between the Poisson and the Gamma-Poisson model
+# depending on the number of MCMC samples and on the DIC values.  The minimum
+# number of MCMC samples for the pilot run is provided by the Raftery and
+# Lewis's diagnostic (Raftery and Lewis 1992). If this number is less than 100
+# 000 for the Poisson and the Gamma-Poisson model and if the DIC difference
+# between Poisson and Gamma-poisson models is small (typically less than 10),
+# then the Poisson model is selected. If this number is more than 100 000 for
+# only one model, the other one is selected.
+# }
+# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
+# \code{\link[rjags]{dic.samples}}, \code{\link[coda]{raftery.diag}}
+# and \code{\link[ggplot2]{ggplot}}
+# 
+# @references Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
+# (2014) Statistical handling of reproduction data for exposure-response
+# modelling.
+# \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
+# 
+# Plummer, M. (2013) JAGS Version 3.4.0 user manual.
+# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
+# 
+# Raftery A.E. and Lewis, S.M. (1992) One long run with diagnostics:
+# Implementation strategies for Markov chain Monte Carlo. \emph{Statistical
+# Science}, 7, 493-497.
+# 
+# Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
+# measures of model complexity and fit (with discussion).  \emph{Journal of
+# the Royal Statistical Society}, Series B 64, 583-639.
+# 
+#' 
+#' @keywords estimation
+#' 
+#' @examples
+#' 
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create an object of class "reproData"
+#' dat <- reproData(cadmium1)
+#' 
+#' \dontrun{
+#' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
+#' out <- reproFitTT(dat, stoc.part = "gammapoisson", 
+#'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
+#' 
+#' # (4) Summary look the estimated values (ECx and parameters)
+#' out$estim.ECx
+#' out$estim.par
+#' 
+#' # (5) Plot the fitted curve with credible limits
+#' plot(out, log.scale = TRUE, ci = TRUE,
+#'      main = "log-logistic gamma-poisson model")
+#' 
+#' # (6) Plot the fitted curve with ggplot style
+#' require("ggplot2")
+#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
+#'      fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
+#'      main = "Log-logistic response to concentration")
+#' 
+#' # (7) Add a specific legend with generic type
+#' plot(out, addlegend = FALSE)
+#' legend("bottomleft", legend = c("Without mortality", "With mortality"),
+#' pch = c(19, 1))
+#' }
+#' 
+#' @export
+#' 
+#' @import rjags
+#' 
+reproFitTT <- function(data,
+                       stoc.part = "bestfit",
+                       target.time = NULL,
+                       ecx,
+                       n.chains = 3,
+                       quiet = FALSE) {
+  # test class object
+  if (! is(data, "reproData"))
+    stop("reproFitTT: object of class reproData expected")
+  
+  # stocastic verification
+  stoc.partpossible <- c("poisson", "gammapoisson", "bestfit")
+  
+  if (!any(stoc.partpossible == stoc.part))
+    stop("Invalid value for argument [stoc.part]")
+  
+  # check 0 Nreprocumul
+  if (all(data$Nreprocumul == 0))
+    stop("Nreprocumul contains only 0 values !")
+  
+  # parameters
+  parameters <- list(poisson = c("d", "log10b", "log10e"),
+                     gammapoisson = c("d", "log10b","log10e", "log10omega"))
+  
+  # select Data at target.time
+  dataTT <- selectDataTT(data, target.time)
+  
+  # create priors parameters
+  jags.data <- reproCreateJagsData(stoc.part, dataTT)
+  
+  # Poisson model only 
+  if (stoc.part == "poisson") {
+    # Define model
+    poisson.model <- reproLoadPoissonModel(model.program = llm.poisson.model.text,
+                                           data = jags.data,
+                                           n.chains, quiet)
+    
+    # Determine sampling parameters
+    poisson.sampling.parameters <- modelSamplingParameters(poisson.model,
+                                                           parameters$poisson,
+                                                           n.chains, quiet)
+    
+    if (poisson.sampling.parameters$niter > 100000)
+      stop("The model needs too many iterations to provide reliable parameter estimates !")
+    
+    # calcul DIC
+    poisson.DIC <- calcDIC(poisson.model, poisson.sampling.parameters, quiet)
+    
+    # list of objet for the coda.sample function
+    coda.arg <- list(model = poisson.model,
+                     model.label = "P",
+                     niter = poisson.sampling.parameters$niter,
+                     thin = poisson.sampling.parameters$thin,
+                     nburnin = poisson.sampling.parameters$burnin,
+                     parameters = parameters$poisson,
+                     DIC = poisson.DIC)
+  }
+  
+  # Gamma-poisson model only
+  if (stoc.part == "gammapoisson") {
+    # Define model
+    gammapoisson.model <- reproLoadGammapoissonModel(model.program = llm.gammapoisson.model.text,
+                                                     data = jags.data,
+                                                     n.chains, quiet)
+    
+    # Determine sampling parameters
+    gammapoisson.sampling.parameters <- modelSamplingParameters(gammapoisson.model,
+                                                                parameters$gammapoisson,
+                                                                n.chains, quiet)
+    
+    if (gammapoisson.sampling.parameters$niter > 100000)
+      stop("The model needs too many iterations to provide reliable parameter estimates !")
+    
+    # calcul DIC
+    gammapoisson.DIC <- calcDIC(gammapoisson.model,
+                                gammapoisson.sampling.parameters, quiet)
+    
+    # list of objet for the coda.sample function
+    coda.arg <- list(model = gammapoisson.model,
+                     model.label = "GP",
+                     niter = gammapoisson.sampling.parameters$niter,
+                     thin = gammapoisson.sampling.parameters$thin,
+                     nburnin = gammapoisson.sampling.parameters$burnin,
+                     parameters = parameters$gammapoisson,
+                     DIC = gammapoisson.DIC)
+  }
+  
+  # Model Selection by the DIC
+  if (stoc.part == "bestfit") {
+    # Define models
+    poisson.model <- reproLoadPoissonModel(model.program = llm.poisson.model.text,
+                                           data = jags.data,
+                                           n.chains, quiet)
+    
+    gammapoisson.model <- reproLoadGammapoissonModel(model.program = llm.gammapoisson.model.text,
+                                                     data = jags.data,
+                                                     n.chains, quiet)
+    # Determine sampling parameters
+    poisson.sampling.parameters <- modelSamplingParameters(poisson.model,
+                                                           parameters$poisson,
+                                                           n.chains, quiet)
+    
+    gammapoisson.sampling.parameters <- modelSamplingParameters(gammapoisson.model,
+                                                                parameters$gammapoisson,
+                                                                n.chains, quiet)
+    
+    if (poisson.sampling.parameters$niter > 100000 && gammapoisson.sampling.parameters$niter > 100000)
+      stop("The model needs too many iterations to provide reliable parameter estimates !")
+    
+    # calcul DIC
+    poisson.DIC <- calcDIC(poisson.model, poisson.sampling.parameters, quiet)
+    gammapoisson.DIC <- calcDIC(gammapoisson.model,
+                                gammapoisson.sampling.parameters, quiet)
+    
+    if (gammapoisson.sampling.parameters$niter > 100000) {
+      # list of object for the coda.sample function
+      coda.arg <- list(model = poisson.model,
+                       model.label = "P",
+                       niter = poisson.sampling.parameters$niter,
+                       thin = poisson.sampling.parameters$thin,
+                       nburnin = poisson.sampling.parameters$burnin,
+                       parameters = parameters$poisson,
+                       DIC = poisson.DIC)
+    }
+    
+    if (poisson.sampling.parameters$niter > 100000) {
+      # list of object for the coda.sample function
+      coda.arg <- list(model = gammapoisson.model,
+                       model.label = "GP",
+                       niter = gammapoisson.sampling.parameters$niter,
+                       thin = gammapoisson.sampling.parameters$thin,
+                       nburnin = gammapoisson.sampling.parameters$burnin,
+                       parameters = parameters$gammapoisson,
+                       DIC = gammapoisson.DIC)
+    }
+    if (poisson.sampling.parameters$niter <= 100000 && gammapoisson.sampling.parameters$niter <= 100000) {
+      if (poisson.DIC <= (gammapoisson.DIC + 10)) {
+        # list of objet for the coda.sample function
+        coda.arg <- list(model = poisson.model,
+                         model.label = "P",
+                         niter = poisson.sampling.parameters$niter,
+                         thin = poisson.sampling.parameters$thin,
+                         nburnin = poisson.sampling.parameters$burnin,
+                         parameters = parameters$poisson,
+                         DIC = poisson.DIC)
+      } else {
+        # list of objet for the coda.sample function
+        coda.arg <- list(model = gammapoisson.model,
+                         model.label = "GP",
+                         niter = gammapoisson.sampling.parameters$niter,
+                         thin = gammapoisson.sampling.parameters$thin,
+                         nburnin = gammapoisson.sampling.parameters$burnin,
+                         parameters = parameters$gammapoisson,
+                         DIC = gammapoisson.DIC)
+      }
+    }
+  }
+  
+  # Sampling
+  prog.b <- ifelse(quiet == TRUE, "none", "text")
+  mcmc <- coda.samples(coda.arg$model,
+                       coda.arg$parameters,
+                       n.iter = coda.arg$niter,
+                       thin = coda.arg$thin,
+                       progress.bar = prog.b)
+  
+  # summarize estime.par et CIs
+  # calculate from the estimated parameters
+  estim.par <- reproPARAMS(mcmc, coda.arg$model.label)
+  
+  # ECx calculation  estimated ECx and their CIs 95%  
+  # vector of ECX
+  if (missing(ecx)) {
+    ecx <- c(5, 10, 20, 50)
+  }
+  estim.ECx <- estimXCX(mcmc, ecx, "EC")
+  
+  # check if the maximum measured concentration is in the EC50's range of
+  # 95% percentile
+  if (50 %in% ecx) {
+    EC50 <- log10(estim.ECx["EC50", "median"])
+    if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc))))
+      warning("The EC50 estimation lies outsides the range of tested concentration and may be unreliable !")
+  }
+  
+  # output
+  OUT <- list(DIC = coda.arg$DIC,
+              estim.ECx = estim.ECx,
+              estim.par = estim.par,
+              det.part = "loglogistic",
+              mcmc = mcmc,
+              model = coda.arg$model,
+              model.label = coda.arg$model.label,
+              parameters = coda.arg$parameters,
+              n.chains = summary(mcmc)$nchain,
+              n.iter = list(start = summary(mcmc)$start,
+                            end = summary(mcmc)$end),
+              n.thin = summary(mcmc)$thin,
+              jags.data = jags.data,
+              transformed.data = data,
+              dataTT = dataTT)
+  
+  class(OUT) <- "reproFitTT"
+  return(OUT)
+}
+
+
+
 reproCreateJagsData <- function(stoc.part, data) {
   # create the parameters to define the prior of the log-logistic model
   # for reproduction data analysis
@@ -177,502 +526,3 @@ llm.poisson.model.text <- "\nmodel # Loglogistic Poisson model\n{\n#\nfor (j in 
 
 llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\nfor (j in 1:n) # loop on replicates\n{\n# Explicit writting of a gamma-Poisson law for each replicate\n# the mean is given by a gamma law centered on the theoretical curve\nrate[j] <- d / (1 + pow(xconc[j]/e, b)) / omega\np[j] <- 1 / (Nindtime[j] * omega + 1)\nNcumul[j] ~ dnegbin(p[j], rate[j])\n}\n# Prior distributions\nd ~ dnorm(meand, taud)T(0,)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\nlog10omega ~ dunif(log10omegamin, log10omegamax)\n\nomega <- pow(10,log10omega)\nb <- pow(10,log10b)\ne <- pow(10,log10e)\n}\n"
 
-#' Print of \code{reproFitTT} object
-#' 
-#' This is the generic \code{print} S3 method for the \code{survFitTT} class.
-#' It prints the underlying JAGS model and some information on the Bayesian 
-#' inference procedure.
-#' 
-#' @param x An object of class \code{reproFitTT}
-#' @param \dots Further arguments to be passed to generic methods.
-#' 
-#' @seealso \code{\link{reproFitTT}}
-#' 
-#' @examples
-#' # (1) Load the data
-#' data(cadmium1)
-#' 
-#' # (2) Create a reproData object
-#' cadmium1 <- reproData(cadmium1)
-#' 
-#' \dontrun{
-#' # (3) Run the reproFitTT function with the log-logistic
-#' # model
-#' out <- reproFitTT(dat, ecx = c(5, 10, 15, 20, 30, 50, 80),
-#' quiet = TRUE)
-#' 
-#' # (4) Print the reproFitTT object
-#' out
-#' }
-#' 
-#' @keywords print
-#' 
-#' @export
-#' 
-print.reproFitTT <- function(x, ...) {
-  # print the model text and the Jags Computing information
-  # for an object of class reproFitTT
-  
-  # M.C.M.C. informations
-  cat("Model:\n")
-  print(x$model)
-  cat("\nComputing information:\n\n")
-  cat("\n", "Iterations = ", x$n.iter[["start"]], ":",
-      x$n.iter[["end"]], "\n", sep = "")
-  cat("Thinning interval =", x$n.thin, "\n")
-  cat("Number of chains =", x$n.chains, "\n")
-  cat("Sample size per chain =",
-      (x$n.iter[["end"]] - x$n.iter[["start"]]) / x$n.thin + 1, "\n")
-}
-
-#' Summary for reproFitTT objects
-#' 
-#' The summary shows the quantiles of priors and posteriors on parameters
-#' and the quantiles of estimated ECx.
-#' 
-#' @param object an object of class \code{reproFitTT}
-#' @param quiet when \code{FALSE}, prints summary on standard output
-#' @param \dots Further arguments to be passed to generic methods.
-#' 
-#' @return The function returns a list with the following fields:
-#' \item{Qpriors}{quantiles for the model's prior}
-#' \item{Qposteriors}{quantiles for the model's posteriors}
-#' \item{QECx}{quantiles for ECx values}
-#' 
-#' @seealso reproFitTT
-#' 
-#' @examples
-#' # (1) Load the data
-#' data(cadmium1)
-#' 
-#' # (2) Create a reproData object
-#' cadmium1 <- reproData(cadmium1)
-#' 
-#' \dontrun{
-#' # (3) Run the reproFitTT function with the log-logistic
-#' # model
-#' out <- reproFitTT(dat, ecx = c(5, 10, 15, 20, 30, 50, 80),
-#' quiet = TRUE)
-#' 
-#' # (4) summarize the reproFitTT object
-#' summary(out)
-#' }
-#' 
-#' @keywords summary
-#' 
-#' @export
-#' 
-summary.reproFitTT <- function(object, quiet = FALSE, ...) {
-  
-  # quantiles of priors parameters
-  n.iter <- object$n.iter$end - object$n.iter$start
-  
-  # b
-  log10b <- qunif(p = c(0.5, 0.025, 0.975),
-                  min = object$jags.data$log10bmin,
-                  max = object$jags.data$log10bmax)
-  
-  b <- 10^log10b
-  
-  # d
-  d <- qnorm(p = c(0.5, 0.025, 0.975),
-                  mean = object$jags.data$meand,
-                  sd = 1 / sqrt(object$jags.data$taud))
-  
-  # e
-  log10e <- qnorm(p = c(0.5, 0.025, 0.975),
-                  mean = object$jags.data$meanlog10e,
-                  sd = 1 / sqrt(object$jags.data$taulog10e))
-  
-  e <- 10^log10e
-  
-  if (object$model.label == "P") {
-    res <- rbind(b, d, e)
-  }
-  if (object$model.label == "GP") {
-    # omega
-    log10omega <- qunif(p = c(0.5, 0.025, 0.975),
-                    min = object$jags.data$log10omegamin,
-                    max = object$jags.data$log10omegamax)
-    
-    omega <- 10^log10omega
-    
-    res <- rbind(b, d, e, omega)
-  }
-  
-  ans1 <-  round(data.frame(res), digits = 3)
-  colnames(ans1) <- c("50%", "2.5%", "97.5%")
-  
-  # quantiles of estimated model parameters
-  ans2 <- round(object$estim.par, digits = 3)
-  colnames(ans2) <- c("50%", "2.5%", "97.5%")
-  
-  # estimated ECx and their CIs 95%
-  ans3 <- round(object$estim.ECx, digits = 3)
-  colnames(ans3) <- c("50%", "2.5%", "97.5%")
-  
-  if (! quiet) {
-    cat("Summary: \n\n")
-    if (object$model.label == "GP")
-      cat("The ", object$det.part, " model with a Gamma Poisson stochastic part was used !\n\n")
-    if(object$model.label == "P")
-      cat("The ", object$det.part, " model with a Poisson stochastic part was used !\n\n")
-    cat("Quantiles of priors on parameters: \n\n")
-    print(ans1)
-    cat("\nQuantiles of posteriors on parameters: \n\n")
-    print(ans2)
-    cat("\nQuantiles of the estimated ECx:\n\n")
-    print(ans3)
-  }
-  
-  invisible(list(Qpriors = ans1,
-                 Qposteriors = ans2,
-                 QECx = ans3))
-}
-
-#' Fits a Bayesian exposure-response model for target-time reproduction analysis
-#' 
-#' This function estimates a model of the cumulated reproduction outputs of a 
-#' population in a given time period in presence of mortality.
-#' 
-#' Because some individuals may die during the observation period, the 
-#' reproduction rate alone is not sufficient to account for the observed number
-#' of offspring. In addition, we need the time individuals have stayed alive
-#' during the experiment. The \code{reproFitTT} function estimates the number 
-#' of individual-days in an experiment between its start and the target time. 
-#' This covariable is then used to estimate a relation between the toxicant
-#' concentration and the reproduction rate \emph{per individual-day}.
-#' 
-#' The \code{reproFitTT} function fits two models, one where inter-individual 
-#' variability is neglected ("Poisson" model) and one where it is taken into
-#' account ("gamma-Poisson" model). When setting \code{stoc.part} to 
-#' \code{"bestfit"}, a model comparison procedure is used to choose between
-#' them. More details are presented in the vignette accompanying the package. 
-#' 
-#' @param data an object of class \code{reproData}
-#' @param stoc.part stochastic part of the model. Possible values are \code{"bestfit"},
-#' \code{"poisson"} and \code{"gammapoisson"}
-#' @param target.time defines the observation period. By default the last time point
-#' @param ecx values of \eqn{x} to calculate a desired \eqn{EC_{x}}{ECx}
-#' @param n.chains number of MCMC chains. The minimum required number of chains is 
-#' @param quiet if \code{TRUE}, does not print messages and progress bars from JAGS
-#' 
-#' 
-#' @return The function returns an object of class \code{reproFitTT} which is a list
-#' of the following objects:
-#' \item{DIC}{DIC value of the selected model}
-#' \item{estim.ECx}{a table of the estimated 5, 10, 20 and 50 \% effective
-#' concentrations (by default) and their 95 \% credible intervals}
-#' \item{estim.par}{a table of the estimated parameters as medians and 95 \%
-#' credible intervals}
-#' \item{mcmc}{an object of class \code{mcmc.list} with the posterior distributions}
-#' \item{model}{a JAGS model object}
-#' \item{parameters}{a list of the parameters names used in the model}
-#' \item{n.chains}{an integer value corresponding to the number of chains used
-#' for the MCMC computation.}
-#' \item{n.iter}{a list of two indices indicating the beginning and
-#' the end of monitored iterations}
-#' \item{n.thin}{a numerical value corresponding to the thinning interval}
-#' 
-#' @author Marie Laure Delignette-Muller
-#' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
-#' <philippe.ruiz@@univ-lyon1.fr>
-#' 
-# FIXME
-# \describe{
-# 
-# Credible limits: For 100 values of concentrations regularly spread within
-# the range of tested concentrations the joint posterior distribution of
-# parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
-# offspring per individual-day for various replicates. For each concentration,
-# 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
-# there is a point estimate and a 95 \% credible interval (Delignette-Muller
-# et al., 2014).
-# 
-# DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
-# al. (2002) is provided by the \code{dic.samples} function. The DIC is a
-# goodness-of-fit criterion penalized by the complexity of the model
-# (Delignette-Muller et al., 2014).
-# 
-# Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
-# control diagnostic based on a criterion that calculates the appropriate
-# number of iterations required to accurately estimate the parameter
-# quantiles. The Raftery and Lewis's diagnostic value used in the
-# \code{reproFitTT} function is the \code{resmatrix} object. See the
-# \code{\link[coda]{raftery.diag}} help for more details.
-# 
-# Model selection: When \code{stoc.part = "bestfit"}, the \code{reproFitTT}
-# function chooses itself between the Poisson and the Gamma-Poisson model
-# depending on the number of MCMC samples and on the DIC values.  The minimum
-# number of MCMC samples for the pilot run is provided by the Raftery and
-# Lewis's diagnostic (Raftery and Lewis 1992). If this number is less than 100
-# 000 for the Poisson and the Gamma-Poisson model and if the DIC difference
-# between Poisson and Gamma-poisson models is small (typically less than 10),
-# then the Poisson model is selected. If this number is more than 100 000 for
-# only one model, the other one is selected.
-# }
-# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-# \code{\link[rjags]{dic.samples}}, \code{\link[coda]{raftery.diag}}
-# and \code{\link[ggplot2]{ggplot}}
-# 
-# @references Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
-# (2014) Statistical handling of reproduction data for exposure-response
-# modelling.
-# \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
-# 
-# Plummer, M. (2013) JAGS Version 3.4.0 user manual.
-# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
-# 
-# Raftery A.E. and Lewis, S.M. (1992) One long run with diagnostics:
-# Implementation strategies for Markov chain Monte Carlo. \emph{Statistical
-# Science}, 7, 493-497.
-# 
-# Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
-# measures of model complexity and fit (with discussion).  \emph{Journal of
-# the Royal Statistical Society}, Series B 64, 583-639.
-# 
-#' 
-#' @keywords estimation
-#' 
-#' @examples
-#' 
-#' # (1) Load the data
-#' data(cadmium1)
-#' 
-#' # (2) Create an object of class "reproData"
-#' dat <- reproData(cadmium1)
-#' 
-#' \dontrun{
-#' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
-#' out <- reproFitTT(dat, stoc.part = "gammapoisson", 
-#'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
-#' 
-#' # (4) Summary look the estimated values (ECx and parameters)
-#' out$estim.ECx
-#' out$estim.par
-#' 
-#' # (5) Plot the fitted curve with credible limits
-#' plot(out, log.scale = TRUE, ci = TRUE,
-#'      main = "log-logistic gamma-poisson model")
-#' 
-#' # (6) Plot the fitted curve with ggplot style
-#' require("ggplot2")
-#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
-#'      main = "Log-logistic response to concentration")
-#' 
-#' # (7) Add a specific legend with generic type
-#' plot(out, addlegend = FALSE)
-#' legend("bottomleft", legend = c("Without mortality", "With mortality"),
-#' pch = c(19, 1))
-#' }
-#' 
-#' @export
-#' 
-#' @import rjags
-#' 
-reproFitTT <- function(data,
-                       stoc.part = "bestfit",
-                       target.time = NULL,
-                       ecx,
-                       n.chains = 3,
-                       quiet = FALSE) {
-  # test class object
-  if (! is(data, "reproData"))
-    stop("reproFitTT: object of class reproData expected")
-
-  # stocastic verification
-  stoc.partpossible <- c("poisson", "gammapoisson", "bestfit")
-  
-  if (!any(stoc.partpossible == stoc.part))
-    stop("Invalid value for argument [stoc.part]")
-  
-  # check 0 Nreprocumul
-  if (all(data$Nreprocumul == 0))
-    stop("Nreprocumul contains only 0 values !")
-  
-  # parameters
-  parameters <- list(poisson = c("d", "log10b", "log10e"),
-                     gammapoisson = c("d", "log10b","log10e", "log10omega"))
-
-  # select Data at target.time
-  dataTT <- selectDataTT(data, target.time)
-
-  # create priors parameters
-  jags.data <- reproCreateJagsData(stoc.part, dataTT)
-
-  # Poisson model only 
-  if (stoc.part == "poisson") {
-    # Define model
-    poisson.model <- reproLoadPoissonModel(model.program = llm.poisson.model.text,
-                                           data = jags.data,
-                                           n.chains, quiet)
-
-  # Determine sampling parameters
-  poisson.sampling.parameters <- modelSamplingParameters(poisson.model,
-                                                         parameters$poisson,
-                                                         n.chains, quiet)
-
-  if (poisson.sampling.parameters$niter > 100000)
-    stop("The model needs too many iterations to provide reliable parameter estimates !")
-
-  # calcul DIC
-  poisson.DIC <- calcDIC(poisson.model, poisson.sampling.parameters, quiet)
-
-  # list of objet for the coda.sample function
-  coda.arg <- list(model = poisson.model,
-                   model.label = "P",
-                   niter = poisson.sampling.parameters$niter,
-                   thin = poisson.sampling.parameters$thin,
-                   nburnin = poisson.sampling.parameters$burnin,
-                   parameters = parameters$poisson,
-                   DIC = poisson.DIC)
-  }
-
-  # Gamma-poisson model only
-  if (stoc.part == "gammapoisson") {
-    # Define model
-    gammapoisson.model <- reproLoadGammapoissonModel(model.program = llm.gammapoisson.model.text,
-                                                     data = jags.data,
-                                                     n.chains, quiet)
-
-    # Determine sampling parameters
-    gammapoisson.sampling.parameters <- modelSamplingParameters(gammapoisson.model,
-                                                                parameters$gammapoisson,
-                                                                n.chains, quiet)
-
-    if (gammapoisson.sampling.parameters$niter > 100000)
-      stop("The model needs too many iterations to provide reliable parameter estimates !")
-
-    # calcul DIC
-    gammapoisson.DIC <- calcDIC(gammapoisson.model,
-                                gammapoisson.sampling.parameters, quiet)
-
-    # list of objet for the coda.sample function
-    coda.arg <- list(model = gammapoisson.model,
-                     model.label = "GP",
-                     niter = gammapoisson.sampling.parameters$niter,
-                     thin = gammapoisson.sampling.parameters$thin,
-                     nburnin = gammapoisson.sampling.parameters$burnin,
-                     parameters = parameters$gammapoisson,
-                     DIC = gammapoisson.DIC)
-  }
-
-  # Model Selection by the DIC
-  if (stoc.part == "bestfit") {
-    # Define models
-    poisson.model <- reproLoadPoissonModel(model.program = llm.poisson.model.text,
-                                           data = jags.data,
-                                           n.chains, quiet)
-
-    gammapoisson.model <- reproLoadGammapoissonModel(model.program = llm.gammapoisson.model.text,
-                                                     data = jags.data,
-                                                     n.chains, quiet)
-    # Determine sampling parameters
-    poisson.sampling.parameters <- modelSamplingParameters(poisson.model,
-                                                           parameters$poisson,
-                                                           n.chains, quiet)
-
-    gammapoisson.sampling.parameters <- modelSamplingParameters(gammapoisson.model,
-                                                                parameters$gammapoisson,
-                                                                n.chains, quiet)
-
-    if (poisson.sampling.parameters$niter > 100000 && gammapoisson.sampling.parameters$niter > 100000)
-      stop("The model needs too many iterations to provide reliable parameter estimates !")
-
-    # calcul DIC
-    poisson.DIC <- calcDIC(poisson.model, poisson.sampling.parameters, quiet)
-    gammapoisson.DIC <- calcDIC(gammapoisson.model,
-                                gammapoisson.sampling.parameters, quiet)
-
-    if (gammapoisson.sampling.parameters$niter > 100000) {
-      # list of object for the coda.sample function
-      coda.arg <- list(model = poisson.model,
-                       model.label = "P",
-                       niter = poisson.sampling.parameters$niter,
-                       thin = poisson.sampling.parameters$thin,
-                       nburnin = poisson.sampling.parameters$burnin,
-                       parameters = parameters$poisson,
-                       DIC = poisson.DIC)
-    }
-
-    if (poisson.sampling.parameters$niter > 100000) {
-      # list of object for the coda.sample function
-      coda.arg <- list(model = gammapoisson.model,
-                       model.label = "GP",
-                       niter = gammapoisson.sampling.parameters$niter,
-                       thin = gammapoisson.sampling.parameters$thin,
-                       nburnin = gammapoisson.sampling.parameters$burnin,
-                       parameters = parameters$gammapoisson,
-                       DIC = gammapoisson.DIC)
-    }
-    if (poisson.sampling.parameters$niter <= 100000 && gammapoisson.sampling.parameters$niter <= 100000) {
-      if (poisson.DIC <= (gammapoisson.DIC + 10)) {
-        # list of objet for the coda.sample function
-        coda.arg <- list(model = poisson.model,
-                         model.label = "P",
-                         niter = poisson.sampling.parameters$niter,
-                         thin = poisson.sampling.parameters$thin,
-                         nburnin = poisson.sampling.parameters$burnin,
-                         parameters = parameters$poisson,
-                         DIC = poisson.DIC)
-      } else {
-        # list of objet for the coda.sample function
-        coda.arg <- list(model = gammapoisson.model,
-                         model.label = "GP",
-                         niter = gammapoisson.sampling.parameters$niter,
-                         thin = gammapoisson.sampling.parameters$thin,
-                         nburnin = gammapoisson.sampling.parameters$burnin,
-                         parameters = parameters$gammapoisson,
-                         DIC = gammapoisson.DIC)
-      }
-    }
-  }
-
-  # Sampling
-  prog.b <- ifelse(quiet == TRUE, "none", "text")
-  mcmc <- coda.samples(coda.arg$model,
-                       coda.arg$parameters,
-                       n.iter = coda.arg$niter,
-                       thin = coda.arg$thin,
-                       progress.bar = prog.b)
-
-  # summarize estime.par et CIs
-  # calculate from the estimated parameters
-  estim.par <- reproPARAMS(mcmc, coda.arg$model.label)
-
-  # ECx calculation  estimated ECx and their CIs 95%  
-  # vector of ECX
-  if (missing(ecx)) {
-    ecx <- c(5, 10, 20, 50)
-  }
-  estim.ECx <- estimXCX(mcmc, ecx, "EC")
-
-  # check if the maximum measured concentration is in the EC50's range of
-  # 95% percentile
-  if (50 %in% ecx) {
-    EC50 <- log10(estim.ECx["EC50", "median"])
-    if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc))))
-      warning("The EC50 estimation lies outsides the range of tested concentration and may be unreliable !")
-  }
-
- # output
- OUT <- list(DIC = coda.arg$DIC,
-             estim.ECx = estim.ECx,
-             estim.par = estim.par,
-             det.part = "loglogistic",
-             mcmc = mcmc,
-             model = coda.arg$model,
-             model.label = coda.arg$model.label,
-             parameters = coda.arg$parameters,
-             n.chains = summary(mcmc)$nchain,
-             n.iter = list(start = summary(mcmc)$start,
-                           end = summary(mcmc)$end),
-             n.thin = summary(mcmc)$thin,
-             jags.data = jags.data,
-             transformed.data = data,
-             dataTT = dataTT)
- 
- class(OUT) <- "reproFitTT"
- return(OUT)
-}

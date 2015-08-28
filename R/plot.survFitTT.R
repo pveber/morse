@@ -1,3 +1,124 @@
+#' Plotting method for \code{survFitTT} objects
+#' 
+#' This function plots exposure-response fits for target time survival
+#' analysis (a.k.a. \code{survFitTT} objects).
+#' 
+#' The fitted curve represents the \strong{estimated mean survival rate} after
+#' the target time has passed as a function of the concentration of pollutant; 
+#' the black dots depict the \strong{observed mean survival rate}. When 
+#' \code{ci = TRUE}, the function plots both credible intervals for the 
+#' estimated mean (by default the red area around the fitted curve) and
+#' confidence intervals for the observed mean (as black error bars). Both types
+#' of intervals are taken at the same level. Typically a good fit is expected
+#' to display a large overlap between the two intervals.
+#' 
+#' @param x an object of class \code{survFitTT}
+#' @param xlab a title for the \eqn{x}-axis
+#' @param ylab a title for the \eqn{y}-axis
+#' @param main main title for the plot
+#' @param fitcol color of the fitted curve
+#' @param fitlty line type of the fitted curve
+#' @param fitlwd width of the fitted curve
+#' @param ci if \code{TRUE}, draws the 95 \% confidence interval on observed data
+#' @param cicol color of the 95 \% confidence interval limits
+#' @param cilty line type for the 95 \% confidence interval limits
+#' @param cilwd width of the 95 \% confidence interval limits
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param \dots Further arguments to be passed to generic methods.
+#' @note When \code{style = "ggplot"}, the function calls package
+#' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
+#' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
+#' 
+#' @keywords plot 
+#'
+#' @export
+#'
+#' @import grDevices
+#' @import ggplot2
+#' @importFrom gridExtra grid.arrange arrangeGrob
+#' @importFrom grid grid.rect gpar
+#' @importFrom graphics plot
+plot.survFitTT <- function(x,
+                           xlab = "Concentrations",
+                           ylab = "Survival rate",
+                           main = NULL,
+                           fitcol = "red",
+                           fitlty = 1,
+                           fitlwd = 1,
+                           ci = FALSE,
+                           cicol = "pink1",
+                           cilty = 1,
+                           cilwd = 1,
+                           addlegend = FALSE,
+                           log.scale = FALSE,
+                           style = "generic", ...) {
+  # plot the fitted curve estimated by survFitTT
+  # INPUTS
+  # - x:  survFitTt object
+  # - xlab : label x
+  # - ylab : label y
+  # - main : main title
+  # - fitcol : color fitted curve
+  # - fitlty : type line fitted curve
+  # - fitlwd : width line fitted curve
+  # - ci : credible interval, boolean
+  # - cicol : color ci ribbon
+  # - cilty : type line ci ribbon
+  # - cilwd : width line ci ribbon
+  # - addlegend : boolean
+  # - log.scale : x log option
+  # - style : generic or ggplot
+  # OUTPUT:
+  # - plot of fitted regression
+  
+  # Selection of datapoints that can be displayed given the type of scale
+  sel <- if(log.scale) x$dataTT$conc > 0 else TRUE
+  
+  dataTT <- x$dataTT[sel, ]
+  dataTT$resp <- dataTT$Nsurv / dataTT$Ninit
+  # data points are systematically pooled, since our model does not
+  # take individual variation into account
+  dataTT <- aggregate(resp ~ conc, dataTT, mean)
+  transf_data_conc <- optLogTransform(log.scale, dataTT$conc)
+  
+  # Concentration values used for display in linear scale
+  display.conc <- (function() {
+    x <- optLogTransform(log.scale, dataTT$conc)
+    s <- seq(min(x),max(x), length = 100)
+    if(log.scale) exp(s) else s
+  })()
+  
+  # Possibly log transformed concentration values for display
+  curv_conc <- optLogTransform(log.scale, display.conc)
+  
+  curv_resp <- survEvalFit(x, display.conc)
+  
+  conf.int <- if(ci) { survLlbinomConfInt(x, log.scale) } else NULL
+  cred.int <- if(ci) { survMeanCredInt(x, display.conc) } else NULL
+  
+  if (style == "generic") {
+    survFitPlotGeneric(x,
+                       dataTT$conc, transf_data_conc, dataTT$resp,
+                       curv_conc, curv_resp,
+                       conf.int, cred.int, log.scale,
+                       xlab, ylab, fitcol, fitlty, fitlwd,
+                       main, addlegend,
+                       cicol, cilty, cilwd)
+  }
+  else if (style == "ggplot") {
+    survFitPlotGG(x,
+                  dataTT$conc, transf_data_conc, dataTT$resp,
+                  curv_conc, curv_resp,
+                  conf.int, cred.int,
+                  xlab, ylab, fitcol, fitlty, fitlwd,
+                  main, addlegend,
+                  cicol, cilty, cilwd / 2)
+  }
+  else stop("Unknown style")
+}
+
 survEvalFit <- function(fit, x) {
   # eval the fitted function on x
   # INPUT :
@@ -381,123 +502,3 @@ survFitPlotGG <- function(x,
   }
 }
 
-#' Plotting method for \code{survFitTT} objects
-#' 
-#' This function plots exposure-response fits for target time survival
-#' analysis (a.k.a. \code{survFitTT} objects).
-#' 
-#' The fitted curve represents the \strong{estimated mean survival rate} after
-#' the target time has passed as a function of the concentration of pollutant; 
-#' the black dots depict the \strong{observed mean survival rate}. When 
-#' \code{ci = TRUE}, the function plots both credible intervals for the 
-#' estimated mean (by default the red area around the fitted curve) and
-#' confidence intervals for the observed mean (as black error bars). Both types
-#' of intervals are taken at the same level. Typically a good fit is expected
-#' to display a large overlap between the two intervals.
-#' 
-#' @param x an object of class \code{survFitTT}
-#' @param xlab a title for the \eqn{x}-axis
-#' @param ylab a title for the \eqn{y}-axis
-#' @param main main title for the plot
-#' @param fitcol color of the fitted curve
-#' @param fitlty line type of the fitted curve
-#' @param fitlwd width of the fitted curve
-#' @param ci if \code{TRUE}, draws the 95 \% confidence interval on observed data
-#' @param cicol color of the 95 \% confidence interval limits
-#' @param cilty line type for the 95 \% confidence interval limits
-#' @param cilwd width of the 95 \% confidence interval limits
-#' @param addlegend if \code{TRUE}, adds a default legend to the plot
-#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param \dots Further arguments to be passed to generic methods.
-#' @note When \code{style = "ggplot"}, the function calls package
-#' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
-#' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
-#' 
-#' @keywords plot 
-#'
-#' @export
-#'
-#' @import grDevices
-#' @import ggplot2
-#' @importFrom gridExtra grid.arrange arrangeGrob
-#' @importFrom grid grid.rect gpar
-#' @importFrom graphics plot
-plot.survFitTT <- function(x,
-                           xlab = "Concentrations",
-                           ylab = "Survival rate",
-                           main = NULL,
-                           fitcol = "red",
-                           fitlty = 1,
-                           fitlwd = 1,
-                           ci = FALSE,
-                           cicol = "pink1",
-                           cilty = 1,
-                           cilwd = 1,
-                           addlegend = FALSE,
-                           log.scale = FALSE,
-                           style = "generic", ...) {
-  # plot the fitted curve estimated by survFitTT
-  # INPUTS
-  # - x:  survFitTt object
-  # - xlab : label x
-  # - ylab : label y
-  # - main : main title
-  # - fitcol : color fitted curve
-  # - fitlty : type line fitted curve
-  # - fitlwd : width line fitted curve
-  # - ci : credible interval, boolean
-  # - cicol : color ci ribbon
-  # - cilty : type line ci ribbon
-  # - cilwd : width line ci ribbon
-  # - addlegend : boolean
-  # - log.scale : x log option
-  # - style : generic or ggplot
-  # OUTPUT:
-  # - plot of fitted regression
-  
-  # Selection of datapoints that can be displayed given the type of scale
-  sel <- if(log.scale) x$dataTT$conc > 0 else TRUE
-  
-  dataTT <- x$dataTT[sel, ]
-  dataTT$resp <- dataTT$Nsurv / dataTT$Ninit
-  # data points are systematically pooled, since our model does not
-  # take individual variation into account
-  dataTT <- aggregate(resp ~ conc, dataTT, mean)
-  transf_data_conc <- optLogTransform(log.scale, dataTT$conc)
-  
-  # Concentration values used for display in linear scale
-  display.conc <- (function() {
-    x <- optLogTransform(log.scale, dataTT$conc)
-    s <- seq(min(x),max(x), length = 100)
-    if(log.scale) exp(s) else s
-  })()
-  
-  # Possibly log transformed concentration values for display
-  curv_conc <- optLogTransform(log.scale, display.conc)
-  
-  curv_resp <- survEvalFit(x, display.conc)
-  
-  conf.int <- if(ci) { survLlbinomConfInt(x, log.scale) } else NULL
-  cred.int <- if(ci) { survMeanCredInt(x, display.conc) } else NULL
-  
-  if (style == "generic") {
-    survFitPlotGeneric(x,
-                       dataTT$conc, transf_data_conc, dataTT$resp,
-                       curv_conc, curv_resp,
-                       conf.int, cred.int, log.scale,
-                       xlab, ylab, fitcol, fitlty, fitlwd,
-                       main, addlegend,
-                       cicol, cilty, cilwd)
-  }
-  else if (style == "ggplot") {
-    survFitPlotGG(x,
-                  dataTT$conc, transf_data_conc, dataTT$resp,
-                  curv_conc, curv_resp,
-                  conf.int, cred.int,
-                  xlab, ylab, fitcol, fitlty, fitlwd,
-                  main, addlegend,
-                  cicol, cilty, cilwd / 2)
-  }
-  else stop("Unknown style")
-}
