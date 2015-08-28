@@ -144,7 +144,7 @@ llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n
 #' # (3) Run the survFitTT function with the log-logistic
 #' # binomial model
 #' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
-#' quiet = TRUE)
+#'                  quiet = TRUE)
 #' 
 #' # (4) Print the survFitTT object
 #' out
@@ -196,7 +196,7 @@ print.survFitTT <- function(x, ...) {
 #' # (3) Run the survFitTT function with the log-logistic
 #' # binomial model
 #' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
-#' quiet = TRUE)
+#'                  quiet = TRUE)
 #' 
 #' # (4) summarize the survFitTT object
 #' summary(out)
