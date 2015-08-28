@@ -1,6 +1,6 @@
 ---
 title: "MORSE tutorial"
-author: "Philippe Ruiz, Philippe Veber, Marie-Laure Delignette-Muller"
+author: "Marie-Laure Delignette-Muller, Philippe Ruiz and Philippe Veber"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 self_contained: no
@@ -13,7 +13,7 @@ vignette: >
 
 ```{r,include=FALSE, echo=FALSE}
 
-knitr::opts_chunk$set(fig.width = 5, 
+knitr::opts_chunk$set(fig.width = 7, 
                       fig.height = 4, 
                       cache = TRUE)
 
@@ -25,87 +25,126 @@ library(morse)
 library(ggplot2)
 ```
 
+The package MORSE is devoted to the analysis of data from standard toxicity
+bioassays. It provides a simple workflow to explore/visualize a dataset, and
+compute estimations of risk assessment indicators. This document illustrates
+a typical use of MORSE on survival and reproduction data, which can be followed
+to analyze new datasets.
+
 # Survival data analysis
 
 The following example shows all the stages to perform survival analysis on
 standard bioassay data and produce estimate values of the $LC_x$.
-We will use a dataset of the library named `cadmium1`, which contains both
-survival and reproduction data from a chronic laboratory bioassay with
-\emph{Daphnia magna} freshwater invertebrate exposed to five concentrations of one metal contaminant (cadmium) during 21 days.
+We will use a dataset of the library named `cadmium2`, which contains both
+survival and reproduction data from a chronic laboratory bioassay. In this
+experiment, snails were exposed to six concentrations of a metal contaminant
+(cadmium) during 56 days.
 
+## Step 1: check the structure and the dataset integrity
 
-The two first parts are the sames as the reproduction analysis.
+The data from a survival assay should be gathered in a `data.frame` with a 
+specific layout. This is documented in the paragraph on `survData` in the 
+reference manual, and you can also inspect one of the datasets provided in 
+the package (like `cadmium2`). First, we load the dataset and use the function
+`survDataCheck` to verify that it has the expected layout:
 
-* Step one, check the structure and the dataset integrity
-   
 ```{r, cache=TRUE}
-data(cadmium1)
-survDataCheck(cadmium1, diagnosis.plot = TRUE)
+data(cadmium2)
+survDataCheck(cadmium2, diagnosis.plot = TRUE)
 ```
 
-* Step two, create a `survData` object
+## Step 2: create a `survData` object
+
+The class `survData` represents \emph{validated} survival data and is the 
+basic representation used for the subsequent operations. Note that if the
+call to `survDataCheck` reports no error, it is guaranteed that `survData`
+will not fail.
+
+```{r, cache=TRUE}
+dat <- survData(cadmium2)
+head(dat)
+```
+
+## Step 3: visualize your dataset
   
+The function `plot` can be used to plot the number of surviving individuals
+as a function of time for all concentrations and replicates.
+
 ```{r, cache=TRUE}
-dat2 <- survData(cadmium1)
-dat2
+plot(dat, style = "ggplot", pool.replicate = FALSE)
 ```
 
-* Step three, plot the `survData` object to analyse the data
-  
-`plot()` plots the number of surviving individuals depending on the time for all
-concentrations and replicates.
+Two graphical styles are available, `"generic"` for standar `R` plots or
+`"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`
+is `TRUE` the datapoints for a given time and concentration are pooled
+and only the mean number of survivors is plotted. To observe the full
+dataset, we set this option to `FALSE`.
 
+By fixing the concentration to a (tested) value, we can visualize one subplot 
+in particular:
 ```{r, cache=TRUE}
-plot(dat2, style = "ggplot", pool.replicate = FALSE)
-```
-
-`plot(, target.time)` plots the number of surviving individuals depending on the
-concentration for a fixed time point.
-  
-```{r, cache=TRUE}
-plot(dat2, target.time = 21, pool.replicate = FALSE, style = "ggplot",
-     addlegend = TRUE)
-```
-
-`plot(, concentration)` plots the number of surviving individuals depending on the time for a fixed concentration.
-
-```{r, cache=TRUE}
-plot(dat2, concentration = 4.36, addlegend = TRUE,
+plot(dat, concentration = 124, addlegend = TRUE,
      pool.replicate = FALSE, style = "ggplot")
 ```
 
-and `plot(, conctration, target.time)` compares the number of surviving individuals of each replicate for a fixed concentration and a fixed time to the control at the same time.
 
+We can also plot the number of surviving individuals at a given time point as a function
+of the concentration, by fixing `target.time` instead of `concentration`:
+  
 ```{r, cache=TRUE}
-plot(dat2, concentration = 4.36, target.time = 21)
-```
-
-The `summary()` provides informations on the experimental design.
-
-```{r, cache=TRUE}
-dat2
-summary(dat2)
-```
-
-
-* Step four, fit an exposure-response model to the survival data at final time
-
-Now it is possible to estimate the parameters of the log-logistic exposure-response model with the `survFitTT()` function.
-This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
-
-```{r, results="hide", cache=TRUE}
-out2 <- survFitTT(dat2,
-                  lcx = c(10, 20, 30, 40, 50))
-```
-
-The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $LC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% confidence interval on observed data.
-
-```{r, cache=TRUE}
-summary(out2)
-plot(out2, log.scale = TRUE, ci = TRUE, style = "ggplot",
+plot(dat, target.time = 21, pool.replicate = FALSE, style = "ggplot",
      addlegend = TRUE)
 ```
-  
+
+
+Finally, when fixing both `concentration` and `target.time`, we can compare one condition
+to the control:
+
+```{r, cache=TRUE}
+plot(dat, concentration = 232, target.time = 21)
+```
+
+The function `summary` provides some descriptive statistics on the experimental design.
+
+```{r, cache=TRUE}
+summary(dat)
+```
+
+
+## Step 4: fit an exposure-response model to the survival data at target time
+
+Now we are ready to fit a probabilistic model for the survival data, which aims
+at finding the relation between concentration of pollutant and mean survival rate
+at the target time. Our model assumes the latter is a log-logistic function of
+the former, and the work here is to estimate the parameters of this log-logistic
+function. Once we have estimated the parameters, we can then calculate the $LC_x$
+for any $x$. All this work is performed by the `survFitTT` function, which requires
+a `survData` object and the levels of $LC_x$ we need:
+
+```{r, results="hide", cache=TRUE}
+fit <- survFitTT(dat,
+                lcx = c(10, 20, 30, 40, 50))
+```
+
+The return value is an object of class `survFitTT` and provides the estimated 
+parameters as a probability distribution, in order to model our uncertainty on
+their true value. For the parameters of the models, as well as the $LC_x$
+values, we report the median (as the estimated value) and the 2.5 \% and 97.5 \%
+quantiles of the distribution (as a measure of uncertainty, a.k.a. credible
+intervals). These can seen using the `summary` method:
+
+
+```{r, cache=TRUE}
+summary(fit)
+```
+
+or in a plot:
+```{r, cache=TRUE}
+plot(fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
+     addlegend = TRUE)
+```
+
+
 <!--
 * Step five, check the obseved versus predicted values
   
@@ -114,86 +153,92 @@ ppc(out2, style = "ggplot")
 ```
 -->
 
-# Reproduction data analyses
-  
-In this example we fit an exposure-response curve on survival data at final
-time. We use the same dataset as the survival analyse.
-  
-* Step one, check the structure and the dataset integrity
-  
-```{r, cache=TRUE}
-data(cadmium1)
-reproDataCheck(cadmium1, diagnosis.plot = TRUE)
-```
-
-The function `reproDataCheck()` performs several tests on the integrity of the
-dataset and returns explicit error messages (if necessary). If no error was
-detected in the dataset an object of class `reproData` can be created.
-If the `reproDataCheck()` function finds an increase of alive individuals with time and if the `diagnosis.plot` argument is `TRUE`, the function plots the number of survivor in function of time per concentration and replicate.
-  
-* Step two, create a `reproData` object
-  
-```{r, cache=TRUE}
-dat1 <- reproData(cadmium1)
-```
-
-The new object contains the reorder dataframe with new datas (see the modelling vignette for more details).
-    
-* Step three, plot the `reproData` object
-  
-`plot()` is an S3 method for the `reproData` class and plots the cmulated number of offsprings depending on the time for all concentrations and replicates. Two graphical styles are available, `"generic"` for standar `R` plots or `"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`is `TRUE` the observed datapoints for a same replicat are pooled together and the mean of the replicate is plotted.
-
-```{r, cache=TRUE}
-plot(dat1, style = "ggplot", pool.replicate = FALSE)
-```
-
-`plot(, target.time)` plots the cumulated number of offsprings depending on the concentration for a fixed target time.
-  
-```{r, cache=TRUE}
-plot(dat1, target.time = 21, addlegend = TRUE, style = "ggplot",
-     pool.replicate = FALSE)
-```
-
-`plot(, concentration)` plots the cumulated number of offsprings depending on the time for a fixed concentration.
-
-```{r, cache=TRUE}
-plot(dat1, concentration = 4.36, addlegend = TRUE, style = "ggplot",
-     pool.replicate = FALSE)
-```
-
-and `plot(, conctration, target.time)` compares the cumulated number of offsprings of each replicate for a fixed concentration and a fixed time to the control at the same time.
-
-```{r, cache=TRUE}
-plot(dat1, concentration = 4.36, target.time = 21, style = "ggplot")
-```
-
-The `summary()` provides informations on the experimental design.
-
-```{r, cache=TRUE}
-dat1
-summary(dat1)
-```
-
-* Step four, fit an exposure-response model to the reproduction data at target time
-
-Now it is possible to estimate the parameters of the log-logistic exposure-response model with the `reproFitTT()` function.
-This function calls the `JAGS` program to estimate the model parameters using the bayesian inference.
-
-By choosing the `bestfit` option for the `stoc.part` argument we let the function
-choose the best stochastic part of the model.
+Note that `survFitTT` will warn you if the estimated $LC_{50}$ lies outside the
+range of tested concentrations:
 
 ```{r, results="hide", cache=TRUE}
-out <- reproFitTT(dat1, stoc.part = "bestfit",
-                  ecx = c(10, 20, 30, 40, 50))
+data("cadmium1")
+fit <- survFitTT(survData(cadmium1),
+                lcx = c(10, 20, 30, 40, 50))
+plot(fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
+     addlegend = TRUE)
 ```
 
-The median and 2.5 \% and 97.5 \% of priors and posteriors on estimated parameter distributions and on $EC_{x}$ estimates are given by the `summary()`. The function `plot()` draws the exposure-response curve with the 95 \% credible limits superimposed to experimental data at target-time.
+In this example, the experimental design did not include sufficiently high
+concentrations, and we are missing measurements that would have a major 
+influence on the final estimation. For this reason this result should be 
+considered unreliable.
 
+# Reproduction data analyses
+  
+The steps in reproduction data analysis are absolutely analogous to what we
+described for survival data. This time the goal is to estimate the relation 
+between pollutant concentration and reproduction rate per individual-day. 
+
+Here is a typical session:
 ```{r, cache=TRUE}
-summary(out)
-plot(out, log.scale = TRUE, ci = TRUE, 
+# (1) load dataset
+data(cadmium2)
+
+# (2) check structure and integrity of the dataset
+reproDataCheck(cadmium2, diagnosis.plot = TRUE)
+
+# (3) create a `reproData` object
+dat <- reproData(cadmium2)
+
+# (4) represent the cumulated number of offspring as a function time
+plot(dat, style = "ggplot", pool.replicate = FALSE)
+plot(dat, target.time = 21, addlegend = TRUE, style = "ggplot",
+     pool.replicate = FALSE)
+plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
+     pool.replicate = FALSE)
+plot(dat, concentration = 124, target.time = 21, style = "ggplot")
+
+# (5) check information on the experimental design
+summary(dat)
+
+# (6) fit an exposure-response model at target-time
+fit <- reproFitTT(dat, stoc.part = "bestfit",
+                  ecx = c(10, 20, 30, 40, 50),
+                  quiet = TRUE)
+plot(fit, log.scale = TRUE, ci = TRUE, 
      style = "ggplot", addlegend = TRUE)
 ```
+As in survival analysis, we assume that the reproduction rate per individual-day
+is a log-logistic function of the concentration. More details and parameter
+signification can be found in the Modeling vignette. 
+
+
+## Model comparison
+
+For reproduction analysis, we consider one model which neglects inter-individual
+variability (named "Poisson") and another one which takes it into account
+(named "gamma Poisson"). You can choose either one using the option `stoc.part`,
+but by setting it to "bestfit", you let `reproFitTT` decide which models fits the
+data best. The choice can be seen by calling the `summary` function:
+```{r, cache=TRUE}
+summary(fit)
+```
+When the gamma Poisson model is selected, the summary shows an additional
+parameter called `omega`, which quantifies the inter-individual variability
+(the higher `omega` the higher variability).
+
+
+## Reproduction data and survival function
+
+In MORSE, reproduction datasets are a special case of survival datasets: a 
+reproduction dataset includes the same information than a survival dataset plus
+the information on reproduction outputs. For that reason the S3 class `reproData`
+inherits from the class `survData`, which means that any operation on a `survData`
+object is legal on a `reproData` object. In particular, to use the plot function
+related to survival analysis on `reproData` object, we can use the `as.survData`
+conversion function:
+
+```{r, cache=TRUE}
+dat <- reproData(cadmium2)
+plot(as.survData(dat))
+```
+
 
 <!--
 * Step five, check the obseved versus predicted values
