@@ -253,24 +253,24 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
   data.three <- data.frame(conc = data$transf_conc,
                            qinf95 = conf.int["qinf95",],
                            qsup95 = conf.int["qsup95",],
-                           conf.int = "Confidence interval")
+                           Conf.Int = "Confidence interval")
   data.four <- data.frame(conc = curv$conc,
                           qinf95 = cred.int[["qinf95"]],
                           qsup95 = cred.int[["qsup95"]],
-                          conf.int = "Credible limits")
+                          Cred.Lim = "Credible limits")
   
   plt_3 <- ggplot(data) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
-                     linetype = conf.int),
+                     linetype = Conf.Int),
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                               ends = "both"), data.three,
                  color = valCols$cols3) +
     theme_minimal()
   
   plt_32 <- ggplot(data) +
-    geom_line(data = data.four, aes(conc, qinf95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
-    geom_line(data = data.four, aes(conc, qsup95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     scale_color_manual(values = valCols$cols4) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
@@ -286,9 +286,9 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
                                ends = "both"),
                  data.three, color = valCols$cols3, linetype = cilty,
                  size = cilwd) +
-    geom_line(data = data.four, aes(conc, qinf95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
-    geom_line(data = data.four, aes(conc, qsup95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                       ymax = qsup95),
