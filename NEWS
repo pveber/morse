@@ -4,22 +4,22 @@ Version 2.0.0
 =============
 
 NEW FEATURES
-- new package structure and function's name.
+- new package structure and function names.
 - the repro.data function is now called reproData and creates an object of class
   reproData without specific target time.
 - the repro.check.data function is now called reproDataCheck.
 - the repro.fullsurvplot and repro.cumulplot functions are replaced by the generic
   plot S3 method for the class reproData.
-- the repro.survplot function now depends of the plot S3 metod for the new class
+- the repro.survplot function now depends on the plot S3 metod for the new class
   survData.
-- the repro.fit function is now called reproFitTT with the associate class
+- the repro.fit function is now called reproFitTT with the associated class
   reproFitTT, with the argument target.time.
 - add of new arguments for the reproFitTT function:
   - "stoc.part" to choose the stochastic part of the model.
   - "ecx" to choose the value of ECx estimated by the function.
   - the deterministic part name are now in the legend of the plot function.
-  - When stoc.part = "bestfit" is choosen the model "gammapoisson" was choose if
-    the DIC of gamma-poisson model was smaller than DIC of poisson model of 10
+  - when stoc.part = "bestfit" is choosen, the model "gammapoisson" is chosen if
+    the DIC of gamma-poisson model is smaller than DIC of poisson model of 10
     (1 in the previous version).
 - upgrade the informations in the summary of the reproData class.
 - upgrade the informations in the summary of the reproFitTT function, and values
