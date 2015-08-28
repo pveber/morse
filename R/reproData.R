@@ -22,8 +22,6 @@
 #'
 #' @return An object of class \code{reproData}.
 #'
-#' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
-#'
 #' @keywords transformation
 #'
 #' @examples

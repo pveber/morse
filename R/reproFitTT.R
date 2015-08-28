@@ -42,10 +42,6 @@
 #' the end of monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #' 
-#' @author Marie Laure Delignette-Muller
-#' <marielaure.delignettemuller@@vetagro-sup.fr>, Philippe Ruiz
-#' <philippe.ruiz@@univ-lyon1.fr>
-#' 
 # FIXME
 # \describe{
 # 

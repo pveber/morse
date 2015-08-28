@@ -27,8 +27,6 @@
 #'
 #' @return A dataframe of class \code{survData}.
 #'
-#' @author Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
-#'
 #' @seealso \code{\link{survDataCheck}}
 #'
 #' @keywords transformation

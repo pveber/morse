@@ -31,10 +31,6 @@
 #' \code{reproDataCheck}
 #' function returns an empty dataframe.
 #'
-#' @author Marie Laure Delignette-Muller <marielaure.delignettemuller@@vetagro-sup.fr>,
-#' Philippe Veber <philippe.veber@@univ-lyon1.fr>,
-#' Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
-#'
 #' @seealso \code{\link{reproData}}
 #'
 #' @keywords check
