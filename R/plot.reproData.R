@@ -151,6 +151,7 @@ reproDataPlotReplicates <- function(x,
 #' summed for a same concentration
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' @keywords plot
@@ -191,7 +192,7 @@ plot.reproData <- function(x,
                            style = "generic",
                            pool.replicate = FALSE,
                            log.scale = FALSE,
-                           addlegend = FALSE) {
+                           addlegend = FALSE, ...) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
 

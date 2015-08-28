@@ -3,8 +3,9 @@
 #' The generic \code{summary} S3 method for the \code{reproData} class provides
 #' information about the structure of the dataset and the experimental design.
 #' 
-#' @param x an object of class \code{reproData}
+#' @param object an object of class \code{reproData}
 #' @param quiet if \code{TRUE}, does no prints
+#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @return The function returns a list with the same fields than 
 #' \code{\link{summary.survData}} plus an additional one:
@@ -26,11 +27,12 @@
 #' 
 #' @export
 #' 
-summary.reproData <- function(x, quiet = FALSE) {
-  res <- summary.survData(x, quiet = quiet)
+summary.reproData <- function(object, quiet = FALSE, ...) {
+  res <- summary.survData(object, quiet = quiet)
 
   # matrix of number of offspring (sum of all replicate) by time / conc
-  ans3 <- tapply(x$Nrepro, list(as.factor(x$conc), as.factor(x$time)), sum)
+  ans3 <- tapply(object$Nrepro,
+                 list(as.factor(object$conc), as.factor(object$time)), sum)
   
   if (! quiet) {
     cat("\nNumber of offspring (sum of replicate) per time and concentration: \n")
@@ -83,7 +85,7 @@ summary.reproData <- function(x, quiet = FALSE) {
 reproData <- function(x) {
 
   # test the integrity of the data with reproDataCheck
-  if (dim(reproDataCheck(x))[1] > 0)
+  if (dim(reproDataCheck(x, diagnosis.plot = FALSE))[1] > 0)
     stop("The [x] argument is not well-formed, please use [reproDataCheck] for details.")
 
   x <- survData(x)

@@ -253,24 +253,24 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
   data.three <- data.frame(conc = data$transf_conc,
                            qinf95 = conf.int["qinf95",],
                            qsup95 = conf.int["qsup95",],
-                           conf.int = "Confidence interval")
+                           Conf.Int = "Confidence interval")
   data.four <- data.frame(conc = curv$conc,
                           qinf95 = cred.int[["qinf95"]],
                           qsup95 = cred.int[["qsup95"]],
-                          conf.int = "Credible limits")
+                          Cred.Lim = "Credible limits")
   
   plt_3 <- ggplot(data) +
     geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
-                     linetype = conf.int),
+                     linetype = Conf.Int),
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                               ends = "both"), data.three,
                  color = valCols$cols3) +
     theme_minimal()
   
   plt_32 <- ggplot(data) +
-    geom_line(data = data.four, aes(conc, qinf95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
-    geom_line(data = data.four, aes(conc, qsup95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     scale_color_manual(values = valCols$cols4) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
@@ -286,9 +286,9 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
                                ends = "both"),
                  data.three, color = valCols$cols3, linetype = cilty,
                  size = cilwd) +
-    geom_line(data = data.four, aes(conc, qinf95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
-    geom_line(data = data.four, aes(conc, qsup95, color = conf.int),
+    geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                       ymax = qsup95),
@@ -409,6 +409,7 @@ survFitPlotGG <- function(x,
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
@@ -435,7 +436,7 @@ plot.survFitTT <- function(x,
                            cilwd = 1,
                            addlegend = FALSE,
                            log.scale = FALSE,
-                           style = "generic") {
+                           style = "generic", ...) {
   # plot the fitted curve estimated by survFitTT
   # INPUTS
   # - x:  survFitTt object
