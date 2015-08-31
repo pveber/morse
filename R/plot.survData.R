@@ -49,7 +49,10 @@
 #'
 #' @import ggplot2
 #' @import grDevices
-#' @importFrom graphics plot
+#' @importFrom graphics plot axis legend lines par points polygon
+#' segments title
+#' @importFrom methods is
+#' @importFrom stats aggregate
 #'
 plot.survData <- function(x,
                           xlab,

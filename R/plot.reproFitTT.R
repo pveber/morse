@@ -25,7 +25,8 @@
 #' @import grDevices
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
-#' @importFrom graphics plot
+#' @importFrom graphics plot axis legend lines par points polygon
+#' segments title
 #' 
 #' @keywords plot 
 #' 
@@ -135,6 +136,7 @@ reproEvalFit <- function(fit, x) {
   return(fNcumulpidtheo)
 }
 
+#' @importFrom stats quantile rgamma
 reproLlmCI <- function(fit, x) {
   # create the parameters for credible interval for the log logistic model
   # INPUT:

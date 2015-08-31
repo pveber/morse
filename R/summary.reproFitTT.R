@@ -34,7 +34,7 @@
 #' @keywords summary
 #' 
 #' @export
-#' 
+#' @importFrom stats qnorm qunif
 summary.reproFitTT <- function(object, quiet = FALSE, ...) {
   
   # quantiles of priors parameters

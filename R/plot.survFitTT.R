@@ -39,7 +39,9 @@
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
-#' @importFrom graphics plot
+#' @importFrom graphics plot axis legend lines par points polygon
+#' @importFrom stats aggregate
+#'
 plot.survFitTT <- function(x,
                            xlab = "Concentrations",
                            ylab = "Survival rate",
@@ -141,6 +143,7 @@ survEvalFit <- function(fit, x) {
   }
 }
 
+#' @importFrom stats aggregate binom.test
 survLlbinomConfInt <- function(x, log.scale) {
   # create confidente interval on observed data for the log logistic
   # binomial model by a binomial test
@@ -164,6 +167,7 @@ survLlbinomConfInt <- function(x, log.scale) {
   return(ci)
 }
 
+#' @importFrom stats quantile
 survMeanCredInt <- function(fit, x) {
   # create the parameters for credible interval for the log logistic binomial
   # model

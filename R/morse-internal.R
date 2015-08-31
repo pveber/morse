@@ -106,6 +106,7 @@ calcDIC <- function(m.M, sampling.parameters, quiet = quiet) {
   return(round(sum(sapply(dic$deviance, mean) + sapply(dic$penalty, mean))))
 }
 
+#' @importFrom stats quantile
 estimXCX <- function(mcmc, xcx, varx) {
   # create the table of estimated values of LCx or ECx
   # for the survival analyses

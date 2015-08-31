@@ -34,6 +34,7 @@
 #' @keywords summary
 #' 
 #' @export
+#' @importFrom stats qnorm qunif
 #' 
 summary.survFitTT <- function(object, quiet = FALSE, ...) {
   
