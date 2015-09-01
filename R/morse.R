@@ -1,6 +1,6 @@
-#' MOdelling tools for Reproduction and Survival data in Ecotoxicology
+#' MOdelling Tools for Reproduction and Survival Data in Ecotoxicology
 #'
-#' This package provides tools for the analysis of survival/reproduction
+#' Provides tools for the analysis of survival/reproduction
 #' bioassay data in quantitative environmental risk assessment. It can be
 #' used to explore/visualize experimental data, and to perform an estimation
 #' of \eqn{LC_{x}} (Lethal Concentration for x\% of individuals) or
