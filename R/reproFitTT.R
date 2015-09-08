@@ -342,7 +342,7 @@ reproFitTT <- function(data,
 }
 
 
-
+#' @importFrom stats sd
 reproCreateJagsData <- function(stoc.part, data) {
   # create the parameters to define the prior of the log-logistic model
   # for reproduction data analysis
