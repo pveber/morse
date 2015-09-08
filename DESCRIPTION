@@ -1,8 +1,8 @@
 Package: morse
 Type: Package
-Title: MOdelling Tools for Reproduction and Survival Data in Ecotoxicology
-Version: 2.0.0
-Date: 2015-09-01
+Title: MOdelling tools for Reproduction and Survival data in Ecotoxicology
+Version: 2.0.1
+Date: 2015-09-08
 Author: Marie Laure Delignette-Muller [aut, cre], Philippe Ruiz [aut, cre], Sandrine Charles [aut], Wandrille Duchemin [ctb], Christelle Lopes [ctb], Guillaume Kon-Kam-king [ctb], Philippe Veber [ctb]
 Maintainer: Philippe Ruiz <philippe.ruiz@univ-lyon1.fr>
 Description: Tools for ecotoxicologists and regulators dedicated to the mathematical and statistical modelling of bioassay data. They use advanced and innovative methods for a valuable quantitative environmental risk assessment.
