@@ -1,5 +1,12 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 2.0.1
+=============
+
+BUG FIXES
+- remove titles in legend of plot.reproFitTT and plot.survFitTT in
+  ggplot style.
+
 Version 2.0.0
 =============
 
