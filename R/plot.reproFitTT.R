@@ -334,7 +334,8 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
                                 ymax = qsup95), fill = valCols$cols3,
                 col = valCols$cols3,
                 alpha = 0.4) +
-    scale_color_manual(values = valCols$cols3) + theme_minimal()
+    scale_color_manual(name = "", values = valCols$cols3) +
+    theme_minimal()
 
   # plot IC
   # final plot
@@ -393,7 +394,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   plt_2 <- ggplot(data) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
-    scale_color_manual(values = valCols$cols2) +
+    scale_color_manual(name = "", values = valCols$cols2) +
     theme_minimal()
   
   plt_4 <-
