@@ -1,3 +1,4 @@
+#' @importFrom stats rbinom quantile
 EvalsurvPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
   
@@ -36,6 +37,7 @@ EvalsurvPpc <- function(x) {
   return(tab)
 }
 
+#' @importFrom stats rgamma rpois quantile
 EvalreproPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
   
@@ -78,6 +80,7 @@ EvalreproPpc <- function(x) {
   return(tab)
 }
 
+#' @importFrom graphics abline arrows
 PpcGeneric <- function(tab, xlab, ylab) {
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
