@@ -188,3 +188,8 @@ fCols <- function(data, fitcol, cicol, analyse) {
                 cols3 = cols3))
     }
 }
+
+exclude_labels <- function(x) {
+  x[-seq.int(1, length(x), 4)] <- ""
+  return(x)
+}
