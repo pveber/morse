@@ -3,10 +3,11 @@ EvalsurvPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
   
   if (x$det.part == "loglogisticbinom_3") {
-    d <- tot.mcmc[1:5000, "d"]
+    d <- sample(tot.mcmc[, "d"], 5000)
   }
-  b <- 10^tot.mcmc[1:5000, "log10b"]
-  e <- 10^tot.mcmc[1:5000, "log10e"]
+  
+  b <- 10^sample(tot.mcmc[, "log10b"], 5000)
+  e <- 10^sample(tot.mcmc[, "log10e"], 5000)
   
   n <- x$jags.data$n
   xconc <- x$jags.data$xconc
@@ -42,11 +43,11 @@ EvalreproPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
   
   if (x$model.label == "GP") {
-    omega <- 10^tot.mcmc[1:5000, "log10omega"]
+    omega <- 10^sample(tot.mcmc[, "log10omega"], 5000)
   }
-  b <- 10^tot.mcmc[1:5000, "log10b"]
-  d <- tot.mcmc[1:5000, "d"]
-  e <- 10^tot.mcmc[1:5000, "log10e"]
+  b <- 10^sample(tot.mcmc[, "log10b"], 5000)
+  d <- sample(tot.mcmc[, "d"], 5000)
+  e <- 10^sample(tot.mcmc[, "log10e"], 5000)
   
   n <- x$jags.data$n
   xconc <- x$jags.data$xconc
