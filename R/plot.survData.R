@@ -90,7 +90,7 @@ plot.survData <- function(x,
   }
   else {
     survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
-                           addlegend, remove.someLabs)
+                           addlegend)
   }
 }
 
@@ -520,8 +520,7 @@ survDataPlotReplicates <- function(x,
                                    target.time,
                                    concentration,
                                    style,
-                                   addlegend,
-                                   remove.someLabs) {
+                                   addlegend) {
   dataPlotReplicates(x, xlab, ylab, "Nsurv", target.time, concentration, style,
                      addlegend)
 }
