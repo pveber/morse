@@ -88,7 +88,7 @@ plot.reproData <- function(x,
   }
   else {
     reproDataPlotReplicates(x, xlab, ylab, target.time, concentration,
-                            style, addlegend, remove.someLabs)
+                            style, addlegend)
   }
 }
 
@@ -197,7 +197,11 @@ reproDataPlotTargetTime <- function(x,
       scale_colour_hue(legend.title, breaks = c("No","Yes"),
                        labels = c(legend.name.no, legend.name.yes)) +
       scale_x_continuous(breaks = df$transf_data_conc,
-                         labels = df$display.conc)
+                         labels = if (remove.someLabs) {
+                           exclude_labels(df$display.conc)
+                         } else {
+                           df$display.conc
+                         })
     
     if (addlegend) {
       return(gp)
