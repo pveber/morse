@@ -1,5 +1,12 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 2.1.0
+=============
+
+NEW FEATURES
+- add function ppc to plot the posterior predictive check of reproFitTT and
+  survFitTT objects.
+
 Version 2.0.0
 =============
 
