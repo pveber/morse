@@ -1,5 +1,12 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 2.0.1
+=============
+
+NEW FEATURES
+- In the Nrepro column of the dataset cadmium2 the number of clutches was replaced
+  by the number of eggs.
+
 Version 2.0.0
 =============
 
