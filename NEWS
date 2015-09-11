@@ -3,9 +3,16 @@
 Version 2.0.1
 =============
 
+NEW FEATURES
+- the dataset cadmium2 now reports the number of eggs instead of the number of
+  clutches.
+
 BUG FIXES
-- the check on replicate's label has been removed in the survDatacheck function.
+- the check on replicate's label has been removed in the survDatacheck
+  function.
 - minor changes in the tutorial vignette.
+
+>>>>>>> update NEWS
 
 Version 2.0.0
 =============
