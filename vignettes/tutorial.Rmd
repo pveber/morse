@@ -50,7 +50,7 @@ the package (like `cadmium2`). First, we load the dataset and use the function
 
 ```{r, cache=TRUE}
 data(cadmium2)
-survDataCheck(cadmium2, diagnosis.plot = TRUE)
+survDataCheck(cadmium2)
 ```
 
 ## Step 2: create a `survData` object
@@ -181,7 +181,7 @@ Here is a typical session:
 data(cadmium2)
 
 # (2) check structure and integrity of the dataset
-reproDataCheck(cadmium2, diagnosis.plot = TRUE)
+reproDataCheck(cadmium2)
 
 # (3) create a `reproData` object
 dat <- reproData(cadmium2)
