@@ -230,8 +230,7 @@ reproDataPlotReplicates <- function(x,
                                     target.time,
                                     concentration,
                                     style,
-                                    addlegend,
-                                    remove.someLabs) {
+                                    addlegend) {
   dataPlotReplicates(x, xlab, ylab, "Nreprocumul", target.time,
                      concentration, style, addlegend)
 }
