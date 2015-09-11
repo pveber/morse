@@ -89,19 +89,17 @@ PpcGeneric <- function(tab, xlab, ylab) {
        xlab = xlab,
        ylab = ylab)
   
-  jitObs <- jitter(tab[, "Obs"])
-  
-  points(jitObs, tab[, "P50"],
+  points(tab[, "Obs"], tab[, "P50"],
          pch = 16)
   
   abline(0, 1)
   
-  arrows(jitObs, tab[, "P50"],
-         jitObs, tab[, "P2.5"],
+  arrows(tab[, "Obs"], tab[, "P50"],
+         tab[, "Obs"], tab[, "P2.5"],
          angle = 90, length = 0.05,
          col = as.character(tab[, "col"]))
-  arrows(jitObs, tab[, "P50"],
-         jitObs, tab[, "P97.5"],
+  arrows(tab[, "Obs"], tab[, "P50"],
+         tab[, "Obs"], tab[, "P97.5"],
          angle = 90, length = 0.05,
          col = as.character(tab[, "col"]))
 }
