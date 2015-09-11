@@ -123,7 +123,8 @@ a `survData` object and the levels of $LC_x$ we need:
 
 ```{r, results="hide", cache=TRUE}
 fit <- survFitTT(dat,
-                lcx = c(10, 20, 30, 40, 50))
+                 target.time = 21,
+                 lcx = c(10, 20, 30, 40, 50))
 ```
 
 The return value is an object of class `survFitTT` and provides the estimated 
@@ -159,7 +160,8 @@ range of tested concentrations:
 ```{r, results="hide", cache=TRUE}
 data("cadmium1")
 fit <- survFitTT(survData(cadmium1),
-                lcx = c(10, 20, 30, 40, 50))
+                 target.time = 21,
+                 lcx = c(10, 20, 30, 40, 50))
 plot(fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
      addlegend = TRUE)
 ```
@@ -199,6 +201,7 @@ summary(dat)
 
 # (6) fit an exposure-response model at target-time
 fit <- reproFitTT(dat, stoc.part = "bestfit",
+                  target.time = 21,
                   ecx = c(10, 20, 30, 40, 50),
                   quiet = TRUE)
 plot(fit, log.scale = TRUE, ci = TRUE, 
