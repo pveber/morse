@@ -116,8 +116,8 @@ PpcGG <- function(tab, xlab, ylab) {
                  arrow = arrow(length = unit(0.25, "cm"), angle = 90,
                                ends = "both"),
                  tab, color = tab$col) +
-    xlim(0, max(tab[, "P97.5"])) +
-    ylim(0, max(tab[, "P97.5"])) +
+    xlim(0, max(tab[, c("P97.5", "Obs")]) + 1) +
+    ylim(0, max(tab[, c("P97.5", "Obs")]) + 1) +
     labs(x = xlab, y = ylab) +
     theme_minimal()
 }
@@ -160,6 +160,7 @@ ppc <- function(x, style = "generic") {
   
   if (is(x, "survFitTT")) {
     tab <- EvalsurvPpc(x)
+    tab[, "Obs"] <- jitter(tab[, "Obs"])
     xlab <- "Observed Nbr. of survivor"
     ylab <- "Predicted Nbr. of survivor"
     
@@ -172,6 +173,7 @@ ppc <- function(x, style = "generic") {
   
   else if (is(x, "reproFitTT")) {
     tab <- EvalreproPpc(x)
+    tab[, "Obs"] <- jitter(tab[, "Obs"])
     xlab <- "Observed Nbr. of cumulated offspring"
     ylab <- "Predicted Nbr. of cumulated offspring"
     
