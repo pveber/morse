@@ -17,6 +17,8 @@
 #' summed for a same concentration
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param remove.someLabs if \code{TRUE}, remove 3/4 of X-axis labels in
+#' \code{'ggplot'} style to avoid the label overlapping.
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -63,7 +65,8 @@ plot.survData <- function(x,
                           style = "generic",
                           pool.replicate = FALSE,
                           log.scale = FALSE,
-                          addlegend = FALSE, ...) {
+                          addlegend = FALSE,
+                          remove.someLabs = FALSE, ...) {
   
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
@@ -75,19 +78,19 @@ plot.survData <- function(x,
   }
   
   if (is.null(target.time) && is.null(concentration)) {
-    survDataPlotFull(x, xlab, ylab, style, addlegend)
+    survDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabs)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
     survDataPlotTargetTime(x, xlab, ylab, main, target.time,
-                           style, log.scale, addlegend)
+                           style, log.scale, addlegend, remove.someLabs)
   }
   else if (is.null(target.time) && ! is.null(concentration)) {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
-                          style, addlegend)
+                          style, addlegend, remove.someLabs)
   }
   else {
     survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
-                           addlegend)
+                           addlegend, remove.someLabs)
   }
 }
 
@@ -192,7 +195,7 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend) {
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
+dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabs) {
 
   time = NULL
   Nsurv = NULL
@@ -220,26 +223,27 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
-                         addlegend = FALSE) {
+                         addlegend = FALSE, remove.someLabs = FALSE) {
 
   if (missing(xlab)) xlab <- "Time"
 
   if (style == "generic")
     dataPlotFullGeneric(data, xlab, ylab, resp, addlegend)
   else if (style == "ggplot")
-    dataPlotFullGG(data, xlab, ylab, resp, addlegend)
+    dataPlotFullGG(data, xlab, ylab, resp, addlegend, remove.someLabs)
   else stop("Unknown plot style")
 }
 
 survDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                             addlegend = FALSE) {
-  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend)
+                             addlegend = FALSE, remove.someLabs = FALSE) {
+  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend, remove.someLabs)
 }
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
-                                   style, log.scale, addlegend) {
+                                   style, log.scale, addlegend,
+                                   remove.someLabs) {
   if (missing(xlab)) xlab <-"Concentration"
 
   if (!target.time %in% x$time)
@@ -334,7 +338,8 @@ dataPlotFixedConc <- function(x,
                               resp,
                               concentration,
                               style = "generic",
-                              addlegend = FALSE) {
+                              addlegend = FALSE,
+                              remove.someLabs = FALSE) {
 
   if (missing(xlab)) xlab <- "Time"
 
@@ -416,7 +421,8 @@ survDataPlotFixedConc <- function(x,
                                   main,
                                   concentration,
                                   style = "generic",
-                                  addlegend = FALSE) {
+                                  addlegend = FALSE,
+                                  remove.someLabs = FALSE) {
 
   dataPlotFixedConc(x, xlab, ylab, main, "Nsurv", concentration,
                     style, addlegend)
@@ -430,7 +436,8 @@ dataPlotReplicates <- function(x,
                                target.time,
                                concentration,
                                style,
-                               addlegend) {
+                               addlegend,
+                               remove.somelabs) {
 
   if (missing(xlab)) xlab <- "Replicate"
 
@@ -498,7 +505,8 @@ survDataPlotReplicates <- function(x,
                                    target.time,
                                    concentration,
                                    style,
-                                   addlegend) {
+                                   addlegend,
+                                   remove.someLabs) {
   dataPlotReplicates(x, xlab, ylab, "Nsurv", target.time, concentration, style,
-                     addlegend)
+                     addlegend, remove.someLabs)
 }
