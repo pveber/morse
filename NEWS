@@ -5,6 +5,7 @@ Version 2.0.1
 
 BUG FIXES
 - the check on replicate's label has been removed in the survDatacheck function.
+- minor changes in the tutorial vignette.
 
 Version 2.0.0
 =============
