@@ -83,26 +83,30 @@ EvalreproPpc <- function(x) {
 
 #' @importFrom graphics abline arrows
 PpcGeneric <- function(tab, xlab, ylab) {
+  obs_val <- unique(tab[, "Obs"])
+  jittered_obs <- jitter(tab[, "Obs"])
+
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
        type = "n",
        xlab = xlab,
        ylab = ylab)
 
-  abline(0, 1)
+  segments(obs_val-0.5, obs_val,
+           obs_val+0.5, obs_val)
 
-  delta <- 0.01 * (max(tab[, "Obs"]) - min(tab[,"Obs"]))
-  segments(tab[, "Obs"],tab[, "P2.5"],
-           tab[, "Obs"],tab[, "P97.5"],
+  delta <- 0.01 * (max(obs_val) - min(obs_val))
+  segments(jittered_obs,tab[, "P2.5"],
+           jittered_obs,tab[, "P97.5"],
            col = as.character(tab[, "col"]))
-  segments(tab[, "Obs"] - delta, tab[, "P2.5"],
-           tab[, "Obs"] + delta, tab[, "P2.5"],
+  segments(jittered_obs - delta, tab[, "P2.5"],
+           jittered_obs + delta, tab[, "P2.5"],
            col = as.character(tab[, "col"]))
-  segments(tab[, "Obs"] - delta, tab[, "P97.5"],
-           tab[, "Obs"] + delta, tab[, "P97.5"],
+  segments(jittered_obs - delta, tab[, "P97.5"],
+           jittered_obs + delta, tab[, "P97.5"],
            col = as.character(tab[, "col"]))
 
-  points(tab[, "Obs"], tab[, "P50"],
+  points(jittered_obs, tab[, "P50"],
          pch = 16)
 }
 
@@ -162,7 +166,6 @@ ppc <- function(x, style = "generic") {
 
   if (is(x, "survFitTT")) {
     tab <- EvalsurvPpc(x)
-    tab[, "Obs"] <- jitter(tab[, "Obs"])
     xlab <- "Observed Nbr. of survivor"
     ylab <- "Predicted Nbr. of survivor"
 
