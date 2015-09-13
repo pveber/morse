@@ -169,18 +169,6 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   consistency.errors <- do.call("errorTableAppend", res)
   errors <- errorTableAppend(errors, consistency.errors)
 
-  ##
-  ## 11. assert labels of replicates are the same for all (time, concentration)
-  ##
-  rep.labels <- by(data,
-                   list(data$conc, data$time),
-                   function(x) { str_c(sort(x$replicate), collapse = "") })
-
-  if (any(rep.labels != rep.labels[[1]])) {
-    msg <- "For at least one time and one concentration a replicate label is different from the control."
-    errors <- errorTableAdd(errors, "ReplicateLabel", msg)
-  }
-
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
     survDataPlotFull(data, ylab = "Number of surviving individuals")
   }
