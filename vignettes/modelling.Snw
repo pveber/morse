@@ -49,13 +49,15 @@ model used in MORSE is defined as follows. Let $t$ be the target time
 in days. We suppose the \emph{mean survival rate after $t$ days} is
 given by a function $f$ of the pollutant level $c$. We also suppose
 that the death of two individuals are two independent events. Hence,
-given an initial number $n^{init}$ of individuals in the assay, we
-obtain that the number $N$ of surviving individuals follows a binomial
+given an initial number $n^{init}_i$ of individuals in the assay, we
+obtain that the number $N_i$ of surviving individuals follows a binomial
 distribution:
 $$
-N \sim \mathcal{B}(n^{init}, f(c))
+N_i \sim \mathcal{B}(n^{init}_i, f(c_i))
 $$
-There may be various possibilities for $f$. In MORSE we assume:
+Note that this model neglects inter-replicate variations, as a given
+concentration of pollutant implies a fixed value of the survival
+rate. There may be various possibilities for $f$. In MORSE we assume:
 $$
 f(c) = \frac{d}{1 + (\frac{c}{e})^b}
 $$
@@ -135,7 +137,7 @@ mortality is observed at particular time points only, so the real life
 time of an individual is unknown and in practice we use the following
 simple estimation: if an individual is alive at $t_k$
 but dead at $t_{k+1}$, its real life time is approximated as
-$\frac{t_{k+1}+t_k}{2}$. 
+$\frac{t_{k+1}+t_k}{2}$.
 
 With this assumption, the effective observation time for concentration
 $c_i$ and replicate $j$ is then given by:
@@ -180,10 +182,10 @@ replicate $j$ can be modelled using a Poisson distribution:
 $$
 N_{ij} \sim Poisson(f(c_i ; \theta) \times NID_{ij})
 $$
-This model is later referenced to as ``Poisson model''.  In case there
-are non-negligible random variations of the reproduction rate between
-two individuals, we propose a second model, named ``gamma-Poisson
-model'', stating that:
+This model is later referenced to as ``Poisson model''.  If there happens
+to be a non-negligible variability of the reproduction rate between
+replicates for a some fixed concentration, we propose a second model,
+named ``gamma-Poisson model'', stating that:
 $$
 N_{ij} \sim Poisson(F_{ij} \times NID_{ij})
 $$
@@ -214,7 +216,7 @@ $d$ and $e$ are estimated using JAGS with the following priors:
 \item we chose a quasi non-informative prior distribution for the
   shape parameter $b$:
   $$\log_{10} b \sim \mathcal{U}(-2,2)$$
-  
+
 \item
   as $d$ corresponds to the reproduction rate without contaminant, we
   set a normal prior $\mathcal{N}(\mu_d,\sigma_d)$ using the data:
@@ -226,7 +228,7 @@ $d$ and $e$ are estimated using JAGS with the following priors:
   condition. Note that since they are used to estimate a prior
   distribution, the data for the control condition are not used in the
   fitting phase.
-  
+
 \item we chose a quasi non-informative prior distribution for the
   $\omega$ parameter of the gamma-Poisson model:
 $$log_{10}(\omega) \sim U(-4,4)$$
@@ -240,7 +242,7 @@ criterion known as Deviance Information Criterion (DIC) to choose the
 most appropriate. In situations where overdispersion (that is
 inter-replicate variability) is negligible, using the Poisson model
 will provide more reliable estimates. That is why a Poisson model is
-preferred unless the gamma-Poisson model has a significantly lower
+preferred unless the gamma-Poisson model has a sufficiently lower
 DIC (in practice we require a difference of 10).
 
 \bibliographystyle{plain}
