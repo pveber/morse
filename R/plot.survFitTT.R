@@ -390,6 +390,7 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                               ends = "both"), data.three,
                  color = valCols$cols3) +
+    scale_linetype(name = "") +
     theme_minimal()
   
   plt_32 <- ggplot(data) +
@@ -397,7 +398,7 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
-    scale_color_manual(values = valCols$cols4) +
+    scale_color_manual(name = "", values = valCols$cols4) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                       ymax = qsup95),
                 fill = valCols$cols4, col = valCols$cols4, alpha = 0.4) +
@@ -406,11 +407,12 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
   # plot IC
   # final plot
   plt_4 <- ggplot(data) +
-    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
+    geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
+                     color = Conf.Int),
                  arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
                                ends = "both"),
-                 data.three, color = valCols$cols3, linetype = cilty,
-                 size = cilwd) +
+                 data.three, linetype = cilty,
+                 size = cilwd, col = valCols$cols3) +
     geom_line(data = data.four, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
@@ -457,14 +459,15 @@ survFitPlotGG <- function(x,
   # points (to create the legend)
   plt_1 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp, color = Points)) +
-    scale_color_manual(values = valCols$cols1) +
+    scale_color_manual(name = "", values = valCols$cols1) +
     theme_minimal()
   
   # curve (to create the legend)
   plt_2 <- ggplot(data) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
-    scale_color_manual(values = valCols$cols2) + theme_minimal()
+    scale_color_manual(name = "", values = valCols$cols2) +
+    theme_minimal()
   
   plt_4 <-
     if (! is.null(conf.int)) {

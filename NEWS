@@ -11,8 +11,9 @@ BUG FIXES
 - the check on replicate's label has been removed in the survDatacheck
   function.
 - minor changes in the tutorial vignette.
+- remove titles in legend of plot.reproFitTT and plot.survFitTT in
+  ggplot style.
 
->>>>>>> update NEWS
 
 Version 2.0.0
 =============
