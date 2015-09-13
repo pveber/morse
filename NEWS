@@ -3,7 +3,7 @@
 Version 2.0.1
 =============
 
-BUG FIXIES
+BUG FIXES
 - the check on replicate's label has been removed in the survDatacheck function.
 
 Version 2.0.0
