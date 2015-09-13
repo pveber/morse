@@ -42,7 +42,7 @@
 #' concentration of pollutant, by default the last time point available for
 #' all concentrations
 #' @param lcx desired values of \eqn{x} (in percent) for which to compute
-#' \eqn{LC_{x}}{LCx} (default is c(5, 10, 20, 50))
+#' \eqn{LC_{x}}{LCx}
 #' @param n.chains number of MCMC chains, the minimum required number of chains
 #' is 2
 #' @param quiet if \code{TRUE}, does not print messages and progress bars from
@@ -51,7 +51,7 @@
 #' @return The function returns an object of class \code{survFitTT}, which is a
 #' list with the following fields:
 #' \item{DIC}{DIC value of the selected model}
-#' \item{estim.LCx}{a table of the estimated LCX along with their 95 \% 
+#' \item{estim.LCx}{a table of the estimated LCX along with their 95 \%
 #' credible intervals}
 #' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
 #' credible intervals}
@@ -62,14 +62,14 @@
 #' \item{parameters}{a list of the parameters names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation}
-#' \item{n.iter}{a list of two indices indicating the beginning and end of 
+#' \item{n.iter}{a list of two indices indicating the beginning and end of
 #' monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #'
 #'
 # FIXME
 # @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-# \code{\link[rjags]{dic.samples}}, 
+# \code{\link[rjags]{dic.samples}},
 # \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
 # \code{\link[ggplot2]{ggplot}}
 #
@@ -121,22 +121,22 @@
 #'
 survFitTT <- function(data,
                       target.time = NULL,
-                      lcx,
+                      lcx = c(5, 10, 20, 50),
                       n.chains = 3,
                       quiet = FALSE) {
   # test class object
   if(! is(data, "survData"))
     stop("survFitTT: object of class survData expected")
-  
+
   # select Data at target.time
   dataTT <- selectDataTT(data, target.time)
-  
+
   # Choose model by testing mortality in the control
   control <- filter(dataTT, conc == 0)
   det.part <-
     if (any(control$Nsurv < control$Ninit)) "loglogisticbinom_3"
   else "loglogisticbinom_2"
-  
+
   # select model text
   if (det.part == "loglogisticbinom_2") {
     model.text <- llbinom2.model.text
@@ -144,7 +144,7 @@ survFitTT <- function(data,
   if (det.part == "loglogisticbinom_3") {
     model.text <- llbinom3.model.text
   }
-  
+
   # parameters
   parameters <- if (det.part == "loglogisticbinom_2") {
     c("log10b", "log10e")
@@ -152,51 +152,48 @@ survFitTT <- function(data,
     if (det.part == "loglogisticbinom_3") {
       c("log10b", "d", "log10e")}
   }
-  
+
   # create priors parameters
   jags.data <- survCreateJagsData(det.part, dataTT)
-  
+
   # Define model
   model <- survLoadModel(model.program = model.text,
                          data = jags.data, n.chains,
                          Nadapt = 3000, quiet)
-  
+
   # Determine sampling parameters
   sampling.parameters <- modelSamplingParameters(model,
                                                  parameters, n.chains, quiet)
-  
+
   if (sampling.parameters$niter > 100000)
     stop("The model needs too many iterations to provide reliable parameter estimates !")
-  
+
   # calcul DIC
   modelDIC <- calcDIC(model, sampling.parameters, quiet)
-  
+
   # Sampling
   prog.b <- ifelse(quiet == TRUE, "none", "text")
-  
+
   mcmc <- coda.samples(model, parameters,
                        n.iter = sampling.parameters$niter,
                        thin = sampling.parameters$thin,
                        progress.bar = prog.b)
-  
+
   # summarize estime.par et CIs
   # calculate from the estimated parameters
   estim.par <- survPARAMS(mcmc, det.part)
-  
+
   # LCx calculation  estimated LCx and their CIs 95%
   # vector of LCX
-  if (missing(lcx)) {
-    lcx <- c(5, 10, 20, 50)
-  }
   estim.LCx <- estimXCX(mcmc, lcx, "LC")
-  
+
   # check if estimated LC50 lies in the tested concentration range
   if (50 %in% lcx) {
     LC50 <- log10(estim.LCx["LC50", "median"])
     if (!(min(log10(data$conc)) < LC50 & LC50 < max(log10(data$conc))))
       warning("The LC50 estimation lies outsides the range of tested concentration and may be unreliable !")
   }
-  
+
   # output
   OUT <- list(DIC = modelDIC,
               estim.LCx = estim.LCx,
@@ -212,7 +209,7 @@ survFitTT <- function(data,
               jags.data = jags.data,
               transformed.data = data,
               dataTT = dataTT)
-  
+
   class(OUT) <- "survFitTT"
   return(OUT)
 }
