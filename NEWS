@@ -1,11 +1,13 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
-Version 2.0.1
+Version DEV
 =============
 
 NEW FEATURES
 - the dataset cadmium2 now reports the number of eggs instead of the number of
   clutches.
+- add S3 method ppc to plot the posterior predictive check on reproFitTT and
+  survFitTT objects.
 
 BUG FIXES
 - the check on replicate's label has been removed in the survDatacheck
