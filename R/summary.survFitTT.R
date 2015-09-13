@@ -82,11 +82,11 @@ summary.survFitTT <- function(object, quiet = FALSE, ...) {
   if (! quiet) {
     cat("Summary: \n\n")
     cat("The ", object$det.part, " model with a binomial stochastic part was used !\n\n")
-    cat("Quantiles of priors on parameters: \n\n")
+    cat("Priors on parameters (quantiles):\n\n")
     print(ans1)
-    cat("\nQuantiles of posteriors on parameters: \n\n")
+    cat("\nPosterior of the parameters (quantiles):\n\n")
     print(ans2)
-    cat("\nQuantiles of the estimated LCx: \n\n")
+    cat("\nPosterior of the LCx (quantiles):\n\n")
     print(ans3)
   }
 

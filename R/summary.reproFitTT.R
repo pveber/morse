@@ -90,11 +90,11 @@ summary.reproFitTT <- function(object, quiet = FALSE, ...) {
       cat("The ", object$det.part, " model with a Gamma Poisson stochastic part was used !\n\n")
     if(object$model.label == "P")
       cat("The ", object$det.part, " model with a Poisson stochastic part was used !\n\n")
-    cat("Quantiles of priors on parameters: \n\n")
+    cat("Priors on parameters (quantiles):\n\n")
     print(ans1)
-    cat("\nQuantiles of posteriors on parameters: \n\n")
+    cat("\nPosterior of the parameters (quantiles):\n\n")
     print(ans2)
-    cat("\nQuantiles of the estimated ECx:\n\n")
+    cat("\nPosterior of the ECx (quantiles):\n\n")
     print(ans3)
   }
 
