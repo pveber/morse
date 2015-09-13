@@ -127,11 +127,11 @@ fit <- survFitTT(dat,
                  lcx = c(10, 20, 30, 40, 50))
 ```
 
-The return value is an object of class `survFitTT` and provides the estimated 
-parameters as a probability distribution, in order to model our uncertainty on
+The returned value is an object of class `survFitTT` and provides the estimated 
+parameters as a posterior[^1] distribution, in order to model our uncertainty on
 their true value. For the parameters of the models, as well as the $LC_x$
 values, we report the median (as the estimated value) and the 2.5 \% and 97.5 \%
-quantiles of the distribution (as a measure of uncertainty, a.k.a. credible
+quantiles of the posterior (as a measure of uncertainty, a.k.a. credible
 intervals). These can seen using the `summary` method:
 
 
@@ -139,11 +139,30 @@ intervals). These can seen using the `summary` method:
 summary(fit)
 ```
 
-or in a plot:
+If the inference went well, it is expected that the difference between 
+quantiles in the posterior will be reduced compared to the prior, meaning
+that the data was helpful to reduce the uncertainty on the true value of
+the parameters. This simple check can be performed using the summary function.
+
+The fit can also be plotted:
 ```{r, cache=TRUE}
 plot(fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
      addlegend = TRUE)
 ```
+This representation shows the estimated relation between concentration of
+pollutant and survival rate (red curve). It is computed by choosing for each
+parameter the median value of its posterior. To assess the uncertainty on this
+estimation, we compute many such curves this time by sampling the parameters 
+in the posterior distribution. This gives rise to the pink band, showing for
+any given concentration an interval (called credible interval) containing the
+survival rate 95% of the time in the posterior distribution. The experimental
+data points are represented in black and correspond to the observed survival
+rate when
+pooling all replicates. The black error bars correspond to a 95% confidence
+interval, which is another, more straightforward way to bound the most
+probable value of the survival rate for a tested concentration. In favorable
+situations, we expect that the credible interval around the estimated curve
+and the confidence interval around experimental points will largely overlap.
 
 
 <!--
@@ -155,7 +174,7 @@ ppc(out2, style = "ggplot")
 -->
 
 Note that `survFitTT` will warn you if the estimated $LC_{50}$ lies outside the
-range of tested concentrations:
+range of tested concentrations, as in the following example:
 
 ```{r, results="hide", cache=TRUE}
 data("cadmium1")
@@ -204,6 +223,7 @@ fit <- reproFitTT(dat, stoc.part = "bestfit",
                   target.time = 21,
                   ecx = c(10, 20, 30, 40, 50),
                   quiet = TRUE)
+summary(fit)
 plot(fit, log.scale = TRUE, ci = TRUE, 
      style = "ggplot", addlegend = TRUE)
 ```
@@ -227,7 +247,7 @@ parameter called `omega`, which quantifies the inter-individual variability
 (the higher `omega` the higher the variability).
 
 
-## Reproduction data and survival function
+## Reproduction data and survival functions
 
 In MORSE, reproduction datasets are a special case of survival datasets: a 
 reproduction dataset includes the same information than a survival dataset plus
@@ -241,6 +261,15 @@ conversion function:
 dat <- reproData(cadmium2)
 plot(as.survData(dat))
 ```
+
+[^1]: In Bayesian inference, the parameters of a model are estimated
+from the data starting from a so-called *prior*, which is a probability
+distribution representing an initial guess on the true parameters, before
+seing the data. The *posterior* distribution represents the uncertainty on
+the parameters after seeing the data and combining it with the prior. To obtain
+a point estimate of the parameters, it is typical to compute the mean or median
+of the posterior and quantify the uncertainty by reporting the standard
+deviation or inter-quantile distance.
 
 
 <!--
