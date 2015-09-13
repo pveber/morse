@@ -45,7 +45,7 @@
 #' @importFrom stats aggregate
 #'
 plot.survFitTT <- function(x,
-                           xlab = "Concentrations",
+                           xlab = "Concentration",
                            ylab = "Survival rate",
                            main = NULL,
                            fitcol = "red",
