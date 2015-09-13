@@ -217,14 +217,14 @@ signification can be found in the Modeling vignette.
 For reproduction analysis, we consider one model which neglects inter-individual
 variability (named "Poisson") and another one which takes it into account
 (named "gamma Poisson"). You can choose either one using the option `stoc.part`,
-but by setting it to "bestfit", you let `reproFitTT` decide which models fits the
+but by setting it to `"bestfit"`, you let `reproFitTT` decide which models fits the
 data best. The choice can be seen by calling the `summary` function:
 ```{r, cache=TRUE}
 summary(fit)
 ```
 When the gamma Poisson model is selected, the summary shows an additional
 parameter called `omega`, which quantifies the inter-individual variability
-(the higher `omega` the higher variability).
+(the higher `omega` the higher the variability).
 
 
 ## Reproduction data and survival function
