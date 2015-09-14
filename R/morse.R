@@ -5,15 +5,15 @@
 #' used to explore/visualize experimental data, and to perform an estimation
 #' of \eqn{LC_{x}} (Lethal Concentration for x\% of individuals) or
 #' \eqn{EC_{x}} (x\% Effect Concentration) values by fitting exposure-response
-#' curves. The \eqn{LC_{x}}/\eqn{EC_{x}} and parameters of the curve are 
+#' curves. The \eqn{LC_{x}}/\eqn{EC_{x}} and parameters of the curve are
 #' provided along with an indication of the uncertainty of the estimation.
-#' 
-#' Estimation procedures in MORSE can be used without a deep knowledge of 
+#'
+#' Estimation procedures in MORSE can be used without a deep knowledge of
 #' their underlying probabilistic model or inference methods. Rather, they
 #' were designed to behave as well as possible without requiring a user to
 #' provide values for some obscure parameters. That said, MORSE models can also
 #' be used as a first step to tailor new models for more specific situations.
-#' 
+#'
 #' The package currently handles survival and reproduction data. Functions
 #' dedicated to survival (resp. reproduction) analysis start with a
 #' \code{surv} (resp. \code{repro}) prefix. MORSE provides a similar
@@ -24,17 +24,17 @@
 #' \item plot a dataset
 #' \item fit a model on a dataset and output the expected estimates
 #' }
-#' Those steps are presented in more details in the "Tutorial" vignette, while 
-#' a more formal description of the estimation procedures are provided in the 
-#' vignette called "Models in MORSE package". Please refer to these documents 
+#' Those steps are presented in more details in the "Tutorial" vignette, while
+#' a more formal description of the estimation procedures are provided in the
+#' vignette called "Models in MORSE package". Please refer to these documents
 #' for further introduction to the use of MORSE.
-#' 
+#'
 #' This reference manual is a detailed description of the functions exposed in
 #' the package.
-#' 
+#'
 #' \strong{Getting started} The package uses the \code{rjags} package
 #' (Plummer, 2013), an R interface to the JAGS library for Bayesian model
-#' estimation. Note that the \code{rjags} package does not include a copy 
+#' estimation. Note that the \code{rjags} package does not include a copy
 #' of the JAGS library: you need to install it separately. For instructions
 #' on downloading JAGS, see the home page at
 #' \url{http://mcmc-jags.sourceforge.net}. Once done, simply follow the steps
@@ -66,7 +66,7 @@
 #' Plummer, M. (2013) \emph{JAGS Version 3.4.0 user manual}.
 #' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}.
 #' @keywords package
-#' 
+#'
 NULL
 
 #' Reproduction and survival datasets for \emph{Daphnia magna} exposed to
@@ -129,6 +129,15 @@ NULL
 #' replicate.} \item{\code{Nrepro}}{A vector of class \code{integer} with the
 #' number of offspring at each time point for each concentration and each
 #' replicate.} }
+#' @references Ducrot, V., Askem, C., Azam, D., Brettschneider, D., Brown,
+#' R., Charles, S., Coke, M., Collinet, M., Delignette-Muller, M.L.,
+#' Forfait-Dubuc, C., Holbech, H., Hutchinson, T., Jach, A., Kinnberg, K.L.,
+#' Lacoste, C., Le Page, G., Matthiessen, P., Oehlmann, J., Rice, L.,
+#' Roberts, E., Ruppert, K., Davis, J.E., Veauvy, C., Weltje, L., Wortham, R.
+#' and Lagadic, L. (2014)
+#' Development and validation of an OECD reproductive toxicity test guideline with
+#' the pond snail Lymnaea stagnalis (Mollusca, Gastropoda),
+#' \emph{Regulatory Toxicology and Pharmacology}, 70(3), 605-14.
 #' @keywords datasets
 NULL
 
