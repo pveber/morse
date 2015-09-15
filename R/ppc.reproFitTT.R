@@ -34,7 +34,7 @@ ppc.reproFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
 
-  ppc_gen(EvalreproPpc(x),style)
+  ppc_gen(EvalreproPpc(x), style)
 }
 
 

@@ -34,7 +34,7 @@ ppc.survFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "survFitTT"))
     stop("x is not of class 'survFitTT'!")
 
-  ppc_gen(EvalsurvPpc(x),style)
+  ppc_gen(EvalsurvPpc(x), style)
 }
 
 ppc_gen <- function(tab, style) {
@@ -81,14 +81,15 @@ EvalsurvPpc <- function(x) {
                         probs = c(2.5, 50, 97.5) / 100))
   tab <- data.frame(QNsurvPred,
                     Ninit, NsurvObs,
-                    col = ifelse(QNsurvPred[,"2.5%"] > NsurvObs | QNsurvPred[,"97.5%"] < NsurvObs,
+                    col = ifelse(QNsurvPred[,"2.5%"] > NsurvObs |
+                                   QNsurvPred[,"97.5%"] < NsurvObs,
                                  "red", "green"))
   colnames(tab) <- c("P2.5", "P50", "P97.5", "Ninit", "Obs", "col")
 
   return(tab)
 }
 
-#' @importFrom graphics abline arrows
+#' @importFrom graphics abline segments
 PpcGeneric <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   jittered_obs <- jitter(tab[, "Obs"])
@@ -99,8 +100,8 @@ PpcGeneric <- function(tab, xlab, ylab) {
        xlab = xlab,
        ylab = ylab)
 
-  segments(obs_val-0.5, obs_val,
-           obs_val+0.5, obs_val)
+  segments(obs_val - 0.5, obs_val,
+           obs_val + 0.5, obs_val)
 
   delta <- 0.01 * (max(obs_val) - min(obs_val))
   segments(jittered_obs,tab[, "P2.5"],
@@ -120,17 +121,18 @@ PpcGeneric <- function(tab, xlab, ylab) {
 #' @import ggplot2
 #' @importFrom  grid arrow unit
 PpcGG <- function(tab, xlab, ylab) {
+  tab$jittered_obs <- jitter(tab[, "Obs"])
+  delta <- 0.01 * (max(tab[, "Obs"]) - min(tab[, "Obs"]))
 
-  ggplot(tab, aes(x = Obs, y = P50)) +
-    geom_point() +
-    geom_abline(intercept = 0, slope = 1) +
-    geom_segment(aes(x = Obs, xend = Obs,
+  ggplot(tab) +
+    geom_segment(aes(x = jittered_obs, xend = jittered_obs,
                      y = P2.5, yend = P97.5),
                  arrow = arrow(length = unit(0.25, "cm"), angle = 90,
                                ends = "both"),
                  tab, color = tab$col) +
-    xlim(0, max(tab[, c("P97.5", "Obs")]) + 1) +
-    ylim(0, max(tab[, c("P97.5", "Obs")]) + 1) +
+    geom_point(aes(x = jittered_obs, y = tab[, "P50"])) +
+    xlim(0, max(tab[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
+    ylim(0, max(tab[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
     labs(x = xlab, y = ylab) +
     theme_minimal()
 }
