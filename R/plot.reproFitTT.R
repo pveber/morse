@@ -82,25 +82,12 @@ plot.reproFitTT <- function(x,
 
   curv_resp <- reproEvalFit(x, display.conc)
 
-  # Define visual parameters
-  mortality <- c(0, 1) # code 0/1 mortality
-  # valid if at least one replicat
-  mortality <- mortality[match(dataTT$Nsurv == dataTT$Ninit,
-                               c(TRUE, FALSE))] # vector of 0 and 1
-
-  # encodes mortality empty dots (1) and not mortality solid dots (19)
-  if (style == "generic")  mortality[which(mortality == 0)] <- 19
-  else if (style == "ggplot") {
-    mortality[which(mortality == 0)] <- "No"
-    mortality[which(mortality == 1)] <- "Yes"
-  }
-
   CI <- if (ci) { CI <- reproLlmCI(x, display.conc) } else NULL
 
   if (style == "generic") {
     reproFitPlotGeneric(dataTT$conc, transf_data_conc, dataTT$resp,
                         curv_conc, curv_resp,
-                        CI, mortality,
+                        CI,
                         xlab, ylab, fitcol, fitlty, fitlwd,
                         main, addlegend,
                         cicol, cilty, cilwd)
@@ -108,7 +95,7 @@ plot.reproFitTT <- function(x,
   else if (style == "ggplot") {
     reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
                    curv_conc, curv_resp,
-                   CI, mortality,
+                   CI,
                    xlab, ylab, fitcol, fitlty, fitlwd,
                    main, addlegend,
                    cicol, cilty, cilwd)
@@ -190,7 +177,7 @@ reproLlmCI <- function(fit, x) {
 }
 
 reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
-                                    curv_conc, curv_resp, mortality,
+                                    curv_conc, curv_resp,
                                     xlab, ylab, fitcol, fitlty, fitlwd,
                                     main, addlegend) {
   # plot the fitted curve estimated by reproFitTT
@@ -200,7 +187,6 @@ reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
        xlab = xlab,
        ylab = ylab,
        main = main,
-       pch = mortality,
        xaxt = "n",
        yaxt = "n",
        ylim = c(0, max(data_resp) + 0.2),
@@ -210,27 +196,24 @@ reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
   axis(side = 1, at = transf_data_conc,
        labels = data_conc)
 
-  # points
-  points(transf_data_conc, data_resp, pch = mortality)
-
   # fitted curve
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
 
   # legend
   if (addlegend) {
-    legend("bottomleft", pch = c(19, 1, NA),
-           lty = c(0, 0, fitlty),
-           lwd = c(1, 1, fitlwd),
-           col = c(1, 1, fitcol),
-           legend = c("No mortality", "Mortality", "loglogistic"),
+    legend("bottomleft",
+           lty = fitlty,
+           lwd = fitlwd,
+           col = fitcol,
+           legend = "loglogistic",
            bty = "n")
   }
 }
 
 reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
                                   curv_conc, curv_resp,
-                                  CI, mortality,
+                                  CI,
                                   xlab, ylab, fitcol, fitlty, fitlwd,
                                   main, addlegend,
                                   cicol, cilty, cilwd) {
@@ -261,27 +244,23 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
   lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
 
-  # points
-  points(transf_data_conc, data_resp, pch = mortality)
-
   # fitted curve
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
 
   # legend
   if(addlegend)
-    legend("bottomleft", pch = c(19, 1, NA, NA),
-           lty = c(0, 0, fitlty, cilty),
-           lwd = c(1, 1, fitlwd, cilwd),
-           col = c(1, 1, fitcol, cicol),
-           legend = c("No mortality", "Mortality",
-                      "loglogistic", "95% Credible limits"),
-           bty = "n")
+  legend("bottomleft",
+         lty = c(fitlty, cilty),
+         lwd = c(fitlwd, cilwd),
+         col = c(fitcol, cicol),
+         legend = c("loglogistic", "95% Credible limits"),
+         bty = "n")
 }
 
 reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
                                 curv_conc, curv_resp,
-                                CI, mortality,
+                                CI,
                                 xlab, ylab, fitcol, fitlty, fitlwd,
                                 main, addlegend,
                                 cicol, cilty, cilwd) {
@@ -289,35 +268,31 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
   if(!is.null(CI)) reproFitPlotGenericCI(data_conc, transf_data_conc,
                                          data_resp,
                                          curv_conc, curv_resp,
-                                         CI, mortality,
+                                         CI,
                                          xlab, ylab, fitcol, fitlty, fitlwd,
                                          main, addlegend,
                                          cicol, cilty, cilwd)
   else {
     reproFitPlotGenericNoCI(data_conc, transf_data_conc, data_resp,
-                            curv_conc, curv_resp, mortality,
+                            curv_conc, curv_resp,
                             xlab, ylab, fitcol, fitlty, fitlwd,
                             main, addlegend)
   }
 }
 
-reproFitPlotGGNoCI <- function(data, curv, valCols,
+reproFitPlotGGNoCI <- function(curv, valCols,
                                fitlty, fitlwd, xlab, ylab, main) {
-  plt_4 <- ggplot(data) +
-    geom_point(data = data, aes(transf_conc, resp, fill = Mortality),
-               pch = 21,
-               size = 3) +
-    scale_fill_manual(values = valCols$cols1, guide = "none") +
+  plt_4 <- ggplot(curv) +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
-    ylim(0, max(data$resp) + 1) +
+    ylim(0, max(curv$resp) + 1) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
 
   return(plt_4)
 }
 
-reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
+reproFitPlotGGCI <- function(curv, CI, cicol, cilty, cilwd,
                              valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   cri <- data.frame(conc = curv$conc,
@@ -325,7 +300,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
                            qsup95 = CI[["qsup95"]],
                            CI = "Credible limits")
 
-  plt_3 <- ggplot(data) +
+  plt_3 <- ggplot(cri) +
     geom_line(data = cri, aes(conc, qinf95, color = CI),
               linetype = cilty, size = cilwd) +
     geom_line(data = cri, aes(conc, qsup95, color = CI),
@@ -339,7 +314,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
 
   # plot IC
   # final plot
-  plt_4 <- ggplot(data) +
+  plt_4 <- ggplot(cri) +
     geom_line(data = cri, aes(conc, qinf95),
               linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_line(data = cri, aes(conc, qsup95),
@@ -348,13 +323,9 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
                                 ymax = qsup95), fill = valCols$cols3,
                 col = valCols$cols3,
                 alpha = 0.4) +
-    geom_point(data = data, aes(transf_conc, resp,
-                                fill = Mortality),
-               pch = 21, size = 3) +
-    scale_fill_manual(values = valCols$cols1, guide = "none") +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
-    ylim(0, max(c(data[,"resp"], CI[["qsup95"]])) + 0.2) +
+    ylim(0, max(CI[["qsup95"]]) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
 
@@ -364,7 +335,7 @@ reproFitPlotGGCI <- function(data, curv, CI, cicol, cilty, cilwd,
 
 reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                            curv_conc, curv_resp,
-                           CI, mortality,
+                           CI,
                            xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend,
                            cicol, cilty, cilwd) {
@@ -375,23 +346,13 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   }
 
   # dataframes points (data) and curve (curv)
-  data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
-                     resp = data_resp, Mortality = mortality)
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
 
   # colors
-  valCols <- fCols(data, fitcol, cicol, "repro")
-
-  # points (to create the legend)
-  plt_1 <- ggplot(data) +
-    geom_point(data = data, aes(conc, resp,
-                                fill = Mortality),
-               pch = 21, size = 3) +
-    scale_fill_manual(values = valCols$cols1) +
-    theme_minimal()
+  valCols <- fCols(curv, fitcol, cicol, "repro")
 
   # curve (to create the legend)
-  plt_2 <- ggplot(data) +
+    plt_2 <- ggplot(curv) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
     scale_color_manual(name = "", values = valCols$cols2) +
@@ -399,37 +360,36 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
 
   plt_4 <-
     if (! is.null(CI)) {
-      reproFitPlotGGCI(data, curv, CI, cicol, cilty, cilwd,
+      reproFitPlotGGCI(curv, CI, cicol, cilty, cilwd,
                        valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
-      reproFitPlotGGNoCI(data, curv, valCols, fitlty, fitlwd,
+      reproFitPlotGGNoCI(curv, valCols, fitlty, fitlwd,
                          xlab, ylab, main)
     }
 
   if (addlegend) {
     # create legends
-    mylegend_1 <- legendGgplotFit(plt_1) # points legend
     mylegend_2 <- legendGgplotFit(plt_2) # mean line legend
 
-    plt_5 <- plt_4 + scale_x_continuous(breaks = data$transf_conc,
-                                        labels = data$conc)
+    plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
+                                        labels = data_conc)
 
     if (is.null(CI)) {
-      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, nrow = 6),
+      grid.arrange(plt_5, arrangeGrob(mylegend_2, nrow = 6),
                    ncol = 2, widths = c(6, 2))
     }
     else {
-      plt_3 <- reproFitPlotGGCI(data, curv, CI, cicol, cilty, cilwd,
+      plt_3 <- reproFitPlotGGCI(curv, CI, cicol, cilty, cilwd,
                                 valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
       mylegend_3 <- legendGgplotFit(plt_3)
-      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
+      grid.arrange(plt_5, arrangeGrob(mylegend_2, mylegend_3,
                                       nrow = 6), ncol = 2,
                    widths = c(6, 2))
     }
   }
   else { # no legend
-    plt_5 <- plt_4 + scale_x_continuous(breaks = data$transf_conc,
-                                        labels = data$conc)
+    plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
+                                        labels = data_conc)
     return(plt_5)
   }
 }
