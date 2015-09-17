@@ -156,8 +156,15 @@ PpcGG <- function(tab, xlab, ylab) {
   df <- data.frame(sObs = c(sObs, max(sObs)),
                    stepX)
   
-  ggplot(df, aes(x = stepX, y = sObs)) +
-    geom_step() +
+  if (length(stepX) < 20) {
+    gf1 <- ggplot(df, aes(x = stepX, y = sObs)) +
+      geom_step()
+  } else {
+    gf1 <- ggplot(tab0) +
+      geom_abline(intercept = 0, slope = 1)
+  }
+  
+  gf2 <- gf1 +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
                      y = P2.5, yend = P97.5), data=tab0,
                  arrow = arrow(length = unit(0.1, "cm"), angle = 90,
@@ -168,5 +175,7 @@ PpcGG <- function(tab, xlab, ylab) {
     ylim(0, max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
      labs(x = xlab, y = ylab) +
      theme_minimal()
+  
+  return(gf2)
 }
 
