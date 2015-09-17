@@ -41,11 +41,11 @@ ppc_gen <- function(tab, style) {
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
 
-  if (style == "generic")
+  if (style == "generic") {
     PpcGeneric(tab, xlab, ylab)
-  else if (style == "ggplot")
+  } else if (style == "ggplot") {
     PpcGG(tab, xlab, ylab)
-  else stop("Unknown style")
+  } else stop("Unknown style")
 }
 
 #' @importFrom stats rbinom quantile
@@ -126,14 +126,14 @@ PpcGG <- function(tab, xlab, ylab) {
 
   ggplot(tab) +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
-                     y = P2.5, yend = P97.5),
+                     y = P2.5, yend = P97.5), tab,
                  arrow = arrow(length = unit(0.25, "cm"), angle = 90,
                                ends = "both"),
-                 tab, color = tab$col) +
-    geom_point(aes(x = jittered_obs, y = tab[, "P50"])) +
+                 color = tab$col) +
+    geom_point(aes(x = jittered_obs, y = P50), tab) +
     xlim(0, max(tab[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
     ylim(0, max(tab[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
-    labs(x = xlab, y = ylab) +
-    theme_minimal()
+     labs(x = xlab, y = ylab) +
+     theme_minimal()
 }
 
