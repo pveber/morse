@@ -87,20 +87,25 @@ EvalsurvPpc <- function(x) {
   return(tab)
 }
 
+stepCalc <- function(obs_val) {
+  sObs <- sort(c(0, obs_val))
+  stepX <- c(0, sapply(2:length(sObs), function(i) {
+    sObs[i-1] + (sObs[i] - sObs[i-1]) / 2}), max(sObs))
+  return(list(sObs = sObs, stepX = stepX))
+}
+
 #' @importFrom graphics abline segments
 PpcGeneric <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   jittered_obs <- jitter(tab[, "Obs"])
+  sObs <- stepCalc(obs_val)$sObs
+  stepX <- stepCalc(obs_val)$stepX
 
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
        type = "n",
        xlab = xlab,
        ylab = ylab)
-  
-  sObs <- sort(c(0, obs_val))
-  stepX <- c(0, sapply(2:length(sObs), function(i) {
-    sObs[i-1] + (sObs[i]-sObs[i-1])/2}), max(sObs))
   
   sapply(2:length(stepX), function(i) {
     segments(stepX[i-1], sObs[i-1], stepX[i], sObs[i-1])
@@ -128,9 +133,8 @@ PpcGG <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   tab$jittered_obs <- jitter(tab[, "Obs"])
   
-  sObs <- sort(c(0, obs_val))
-  stepX <- c(0, sapply(2:length(sObs), function(i) {
-    sObs[i-1] + (sObs[i]-sObs[i-1])/2}), max(sObs))
+  sObs <- stepCalc(obs_val)$sObs
+  stepX <- stepCalc(obs_val)$stepX
   
   df <- data.frame(sObs = c(sObs, max(sObs)),
                    stepX)
