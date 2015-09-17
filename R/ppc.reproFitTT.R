@@ -1,9 +1,9 @@
-#' Posterior predictive check plot for survFitTT objects
+#' Posterior predictive check plot for reproFitTT objects
 #'
 #' The \code{ppc} functions plot the observed versus predicted values for the
-#' \code{survFitTT} and \code{reporFitTT} objects.
+#' \code{reporFitTT} objects.
 #'
-#' @param x An object of class \code{reproFitTT} or \code{survFitTT}
+#' @param x An object of class \code{reproFitTT}
 #' @param style Graphical package method: \code{generic} or \code{ggplot}.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
