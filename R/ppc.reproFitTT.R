@@ -1,6 +1,6 @@
 #' Posterior predictive check plot for reproFitTT objects
 #'
-#' The \code{ppc} functions plot the observed versus predicted values for the
+#' The \code{ppc} function plot the observed versus predicted values for the
 #' \code{reporFitTT} objects.
 #'
 #' @param x An object of class \code{reproFitTT}
