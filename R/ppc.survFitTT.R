@@ -143,10 +143,11 @@ PpcGeneric <- function(tab, xlab, ylab) {
 #' @importFrom  grid arrow unit
 PpcGG <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
-  tab$jittered_obs <- jitter(tab[, "Obs"])
-  
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)
+  
+  tab0 <- cbind(tab[order(tab$Obs),], jittered_obs)
   
   df <- data.frame(sObs = c(sObs, max(sObs)),
                    stepX)
@@ -154,13 +155,13 @@ PpcGG <- function(tab, xlab, ylab) {
   ggplot(df, aes(x = stepX, y = sObs)) +
     geom_step() +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
-                     y = P2.5, yend = P97.5), tab,
+                     y = P2.5, yend = P97.5), data=tab0,
                  arrow = arrow(length = unit(0.1, "cm"), angle = 90,
                                ends = "both"),
-                 color = tab$col) +
-    geom_point(aes(x = jittered_obs, y = P50), tab) +
-    xlim(0, max(tab[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
-    ylim(0, max(tab[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
+                 color = tab0$col) +
+    geom_point(aes(x = jittered_obs, y = P50), tab0) +
+    xlim(0, max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
+    ylim(0, max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
      labs(x = xlab, y = ylab) +
      theme_minimal()
 }
