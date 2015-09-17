@@ -122,12 +122,11 @@ PpcGeneric <- function(tab, xlab, ylab) {
 #' @importFrom  grid arrow unit
 PpcGG <- function(tab, xlab, ylab) {
   tab$jittered_obs <- jitter(tab[, "Obs"])
-  delta <- 0.01 * (max(tab[, "Obs"]) - min(tab[, "Obs"]))
 
   ggplot(tab) +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
                      y = P2.5, yend = P97.5), tab,
-                 arrow = arrow(length = unit(0.25, "cm"), angle = 90,
+                 arrow = arrow(length = unit(0.1, "cm"), angle = 90,
                                ends = "both"),
                  color = tab$col) +
     geom_point(aes(x = jittered_obs, y = P50), tab) +
