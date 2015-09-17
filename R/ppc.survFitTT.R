@@ -41,11 +41,9 @@ ppc_gen <- function(tab, style) {
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
 
-  if (style == "generic") {
-    PpcGeneric(tab, xlab, ylab)
-  } else if (style == "ggplot") {
-    PpcGG(tab, xlab, ylab)
-  } else stop("Unknown style")
+  if (style == "generic") PpcGeneric(tab, xlab, ylab)
+  else if (style == "ggplot") PpcGG(tab, xlab, ylab)
+  else stop("Unknown style")
 }
 
 #' @importFrom stats rbinom quantile
@@ -99,9 +97,15 @@ PpcGeneric <- function(tab, xlab, ylab) {
        type = "n",
        xlab = xlab,
        ylab = ylab)
-
-  segments(obs_val - 0.5, obs_val,
-           obs_val + 0.5, obs_val)
+  
+  sObs <- sort(c(0, obs_val))
+  stepX <- c(0, sapply(2:length(sObs), function(i) {
+    sObs[i-1] + (sObs[i]-sObs[i-1])/2}), max(sObs))
+  
+  sapply(2:length(stepX), function(i) {
+    segments(stepX[i-1], sObs[i-1], stepX[i], sObs[i-1])
+    segments(stepX[i], sObs[i-1], stepX[i], sObs[i])
+  })
 
   delta <- 0.01 * (max(obs_val) - min(obs_val))
   segments(jittered_obs,tab[, "P2.5"],
@@ -114,7 +118,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
            jittered_obs + delta, tab[, "P97.5"],
            col = as.character(tab[, "col"]))
 
-  points(jittered_obs, tab[, "P50"],
+  points(tab[, "Obs"], tab[, "P50"],
          pch = 16)
 }
 
