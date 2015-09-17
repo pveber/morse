@@ -88,18 +88,29 @@ EvalsurvPpc <- function(x) {
 }
 
 stepCalc <- function(obs_val) {
+  # calculation of steps coordinate
   sObs <- sort(c(0, obs_val))
   stepX <- c(0, sapply(2:length(sObs), function(i) {
     sObs[i-1] + (sObs[i] - sObs[i-1]) / 2}), max(sObs))
   return(list(sObs = sObs, stepX = stepX))
 }
 
+jitterObsGenerator <- function(stepX, tab, obs_val) {
+  # uniform jittering of observed values
+  spaceX <- min(sapply(2:length(stepX),
+                       function(i) { stepX[i] - stepX[i-1] }))/2
+  lengthX <- table(tab[, "Obs"])
+  return(unlist(mapply(function(x, y) {
+    seq(x - spaceX, x + spaceX, length.out = y)
+  }, x = sort(obs_val), y = lengthX)))
+}
+
 #' @importFrom graphics abline segments
 PpcGeneric <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
-  jittered_obs <- jitter(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)
 
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
@@ -111,19 +122,20 @@ PpcGeneric <- function(tab, xlab, ylab) {
     segments(stepX[i-1], sObs[i-1], stepX[i], sObs[i-1])
     segments(stepX[i], sObs[i-1], stepX[i], sObs[i])
   })
-
+  
+  tab0 <- tab[order(tab$Obs),]
   delta <- 0.01 * (max(obs_val) - min(obs_val))
-  segments(jittered_obs,tab[, "P2.5"],
-           jittered_obs,tab[, "P97.5"],
-           col = as.character(tab[, "col"]))
-  segments(jittered_obs - delta, tab[, "P2.5"],
-           jittered_obs + delta, tab[, "P2.5"],
-           col = as.character(tab[, "col"]))
-  segments(jittered_obs - delta, tab[, "P97.5"],
-           jittered_obs + delta, tab[, "P97.5"],
-           col = as.character(tab[, "col"]))
+  segments(jittered_obs, tab0[, "P2.5"],
+           jittered_obs, tab0[, "P97.5"],
+           col = as.character(tab0[, "col"]))
+  segments(jittered_obs - delta, tab0[, "P2.5"],
+           jittered_obs + delta, tab0[, "P2.5"],
+           col = as.character(tab0[, "col"]))
+  segments(jittered_obs - delta, tab0[, "P97.5"],
+           jittered_obs + delta, tab0[, "P97.5"],
+           col = as.character(tab0[, "col"]))
 
-  points(jittered_obs, tab[, "P50"],
+  points(jittered_obs, tab0[, "P50"],
          pch = 16)
 }
 
