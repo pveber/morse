@@ -125,9 +125,18 @@ PpcGeneric <- function(tab, xlab, ylab) {
 #' @import ggplot2
 #' @importFrom  grid arrow unit
 PpcGG <- function(tab, xlab, ylab) {
+  obs_val <- unique(tab[, "Obs"])
   tab$jittered_obs <- jitter(tab[, "Obs"])
-
-  ggplot(tab) +
+  
+  sObs <- sort(c(0, obs_val))
+  stepX <- c(0, sapply(2:length(sObs), function(i) {
+    sObs[i-1] + (sObs[i]-sObs[i-1])/2}), max(sObs))
+  
+  df <- data.frame(sObs = c(sObs, max(sObs)),
+                   stepX)
+  
+  ggplot(df, aes(x = stepX, y = sObs)) +
+    geom_step() +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
                      y = P2.5, yend = P97.5), tab,
                  arrow = arrow(length = unit(0.1, "cm"), angle = 90,
