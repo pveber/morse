@@ -123,7 +123,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
            jittered_obs + delta, tab[, "P97.5"],
            col = as.character(tab[, "col"]))
 
-  points(tab[, "Obs"], tab[, "P50"],
+  points(jittered_obs, tab[, "P50"],
          pch = 16)
 }
 
