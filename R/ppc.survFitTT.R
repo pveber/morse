@@ -118,10 +118,14 @@ PpcGeneric <- function(tab, xlab, ylab) {
        xlab = xlab,
        ylab = ylab)
   
-  sapply(2:length(stepX), function(i) {
-    segments(stepX[i-1], sObs[i-1], stepX[i], sObs[i-1])
-    segments(stepX[i], sObs[i-1], stepX[i], sObs[i])
-  })
+  if (length(stepX) < 20) {
+    sapply(2:length(stepX), function(i) {
+      segments(stepX[i-1], sObs[i-1], stepX[i], sObs[i-1])
+      segments(stepX[i], sObs[i-1], stepX[i], sObs[i])
+    })
+  } else {
+    abline(0, 1)
+  }
   
   tab0 <- tab[order(tab$Obs),]
   delta <- 0.01 * (max(obs_val) - min(obs_val))
