@@ -101,9 +101,10 @@ jitterObsGenerator <- function(stepX, tab, obs_val) {
   spaceX <- min(sapply(2:length(stepX),
                        function(i) { stepX[i] - stepX[i-1] }))/2
   lengthX <- table(tab[, "Obs"])
-  return(unlist(mapply(function(x, y) {
-    seq(x - spaceX, x + spaceX, length.out = y)
-  }, x = sort(obs_val), y = lengthX)))
+  return(list(spaceX = spaceX,
+              jitterObs = unlist(mapply(function(x, y) {
+                seq(x - spaceX, x + spaceX, length.out = y)
+              }, x = sort(obs_val), y = lengthX))))
 }
 
 #' @importFrom graphics abline segments
@@ -111,7 +112,8 @@ PpcGeneric <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
-  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)$jitterObs
+  spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
 
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
@@ -120,9 +122,10 @@ PpcGeneric <- function(tab, xlab, ylab) {
        ylab = ylab)
   
   if (length(stepX) < 20) {
-    sapply(2:length(stepX), function(i) {
-      segments(stepX[i-1], sObs[i-1], stepX[i], sObs[i-1])
-      segments(stepX[i], sObs[i-1], stepX[i], sObs[i])
+    sapply(2:length(sObs), function(i) {
+      segments(sObs[i-1] - spaceX / 2, sObs[i-1],
+               sObs[i-1] + spaceX / 2, sObs[i-1],
+               col = "blue", lwd = 2)
     })
   } else {
     abline(0, 1)
