@@ -122,7 +122,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
        ylab = ylab)
   
   if (length(stepX) < 20) {
-    sapply(2:length(sObs), function(i) {
+    sapply(2:(length(sObs) + 1), function(i) {
       segments(sObs[i-1] - spaceX / 2, sObs[i-1],
                sObs[i-1] + spaceX / 2, sObs[i-1],
                col = "blue", lwd = 2)
