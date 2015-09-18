@@ -123,9 +123,8 @@ PpcGeneric <- function(tab, xlab, ylab) {
   
   if (length(stepX) < 20) {
     sapply(2:(length(sObs) + 1), function(i) {
-      segments(sObs[i-1] - spaceX / 2, sObs[i-1],
-               sObs[i-1] + spaceX / 2, sObs[i-1],
-               col = "blue", lwd = 2)
+      segments(sObs[i-1] - spaceX, sObs[i-1],
+               sObs[i-1] + spaceX, sObs[i-1])
     })
   } else {
     abline(0, 1)
@@ -153,16 +152,18 @@ PpcGG <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
-  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)$jitterObs
+  spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
   
   tab0 <- cbind(tab[order(tab$Obs),], jittered_obs)
-  
-  df <- data.frame(sObs = c(sObs, max(sObs)),
-                   stepX)
+
+  df <- data.frame(sObs, spaceX)
   
   if (length(stepX) < 20) {
-    gf1 <- ggplot(df, aes(x = stepX, y = sObs)) +
-      geom_step()
+    gf1 <- ggplot(df) +
+      geom_segment(aes(x = sObs - spaceX,
+                       xend = sObs + spaceX,
+                       y = sObs, yend = sObs))
   } else {
     gf1 <- ggplot(tab0) +
       geom_abline(intercept = 0, slope = 1)
@@ -175,8 +176,8 @@ PpcGG <- function(tab, xlab, ylab) {
                                ends = "both"),
                  color = tab0$col) +
     geom_point(aes(x = jittered_obs, y = P50), tab0) +
-    xlim(0, max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
-    ylim(0, max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
+    xlim(-spaceX, max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
+    ylim(-spaceX, max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
      labs(x = xlab, y = ylab) +
      theme_minimal()
   
