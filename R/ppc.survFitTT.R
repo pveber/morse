@@ -33,13 +33,14 @@
 ppc.survFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "survFitTT"))
     stop("x is not of class 'survFitTT'!")
-
-  ppc_gen(EvalsurvPpc(x), style)
-}
-
-ppc_gen <- function(tab, style) {
+  
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
+
+  ppc_gen(EvalsurvPpc(x), style, xlab, ylab)
+}
+
+ppc_gen <- function(tab, style, xlab, ylab) {
 
   if (style == "generic") PpcGeneric(tab, xlab, ylab)
   else if (style == "ggplot") PpcGG(tab, xlab, ylab)
