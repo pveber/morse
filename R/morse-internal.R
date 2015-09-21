@@ -177,9 +177,6 @@ fCols <- function(data, fitcol, cicol, analyse) {
                 cols4 = cols4))
            
     } else if (analyse == "repro") {
-    #points
-    cols1 <- c("black", "white")
-    names(cols1) <- sort(unique(data$Mortality))
     # fitted curve
     cols2 <- fitcol
     names(cols2) <- "loglogistic"
@@ -187,8 +184,7 @@ fCols <- function(data, fitcol, cicol, analyse) {
     cols3 <- cicol
     names(cols3) <- "Credible limits"
     
-    return(list(cols1 = cols1,
-                cols2 = cols2,
+    return(list(cols2 = cols2,
                 cols3 = cols3))
     }
 }

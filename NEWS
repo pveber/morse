@@ -15,6 +15,7 @@ BUG FIXES
 - minor changes in the tutorial vignette.
 - remove titles in legend of plot.reproFitTT and plot.survFitTT in
   ggplot style.
+- remove observed value points in plot.reproFitTT.
 
 
 Version 2.0.0
