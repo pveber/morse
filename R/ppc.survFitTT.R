@@ -98,8 +98,9 @@ stepCalc <- function(obs_val) {
 
 jitterObsGenerator <- function(stepX, tab, obs_val) {
   # uniform jittering of observed values
-  spaceX <- min(sapply(2:length(stepX),
-                       function(i) { stepX[i] - stepX[i-1] }))/2
+  allSpaceX <- sapply(2:length(stepX),
+                      function(i) { stepX[i] - stepX[i-1] })
+  spaceX <- min(allSpaceX[which(allSpaceX != 0)])/2
   lengthX <- table(tab[, "Obs"])
   return(list(spaceX = spaceX,
               jitterObs = unlist(mapply(function(x, y) {
@@ -121,7 +122,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
        xlab = xlab,
        ylab = ylab)
   
-  if (length(stepX) < 20) {
+  if (max(sObs) < 20) {
     sapply(2:(length(sObs) + 1), function(i) {
       segments(sObs[i-1] - spaceX, sObs[i-1],
                sObs[i-1] + spaceX, sObs[i-1])
