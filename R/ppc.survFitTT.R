@@ -102,10 +102,15 @@ jitterObsGenerator <- function(stepX, tab, obs_val) {
                       function(i) { stepX[i] - stepX[i-1] })
   spaceX <- min(allSpaceX[which(allSpaceX != 0)])/2
   lengthX <- table(tab[, "Obs"])
+  jitterObs <- mapply(function(x, y) {
+    if (y == 1) {
+      seq(x, x, length.out = y)
+    } else {
+      seq(x - spaceX, x + spaceX, length.out = y)
+    }
+  }, x = sort(obs_val), y = lengthX)
   return(list(spaceX = spaceX,
-              jitterObs = unlist(mapply(function(x, y) {
-                seq(x - spaceX, x + spaceX, length.out = y)
-              }, x = sort(obs_val), y = lengthX))))
+              jitterObs = unlist(jitterObs)))
 }
 
 #' @importFrom graphics abline segments
