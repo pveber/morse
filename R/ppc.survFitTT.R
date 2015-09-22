@@ -106,7 +106,8 @@ jitterObsGenerator <- function(stepX, tab, obs_val) {
     if (y == 1) {
       seq(x, x, length.out = y)
     } else {
-      seq(x - spaceX, x + spaceX, length.out = y)
+      seq(x - spaceX + (2 * spaceX / (y + 1)),
+          x + spaceX - (2 * spaceX / (y + 1)), length.out = y)
     }
   }, x = sort(obs_val), y = lengthX)
   return(list(spaceX = spaceX,
