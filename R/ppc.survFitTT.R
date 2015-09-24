@@ -166,7 +166,7 @@ PpcGG <- function(tab, xlab, ylab) {
 
   df <- data.frame(sObs, spaceX)
   
-  if (length(stepX) < 20) {
+  if (max(sObs) < 20) {
     gf1 <- ggplot(df) +
       geom_segment(aes(x = sObs - spaceX,
                        xend = sObs + spaceX,
