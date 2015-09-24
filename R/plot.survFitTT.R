@@ -5,7 +5,7 @@
 #'
 #' The fitted curve represents the \strong{estimated survival rate} after
 #' the target time has passed as a function of the concentration of pollutant;
-#' the black dots depict the \strong{observed survival rate} at each tested.
+#' the black dots depict the \strong{observed survival rate} at each tested
 #' concentration. Note that since our model does not take inter-replicate
 #' variability into consideration, replicates are systematically pooled in this
 #' plot. When \code{ci = TRUE}, the function plots both credible intervals for
