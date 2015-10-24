@@ -5,6 +5,7 @@
 #'
 #' @param x An object of class \code{reproFitTT} or \code{survFitTT}
 #' @param style Graphical package method: \code{generic} or \code{ggplot}.
+#' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @examples
 #'
@@ -29,7 +30,7 @@
 #' @import grDevices
 #' @importFrom graphics plot
 #'
-ppc.reproFitTT <- function(x, style = "generic") {
+ppc.reproFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
 
