@@ -8,6 +8,8 @@ NEW FEATURES
   clutches.
 - add S3 method ppc to plot the posterior predictive check on reproFitTT and
   survFitTT objects.
+- added a new argument 'remove.someLabels' to plot.reproData and plot.survData
+  functions to avoid the overlap of labels of the X-axis in ggplot style.
 
 BUG FIXES
 - the check on replicate's label has been removed in the survDatacheck
@@ -17,8 +19,6 @@ BUG FIXES
   ggplot style.
 - remove observed value points in plot.reproFitTT.
 
-- add a new argument 'remove.someLabs' in plot.reproData and plot.survData
-  functions to ovoid the overlap of label in x-axis in ggplot style.
 
 Version 2.0.0
 =============
@@ -63,7 +63,7 @@ Version 1.0.2
 
 BUG FIXES
 - correction of points color in the legend for the plot.repro.fit function (ggplot).
-- change the ylim range for the plot.repro.fit function (generic). 
+- change the ylim range for the plot.repro.fit function (generic).
 - correction of the log.scale option for the repro.survplot function.
 
 Version 1.0.1
