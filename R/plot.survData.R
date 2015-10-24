@@ -17,6 +17,8 @@
 #' summed for a same concentration
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
+#' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -63,27 +65,28 @@ plot.survData <- function(x,
                           style = "generic",
                           pool.replicate = FALSE,
                           log.scale = FALSE,
-                          addlegend = FALSE, ...) {
-  
+                          addlegend = FALSE,
+                          remove.someLabels = FALSE, ...) {
+
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
-  
+
   if (pool.replicate) {
     # agregate by sum of replicate
     x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
                replicate = 1)
   }
-  
+
   if (is.null(target.time) && is.null(concentration)) {
-    survDataPlotFull(x, xlab, ylab, style, addlegend)
+    survDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabels)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
     survDataPlotTargetTime(x, xlab, ylab, main, target.time,
-                           style, log.scale, addlegend)
+                           style, log.scale, addlegend, remove.someLabels)
   }
   else if (is.null(target.time) && ! is.null(concentration)) {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
-                          style, addlegend)
+                          style, addlegend, remove.someLabels)
   }
   else {
     survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
@@ -192,7 +195,7 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend) {
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
+dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels) {
 
   time = NULL
   Nsurv = NULL
@@ -206,7 +209,13 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
     geom_line() +
     labs(x = xlab, y = ylab) +
     facet_wrap(~conc, ncol = 2) +
-    scale_x_continuous(breaks = unique(data$time)) +
+    scale_x_continuous(breaks = unique(data$time),
+                       labels = if (remove.someLabels) {
+                         exclude_labels(unique(data$time))
+                       } else {
+                           unique(data$time)
+                         }
+                       ) +
     scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
     theme_minimal()
 
@@ -220,26 +229,27 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend) {
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
-                         addlegend = FALSE) {
+                         addlegend = FALSE, remove.someLabels = FALSE) {
 
   if (missing(xlab)) xlab <- "Time"
 
   if (style == "generic")
     dataPlotFullGeneric(data, xlab, ylab, resp, addlegend)
   else if (style == "ggplot")
-    dataPlotFullGG(data, xlab, ylab, resp, addlegend)
+    dataPlotFullGG(data, xlab, ylab, resp, addlegend, remove.someLabels)
   else stop("Unknown plot style")
 }
 
 survDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                             addlegend = FALSE) {
-  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend)
+                             addlegend = FALSE, remove.someLabels = FALSE) {
+  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend, remove.someLabels)
 }
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
 survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
-                                   style, log.scale, addlegend) {
+                                   style, log.scale, addlegend,
+                                   remove.someLabels) {
   if (missing(xlab)) xlab <-"Concentration"
 
   if (!target.time %in% x$time)
@@ -252,13 +262,13 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
   sel <- if(log.scale) xf$conc > 0 else TRUE
   x <- xf[sel, ]
   transf_data_conc <- optLogTransform(log.scale, x$conc)
-  
+
   # Concentration values used for display in linear scale
   display.conc <- (function() {
     x <- optLogTransform(log.scale, x$conc)
     if(log.scale) exp(x) else x
   })()
-  
+
   # vector color
   x$color <- as.numeric(as.factor(x$replicate))
 
@@ -301,7 +311,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
     df <- data.frame(x,
                      transf_data_conc,
                      display.conc)
-    
+
     if (length(unique(df$replicate)) == 1) {
       gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv))
     } else {
@@ -314,7 +324,12 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
       labs(x = xlab,
            y = ylab) +
       scale_x_continuous(breaks = df$transf_data_conc,
-                         labels = df$display.conc) +
+                         labels = if (remove.someLabels) {
+                           exclude_labels(df$display.conc)
+                         } else {
+                           df$display.conc
+                         }
+      ) +
       scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$Nsurv))))))
 
     # legend option
@@ -334,7 +349,8 @@ dataPlotFixedConc <- function(x,
                               resp,
                               concentration,
                               style = "generic",
-                              addlegend = FALSE) {
+                              addlegend = FALSE,
+                              remove.someLabels = FALSE) {
 
   if (missing(xlab)) xlab <- "Time"
 
@@ -370,7 +386,7 @@ dataPlotFixedConc <- function(x,
                 pch = 16,
                 col = x$color)
        })
-    
+
     # axis
     axis(side = 1, at = sort(unique(x[, "time"])))
     axis(side = 2, at = unique(round(pretty(c(0, max(x[, resp]))))))
@@ -397,7 +413,12 @@ dataPlotFixedConc <- function(x,
       labs(x = xlab,
            y = ylab) +
       scale_color_hue("Replicate") +
-      scale_x_continuous(breaks = unique(x$time)) +
+      scale_x_continuous(breaks = unique(x$time),
+                         labels = if (remove.someLabels) {
+                           exclude_labels(unique(x$time))
+                         } else {
+                           unique(x$time)
+                         }) +
       scale_y_continuous(breaks = unique(round(pretty(c(0, max(x$response)))))) +
       expand_limits(x = 0, y = 0)
 
@@ -416,10 +437,11 @@ survDataPlotFixedConc <- function(x,
                                   main,
                                   concentration,
                                   style = "generic",
-                                  addlegend = FALSE) {
+                                  addlegend = FALSE,
+                                  remove.someLabels = FALSE) {
 
   dataPlotFixedConc(x, xlab, ylab, main, "Nsurv", concentration,
-                    style, addlegend)
+                    style, addlegend, remove.someLabels)
 }
 
 #' @importFrom dplyr %>% filter
@@ -447,7 +469,7 @@ dataPlotReplicates <- function(x,
 
   if (style == "generic") {
     par(mfrow = c(1, ifelse(concentration == 0, 1, 2)))
-    
+
     plot(as.numeric(control$replicate), control[,resp],
          xlab = xlab,
          ylab = ylab,
@@ -456,11 +478,11 @@ dataPlotReplicates <- function(x,
          ylim = c(0, max(control[, resp])),
          xaxt = "n",
          yaxt = "n")
-    
+
     # axis
     axis(side = 1, at = sort(unique(control[, "replicate"])))
     axis(side = 2, at = unique(round(pretty(c(0, max(control[, resp]))))))
-    
+
     # fixed concentration
     if (! concentration == 0) {
       plot(as.numeric(xtt$replicate), xtt[,resp],
@@ -471,7 +493,7 @@ dataPlotReplicates <- function(x,
            ylim = c(0, max(control[, resp])),
            xaxt = "n",
            yaxt = "n")
-      
+
       # axis
       axis(side = 1, at = sort(unique(xtt[, "replicate"])))
       axis(side = 2, at = unique(round(pretty(c(0, max(xtt[, resp]))))))
