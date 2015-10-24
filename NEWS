@@ -17,6 +17,8 @@ BUG FIXES
   ggplot style.
 - remove observed value points in plot.reproFitTT.
 
+- add a new argument 'remove.someLabs' in plot.reproData and plot.survData
+  functions to ovoid the overlap of label in x-axis in ggplot style.
 
 Version 2.0.0
 =============

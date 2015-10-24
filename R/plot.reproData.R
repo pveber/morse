@@ -17,6 +17,8 @@
 #' summed for a same concentration
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param remove.someLabs if \code{TRUE}, remove 3/4 of X-axis labels in
+#' \code{'ggplot'} style to avoid the label overlapping.
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -61,7 +63,8 @@ plot.reproData <- function(x,
                            style = "generic",
                            pool.replicate = FALSE,
                            log.scale = FALSE,
-                           addlegend = FALSE, ...) {
+                           addlegend = FALSE,
+                           remove.someLabs = FALSE, ...) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
   
@@ -72,14 +75,16 @@ plot.reproData <- function(x,
   }
   
   if (is.null(target.time) && is.null(concentration)) {
-    reproDataPlotFull(x, xlab, ylab, style, addlegend)
+    reproDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabs)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
     reproDataPlotTargetTime(x, xlab, ylab, main, target.time,
-                            style, log.scale, addlegend)
+                            style, log.scale, addlegend,
+                            remove.someLabs)
   }
   else if (is.null(target.time) && ! is.null(concentration)) {
-    reproDataPlotFixedConc(x, xlab, ylab, main, concentration, style, addlegend)
+    reproDataPlotFixedConc(x, xlab, ylab, main, concentration, style, addlegend,
+                           remove.someLabs)
   }
   else {
     reproDataPlotReplicates(x, xlab, ylab, target.time, concentration,
@@ -90,8 +95,9 @@ plot.reproData <- function(x,
 
 
 reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                              addlegend = TRUE) {
-  dataPlotFull(data, xlab, ylab, "Nreprocumul", style, addlegend)
+                              addlegend = TRUE, remove.someLabs) {
+  dataPlotFull(data, xlab, ylab, "Nreprocumul", style, addlegend,
+               remove.someLabs)
 }
 
 
@@ -104,7 +110,8 @@ reproDataPlotTargetTime <- function(x,
                                     target.time,
                                     style,
                                     log.scale,
-                                    addlegend) {
+                                    addlegend,
+                                    remove.someLabs) {
 
   if (missing(xlab)) xlab <-"Concentration"
 
@@ -190,7 +197,11 @@ reproDataPlotTargetTime <- function(x,
       scale_colour_hue(legend.title, breaks = c("No","Yes"),
                        labels = c(legend.name.no, legend.name.yes)) +
       scale_x_continuous(breaks = df$transf_data_conc,
-                         labels = df$display.conc)
+                         labels = if (remove.someLabs) {
+                           exclude_labels(df$display.conc)
+                         } else {
+                           df$display.conc
+                         })
     
     if (addlegend) {
       return(gp)
@@ -207,9 +218,10 @@ reproDataPlotFixedConc <- function(x,
                                    main,
                                    concentration,
                                    style = "generic",
-                                   addlegend = FALSE) {
+                                   addlegend = FALSE,
+                                   remove.someLabs = FALSE) {
   dataPlotFixedConc(x, xlab, ylab, main, "Nreprocumul",
-                    concentration, style, addlegend)
+                    concentration, style, addlegend, remove.someLabs)
 }
 
 reproDataPlotReplicates <- function(x,
