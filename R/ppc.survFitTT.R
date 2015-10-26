@@ -126,7 +126,21 @@ PpcGeneric <- function(tab, xlab, ylab) {
        c(0, max(tab[, "P97.5"])),
        type = "n",
        xlab = xlab,
-       ylab = ylab)
+       ylab = ylab,
+       xaxt = "n",
+       yaxt = "n")
+  
+  # axis
+  axis(side = 2, at = if (max(tab[, "Obs"]) == 1) {
+    c(0, 1)
+  } else {
+    pretty(c(0, max(tab[, "P97.5"])))
+  })
+  axis(side = 1, at = if (max(tab[, "Obs"]) == 1) {
+    c(0, 1)
+  } else {
+    pretty(c(0, max(tab[, "P97.5"])))
+  })
   
   if (max(sObs) < 20) {
     sapply(1:length(sObs), function(i) {
@@ -170,7 +184,11 @@ PpcGG <- function(tab, xlab, ylab) {
     gf1 <- ggplot(df) +
       geom_segment(aes(x = sObs - (spaceX * 1.25),
                        xend = sObs + (spaceX * 1.25),
-                       y = sObs, yend = sObs))
+                       y = sObs, yend = sObs)) +
+      scale_x_continuous(breaks = c(0, tab0[, "Obs"]),
+                         labels = c(0, tab0[, "Obs"])) +
+      scale_y_continuous(breaks = c(0, tab0[, "Obs"]),
+                         labels = c(0, tab0[, "Obs"]))
   } else {
     gf1 <- ggplot(tab0) +
       geom_abline(intercept = 0, slope = 1)
@@ -183,11 +201,10 @@ PpcGG <- function(tab, xlab, ylab) {
                                ends = "both"),
                  color = tab0$col) +
     geom_point(aes(x = jittered_obs, y = P50), tab0) +
-    xlim(-(spaceX * 1.25), max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
-    ylim(-(spaceX * 1.25), max(tab0[, c("P97.5", "Obs", "jittered_obs")]) + 1) +
-     labs(x = xlab, y = ylab) +
-     theme_minimal()
+    expand_limits(y = 0) +
+    expand_limits(x = 0) +
+    labs(x = xlab, y = ylab) +
+    theme_minimal()
   
   return(gf2)
 }
-
