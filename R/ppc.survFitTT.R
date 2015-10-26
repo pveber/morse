@@ -129,9 +129,9 @@ PpcGeneric <- function(tab, xlab, ylab) {
        ylab = ylab)
   
   if (max(sObs) < 20) {
-    sapply(2:(length(sObs) + 1), function(i) {
-      segments(sObs[i-1] - (spaceX * 1.25), sObs[i-1],
-               sObs[i-1] + (spaceX * 1.25), sObs[i-1])
+    sapply(1:length(sObs), function(i) {
+      segments(sObs[i] - (spaceX * 1.25), sObs[i],
+               sObs[i] + (spaceX * 1.25), sObs[i])
     })
   } else {
     abline(0, 1)
