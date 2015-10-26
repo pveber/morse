@@ -90,7 +90,7 @@ EvalsurvPpc <- function(x) {
 
 stepCalc <- function(obs_val) {
   # calculation of steps coordinate
-  sObs <- sort(c(0, obs_val))
+  sObs <- sort(obs_val)
   stepX <- c(0, sapply(2:length(sObs), function(i) {
     sObs[i-1] + (sObs[i] - sObs[i-1]) / 2}), max(sObs))
   return(list(sObs = sObs, stepX = stepX))
