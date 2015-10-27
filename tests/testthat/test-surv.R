@@ -85,8 +85,10 @@ test_that("survDataCheck", {
   zinc9[, "replicate"] <- as.character(zinc9[, "replicate"])
   zinc9[12, "replicate"] <- "D"
   zinc9[, "replicate"] <- as.factor(zinc9[, "replicate"])
-  expect_equal(survDataCheck(zinc9, diagnosis.plot = FALSE)$id[4],
-               "ReplicateLabel")
+  expect_equal(survDataCheck(zinc9, diagnosis.plot = FALSE)$id[1],
+               "firstTime0")
+  expect_equal(survDataCheck(zinc9, diagnosis.plot = FALSE)$id[3],
+               "missingReplicate")
 
   zinc10 <- zinc
   zinc10[46, "time"] <- "A"
@@ -95,8 +97,10 @@ test_that("survDataCheck", {
 
   cadmium19 <- cadmium1
   cadmium19[12, "replicate"] <- 5
-  expect_equal(survDataCheck(cadmium19, diagnosis.plot = FALSE)$id[4],
-               "ReplicateLabel")
+  expect_equal(survDataCheck(cadmium19, diagnosis.plot = FALSE)$id[1],
+               "firstTime0")
+  expect_equal(survDataCheck(cadmium19, diagnosis.plot = FALSE)$id[3],
+               "missingReplicate")
 })
 
 test_that("survData", {
