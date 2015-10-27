@@ -3,6 +3,10 @@
 Version 2.0.1
 =============
 
+SYSTEM REQUIREMENTS
+- the JAGS version 4.0.0 or higher is required
+- the rjags version 4.4 or higher is required
+
 NEW FEATURES
 - the dataset cadmium2 now reports the number of eggs instead of the number of
   clutches.
