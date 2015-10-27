@@ -1,9 +1,9 @@
-#' Posterior predictive check plot for survFitTT objects
+#' Posterior predictive check plot for reproFitTT objects
 #'
-#' The \code{ppc} functions plot the observed versus predicted values for the
-#' \code{survFitTT} and \code{reporFitTT} objects.
+#' The \code{ppc} function plot the observed versus predicted values for the
+#' \code{reporFitTT} objects.
 #'
-#' @param x An object of class \code{reproFitTT} or \code{survFitTT}
+#' @param x An object of class \code{reproFitTT}
 #' @param style Graphical package method: \code{generic} or \code{ggplot}.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
@@ -33,8 +33,11 @@
 ppc.reproFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
+  
+  xlab <- "Observed Cumul. Nbr. of offspring"
+  ylab <- "Predicted Cumul. Nbr. of offspring"
 
-  ppc_gen(EvalreproPpc(x),style)
+  ppc_gen(EvalreproPpc(x), style, xlab, ylab)
 }
 
 
