@@ -1,6 +1,5 @@
 ---
 title: "MORSE tutorial"
-author: "Marie-Laure Delignette-Muller, Philippe Ruiz and Philippe Veber"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 self_contained: no
