@@ -285,6 +285,9 @@ survFitTKTD <- function(data,
                         distr = "norm",
                         n.chains = 3,
                         quiet = FALSE) {
+  # test class object
+  if(! is(data, "survData"))
+    stop("survFitTKTD: object of class survData expected")
   
   # data transformation
   # agregate by sum of replicate
