@@ -44,16 +44,14 @@
 #' # (5) Plot the reproduction data for a fixed concentration and target.time
 #' plot(cadmium1, target.time = 21, concentration = 0.86)
 #'
-#'
-#' @export
-#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot axis legend lines par points polygon
 #' segments title
 #' @importFrom methods is
 #' @importFrom stats aggregate
-#'
+#' 
+#' @export
 plot.reproData <- function(x,
                            xlab,
                            ylab = "Cumulated Number of offspring",

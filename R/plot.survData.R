@@ -47,8 +47,6 @@
 #' # target.time with ggplot style
 #' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
 #'
-#' @export
-#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot axis legend lines par points polygon
@@ -56,6 +54,7 @@
 #' @importFrom methods is
 #' @importFrom stats aggregate
 #'
+#' @export
 plot.survData <- function(x,
                           xlab,
                           ylab = "Number of surviving individuals",

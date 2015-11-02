@@ -132,10 +132,9 @@
 #' pch = c(19, 1))
 #' }
 #'
-#' @export
-#'
 #' @import rjags
-#'
+#' 
+#' @export
 reproFitTT <- function(data,
                        stoc.part = "bestfit",
                        target.time = NULL,

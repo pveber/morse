@@ -29,7 +29,6 @@
 #' @keywords print
 #' 
 #' @export
-#' 
 print.survFitTT <- function(x, ...) {
   # print the model text and the Jags Computing information
   # for an object of class survFitTT
