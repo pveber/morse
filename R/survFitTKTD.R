@@ -359,6 +359,7 @@ survFitTKTD <- function(data,
               n.iter = list(start = summary(mcmc$samples)$start,
                             end = summary(mcmc$samples)$end),
               n.thin = summary(mcmc$samples)$thin,
+              distr = distr,
               jags.data = jags.data,
               transformed.data = data)
   
