@@ -12,7 +12,7 @@ survTKTDCreateJagsData <- function(data, distr) {
   concmin <- min(data$conc[data$conc != 0])
   concmax <- max(data$conc)
   
-  tmin <- min(filter(data, time != 0)$time)
+  tmin <- min(data$time)
   tmax <- max(data$time)
   
   deltaCmin = NULL
