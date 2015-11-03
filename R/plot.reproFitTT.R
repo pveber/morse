@@ -27,7 +27,8 @@
 #' segments title
 #'
 #' @keywords plot
-#'
+#' 
+#' @export
 plot.reproFitTT <- function(x,
                             xlab = "Concentration",
                             ylab = "Nb of offspring per ind.day",
