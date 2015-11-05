@@ -24,12 +24,11 @@
 #' ppc(out)
 #' }
 #'
-#' @export
-#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot
-#'
+#' 
+#' @export
 ppc.survFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "survFitTT"))
     stop("x is not of class 'survFitTT'!")

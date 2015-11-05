@@ -114,11 +114,10 @@
 #'      pch = c(19,1))
 #' }
 #'
-#' @export
-#'
 #' @import rjags
 #' @importFrom dplyr filter
-#'
+#' 
+#' @export
 survFitTT <- function(data,
                       target.time = NULL,
                       lcx = c(5, 10, 20, 50),

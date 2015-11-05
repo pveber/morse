@@ -24,12 +24,11 @@
 #' ppc(out)
 #' }
 #'
-#' @export
-#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot
 #'
+#' @export
 ppc.reproFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")

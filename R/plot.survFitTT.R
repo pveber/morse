@@ -35,8 +35,6 @@
 #'
 #' @keywords plot
 #'
-#' @export
-#'
 #' @import grDevices
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange arrangeGrob
@@ -44,6 +42,7 @@
 #' @importFrom graphics plot axis legend lines par points polygon
 #' @importFrom stats aggregate
 #'
+#' @export
 plot.survFitTT <- function(x,
                            xlab = "Concentration",
                            ylab = "Survival rate",

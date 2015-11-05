@@ -48,7 +48,6 @@
 #' reproDataCheck(copper)
 #'
 #' @export
-#'
 reproDataCheck <- function(data, diagnosis.plot = TRUE) {
 
   ##
