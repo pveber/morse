@@ -5,8 +5,6 @@
 #' 
 #' @param x an S3 object of a class derived from \code{survData}
 #' 
-#' @export
-#' 
 #' @examples 
 #' data(zinc)
 #' x <- reproData(zinc)
@@ -16,6 +14,8 @@
 #'
 #' #and
 #' plot(as.survData(x))
+#' 
+#' @export
 as.survData <- function(x) {
   if(inherits(x,"survData")) {
     class(x) <- c("survData","data.frame")

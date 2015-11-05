@@ -26,7 +26,6 @@
 #' @keywords summary
 #' 
 #' @export
-#' 
 summary.reproData <- function(object, quiet = FALSE, ...) {
   res <- summary.survData(object, quiet = quiet)
   

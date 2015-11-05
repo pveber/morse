@@ -39,10 +39,10 @@
 #' # (2) Create an objet of class 'survData'
 #' dat <- survData(zinc)
 #' class(dat)
-#
-#' @export
+#' 
 #' @importFrom dplyr left_join rename
-# @importFrom plyr rename
+#' 
+#' @export
 survData <- function(data) {
   ### INPUT
   # [data]: a [data.frame] with above mentionned requirements

@@ -35,7 +35,6 @@
 #' class(dat)
 #'
 #' @export
-#'
 reproData <- function(x) {
 
   # test the integrity of the data with reproDataCheck

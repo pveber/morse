@@ -18,9 +18,7 @@
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
 #' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
-#'
-#' @export
-#'
+#' 
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom gridExtra grid.arrange arrangeGrob
@@ -29,7 +27,8 @@
 #' segments title
 #'
 #' @keywords plot
-#'
+#' 
+#' @export
 plot.reproFitTT <- function(x,
                             xlab = "Concentration",
                             ylab = "Nb of offspring per ind.day",
