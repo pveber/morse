@@ -66,8 +66,8 @@
 # \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
 # \code{\link[ggplot2]{ggplot}}
 #
-# @references Plummer, M. (2013) JAGS Version 3.4.0 user manual.
-# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
+# @references Plummer, M. (2013) JAGS Version 4.0.0 user manual.
+# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
 #
 # Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
 # measures of model complexity and fit (with discussion).  \emph{Journal of

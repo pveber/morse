@@ -85,8 +85,8 @@
 # modelling.
 # \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
 #
-# Plummer, M. (2013) JAGS Version 3.4.0 user manual.
-# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}
+# Plummer, M. (2013) JAGS Version 4.0.0 user manual.
+# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
 #
 # Raftery A.E. and Lewis, S.M. (1992) One long run with diagnostics:
 # Implementation strategies for Markov chain Monte Carlo. \emph{Statistical

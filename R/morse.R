@@ -63,8 +63,8 @@
 #' modelling}.
 #' \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
 #'
-#' Plummer, M. (2013) \emph{JAGS Version 3.4.0 user manual}.
-#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}.
+#' Plummer, M. (2013) \emph{JAGS Version 4.0.0 user manual}.
+#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}.
 #' @keywords package
 #'
 NULL
