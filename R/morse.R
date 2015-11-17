@@ -41,7 +41,7 @@
 #' described in the tutorial vignette.
 #'
 #' \tabular{ll}{ Package: \tab morse\cr Type: \tab Package\cr Version: \tab
-#' 2.1.0\cr Date: \tab 2015-11-06\cr License: \tab GPL (>=2)\cr }
+#' 2.1.0\cr Date: \tab 2015-11-17\cr License: \tab GPL (>=2)\cr }
 #'
 #' @name morse-package
 #' @aliases morse-package morse
