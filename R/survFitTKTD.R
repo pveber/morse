@@ -1,8 +1,11 @@
 #' @importFrom dplyr filter
-survTKTDCreateJagsData <- function(data, distr) {
+survTKTDCreateJagsData <- function(data, distr, bond) {
   # Creates the parameters to define the prior of the TKTD model
   # INPUTS
-  # data: object of class survData
+  # data : object of class survData
+  # distr : normal or uniform priors
+  # bond : 0.01 and 0.99 or 0.001 and 0.999 % of the highest tested
+  # concentration
   # OUTPUT
   # jags.data : list of data required for the jags.model function
   
@@ -22,15 +25,30 @@ survTKTDCreateJagsData <- function(data, distr) {
   deltaCmin <- min(deltaCmin)
   
   # ks parameters
-  ksmax <- -log(0.01) / (tmin * deltaCmin)
-  ksmin <- -log(0.99) / (tmax * (concmax - concmin))
+  if (bond == "01") {
+    ksmax <- -log(0.01) / (tmin * deltaCmin)
+    ksmin <- -log(0.99) / (tmax * (concmax - concmin))
+  } else if (bond == "001") {
+    ksmax <- -log(0.001) / (tmin * deltaCmin)
+    ksmin <- -log(0.999) / (tmax * (concmax - concmin))
+  } else {
+    stop("Wrong bond")
+  }
   meanlog10ks <- (log10(ksmax) + log10(ksmin)) / 2
   sdlog10ks <- (log10(ksmax) - log10(ksmin)) / 4
   taulog10ks <- 1 / sdlog10ks^2
   
   # ke parameters
-  kemax <- -log(0.01) / tmin
-  kemin <- -log(0.99) / tmax
+  if (bond == "01") {
+    kemax <- -log(0.01) / tmin
+    kemin <- -log(0.99) / tmax
+  } else if (bond == "001") {
+    kemax <- -log(0.001) / tmin
+    kemin <- -log(0.999) / tmax
+  } else {
+    stop("Wrong bond")
+  }
+
   meanlog10ke <- (log10(kemax) + log10(kemin)) / 2
   
   sdlog10ke <- (log10(kemax) - log10(kemin)) / 4
@@ -38,7 +56,13 @@ survTKTDCreateJagsData <- function(data, distr) {
   
   # m0 parameters
   m0max <- -log(0.5) / tmin
-  m0min <- -log(0.99) / tmax
+  if (bond == "01") {
+    m0min <- -log(0.99) / tmax
+  } else if (bond == "001") {
+    m0min <- -log(0.99) / tmax
+  } else {
+    stop("Wrong bond")
+  }
   meanlog10m0 <- (log10(m0max) + log10(m0min)) / 2
   
   sdlog10m0 <- (log10(m0max) - log10(m0min)) / 4
@@ -169,6 +193,9 @@ survTKTDPARAMS <- function(mcmc) {
 #' @import coda
 coda.samples.dic <- function (model, variable.names = NULL, n.iter, thin = 1, ...)
 {
+  # From http://ihrke.github.io/dic_jags.html
+  # Run coda.sample and dic.sample simultaneously
+  
   load.module('dic') # necessary for pD and deviance monitor
   
   start <- model$iter() + thin
@@ -225,6 +252,8 @@ coda.samples.dic <- function (model, variable.names = NULL, n.iter, thin = 1, ..
 #' @param distr If \code{"norm"} gives normal distributions for prior distribution
 #' parameters, else if \code{"unif"} gives uniform distributions for prior
 #' distribution parameters.
+#' @param bond If \code{"01"} the extreme case where the survival remains at 99\%
+#' at the highest tested concentration, else if \code{"001"} it's 99.9\%.
 #' @param n.chains Number of MCMC chains. The minimum required number of chains
 #' is 2.
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
@@ -283,6 +312,7 @@ coda.samples.dic <- function (model, variable.names = NULL, n.iter, thin = 1, ..
 #' 
 survFitTKTD <- function(data,
                         distr = "norm",
+                        bond = "01",
                         n.chains = 3,
                         quiet = FALSE) {
   # test class object
@@ -316,7 +346,7 @@ survFitTKTD <- function(data,
   data[is.na(data$tprec),
        c("tprec", "Nprec", "N_init")] <- datasurv0[, c("tprec", "Nprec", "N_init")]
   
-  jags.data <- survTKTDCreateJagsData(data, distr)
+  jags.data <- survTKTDCreateJagsData(data, distr, bond)
   
   # Define model
   if (distr == "norm") {
