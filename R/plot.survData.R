@@ -226,14 +226,16 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend, one.plot) {
     axis(side = 2, at = unique(round(pretty(c(0, max(data[, resp]))))))
     
     by(data, data$conc, function(x) {
-      # lines and points
-      index <- concentration.index[[as.character(x$conc[1])]]
-      lines(x$time, x[, resp],
-            type = "l",
-            col = colors[index])
-      points(x$time, x[, resp],
-             pch = pchs[index],
-             col = colors[index])
+      by(x, x$replicate, function(y) {
+        # lines and points
+        index <- concentration.index[[as.character(y$conc[1])]]
+        lines(y$time, y[, resp],
+              type = "l",
+              col = colors[index])
+        points(y$time, y[, resp],
+               pch = pchs[index],
+               col = colors[index])
+      })
     })
     
     if (addlegend) {
