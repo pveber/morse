@@ -259,22 +259,40 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels,
   title.legend <- "Replicate"
 
   data$response <- data[,resp]
-
-  # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
-    geom_point() +
-    geom_line() +
-    labs(x = xlab, y = ylab) +
-    facet_wrap(~conc, ncol = 2) +
-    scale_x_continuous(breaks = unique(data$time),
-                       labels = if (remove.someLabels) {
-                         exclude_labels(unique(data$time))
-                       } else {
+  
+  if (!one.plot) {
+    # create ggplot object Nsurv / time / replicate / conc
+    fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
+      geom_point() +
+      geom_line() +
+      labs(x = xlab, y = ylab) +
+      facet_wrap(~conc, ncol = 2) +
+      scale_x_continuous(breaks = unique(data$time),
+                         labels = if (remove.someLabels) {
+                           exclude_labels(unique(data$time))
+                         } else {
                            unique(data$time)
                          }
-                       ) +
-    scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
-    theme_minimal()
+      ) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
+      theme_minimal()
+  } else {
+    # create ggplot object Nsurv / time / replicate / conc
+    fg <- ggplot(data, aes(time, response, color = factor(conc),
+                 group = interaction(factor(conc), factor(replicate)))) +
+      geom_point() +
+      geom_line() +
+      labs(x = xlab, y = ylab) +
+      scale_x_continuous(breaks = unique(data$time),
+                         labels = if (remove.someLabels) {
+                           exclude_labels(unique(data$time))
+                         } else {
+                           unique(data$time)
+                         }
+      ) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
+      theme_minimal()
+  }
 
   # legend option
   if (addlegend){
