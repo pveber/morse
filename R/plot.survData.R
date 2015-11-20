@@ -273,7 +273,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels,
 
   time = NULL
   Nsurv = NULL
-  title.legend <- "Replicate"
+  title.legend <- "Concentration"
 
   data$response <- data[,resp]
   
@@ -677,7 +677,9 @@ survDataPlotByConc <- function(x,
              cex = 1,
              ncol = 2)
     }
-  } else {
+  } else if (style == "ggplot") {
+    title.legend <- "Time"
+    
     fg <- ggplot(x, aes(conc, Nsurv, color = factor(time))) +
       geom_point() +
       geom_line() +
@@ -689,11 +691,11 @@ survDataPlotByConc <- function(x,
     
     # legend option
     if (addlegend) {
-      fd <- fg + scale_colour_hue("Time") # the default legend
+      fd <- fg + scale_colour_hue(title.legend) # the default legend
     } else {
       fd <- fg + theme(legend.position = "none") # remove legend
     }
     return(fd)
-  }
+  } else stop("Unknown plot style")
 }
 

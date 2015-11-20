@@ -58,6 +58,7 @@ survFitPlotDataTKTD <- function(x) {
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
 #' @param style Graphical method: \code{generic} or \code{ggplot}.
+#' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @keywords plot 
 #' @export
@@ -72,7 +73,7 @@ plot.survFitTKTD <- function(x,
                              xlab,
                              ylab,
                              main,
-                             style = "generic") {
+                             style = "generic", ...) {
   
   # default axis parameters
   if (missing(xlab)) {
