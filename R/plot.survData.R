@@ -630,11 +630,6 @@ survDataPlotByConc <- function(x,
   
   if (missing(xlab)) xlab <- "Concentration"
   if (missing(ylab)) ylab <- "Number of survivor"
-
-  
-  # agregate by sum of replicate
-  x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
-             replicate = 1)
   
   time.index <- TimeIndex(x)
   # vectors of colors and pch
@@ -658,13 +653,15 @@ survDataPlotByConc <- function(x,
     
     # lines and points
     by(x, x$time, function(y) {
-      index <- time.index[[as.character(y$time[1])]]
-      lines(y$conc, y$Nsurv,
-            type = "l",
-            col = colors[index])
-      points(y$conc, y$Nsurv,
-             col = colors[index],
-             pch = pchs[index])
+      by(y, y$replicate, function(z) {
+        index <- time.index[[as.character(z$time[1])]]
+        lines(z$conc, z$Nsurv,
+              type = "l",
+              col = colors[index])
+        points(z$conc, z$Nsurv,
+               col = colors[index],
+               pch = pchs[index])
+      })
     })
     
     if (addlegend) {
@@ -680,7 +677,8 @@ survDataPlotByConc <- function(x,
   } else if (style == "ggplot") {
     title.legend <- "Time"
     
-    fg <- ggplot(x, aes(conc, Nsurv, color = factor(time))) +
+    fg <- ggplot(x, aes(conc, Nsurv, color = factor(time),
+                 group = interaction(factor(time), factor(replicate)))) +
       geom_point() +
       geom_line() +
       labs(x = xlab, y = ylab) +
