@@ -17,6 +17,8 @@
 #' summed for a same concentration
 #' @param one.plot if \code{TRUE}, displays the Response / Time points in one
 #' plot else use a grid.
+#' @param by.conc if \code{TRUE}, displays the Response in fonction of
+#' concentration with one line by timepoints.
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
@@ -66,6 +68,7 @@ plot.survData <- function(x,
                           style = "generic",
                           pool.replicate = FALSE,
                           one.plot = FALSE,
+                          by.conc = FALSE,
                           log.scale = FALSE,
                           addlegend = FALSE,
                           remove.someLabels = FALSE, ...) {
@@ -79,24 +82,26 @@ plot.survData <- function(x,
                replicate = 1)
   }
 
-  if (is.null(target.time) && is.null(concentration)) {
+  if (is.null(target.time) && is.null(concentration) && !by.conc) {
     survDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabels,
                      one.plot)
   }
-  else if (! is.null(target.time) && is.null(concentration)) {
+  else if (! is.null(target.time) && is.null(concentration) && !by.conc) {
     survDataPlotTargetTime(x, xlab, ylab, main, target.time,
                            style, log.scale, addlegend, remove.someLabels)
   }
-  else if (is.null(target.time) && ! is.null(concentration)) {
+  else if (is.null(target.time) && ! is.null(concentration) && !by.conc) {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
                           style, addlegend, remove.someLabels)
+  }
+  else if (by.conc) {
+    survDataPlotByConc(x, xlab, ylab, main, style, addlegend)
   }
   else {
     survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
                            addlegend)
   }
 }
-
 
 # [ReplicateIndex(data)] builds a list of indices, each one named after
 # a replicate of [data], thus providing a dictionary from replicate names to
@@ -115,6 +120,16 @@ ConcentrationIndex <- function(data) {
   concentration <- unique(data$conc)
   r <- as.list(seq(1, length(concentration)))
   names(r) <- as.character(concentration)
+  return(r)
+}
+
+# [TimeIndex(data)] builds a list of indices, each one named after
+# a time of [data], thus providing a dictionary from time
+# values to integer keys.
+TimeIndex <- function(data) {
+  time <- unique(data$time)
+  r <- as.list(seq(1, length(time)))
+  names(r) <- as.character(time)
   return(r)
 }
 
@@ -605,3 +620,62 @@ survDataPlotReplicates <- function(x,
   dataPlotReplicates(x, xlab, ylab, "Nsurv", target.time, concentration, style,
                      addlegend)
 }
+
+survDataPlotByConc <- function(x,
+                               xlab,
+                               ylab,
+                               main,
+                               style,
+                               addlegend) {
+  
+  if (missing(xlab)) xlab <- "Concentration"
+  if (missing(ylab)) ylab <- "Number of survivor"
+  
+  # agregate by sum of replicate
+  x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
+             replicate = 1)
+  
+  time.index <- TimeIndex(x)
+  # vectors of colors and pch
+  colors <- rainbow(length(unique(x$time)))
+  pchs <- as.numeric(as.factor(unique(x$time)))
+  
+  if (style == "generic") {
+    # background
+    plot(x$conc,
+         x$Nsurv,
+         xlab = xlab,
+         ylab = ylab,
+         ylim = c(0, max(x$Nsurv)),
+         xaxt = "n",
+         yaxt = "n",
+         type = "n")
+    
+    # axis
+    axis(side = 1, at = sort(unique(x[, "conc"])))
+    axis(side = 2, at = unique(round(pretty(c(0, max(x[, "Nsurv"]))))))
+    
+    # lines and points
+    by(x, x$time, function(y) {
+      index <- time.index[[as.character(y$time[1])]]
+      lines(y$conc, y$Nsurv,
+            type = "l",
+            col = colors[index])
+      points(y$conc, y$Nsurv,
+             col = colors[index],
+             pch = pchs[index])
+    })
+    
+    if (addlegend) {
+      legend("bottomleft",
+             legend = unique(x$time),
+             lty = 1,
+             pch = pchs,
+             col = colors,
+             bty = "n",
+             cex = 1,
+             ncol = 2)
+    }
+  }
+}
+
