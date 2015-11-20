@@ -312,7 +312,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels,
   }
 
   # legend option
-  if (addlegend){
+  if (addlegend) {
     fd <- fg + scale_colour_hue(title.legend) # the default legend
   } else {
     fd <- fg + theme(legend.position = "none") # remove legend
@@ -624,12 +624,13 @@ survDataPlotReplicates <- function(x,
 survDataPlotByConc <- function(x,
                                xlab,
                                ylab,
-                               main,
+                               main = NULL,
                                style,
                                addlegend) {
   
   if (missing(xlab)) xlab <- "Concentration"
   if (missing(ylab)) ylab <- "Number of survivor"
+
   
   # agregate by sum of replicate
   x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
@@ -676,6 +677,23 @@ survDataPlotByConc <- function(x,
              cex = 1,
              ncol = 2)
     }
+  } else {
+    fg <- ggplot(x, aes(conc, Nsurv, color = factor(time))) +
+      geom_point() +
+      geom_line() +
+      labs(x = xlab, y = ylab) +
+      scale_x_continuous(breaks = unique(x$conc)) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0,
+                                                        max(x[, "Nsurv"])))))) +
+      theme_minimal()
+    
+    # legend option
+    if (addlegend) {
+      fd <- fg + scale_colour_hue("Time") # the default legend
+    } else {
+      fd <- fg + theme(legend.position = "none") # remove legend
+    }
+    return(fd)
   }
 }
 
