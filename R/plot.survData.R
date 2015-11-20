@@ -273,11 +273,11 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels,
 
   time = NULL
   Nsurv = NULL
-  title.legend <- "Concentration"
 
   data$response <- data[,resp]
   
   if (!one.plot) {
+    title.legend <- "Replicate"
     # create ggplot object Nsurv / time / replicate / conc
     fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
       geom_point() +
@@ -294,6 +294,8 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels,
       scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
       theme_minimal()
   } else {
+    title.legend <- "Concentration"
+    
     # create ggplot object Nsurv / time / replicate / conc
     fg <- ggplot(data, aes(time, response, color = factor(conc),
                  group = interaction(factor(conc), factor(replicate)))) +
