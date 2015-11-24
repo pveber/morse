@@ -1,0 +1,13 @@
+# Sample .travis.yml for R projects
+
+language: r
+warnings_are_errors: true
+sudo: required
+install:
+  -,./travis-tool.sh install_deps coda dplyr graphics grDevices ggplot2 grid gridExtra methods rjags stats stringr knitr rmarkdown testthat
+env:
+  global:
+    - CRAN: http://cran.rstudio.com
+    - R_BUILD_ARGS="--no-build-vignettes --no-manual"
+    - R_CHECK_ARGS="--no-build-vignettes --no-manual --as-cran"
+    - BOOTSTRAP_LATEX=""
