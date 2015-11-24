@@ -4,7 +4,7 @@ language: r
 warnings_are_errors: true
 sudo: required
 install:
-  -,./travis-tool.sh install_deps coda dplyr graphics grDevices ggplot2 grid gridExtra methods rjags stats stringr knitr rmarkdown testthat
+  - ./travis-tool.sh install_deps coda dplyr graphics grDevices ggplot2 grid gridExtra methods rjags stats stringr knitr rmarkdown testthat
 env:
   global:
     - CRAN: http://cran.rstudio.com
