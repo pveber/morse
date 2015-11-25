@@ -3,21 +3,6 @@ warnings_are_errors: true
 sudo: required
 bioc_required: false
 
-r_binary_packages:
-  - coda
-  - dplyr
-  - graphics
-  - grDevices
-  - ggplot2
-  - grid
-  - gridExtra
-  - methods
-  - rjags
-  - stats
-  - stringr
-  - knitr
-  - rmarkdown
-  - testthat
   
 env:
   global:
