@@ -59,7 +59,7 @@ survTKTDCreateJagsData <- function(data, distr, bond) {
   if (bond == "01") {
     m0min <- -log(0.99) / tmax
   } else if (bond == "001") {
-    m0min <- -log(0.99) / tmax
+    m0min <- -log(0.999) / tmax
   } else {
     stop("Wrong bond")
   }
