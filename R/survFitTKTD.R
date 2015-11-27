@@ -268,6 +268,12 @@ survFitTKTD <- function(data,
   if(! is(data, "survData"))
     stop("survFitTKTD: object of class survData expected")
   
+  # data transformation
+  # agregate by sum of replicate
+  data <- cbind(aggregate(Nsurv ~ time + conc, data, sum),
+                replicate = 1)
+  data <- summarise(group_by(data, conc, time), N_alive = sum(Nsurv))
+  
   n <- nrow(data)
   data$tprec <- NA
   data$Nprec <- NA
