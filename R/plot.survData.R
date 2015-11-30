@@ -76,7 +76,7 @@ plot.survData <- function(x,
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
 
-  if (pool.replicate) {
+  if (pool.replicate || one.plot) {
     # agregate by sum of replicate
     x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
                replicate = 1)
