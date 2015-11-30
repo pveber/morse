@@ -77,10 +77,10 @@ survTKTDCreateJagsData <- function(data, distr, bond) {
     return(list( 'x' = data$conc, 'y' = data$N_alive,
                  't' = data$time, 'tprec' = data$tprec,
                  'Nprec' = data$Nprec,
-                 concmin = concmin, concmax = concmax,
-                 ksmin = ksmin, ksmax = ksmax,
-                 kemin = kemin, kemax = kemax,
-                 m0min = m0min, m0max = m0max,
+                 minlog10conc = log10(concmin), maxlog10conc = log10(concmax),
+                 minlog10ks = log10(ksmin), maxlog10ks = log10(ksmax),
+                 minlog10ke = log10(kemin), maxlog10ke = log10(kemax),
+                 minlog10m0 = log10(m0min), maxlog10m0 = log10(m0max),
                  ndat = length(data$conc),
                  bigtime = max(data$time) + 10))
   } else if (distr == "norm") {
@@ -98,10 +98,10 @@ survTKTDCreateJagsData <- function(data, distr, bond) {
 
 modelTKTDUnif <- "model {
 #########priors 
-log10ks ~ dunif(log10(ksmin), log10(ksmax))
-log10NEC ~ dunif(log10(concmin) - 1, log10(concmax) + 1)
-log10ke ~ dunif(log10(kemin), log10(kemax))
-log10m0 ~ dunif(log10(m0min), log10(m0max))
+log10ks ~ dunif(minlog10ks, maxlog10ks)
+log10NEC ~ dunif(minlog10conc - 1, maxlog10conc + 1)
+log10ke ~ dunif(minlog10ke, maxlog10ke)
+log10m0 ~ dunif(minlog10m0, maxlog10m0)
 
 #####parameter transformation
 ks <- 10**log10ks
