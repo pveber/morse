@@ -98,16 +98,16 @@ survTKTDCreateJagsData <- function(data, distr, bond) {
 
 modelTKTDUnif <- "model {
 #########priors 
-lks ~ dunif(log(ksmin) / log(10), log(ksmax) / log(10))
-lNEC ~ dunif(log(concmin) / log(10) - 1, log(concmax) / log(10) + 1)
-lke ~ dunif(log(kemin) / log(10), log(kemax) / log(10))
-lm0 ~ dunif(log(m0min) / log(10), log(m0max) / log(10))
+log10ks ~ dunif(log10(ksmin), log10(ksmax))
+log10NEC ~ dunif(log10(concmin) - 1, log10(concmax) + 1)
+log10ke ~ dunif(log10(kemin), log10(kemax))
+log10m0 ~ dunif(log10(m0min), log10(m0max))
 
 #####parameter transformation
-ks <- 10**lks
-NEC <- 10**lNEC
-ke <- 10**lke
-m0 <- 10**lm0
+ks <- 10**log10ks
+NEC <- 10**log10NEC
+ke <- 10**log10ke
+m0 <- 10**log10m0
 
 ##########Computation of the likelihood
 for (i in 1:ndat)
@@ -125,16 +125,16 @@ for (i in 1:ndat)
 
 modelTKTDNorm <- "model {
 #########priors 
-lks ~ dnorm(meanlog10ks, taulog10ks)
-lNEC ~ dnorm(meanlog10nec, taulog10nec)
-lke ~ dnorm(meanlog10ke, taulog10ke)
-lm0 ~ dnorm(meanlog10m0, taulog10m0)
+log10ks ~ dnorm(meanlog10ks, taulog10ks)
+log10NEC ~ dnorm(meanlog10nec, taulog10nec)
+log10ke ~ dnorm(meanlog10ke, taulog10ke)
+log10m0 ~ dnorm(meanlog10m0, taulog10m0)
 
 #####parameter transformation
-ks <- 10**lks
-NEC <- 10**lNEC
-ke <- 10**lke
-m0 <- 10**lm0
+ks <- 10**log10ks
+NEC <- 10**log10NEC
+ke <- 10**log10ke
+m0 <- 10**log10m0
 
 ##########Computation of the likelihood
 for (i in 1:ndat)
@@ -163,21 +163,20 @@ survTKTDPARAMS <- function(mcmc) {
   # Retrieving parameters of the model
   res.M <- summary(mcmc)
   
-  ke <- 10^res.M$quantiles["lke", "50%"]
-  keinf <- 10^res.M$quantiles["lke", "2.5%"]
-  kesup <- 10^res.M$quantiles["lke", "97.5%"]
-  ks <- 10^res.M$quantiles["lks", "50%"]
-  ksinf <- 10^res.M$quantiles["lks", "2.5%"]
-  kssup <- 10^res.M$quantiles["lks", "97.5%"]
-  nec <- 10^res.M$quantiles["lNEC", "50%"]
-  necinf <- 10^res.M$quantiles["lNEC", "2.5%"]
-  necsup <- 10^res.M$quantiles["lNEC", "97.5%"]
-  m0 <- 10^res.M$quantiles["lm0", "50%"]
-  m0inf <- 10^res.M$quantiles["lm0", "2.5%"]
-  m0sup <- 10^res.M$quantiles["lm0", "97.5%"]
+  ke <- 10^res.M$quantiles["log10ke", "50%"]
+  keinf <- 10^res.M$quantiles["log10ke", "2.5%"]
+  kesup <- 10^res.M$quantiles["log10ke", "97.5%"]
+  ks <- 10^res.M$quantiles["log10ks", "50%"]
+  ksinf <- 10^res.M$quantiles["log10ks", "2.5%"]
+  kssup <- 10^res.M$quantiles["log10ks", "97.5%"]
+  nec <- 10^res.M$quantiles["log10NEC", "50%"]
+  necinf <- 10^res.M$quantiles["log10NEC", "2.5%"]
+  necsup <- 10^res.M$quantiles["log10NEC", "97.5%"]
+  m0 <- 10^res.M$quantiles["log10m0", "50%"]
+  m0inf <- 10^res.M$quantiles["log10m0", "2.5%"]
+  m0sup <- 10^res.M$quantiles["log10m0", "97.5%"]
   
   # Definition of the parameter storage and storage data
-  # If Poisson Model
   
   rownames <- c("ke", "ks", "nec", "m0")
   params <- c(ke, ks, nec, m0)
@@ -306,12 +305,9 @@ survFitTKTD <- function(data,
   }
   
   # Determine sampling parameters
-  parameters <- c("lke", "lNEC","lks", "lm0")
+  parameters <- c("log10ke", "log10NEC","log10ks", "log10m0")
   sampling.parameters <- modelSamplingParameters(model,
                                                  parameters, n.chains, quiet)
-  
-#   if (sampling.parameters$niter > 100000)
-#     stop("The model needs too many iterations to provide reliable parameter estimates !")
   
   # Sampling
   prog.b <- ifelse(quiet == TRUE, "none", "text")
@@ -323,17 +319,17 @@ survFitTKTD <- function(data,
   
   # summarize estime.par et CIs
   # calculate from the estimated parameters
-  estim.par <- survTKTDPARAMS(mcmc$samples)
+  estim.par <- survTKTDPARAMS(mcmc)
   
   #OUTPUT
   OUT <- list(estim.par = estim.par,
-              mcmc = mcmc$samples,
+              mcmc = mcmc,
               model = model,
               parameters = parameters,
-              n.chains = summary(mcmc$samples)$nchain,
-              n.iter = list(start = summary(mcmc$samples)$start,
-                            end = summary(mcmc$samples)$end),
-              n.thin = summary(mcmc$samples)$thin,
+              n.chains = summary(mcmc)$nchain,
+              n.iter = list(start = summary(mcmc)$start,
+                            end = summary(mcmc)$end),
+              n.thin = summary(mcmc)$thin,
               distr = distr,
               jags.data = jags.data,
               transformed.data = data)
