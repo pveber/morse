@@ -20,7 +20,7 @@ survTKTDCreateJagsData <- function(data, distr, bond) {
   
   deltaCmin = NULL
   for (i in 2:length(unique(data$conc))) {
-    deltaCmin[i - 1] <- unique(data$conc)[i] - unique(data$conc)[i - 1]
+    deltaCmin[i - 1] <- sort(unique(data$conc))[i] - sort(unique(data$conc))[i - 1]
   }
   deltaCmin <- min(deltaCmin)
   
@@ -269,11 +269,8 @@ survFitTKTD <- function(data,
     stop("survFitTKTD: object of class survData expected")
   
   # data transformation
-  # agregate by sum of replicate
-  data <- cbind(aggregate(Nsurv ~ time + conc, data, sum),
-                replicate = 1)
   data <- summarise(group_by(data, conc, time), N_alive = sum(Nsurv))
-  
+
   n <- nrow(data)
   data$tprec <- NA
   data$Nprec <- NA
