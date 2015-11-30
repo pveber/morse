@@ -106,8 +106,14 @@ plot.survFitTKTD <- function(x,
                              addlegend = FALSE,
                              style = "generic", ...) {
   
-  # create observed and theoretical values
-  data <- survFitPlotDataTKTD(x)
+#   dataT <- x$transformed.data
+#   dataT$resp <- dataT$N_alive / dataT$N_init
+#   # data points are systematically pooled, since our model does not
+#   # take individual variation into account
+#   dataT <- cbind(aggregate(resp ~ time + conc, dataT, mean),
+#                  replicate = 1)
+
+  data <- survFitPlotDataTKTD(x) #, dataT)
   
   
   if (style == "generic") {
