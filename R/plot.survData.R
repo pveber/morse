@@ -657,9 +657,6 @@ survDataPlotByConc <- function(x,
     by(x, x$time, function(y) {
       by(y, y$replicate, function(z) {
         index <- time.index[[as.character(z$time[1])]]
-        lines(z$conc, z$Nsurv,
-              type = "l",
-              col = colors[index])
         points(z$conc, z$Nsurv,
                col = colors[index],
                pch = pchs[index])
@@ -669,7 +666,6 @@ survDataPlotByConc <- function(x,
     if (addlegend) {
       legend("bottomleft",
              legend = unique(x$time),
-             lty = 1,
              pch = pchs,
              col = colors,
              bty = "n",
@@ -682,7 +678,6 @@ survDataPlotByConc <- function(x,
     fg <- ggplot(x, aes(conc, Nsurv, color = factor(time),
                  group = interaction(factor(time), factor(replicate)))) +
       geom_point() +
-      geom_line() +
       labs(x = xlab, y = ylab) +
       scale_x_continuous(breaks = unique(x$conc)) +
       scale_y_continuous(breaks = unique(round(pretty(c(0,
