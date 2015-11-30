@@ -51,6 +51,29 @@ survFitPlotDataTKTD <- function(x) {
               dobs = dobs))
 }
 
+#' importFrom stats quantile
+survTKTDMeanCredInt <- function(fit) {
+  # create the parameters for credible interval for the TKTD model
+  mctot <- do.call("rbind", fit$mcmc)
+  k <- nrow(mctot)
+  # parameters
+  keCI <- 10^mctot[,"log10ke"]
+  ksCI <- 10^mctot[,"log10ks"]
+  m0CI <- 10^mctot[,"log10m0"]
+  NECCI <- 10^mctot[,"log10NEC"]
+  
+  # quantiles
+  qinf95 = NULL
+  
+  data <- survFitPlotDataTKTD(s, ksCI, keCI, NECCI, m0CI)
+  
+  x <- seq(min(fit$time), max(fit$time), length = 100)
+  
+  for (i in 1:length(x)) {
+    theomean
+  }
+}
+
 #' Plotting method for survFitTKTD objects
 #' 
 #' @param x An object of class \code{survFitTKTD}.
@@ -79,6 +102,7 @@ plot.survFitTKTD <- function(x,
                              cicol = "pink1",
                              cilty = 1,
                              cilwd = 1,
+                             one.plot = TRUE,
                              addlegend = FALSE,
                              style = "generic", ...) {
   
@@ -90,28 +114,55 @@ plot.survFitTKTD <- function(x,
     # vector color
     data[["dobs"]]$color <- as.numeric(as.factor(data[["dobs"]][["conc"]]))
     data[["dtheo"]]$color <- as.numeric(as.factor(data[["dtheo"]][["conc"]]))
-    plot(data[["dobs"]][["t"]],
-         data[["dobs"]][["psurv"]],
-         xlab = xlab,
-         ylab = ylab,
-         pch = 16,
-         col = data[["dobs"]]$color,
-         main = main)
     
-    # one line by replicate
-    by(data[["dtheo"]], list(data[["dtheo"]]$conc),
-       function(x) {
-         lines(x$t, x$psurv, # lines
-               col = x$color)
-       })
+    if (one.plot) {
+      plot(data[["dobs"]][["t"]],
+           data[["dobs"]][["psurv"]],
+           xlab = xlab,
+           ylab = ylab,
+           pch = 16,
+           col = data[["dobs"]]$color,
+           main = main)
+     # one line by replicate
+      by(data[["dtheo"]], list(data[["dtheo"]]$conc),
+         function(x) {
+           lines(x$t, x$psurv, # lines
+                 col = x$color)
+         })
+    } else {
+      par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
+      
+      # one line by replicate
+      by(data[["dtheo"]], list(data[["dtheo"]]$conc),
+         function(x) {
+           plot(x[, "t"],
+                x[, "psurv"],
+                xlab = xlab,
+                ylab = ylab,
+                type = "n",
+                ylim = c(0, 1),
+                col = x[, "color"],
+                main = main)
+           lines(x[, "t"], x[, "psurv"], # lines
+                 col = x[, "color"])
+         })
+      par(mfrow = c(1, 1))
+    }
   }
   
   if (style == "ggplot") {
-    
-    plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
-      facet_wrap(~conc) +
-      labs(x = xlab, y = ylab) + ggtitle(main) +
-      geom_point() + geom_line(data = data$dtheo) + theme_minimal()
+    if (one.plot) {
+      plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
+        labs(x = xlab, y = ylab) + ggtitle(main) +
+        ylim(c(0, 1)) +
+        geom_point() + geom_line(data = data$dtheo) + theme_minimal()
+    } else {
+      plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
+        facet_wrap(~conc) +
+        labs(x = xlab, y = ylab) + ggtitle(main) +
+        ylim(c(0, 1)) +
+        geom_point() + geom_line(data = data$dtheo) + theme_minimal()
+    }
     
     plt1
   }
