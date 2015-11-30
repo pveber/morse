@@ -70,24 +70,21 @@ survFitPlotDataTKTD <- function(x) {
 #' @importFrom graphics plot
 #' 
 plot.survFitTKTD <- function(x,
-                             xlab,
-                             ylab,
-                             main,
+                             xlab = "Time",
+                             ylab = "Survival rate",
+                             main = NULL,
+                             fitlty = 1,
+                             fitlwd = 1,
+                             ci = FALSE,
+                             cicol = "pink1",
+                             cilty = 1,
+                             cilwd = 1,
+                             addlegend = FALSE,
                              style = "generic", ...) {
-  
-  # default axis parameters
-  if (missing(xlab)) {
-    xlab <- "Time"
-  }
-  if (missing(ylab)) {
-    ylab <- "Response"
-  }
-  if (missing(main)) {
-    main <- NULL
-  }
   
   # create observed and theoretical values
   data <- survFitPlotDataTKTD(x)
+  
   
   if (style == "generic") {
     # vector color
@@ -111,8 +108,8 @@ plot.survFitTKTD <- function(x,
   
   if (style == "ggplot") {
     
-    plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = conc,
-                                  group = as.factor(conc))) +
+    plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
+      facet_wrap(~conc) +
       labs(x = xlab, y = ylab) + ggtitle(main) +
       geom_point() + geom_line(data = data$dtheo) + theme_minimal()
     
