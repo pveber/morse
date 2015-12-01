@@ -17,10 +17,11 @@ survTKTDCreateJagsData <- function(data, distr, bond) {
   
   tmin <- min(data$time)
   tmax <- max(data$time)
+  conc <- sort(unique(data$conc))
   
   deltaCmin = NULL
-  for (i in 2:length(unique(data$conc))) {
-    deltaCmin[i - 1] <- sort(unique(data$conc))[i] - sort(unique(data$conc))[i - 1]
+  for (i in 2:length(conc)) {
+    deltaCmin[i - 1] <- conc[i] - conc[i - 1]
   }
   deltaCmin <- min(deltaCmin)
   
@@ -99,7 +100,7 @@ survTKTDCreateJagsData <- function(data, distr, bond) {
 modelTKTDUnif <- "model {
 #########priors 
 log10ks ~ dunif(minlog10ks, maxlog10ks)
-log10NEC ~ dunif(minlog10conc - 1, maxlog10conc + 1)
+log10NEC ~ dunif(minlog10conc, maxlog10conc)
 log10ke ~ dunif(minlog10ke, maxlog10ke)
 log10m0 ~ dunif(minlog10m0, maxlog10m0)
 
