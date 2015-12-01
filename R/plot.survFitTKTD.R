@@ -1,13 +1,14 @@
-Surv <- function (Cw, time , ks, ke, NEC, m0)
+Surv <- function (Cw, time, ks, ke, NEC, m0)
   # Fonction S ecrite en R pour la validation en simu ensuite
   # Cw est la concentration dans le milieu
 {
   S <- exp(-m0*time) # survie de base avec mortalite naturelle seule
-  if(Cw > NEC) {
+  if (Cw > NEC) {
     tNEC <- -(1/ke)*log(1 - NEC/Cw)
     if (time > tNEC) {
       # ajoute de la mortalite due au toxique
-      S <- S * exp( ks/ke*Cw*(exp(-ke*tNEC) -exp(-ke*time)) - ks*(Cw-NEC)*(time - tNEC) )
+      S <- S * exp( ks/ke*Cw*(exp(-ke*tNEC) -exp(-ke*time))
+                          - ks*(Cw-NEC)*(time - tNEC) )
     }
   }
   return(S)
@@ -31,6 +32,7 @@ survFitPlotDataTKTD <- function(x) {
   nec <- x$estim.par["nec", "median"]
   m0 <- x$estim.par["m0", "median"]
   
+  
   for (i in 1:length(concobs)) {
     for (j in 1:npoints) {
       psurv <- Surv(Cw = concobs[i], time = tfin[j],
@@ -51,27 +53,52 @@ survFitPlotDataTKTD <- function(x) {
               dobs = dobs))
 }
 
-#' importFrom stats quantile
-survTKTDMeanCredInt <- function(fit) {
-  # create the parameters for credible interval for the TKTD model
-  mctot <- do.call("rbind", fit$mcmc)
+survFitPlotCITKTD <- function(x) {
+  # INPUT
+  # x : An object of class survFitTKTD
+  # OUTPUT
+  # A list of - dobs : observed values
+  #           - dtheo : estimated values
+  npoints <- 100
+  
+  concobs <- unique(x$transformed.data$conc)
+  tfin <- seq(0, max(x$jags.data$t), length.out = npoints)
+  
+  # prameters
+  mctot <- do.call("rbind", x$mcmc)
   k <- nrow(mctot)
-  # parameters
-  keCI <- 10^mctot[,"log10ke"]
-  ksCI <- 10^mctot[,"log10ks"]
-  m0CI <- 10^mctot[,"log10m0"]
-  NECCI <- 10^mctot[,"log10NEC"]
+  ks <- 10^mctot[, "lks"]
+  ke <- 10^mctot[, "lke"]
+  m0 <- 10^mctot[, "lm0"]
+  nec <- 10^mctot[, "lNEC"]
   
-  # quantiles
-  qinf95 = NULL
-  
-  data <- survFitPlotDataTKTD(s, ksCI, keCI, NECCI, m0CI)
-  
-  x <- seq(min(fit$time), max(fit$time), length = 100)
-  
-  for (i in 1:length(x)) {
-    theomean
+  dtheo <- array(data = NA, dim = c(npoints, length(nec), length(concobs)))
+  for (k in 1:length(concobs)) {
+    for (i in 1:length(nec)) {
+      for (j in 1:npoints) {
+        dtheo[j, i, k] <- Surv(Cw = concobs[k], time = tfin[j],
+                                ks = ks[i], ke = ke[i],
+                                NEC = nec[i],
+                                m0 = m0[i])
+#         
+#         
+#         dtheo[[k]] <- rbind(dtheo[[k]], data.frame(conc = concobs[i],
+#                                                      t = tfin[j],
+#                                                      psurv = psurv,
+#                                                      q = k))
+      }
+    }
   }
+  
+  dtheof <- rbind(dtheo[,, 1], dtheo[,, 2], dtheo[,, 3],
+                  dtheo[,, 4], dtheo[,, 5])
+  
+  dobs <- data.frame(conc = x$transformed.data$conc,
+                     t = x$transformed.data$time, 
+                     psurv = x$transformed.data$N_alive / x$transformed.data$N_init)
+  
+  return(list(dtheo = dtheof,
+              dobs = dobs))
 }
 
 #' Plotting method for survFitTKTD objects
@@ -106,14 +133,9 @@ plot.survFitTKTD <- function(x,
                              addlegend = FALSE,
                              style = "generic", ...) {
   
-#   dataT <- x$transformed.data
-#   dataT$resp <- dataT$N_alive / dataT$N_init
-#   # data points are systematically pooled, since our model does not
-#   # take individual variation into account
-#   dataT <- cbind(aggregate(resp ~ time + conc, dataT, mean),
-#                  replicate = 1)
-
-  data <- survFitPlotDataTKTD(x) #, dataT)
+  data <- survFitPlotDataTKTD(x)
+  
+  if (CI) dataCI <- survFitPlotCITKTD(x)
   
   
   if (style == "generic") {
@@ -167,6 +189,7 @@ plot.survFitTKTD <- function(x,
         facet_wrap(~conc) +
         labs(x = xlab, y = ylab) + ggtitle(main) +
         ylim(c(0, 1)) +
+        
         geom_point() + geom_line(data = data$dtheo) + theme_minimal()
     }
     
