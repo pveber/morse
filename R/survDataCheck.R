@@ -84,7 +84,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 3. assert concentrations are numeric
   ##
-  if (!is.double(data$conc)) {
+  if (!is.double(data$conc) && !is.integer(data$conc)) {
     msg <- "Column 'conc' must contain only numerical values."
     errors <- errorTableAdd(errors, "concNumeric", msg)
   }
