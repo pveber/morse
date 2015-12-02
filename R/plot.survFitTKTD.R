@@ -32,7 +32,6 @@ survFitPlotDataTKTD <- function(x) {
   nec <- x$estim.par["nec", "median"]
   m0 <- x$estim.par["m0", "median"]
   
-  
   for (i in 1:length(concobs)) {
     for (j in 1:npoints) {
       psurv <- Surv(Cw = concobs[i], time = tfin[j],
@@ -72,6 +71,7 @@ survFitPlotCITKTD <- function(x) {
   m0 <- 10^mctot[, "log10m0"][sel]
   nec <- 10^mctot[, "log10NEC"][sel]
   
+  # all theorical
   dtheo = list()
   for (k in 1:length(concobs)) {
     dtheo[[k]] <- array(data = NA, dim = c(npoints, length(nec)))
@@ -91,6 +91,18 @@ survFitPlotCITKTD <- function(x) {
                                 dtheof))
   names(dtheof) <- c("conc", "time", paste0("X", 1:length(sel)))
   
+  # quantile
+  qinf95 = NULL
+  qsup95 = NULL
+  
+  for (i in 1:dim(dtheof)[1]) {
+    qinf95[i] <- quantile(dtheof[i, 3:length(dtheof)],
+                          probs = 0.025, na.rm = TRUE)
+    qsup95[i] <- quantile(dtheof[i, 3:length(dtheof)],
+                          probs = 0.975, na.rm = TRUE)
+  }
+  
+  dtheof <- cbind(qinf95, qsup95, dtheof)
   
   return(dtheof)
 }
@@ -129,8 +141,10 @@ plot.survFitTKTD <- function(x,
                              style = "generic", ...) {
   
   data <- survFitPlotDataTKTD(x)
-  
-  if (ci) dataCI <- melt(survFitPlotCITKTD(x), id.vars = c("conc", "time"))
+  if (ci) {
+    dataCI <- survFitPlotCITKTD(x)
+    dataCIm <- melt(dataCI, id.vars = c("conc", "time"))
+  }
   
   if (style == "generic") {
     # vector color
@@ -167,13 +181,6 @@ plot.survFitTKTD <- function(x,
                   main = main)
              lines(x = x[, "t"], y = x[, "psurv"],
                    col = x[, "color"])
-           })
-        by(data[["dobs"]], list(data[["dobs"]]$conc),
-           function(x) {
-             points(x[, "t"],
-                    x[, "psurv"],
-                    pch = 16,
-                    col = x[, "color"])
            })
       } else {
         # one line by replicate
@@ -216,10 +223,11 @@ plot.survFitTKTD <- function(x,
       } else {
         plt1 <- ggplot(data$dobs,
                        aes(x = t, y = psurv, colour = factor(conc))) +
-          geom_line(data = dataCI, aes(x = time, y = value, group = variable),
+          geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
                     alpha = 0.05) +
-          geom_line(data = dataCI, aes(x = )) +
-          geom_line(data = data$dtheo, colour = "red") +
+          geom_line(data = data$dtheo, color = "red") +
+          geom_line(data = dataCI, aes(x = time, y = qinf95), linetype = 'dashed', color = "black") +
+          geom_line(data = dataCI, aes(x = time, y = qsup95), linetype = 'dashed', color = "black") +
           facet_wrap(~conc) +
           labs(x = xlab, y = ylab) + ggtitle(main) +
           ylim(c(0, 1)) +
