@@ -66,39 +66,31 @@ survFitPlotCITKTD <- function(x) {
   
   # prameters
   mctot <- do.call("rbind", x$mcmc)
-  k <- nrow(mctot)
-  ks <- 10^mctot[, "lks"]
-  ke <- 10^mctot[, "lke"]
-  m0 <- 10^mctot[, "lm0"]
-  nec <- 10^mctot[, "lNEC"]
+  sel <- sample(nrow(mctot))[1:ceiling(nrow(mctot) / 10)]
+  ks <- 10^mctot[, "log10ks"][sel]
+  ke <- 10^mctot[, "log10ke"][sel]
+  m0 <- 10^mctot[, "log10m0"][sel]
+  nec <- 10^mctot[, "log10NEC"][sel]
   
-  dtheo <- array(data = NA, dim = c(npoints, length(nec), length(concobs)))
+  dtheo = list()
   for (k in 1:length(concobs)) {
+    dtheo[[k]] <- array(data = NA, dim = c(npoints, length(nec)))
     for (i in 1:length(nec)) {
       for (j in 1:npoints) {
-        dtheo[j, i, k] <- Surv(Cw = concobs[k], time = tfin[j],
+        dtheo[[k]][j, i] <- Surv(Cw = concobs[k], time = tfin[j],
                                 ks = ks[i], ke = ke[i],
                                 NEC = nec[i],
                                 m0 = m0[i])
-#         
-#         
-#         dtheo[[k]] <- rbind(dtheo[[k]], data.frame(conc = concobs[i],
-#                                                      t = tfin[j],
-#                                                      psurv = psurv,
-#                                                      q = k))
       }
     }
   }
   
-  dtheof <- rbind(dtheo[,, 1], dtheo[,, 2], dtheo[,, 3],
-                  dtheo[,, 4], dtheo[,, 5])
-  
-  dobs <- data.frame(conc = x$transformed.data$conc,
-                     t = x$transformed.data$time, 
-                     psurv = x$transformed.data$N_alive / x$transformed.data$N_init)
-  
-  return(list(dtheo = dtheof,
-              dobs = dobs))
+  dtheof <- do.call("rbind", dtheo)
+  dtheof <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
+                                rep(tfin, length(concobs)),
+                                dtheof))
+  names(dtheof) <- c("conc", "time", paste0("X", 1:length(sel)))
+  return(dtheof)
 }
 
 #' Plotting method for survFitTKTD objects
@@ -115,6 +107,7 @@ survFitPlotCITKTD <- function(x) {
 #' 
 #' @import ggplot2
 #' @import grDevices
+#' @importFrom reshape2 melt
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
@@ -136,7 +129,6 @@ plot.survFitTKTD <- function(x,
   data <- survFitPlotDataTKTD(x)
   
   if (CI) dataCI <- survFitPlotCITKTD(x)
-  
   
   if (style == "generic") {
     # vector color
@@ -185,12 +177,17 @@ plot.survFitTKTD <- function(x,
         ylim(c(0, 1)) +
         geom_point() + geom_line(data = data$dtheo) + theme_minimal()
     } else {
-      plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
+      dataCI2 <- melt(dataCI, id.vars = c("conc", "time"))
+      plt1 <- ggplot(data$dobs,
+                     aes(x = t, y = psurv, colour = factor(conc))) +
+        geom_point() +
+        geom_line(data = data$dtheo) +
         facet_wrap(~conc) +
         labs(x = xlab, y = ylab) + ggtitle(main) +
         ylim(c(0, 1)) +
-        
-        geom_point() + geom_line(data = data$dtheo) + theme_minimal()
+        geom_line(data = dataCI2, aes(x = time, y = value, group = variable),
+                  alpha = 0.05) +
+         theme_minimal()
     }
     
     plt1
