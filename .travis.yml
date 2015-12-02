@@ -3,6 +3,9 @@ warnings_are_errors: true
 sudo: required
 bioc_required: false
 
+install:
+ - mkdir ~/.R
+
 before_script:
 - R CMD INSTALL .
 - Rscript -e "library(coda); library(dplyr); library(graphics); library(grDevices); library(ggplot2); library(grid); library(gridExtra); library(methods); library(rjags); library(stats); library(stringr)"
