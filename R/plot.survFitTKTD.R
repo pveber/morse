@@ -90,6 +90,8 @@ survFitPlotCITKTD <- function(x) {
                                 rep(tfin, length(concobs)),
                                 dtheof))
   names(dtheof) <- c("conc", "time", paste0("X", 1:length(sel)))
+  
+  
   return(dtheof)
 }
 
@@ -128,7 +130,7 @@ plot.survFitTKTD <- function(x,
   
   data <- survFitPlotDataTKTD(x)
   
-  if (CI) dataCI <- survFitPlotCITKTD(x)
+  if (ci) dataCI <- melt(survFitPlotCITKTD(x), id.vars = c("conc", "time"))
   
   if (style == "generic") {
     # vector color
@@ -151,45 +153,79 @@ plot.survFitTKTD <- function(x,
          })
     } else {
       par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
-      
-      # one line by replicate
-      by(data[["dtheo"]], list(data[["dtheo"]]$conc),
-         function(x) {
-           plot(x[, "t"],
-                x[, "psurv"],
-                xlab = xlab,
-                ylab = ylab,
-                type = "n",
-                ylim = c(0, 1),
-                col = x[, "color"],
-                main = main)
-           lines(x[, "t"], x[, "psurv"], # lines
-                 col = x[, "color"])
-         })
+      if (!ci) {
+        # one line by replicate
+        by(data[["dtheo"]], list(data[["dtheo"]]$conc),
+           function(x) {
+             plot(x[, "t"],
+                  x[, "psurv"],
+                  xlab = xlab,
+                  ylab = ylab,
+                  type = "n",
+                  ylim = c(0, 1),
+                  col = x[, "color"],
+                  main = main)
+             lines(x = x[, "t"], y = x[, "psurv"],
+                   col = x[, "color"])
+           })
+        by(data[["dobs"]], list(data[["dobs"]]$conc),
+           function(x) {
+             points(x[, "t"],
+                    x[, "psurv"],
+                    pch = 16,
+                    col = x[, "color"])
+           })
+      } else {
+        # one line by replicate
+        by(data[["dtheo"]], list(data[["dtheo"]]$conc),
+           function(x) {
+             plot(x[, "t"],
+                  x[, "psurv"],
+                  xlab = xlab,
+                  ylab = ylab,
+                  type = "n",
+                  ylim = c(0, 1),
+                  col = x[, "color"],
+                  main = main)
+             lines(x[, "t"], x[, "psurv"], # lines
+                   col = x[, "color"])
+           })
+      }
       par(mfrow = c(1, 1))
     }
   }
   
   if (style == "ggplot") {
     if (one.plot) {
+      if (ci) warning("Credible intervals are only evalables in grid plot !")
       plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
+        geom_point() + geom_line(data = data$dtheo, colour = "red") +
         labs(x = xlab, y = ylab) + ggtitle(main) +
         ylim(c(0, 1)) +
-        geom_point() + geom_line(data = data$dtheo) + theme_minimal()
+        theme_minimal()
     } else {
-      dataCI2 <- melt(dataCI, id.vars = c("conc", "time"))
-      plt1 <- ggplot(data$dobs,
-                     aes(x = t, y = psurv, colour = factor(conc))) +
-        geom_point() +
-        geom_line(data = data$dtheo) +
-        facet_wrap(~conc) +
-        labs(x = xlab, y = ylab) + ggtitle(main) +
-        ylim(c(0, 1)) +
-        geom_line(data = dataCI2, aes(x = time, y = value, group = variable),
-                  alpha = 0.05) +
-         theme_minimal()
+      if (!ci) {
+        plt1 <- ggplot(data$dobs,
+                       aes(x = t, y = psurv, colour = factor(conc))) +
+          geom_point() +
+          geom_line(data = data$dtheo, colour = "red") +
+          facet_wrap(~conc) +
+          labs(x = xlab, y = ylab) + ggtitle(main) +
+          ylim(c(0, 1)) +
+          theme_minimal()
+      } else {
+        plt1 <- ggplot(data$dobs,
+                       aes(x = t, y = psurv, colour = factor(conc))) +
+          geom_line(data = dataCI, aes(x = time, y = value, group = variable),
+                    alpha = 0.05) +
+          geom_line(data = dataCI, aes(x = )) +
+          geom_line(data = data$dtheo, colour = "red") +
+          facet_wrap(~conc) +
+          labs(x = xlab, y = ylab) + ggtitle(main) +
+          ylim(c(0, 1)) +
+          theme_minimal()
+      }
     }
-    
     plt1
   }
 }
