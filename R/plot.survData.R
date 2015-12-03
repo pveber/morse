@@ -216,6 +216,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels)
                          }
                        ) +
     scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
+    expand_limits(x = 0, y = 0) +
     theme_minimal()
 
   # legend option
@@ -329,7 +330,8 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
                            df$display.conc
                          }
       ) +
-      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$Nsurv))))))
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$Nsurv)))))) +
+      expand_limits(x = 0, y = 0)
 
     # legend option
     if (addlegend) {
