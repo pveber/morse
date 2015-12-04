@@ -42,41 +42,9 @@ plot.survFitTKTD <- function(x,
   }
   
   if (style == "ggplot") {
-    if (one.plot) {
-      if (ci) warning("Credible intervals are only evalables in grid plot !")
-      plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
-        geom_point() + geom_line(data = data$dtheo) +
-        labs(x = xlab, y = ylab) + ggtitle(main) +
-        ylim(c(0, 1)) +
-        theme_minimal()
-    } else {
-      if (!ci) {
-        plt1 <- ggplot(data$dobs,
-                       aes(x = t, y = psurv, colour = factor(conc))) +
-          geom_point() +
-          geom_line(data = data$dtheo, colour = "red") +
-          facet_wrap(~conc) +
-          labs(x = xlab, y = ylab) + ggtitle(main) +
-          ylim(c(0, 1)) +
-          theme_minimal() +
-          scale_color_discrete(guide = "none")
-      } else {
-        plt1 <- ggplot(data$dobs,
-                       aes(x = t, y = psurv, colour = factor(conc))) +
-          geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
-                    alpha = 0.05) +
-          geom_line(data = data$dtheo, color = "red") +
-          geom_line(data = dataCI, aes(x = time, y = qinf95), linetype = 'dashed', color = "black") +
-          geom_line(data = dataCI, aes(x = time, y = qsup95), linetype = 'dashed', color = "black") +
-          facet_wrap(~conc) +
-          labs(x = xlab, y = ylab) + ggtitle(main) +
-          ylim(c(0, 1)) +
-          theme_minimal() +
-          scale_color_discrete(guide = "none")
-      }
-    }
-    plt1
+    survFitPlotTKTDGG(data, xlab, ylab, main, one.plot, ci, dataCI, dataCIm)
   }
+  else stop("Unknown style")
 }
 
 Surv <- function (Cw, time, ks, ke, NEC, m0)
@@ -188,6 +156,22 @@ survFitPlotCITKTD <- function(x) {
   return(dtheof)
 }
 
+survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, one.plot, ci, dataCIm) {
+  # vector color
+  data[["dobs"]]$color <- as.numeric(as.factor(data[["dobs"]][["conc"]]))
+  data[["dtheo"]]$color <- as.numeric(as.factor(data[["dtheo"]][["conc"]]))
+  
+  if (one.plot) {
+    survFitPlotTKTDGenericOnePlot(data, xlab, ylab, main)
+  } else {
+    par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
+    
+    survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, main, ci, dataCIm)
+    
+    par(mfrow = c(1, 1))
+  }
+}
+
 survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main) {
   plot(data[["dobs"]][["t"]],
        data[["dobs"]][["psurv"]],
@@ -202,6 +186,14 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main) {
        lines(x$t, x$psurv, # lines
              col = x$color)
      })
+}
+
+survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, main, ci, dataCIm) {
+  if (ci) {
+    survFitPlotTKTDGenericNoOnePlotCi(data, xlab, ylab, main, dataCIm)
+  } else {
+    survFitPlotTKTDGenericNoOnePlotNoCi(data, xlab, ylab, main)
+  }
 }
 
 survFitPlotTKTDGenericNoOnePlotCi <- function(data, xlab, ylab, main, dataCIm) {
@@ -238,27 +230,59 @@ survFitPlotTKTDGenericNoOnePlotNoCi <- function(data, xlab, ylab, main) {
      })
 }
 
-survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, main, ci, dataCIm) {
-  if (ci) {
-    survFitPlotTKTDGenericNoOnePlotCi(data, xlab, ylab, main, dataCIm)
+survFitPlotTKTDGG <- function(data, xlab, ylab, main, one.plot, ci, dataCI,
+                              dataCIm) {
+
+  if (one.plot) {
+    if (ci) warning("Credible intervals are only evalables in grid plot !")
+    survFitPlotTKTDGGOnePlot(data, xlab, ylab, main)
   } else {
-    survFitPlotTKTDGenericNoOnePlotNoCi(data, xlab, ylab, main)
+    survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, ci, dataCI, dataCIm)
   }
 }
 
-survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, one.plot, ci, dataCIm) {
-  # vector color
-  data[["dobs"]]$color <- as.numeric(as.factor(data[["dobs"]][["conc"]]))
-  data[["dtheo"]]$color <- as.numeric(as.factor(data[["dtheo"]][["conc"]]))
-  
-  if (one.plot) {
-    survFitPlotTKTDGenericOnePlot(data, xlab, ylab, main)
+survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main) {
+  ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
+    geom_point() + geom_line(data = data$dtheo) +
+    labs(x = xlab, y = ylab) + ggtitle(main) +
+    ylim(c(0, 1)) +
+    theme_minimal()
+}
+
+survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, ci, dataCI,
+                                       dataCIm) {
+  if (ci) {
+    survFitPlotTKTDGGNoOnePlotCi(data, xlab, ylab, main, dataCI, dataCIm)
   } else {
-    par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
-
-    survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, main, ci, dataCIm)
-
-    par(mfrow = c(1, 1))
+    survFitPlotTKTDGGNoOnePlotNoCi(data, xlab, ylab, main)
   }
+}
+
+survFitPlotTKTDGGNoOnePlotCi <- function(data, xlab, ylab, main, dataCI,
+                                         dataCIm) {
+  ggplot(data$dobs,
+         aes(x = t, y = psurv, colour = factor(conc))) +
+    geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
+              alpha = 0.05) +
+    geom_line(data = data$dtheo, color = "red") +
+    geom_line(data = dataCI, aes(x = time, y = qinf95), linetype = 'dashed', color = "black") +
+    geom_line(data = dataCI, aes(x = time, y = qsup95), linetype = 'dashed', color = "black") +
+    facet_wrap(~conc) +
+    labs(x = xlab, y = ylab) + ggtitle(main) +
+    ylim(c(0, 1)) +
+    theme_minimal() +
+    scale_color_discrete(guide = "none")
+}
+
+survFitPlotTKTDGGNoOnePlotNoCi <- function(data, xlab, ylab, main) {
+  ggplot(data$dobs,
+         aes(x = t, y = psurv, colour = factor(conc))) +
+    geom_point() +
+    geom_line(data = data$dtheo, colour = "red") +
+    facet_wrap(~conc) +
+    labs(x = xlab, y = ylab) + ggtitle(main) +
+    ylim(c(0, 1)) +
+    theme_minimal() +
+    scale_color_discrete(guide = "none")
 }
 
