@@ -14,6 +14,7 @@ BUG FIXES
   unconstrained time and concentration. They used to display a misleading
   "replicate" legend, which would not correspond to a real replication unit
   (beaker).
+- the DIC is not calulated in survFiTT
 
 Version 2.1.0
 =============
