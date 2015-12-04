@@ -5,7 +5,9 @@ version dev
 
 BUG FIXIES
 - survDataCheck and reproDataCheck would fail on datasets with integer-only
-  concentrations
+  concentrations.
+- the summary of survData and reproData now doesn't show the number of datapoints
+  per concentration and the number of datapoints per time.
 
 Version 2.1.0
 =============
