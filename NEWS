@@ -1,5 +1,11 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+version dev
+===========
+
+BUG FIXIES
+in plot.survData all ggplot style graphique start at 0,0.
+
 Version 2.1.0
 =============
 
