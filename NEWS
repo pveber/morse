@@ -1,5 +1,10 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+version dev
+===========
+
+- concentration in integer are now accepted by survDataCheck and reproDataCheck
+
 Version 2.1.0
 =============
 
