@@ -1,3 +1,84 @@
+#' Plotting method for survFitTKTD objects
+#' 
+#' @param x An object of class \code{survFitTKTD}.
+#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
+#' @param main A main title for the plot.
+#' @param style Graphical method: \code{generic} or \code{ggplot}.
+#' @param \dots Further arguments to be passed to generic methods.
+#' 
+#' @keywords plot 
+#' @export
+#' 
+#' @import ggplot2
+#' @import grDevices
+#' @importFrom reshape2 melt
+#' @importFrom gridExtra grid.arrange arrangeGrob
+#' @importFrom grid grid.rect gpar
+#' @importFrom graphics plot
+#' 
+plot.survFitTKTD <- function(x,
+                             xlab = "Time",
+                             ylab = "Survival rate",
+                             main = NULL,
+                             fitlty = 1,
+                             fitlwd = 1,
+                             ci = FALSE,
+                             cicol = "pink1",
+                             cilty = 1,
+                             cilwd = 1,
+                             one.plot = TRUE,
+                             addlegend = FALSE,
+                             style = "generic", ...) {
+  
+  data <- survFitPlotDataTKTD(x)
+  
+  dataCI <- if (ci && !one.plot) { survFitPlotCITKTD(x) } else NULL
+  dataCIm <- if (ci && !one.plot) { melt(dataCI,
+                                         id.vars = c("conc", "time")) } else NULL
+  
+  if (style == "generic") {
+    survFitPlotTKTDGeneric(data, xlab, ylab, main, one.plot, ci, dataCIm)
+  }
+  
+  if (style == "ggplot") {
+    if (one.plot) {
+      if (ci) warning("Credible intervals are only evalables in grid plot !")
+      plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
+        geom_point() + geom_line(data = data$dtheo) +
+        labs(x = xlab, y = ylab) + ggtitle(main) +
+        ylim(c(0, 1)) +
+        theme_minimal()
+    } else {
+      if (!ci) {
+        plt1 <- ggplot(data$dobs,
+                       aes(x = t, y = psurv, colour = factor(conc))) +
+          geom_point() +
+          geom_line(data = data$dtheo, colour = "red") +
+          facet_wrap(~conc) +
+          labs(x = xlab, y = ylab) + ggtitle(main) +
+          ylim(c(0, 1)) +
+          theme_minimal() +
+          scale_color_discrete(guide = "none")
+      } else {
+        plt1 <- ggplot(data$dobs,
+                       aes(x = t, y = psurv, colour = factor(conc))) +
+          geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
+                    alpha = 0.05) +
+          geom_line(data = data$dtheo, color = "red") +
+          geom_line(data = dataCI, aes(x = time, y = qinf95), linetype = 'dashed', color = "black") +
+          geom_line(data = dataCI, aes(x = time, y = qsup95), linetype = 'dashed', color = "black") +
+          facet_wrap(~conc) +
+          labs(x = xlab, y = ylab) + ggtitle(main) +
+          ylim(c(0, 1)) +
+          theme_minimal() +
+          scale_color_discrete(guide = "none")
+      }
+    }
+    plt1
+  }
+}
+
 Surv <- function (Cw, time, ks, ke, NEC, m0)
   # Fonction S ecrite en R pour la validation en simu ensuite
   # Cw est la concentration dans le milieu
@@ -107,135 +188,77 @@ survFitPlotCITKTD <- function(x) {
   return(dtheof)
 }
 
-#' Plotting method for survFitTKTD objects
-#' 
-#' @param x An object of class \code{survFitTKTD}.
-#' @param xlab A label for the \eqn{X}-axis, by default \code{Concentrations}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
-#' @param main A main title for the plot.
-#' @param style Graphical method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
-#' 
-#' @keywords plot 
-#' @export
-#' 
-#' @import ggplot2
-#' @import grDevices
-#' @importFrom reshape2 melt
-#' @importFrom gridExtra grid.arrange arrangeGrob
-#' @importFrom grid grid.rect gpar
-#' @importFrom graphics plot
-#' 
-plot.survFitTKTD <- function(x,
-                             xlab = "Time",
-                             ylab = "Survival rate",
-                             main = NULL,
-                             fitlty = 1,
-                             fitlwd = 1,
-                             ci = FALSE,
-                             cicol = "pink1",
-                             cilty = 1,
-                             cilwd = 1,
-                             one.plot = TRUE,
-                             addlegend = FALSE,
-                             style = "generic", ...) {
-  
-  data <- survFitPlotDataTKTD(x)
-  if (ci && !one.plot) {
-    dataCI <- survFitPlotCITKTD(x)
-    dataCIm <- melt(dataCI, id.vars = c("conc", "time"))
-  }
-  
-  if (style == "generic") {
-    # vector color
-    data[["dobs"]]$color <- as.numeric(as.factor(data[["dobs"]][["conc"]]))
-    data[["dtheo"]]$color <- as.numeric(as.factor(data[["dtheo"]][["conc"]]))
-    
-    if (one.plot) {
-      plot(data[["dobs"]][["t"]],
-           data[["dobs"]][["psurv"]],
-           xlab = xlab,
-           ylab = ylab,
-           pch = 16,
-           col = data[["dobs"]]$color,
-           main = main)
-     # one line by replicate
-      by(data[["dtheo"]], list(data[["dtheo"]]$conc),
-         function(x) {
-           lines(x$t, x$psurv, # lines
-                 col = x$color)
-         })
-    } else {
-      par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
-      if (!ci) {
-        # one line by replicate
-        by(data[["dtheo"]], list(data[["dtheo"]]$conc),
-           function(x) {
-             plot(x[, "t"],
-                  x[, "psurv"],
-                  xlab = xlab,
-                  ylab = ylab,
-                  type = "n",
-                  ylim = c(0, 1),
-                  col = x[, "color"],
-                  main = main)
-             lines(x = x[, "t"], y = x[, "psurv"],
-                   col = x[, "color"])
-           })
-      } else {
-        # one line by replicate
-        by(data[["dtheo"]], list(data[["dtheo"]]$conc),
-           function(x) {
-             plot(x[, "t"],
-                  x[, "psurv"],
-                  xlab = xlab,
-                  ylab = ylab,
-                  type = "n",
-                  ylim = c(0, 1),
-                  col = x[, "color"],
-                  main = main)
-             lines(x[, "t"], x[, "psurv"], # lines
-                   col = x[, "color"])
-           })
-      }
-      par(mfrow = c(1, 1))
-    }
-  }
-  
-  if (style == "ggplot") {
-    if (one.plot) {
-      if (ci) warning("Credible intervals are only evalables in grid plot !")
-      plt1 <- ggplot(data$dobs, aes(x = t, y = psurv, colour = factor(conc))) +
-        geom_point() + geom_line(data = data$dtheo) +
-        labs(x = xlab, y = ylab) + ggtitle(main) +
-        ylim(c(0, 1)) +
-        theme_minimal()
-    } else {
-      if (!ci) {
-        plt1 <- ggplot(data$dobs,
-                       aes(x = t, y = psurv, colour = factor(conc))) +
-          geom_point() +
-          geom_line(data = data$dtheo, colour = "red") +
-          facet_wrap(~conc) +
-          labs(x = xlab, y = ylab) + ggtitle(main) +
-          ylim(c(0, 1)) +
-          theme_minimal() +
-          scale_color_discrete(guide = "none")
-      } else {
-        plt1 <- ggplot(data$dobs,
-                       aes(x = t, y = psurv, colour = factor(conc))) +
-          geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
-                    alpha = 0.05) +
-          geom_line(data = data$dtheo, color = "red") +
-          geom_line(data = dataCI, aes(x = time, y = qinf95), linetype = 'dashed', color = "black") +
-          geom_line(data = dataCI, aes(x = time, y = qsup95), linetype = 'dashed', color = "black") +
-          facet_wrap(~conc) +
-          labs(x = xlab, y = ylab) + ggtitle(main) +
-          ylim(c(0, 1)) +
-          theme_minimal() +
-          scale_color_discrete(guide = "none")
-      }
-    }
-    plt1
+survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main) {
+  plot(data[["dobs"]][["t"]],
+       data[["dobs"]][["psurv"]],
+       xlab = xlab,
+       ylab = ylab,
+       pch = 16,
+       col = data[["dobs"]]$color,
+       main = main)
+  # one line by replicate
+  by(data[["dtheo"]], list(data[["dtheo"]]$conc),
+     function(x) {
+       lines(x$t, x$psurv, # lines
+             col = x$color)
+     })
+}
+
+survFitPlotTKTDGenericNoOnePlotCi <- function(data, xlab, ylab, main, dataCIm) {
+  # one line by replicate
+  by(data[["dtheo"]], list(data[["dtheo"]]$conc),
+     function(x) {
+       plot(x[, "t"],
+            x[, "psurv"],
+            xlab = xlab,
+            ylab = ylab,
+            type = "n",
+            ylim = c(0, 1),
+            col = x[, "color"],
+            main = main)
+       lines(x[, "t"], x[, "psurv"], # lines
+             col = x[, "color"])
+     })
+}
+
+survFitPlotTKTDGenericNoOnePlotNoCi <- function(data, xlab, ylab, main) {
+  # one line by replicate
+  by(data[["dtheo"]], list(data[["dtheo"]]$conc),
+     function(x) {
+       plot(x[, "t"],
+            x[, "psurv"],
+            xlab = xlab,
+            ylab = ylab,
+            type = "n",
+            ylim = c(0, 1),
+            col = x[, "color"],
+            main = main)
+       lines(x[, "t"], x[, "psurv"], # lines
+             col = x[, "color"])
+     })
+}
+
+survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, main, ci, dataCIm) {
+  if (ci) {
+    survFitPlotTKTDGenericNoOnePlotCi(data, xlab, ylab, main, dataCIm)
+  } else {
+    survFitPlotTKTDGenericNoOnePlotNoCi(data, xlab, ylab, main)
   }
 }
+
+survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, one.plot, ci, dataCIm) {
+  # vector color
+  data[["dobs"]]$color <- as.numeric(as.factor(data[["dobs"]][["conc"]]))
+  data[["dtheo"]]$color <- as.numeric(as.factor(data[["dtheo"]][["conc"]]))
+  
+  if (one.plot) {
+    survFitPlotTKTDGenericOnePlot(data, xlab, ylab, main)
+  } else {
+    par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
+
+    survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, main, ci, dataCIm)
+
+    par(mfrow = c(1, 1))
+  }
+}
+
