@@ -1,5 +1,11 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+version dev
+===========
+
+BUG FIXES
+- in plot.survData the legend was removed for global graphique.
+
 Version 2.1.0
 =============
 
