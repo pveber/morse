@@ -3,6 +3,7 @@
 version dev
 ===========
 
+BUG FIXIES
 - concentration in integer are now accepted by survDataCheck and reproDataCheck
 
 Version 2.1.0
