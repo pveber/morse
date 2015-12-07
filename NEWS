@@ -4,7 +4,8 @@ version dev
 ===========
 
 BUG FIXIES
-- concentration in integer are now accepted by survDataCheck and reproDataCheck
+- survDataCheck and reproDataCheck would fail on datasets with integer-only
+  concentrations
 
 Version 2.1.0
 =============
