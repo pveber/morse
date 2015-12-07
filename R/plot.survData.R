@@ -220,11 +220,13 @@ survDataPlotFull <- function(data, xlab, ylab, style = "generic",
 survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
                                    style, log.scale, addlegend,
                                    remove.someLabels) {
-  if (missing(xlab)) xlab <-"Concentration"
+  if (missing(xlab)) xlab <- "Concentration"
+  ylab <- "Survival rate"
 
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
 
+  x$resp <- x$Nsurv / x$Ninit
   # select the target.time
   xf <- filter(x, x$time == target.time)
 
@@ -243,7 +245,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
   x$color <- as.numeric(as.factor(x$replicate))
 
   if (style == "generic") {
-    plot(transf_data_conc, seq(0, max(x$Nsurv),
+    plot(transf_data_conc, seq(0, max(x$resp),
                                length.out = length(transf_data_conc)),
          type = "n",
          xaxt = "n",
@@ -254,16 +256,16 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
 
     axis(side = 1, at = transf_data_conc,
          labels = display.conc)
-    axis(side = 2, at = unique(round(pretty(c(0, max(x$Nsurv))))),
-         labels = unique(round(pretty(c(0, max(x$Nsurv))))))
+    axis(side = 2, at = unique(round(pretty(c(0, max(x$resp))))),
+         labels = unique(round(pretty(c(0, max(x$resp))))))
 
     # points
     if (length(unique(x$replicate)) == 1) {
       # points
-      points(transf_data_conc, x$Nsurv,
+      points(transf_data_conc, x$resp,
              pch = 16)
     } else {
-      tt <- xyTable(transf_data_conc, x$Nsurv)
+      tt <- xyTable(transf_data_conc, x$resp)
       points(tt$x, tt$y,
              cex = (tt$number) / 3,
              pch = 16)
@@ -283,9 +285,9 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
                      display.conc)
 
     if (length(unique(df$replicate)) == 1) {
-      gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv))
+      gp <- ggplot(df, aes(x = transf_data_conc, y = resp))
     } else {
-      gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv)) +
+      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
         stat_sum(aes(size = factor(..n..))) +
         scale_size_discrete("Replicate")
     }
@@ -300,7 +302,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
                            df$display.conc
                          }
       ) +
-      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$Nsurv)))))) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$resp)))))) +
       expand_limits(x = 0, y = 0)
 
     # legend option
