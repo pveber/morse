@@ -1,5 +1,13 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+version dev
+===========
+
+NEW FEATURES
+- the DIC is not calculated in survFiTT anymore. Since we don't
+  perform model selection, this was not really useful and we thus
+  obtain a significant speed-up.
+
 Version 2.1.0
 =============
 
