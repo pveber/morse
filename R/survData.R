@@ -79,7 +79,8 @@ survData <- function(data) {
   }
 
   out <- cbind(out, Nindtime)
-
+  # force concentration as type double
+  out$conc <- as.double(out$conc)
   class(out) <- c("survData", "data.frame")
   return(out)
 }

@@ -15,6 +15,10 @@
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
+#' @param one.plot if \code{TRUE}, displays the Response / Time points in one
+#' plot else use a grid.
+#' @param by.conc if \code{TRUE}, displays the Response in fonction of
+#' concentration with one line by timepoints.
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
@@ -63,6 +67,8 @@ plot.survData <- function(x,
                           concentration = NULL,
                           style = "generic",
                           pool.replicate = FALSE,
+                          one.plot = FALSE,
+                          by.conc = FALSE,
                           log.scale = FALSE,
                           addlegend = FALSE,
                           remove.someLabels = FALSE, ...) {
@@ -70,29 +76,33 @@ plot.survData <- function(x,
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
 
-  if (pool.replicate) {
+  if (pool.replicate || one.plot) {
     # agregate by sum of replicate
-    x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
+    x <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, x, sum),
                replicate = 1)
   }
 
-  if (is.null(target.time) && is.null(concentration)) {
-    survDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabels)
+  if (is.null(target.time) && is.null(concentration) && !by.conc) {
+    survDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabels,
+                     one.plot)
   }
-  else if (! is.null(target.time) && is.null(concentration)) {
+  else if (! is.null(target.time) && is.null(concentration) && !by.conc) {
     survDataPlotTargetTime(x, xlab, ylab, main, target.time,
-                           style, log.scale, addlegend, remove.someLabels)
+                           style, log.scale, addlegend, remove.someLabels,
+                           pool.replicate)
   }
-  else if (is.null(target.time) && ! is.null(concentration)) {
+  else if (is.null(target.time) && ! is.null(concentration) && !by.conc) {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
                           style, addlegend, remove.someLabels)
+  }
+  else if (by.conc) {
+    survDataPlotByConc(x, xlab, ylab, main, style, addlegend)
   }
   else {
     survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
                            addlegend)
   }
 }
-
 
 # [ReplicateIndex(data)] builds a list of indices, each one named after
 # a replicate of [data], thus providing a dictionary from replicate names to
@@ -104,122 +114,191 @@ ReplicateIndex <- function(data) {
   return(r)
 }
 
+# [ConcentrationIndex(data)] builds a list of indices, each one named after
+# a concentration of [data], thus providing a dictionary from concentration
+# values to integer keys.
+ConcentrationIndex <- function(data) {
+  concentration <- unique(data$conc)
+  r <- as.list(seq(1, length(concentration)))
+  names(r) <- as.character(concentration)
+  return(r)
+}
 
-# [plotMatrixGeometry(n)] returns a vector [c(w,h)] such that a matrix of plots
-# of dimension ([w], [h]) is big enough to display [n] plots in a pretty way.
-# This will typically be used in [par(mfrow)] calls.
-plotMatrixGeometry <- function(nblevels) {
-  PlotPar <- c(c(2, 2), c(2, 3), c(2, 4), c(3, 3), c(2, 5), c(3, 4), c(3, 5),
-               c(4, 4))
-  NbPlotTheo <- matrix(ncol = 2, nrow = 8)
-  NbPlotTheo[, 1] <- c(1, 3, 5, 7, 9, 11, 13, 15)
-  NbPlotTheo[, 2] <- c(4, 6, 8, 9, 10, 12, 15, 16)
-  if (nblevels < 15) {
-    i <- NbPlotTheo[NbPlotTheo[, 2] - nblevels > 0, 1][1]
-  } else {
-    i <- 15
-  }
-  return(c(PlotPar[i], PlotPar[i + 1]))
+# [TimeIndex(data)] builds a list of indices, each one named after
+# a time of [data], thus providing a dictionary from time
+# values to integer keys.
+TimeIndex <- function(data) {
+  time <- unique(data$time)
+  r <- as.list(seq(1, length(time)))
+  names(r) <- as.character(time)
+  return(r)
 }
 
 # General full plot: one subplot for each concentration, and one color for
 # each replicate (for generic graphics)
-dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend) {
+dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend, one.plot) {
   replicate.index <- ReplicateIndex(data)
+  concentration.index <- ConcentrationIndex(data)
 
   # creation of a vector of colors
-  colors <- rainbow(length(unique(data$replicate)))
-  pchs <- as.numeric(unique(data$replicate))
-  # split of the graphical window in subplots
-  par(mfrow = plotMatrixGeometry(length(unique(data$conc))))
-
-  by(data, data$conc, function(x) {
+  if (one.plot) {
+    colors <- rainbow(length(unique(data$conc)))
+    pchs <- as.numeric(as.factor(unique(data$conc)))
+  } else {
+    colors <- rainbow(length(unique(data$replicate)))
+    pchs <- as.numeric(unique(data$replicate))
+  }
+  
+  if (!one.plot) {
+    # split of the graphical window in subplots
+    par(mfrow = plotMatrixGeometry(length(unique(data$conc))))
+    
+    by(data, data$conc, function(x) {
+      # bakground
+      plot(x$time, rep(0, length(x$time)),
+           xlab = xlab,
+           ylab = ylab,
+           ylim = c(0, max(x[, resp])),
+           type = "n",
+           col = 'white',
+           xaxt = "n",
+           yaxt = "n")
+      
+      # axis
+      axis(side = 1, at = sort(unique(x[, "time"])))
+      axis(side = 2, at = unique(round(pretty(c(0, max(x[, resp]))))))
+      
+      # lines and points
+      by(x, x$replicate, function(y) {
+        index <- replicate.index[[y$replicate[1]]]
+        lines(y$time, y[, resp],
+              type = "l",
+              col = colors[index])
+        points(y$time, y[, resp],
+               pch = pchs[index],
+               col = colors[index])
+      })
+      
+      # title
+      title(paste("Conc: ", unique(x$conc), sep = ""))
+    })
+    
+    if (addlegend) {
+      # creation of an empty plot to display legend
+      plot(0, 0,
+           xlab = "",
+           ylab = "",
+           xlim = c(0,5),
+           ylim = c(0,5),
+           type = "n",
+           xaxt = "n",
+           yaxt = "n")
+      
+      # Display legend
+      title.legend <- "Replicate"
+      mat <- matrix(nrow = length(unique(data$replicate)), ncol = 2)
+      mat[, 1] <- rep(title.legend, length(unique(data$replicate)))
+      mat[, 2] <- unique(as.character(data$replicate))
+      name <- apply(mat, 1, function(x) {paste(x[1], x[2], sep = ": ")})
+      
+      legend("top", name,
+             lty = rep(1, length(unique(data$replicate))),
+             pch = pchs,
+             col = colors,
+             bty = "n",
+             cex = 1)
+    }
+    par(mfrow = c(1, 1))
+  } else {
     # bakground
-    plot(x$time, rep(0, length(x$time)),
+    plot(data$time, rep(0, length(data$time)),
          xlab = xlab,
          ylab = ylab,
-         ylim = c(0, max(x[, resp])),
+         ylim = c(0, max(data[, resp])),
          type = "n",
          col = 'white',
          xaxt = "n",
          yaxt = "n")
-
+    
     # axis
-    axis(side = 1, at = sort(unique(x[, "time"])))
-    axis(side = 2, at = unique(round(pretty(c(0, max(x[, resp]))))))
-
-    # lines and points
-    by(x, x$replicate, function(y) {
-      index <- replicate.index[[y$replicate[1]]]
-      lines(y$time, y[, resp],
-            type = "l",
-            col = colors[index])
-      points(y$time, y[, resp],
-             pch = pchs[index],
-             col = colors[index])
+    axis(side = 1, at = sort(unique(data[, "time"])))
+    axis(side = 2, at = unique(round(pretty(c(0, max(data[, resp]))))))
+    
+    by(data, data$conc, function(x) {
+      by(x, x$replicate, function(y) {
+        # lines and points
+        index <- concentration.index[[as.character(y$conc[1])]]
+        lines(y$time, y[, resp],
+              type = "l",
+              col = colors[index])
+        points(y$time, y[, resp],
+               pch = pchs[index],
+               col = colors[index])
+      })
     })
-
-    # title
-    title(paste("Conc: ", unique(x$conc), sep = ""))
-  })
-
-  if (addlegend) {
-    # creation of an empty plot to display legend
-    plot(0, 0,
-         xlab = "",
-         ylab = "",
-         xlim = c(0,5),
-         ylim = c(0,5),
-         type = "n",
-         xaxt = "n",
-         yaxt = "n")
-
-    # Display legend
-    title.legend <- "Replicate"
-    mat <- matrix(nrow = length(unique(data$replicate)), ncol = 2)
-    mat[, 1] <- rep(title.legend, length(unique(data$replicate)))
-    mat[, 2] <- unique(as.character(data$replicate))
-    name <- apply(mat, 1, function(x) {paste(x[1], x[2], sep = ": ")})
-
-    legend("top", name,
-           lty = rep(1, length(unique(data$replicate))),
-           pch = pchs,
-           col = colors,
-           bty = "n",
-           cex = 1)
+    
+    if (addlegend) {
+      legend("bottomleft",
+             legend = unique(data$conc),
+             lty = rep(1, length(unique(data$replicate))),
+             pch = pchs,
+             col = colors,
+             bty = "n",
+             cex = 1)
+    }
   }
-  par(mfrow = c(1, 1))
 }
 
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels) {
+dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels,
+                           one.plot) {
 
   time = NULL
   Nsurv = NULL
-  title.legend <- "Replicate"
 
   data$response <- data[,resp]
-
-  # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
-    geom_point() +
-    geom_line() +
-    labs(x = xlab, y = ylab) +
-    facet_wrap(~conc, ncol = 2) +
-    scale_x_continuous(breaks = unique(data$time),
-                       labels = if (remove.someLabels) {
-                         exclude_labels(unique(data$time))
-                       } else {
+  
+  if (!one.plot) {
+    title.legend <- "Replicate"
+    # create ggplot object Nsurv / time / replicate / conc
+    fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
+      geom_point() +
+      geom_line() +
+      labs(x = xlab, y = ylab) +
+      facet_wrap(~conc, ncol = 2) +
+      scale_x_continuous(breaks = unique(data$time),
+                         labels = if (remove.someLabels) {
+                           exclude_labels(unique(data$time))
+                         } else {
                            unique(data$time)
                          }
-                       ) +
-    scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
-    theme_minimal()
+      ) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
+      theme_minimal()
+  } else {
+    title.legend <- "Concentration"
+    
+    # create ggplot object Nsurv / time / replicate / conc
+    fg <- ggplot(data, aes(time, response, color = factor(conc),
+                 group = interaction(factor(conc), factor(replicate)))) +
+      geom_point() +
+      geom_line() +
+      labs(x = xlab, y = ylab) +
+      scale_x_continuous(breaks = unique(data$time),
+                         labels = if (remove.someLabels) {
+                           exclude_labels(unique(data$time))
+                         } else {
+                           unique(data$time)
+                         }
+      ) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
+      theme_minimal()
+  }
 
   # legend option
-  if (addlegend){
+  if (addlegend) {
     fd <- fg + scale_colour_hue(title.legend) # the default legend
   } else {
     fd <- fg + theme(legend.position = "none") # remove legend
@@ -228,34 +307,43 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels)
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
-                         addlegend = FALSE, remove.someLabels = FALSE) {
+                         addlegend = FALSE, remove.someLabels = FALSE,
+                         one.plot = FALSE) {
 
   if (missing(xlab)) xlab <- "Time"
 
   if (style == "generic")
-    dataPlotFullGeneric(data, xlab, ylab, resp, addlegend)
+    dataPlotFullGeneric(data, xlab, ylab, resp, addlegend, one.plot)
   else if (style == "ggplot")
-    dataPlotFullGG(data, xlab, ylab, resp, addlegend, remove.someLabels)
+    dataPlotFullGG(data, xlab, ylab, resp, addlegend, remove.someLabels,
+                   one.plot)
   else stop("Unknown plot style")
 }
 
 survDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                             addlegend = FALSE, remove.someLabels = FALSE) {
-  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend, remove.someLabels)
+                             addlegend = FALSE, remove.someLabels = FALSE,
+                             one.plot = FALSE) {
+  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend, remove.someLabels,
+               one.plot)
 }
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
+#' @importFrom grid arrow unit
 survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
                                    style, log.scale, addlegend,
-                                   remove.someLabels) {
-  if (missing(xlab)) xlab <-"Concentration"
+                                   remove.someLabels, pool.replicate) {
+  if (missing(xlab)) xlab <- "Concentration"
+  ylab <- "Survival rate"
 
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
 
+  x$resp <- x$Nsurv / x$Ninit
   # select the target.time
   xf <- filter(x, x$time == target.time)
+  
+  if (pool.replicate) conf.int <- survConfInt(xf, log.scale)
 
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) xf$conc > 0 else TRUE
@@ -272,7 +360,9 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
   x$color <- as.numeric(as.factor(x$replicate))
 
   if (style == "generic") {
-    plot(transf_data_conc, seq(0, max(x$Nsurv),
+    plot(transf_data_conc, seq(0, ifelse(pool.replicate,
+                                         max(conf.int["qsup95",]),
+                                         max(x$resp)),
                                length.out = length(transf_data_conc)),
          type = "n",
          xaxt = "n",
@@ -283,16 +373,41 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
 
     axis(side = 1, at = transf_data_conc,
          labels = display.conc)
-    axis(side = 2, at = unique(round(pretty(c(0, max(x$Nsurv))))),
-         labels = unique(round(pretty(c(0, max(x$Nsurv))))))
+    axis(side = 2, at = unique(round(pretty(c(0, max(x$resp))))),
+         labels = unique(round(pretty(c(0, max(x$resp))))))
 
     # points
     if (length(unique(x$replicate)) == 1) {
       # points
-      points(transf_data_conc, x$Nsurv,
+      points(transf_data_conc, x$resp,
              pch = 16)
+      
+      # segment CI
+      
+      segments(transf_data_conc, x$resp,
+               transf_data_conc, conf.int["qsup95", ])
+      
+      Bond <- if (log.scale) {
+        0.03 * (max(transf_data_conc) - min(transf_data_conc))
+      } else {
+        0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
+      }
+      
+      segments(transf_data_conc - Bond,
+               conf.int["qsup95", ],
+               transf_data_conc + Bond,
+               conf.int["qsup95", ])
+      
+      segments(transf_data_conc, x$resp,
+               transf_data_conc, conf.int["qinf95", ])
+      
+      segments(transf_data_conc - Bond,
+               conf.int["qinf95", ],
+               transf_data_conc + Bond,
+               conf.int["qinf95", ])
+      
     } else {
-      tt <- xyTable(transf_data_conc, x$Nsurv)
+      tt <- xyTable(transf_data_conc, x$resp)
       points(tt$x, tt$y,
              cex = (tt$number) / 3,
              pch = 16)
@@ -310,11 +425,21 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
     df <- data.frame(x,
                      transf_data_conc,
                      display.conc)
+    if (pool.replicate)
+    dfCI <- data.frame(conc = transf_data_conc,
+                       qinf95 = conf.int["qinf95",],
+                       qsup95 = conf.int["qsup95",],
+                       Conf.Int = "Confidence interval")
 
     if (length(unique(df$replicate)) == 1) {
-      gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv))
+      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
+        geom_segment(aes(x = conc, xend = conc, y = qinf95,
+                         yend = qsup95,
+                         linetype = Conf.Int),
+                     arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
+                                   ends = "both"), dfCI)
     } else {
-      gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv)) +
+      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
         stat_sum(aes(size = factor(..n..))) +
         scale_size_discrete("Replicate")
     }
@@ -329,7 +454,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
                            df$display.conc
                          }
       ) +
-      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$Nsurv))))))
+      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$resp))))))
 
     # legend option
     if (addlegend) {
@@ -523,3 +648,99 @@ survDataPlotReplicates <- function(x,
   dataPlotReplicates(x, xlab, ylab, "Nsurv", target.time, concentration, style,
                      addlegend)
 }
+
+survDataPlotByConc <- function(x,
+                               xlab,
+                               ylab,
+                               main = NULL,
+                               style,
+                               addlegend) {
+  
+  if (missing(xlab)) xlab <- "Concentration"
+  if (missing(ylab)) ylab <- "Number of survivor"
+  
+  time.index <- TimeIndex(x)
+  # vectors of colors and pch
+  colors <- rainbow(length(unique(x$time)))
+  pchs <- as.numeric(as.factor(unique(x$time)))
+  
+  if (style == "generic") {
+    # background
+    plot(x$conc,
+         x$Nsurv,
+         xlab = xlab,
+         ylab = ylab,
+         ylim = c(0, max(x$Nsurv)),
+         xaxt = "n",
+         yaxt = "n",
+         type = "n")
+    
+    # axis
+    axis(side = 1, at = sort(unique(x[, "conc"])))
+    axis(side = 2, at = unique(round(pretty(c(0, max(x[, "Nsurv"]))))))
+    
+    # lines and points
+    by(x, x$time, function(y) {
+      by(y, y$replicate, function(z) {
+        index <- time.index[[as.character(z$time[1])]]
+        points(z$conc, z$Nsurv,
+               col = colors[index],
+               pch = pchs[index])
+      })
+    })
+    
+    if (addlegend) {
+      legend("bottomleft",
+             legend = unique(x$time),
+             pch = pchs,
+             col = colors,
+             bty = "n",
+             cex = 1,
+             ncol = 2)
+    }
+  } else if (style == "ggplot") {
+    title.legend <- "Time"
+    
+    fg <- ggplot(x, aes(conc, Nsurv, color = factor(time),
+                 group = interaction(factor(time), factor(replicate)))) +
+      geom_point() +
+      labs(x = xlab, y = ylab) +
+      scale_x_continuous(breaks = unique(x$conc)) +
+      scale_y_continuous(breaks = unique(round(pretty(c(0,
+                                                        max(x[, "Nsurv"])))))) +
+      theme_minimal()
+    
+    # legend option
+    if (addlegend) {
+      fd <- fg + scale_colour_hue(title.legend) # the default legend
+    } else {
+      fd <- fg + theme(legend.position = "none") # remove legend
+    }
+    return(fd)
+  } else stop("Unknown plot style")
+}
+
+#' @importFrom stats aggregate binom.test
+survConfInt <- function(x, log.scale) {
+  # create confidente interval on observed data for the log logistic
+  # binomial model by a binomial test
+  # INPUT:
+  # - x : object of class survFitTT
+  # - log.scale : boolean
+  # OUTPUT:
+  
+  # - ci : confidente interval
+  x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
+             Ninit = aggregate(Ninit ~ time + conc, x, sum)$Ninit)
+  
+  ci <- apply(x, 1, function(x) {
+    binom.test(x["Nsurv"], x["Ninit"])$conf.int
+  })
+  rownames(ci) <- c("qinf95", "qsup95")
+  colnames(ci) <- x$conc
+  
+  if (log.scale) ci <- ci[ ,colnames(ci) != 0]
+  
+  return(ci)
+}
+
