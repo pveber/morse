@@ -68,7 +68,7 @@ plot.reproData <- function(x,
 
   if (pool.replicate) {
     # agregate by sum of replicate
-    x <- cbind(aggregate(Nreprocumul ~ time + conc, x, sum),
+    x <- cbind(aggregate(cbind(Nreprocumul, Nsurv, Ninit) ~ time + conc, x, sum),
                replicate = 1)
   }
 
