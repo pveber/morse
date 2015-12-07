@@ -4,7 +4,10 @@ version dev
 ===========
 
 BUG FIXES
-- in plot.survData the legend was removed for global graphique.
+- plot.survData (and plot.reproData) don't display a legend anymore with
+  unconstrained time and concentration. They used to display a misleading
+  "replicate" legend, which would not correspond to a real replication unit
+  (beaker).
 
 Version 2.1.0
 =============
