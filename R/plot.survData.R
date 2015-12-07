@@ -78,7 +78,7 @@ plot.survData <- function(x,
 
   if (pool.replicate || one.plot) {
     # agregate by sum of replicate
-    x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
+    x <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, x, sum),
                replicate = 1)
   }
 
@@ -88,7 +88,8 @@ plot.survData <- function(x,
   }
   else if (! is.null(target.time) && is.null(concentration) && !by.conc) {
     survDataPlotTargetTime(x, xlab, ylab, main, target.time,
-                           style, log.scale, addlegend, remove.someLabels)
+                           style, log.scale, addlegend, remove.someLabels,
+                           pool.replicate)
   }
   else if (is.null(target.time) && ! is.null(concentration) && !by.conc) {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
@@ -328,9 +329,10 @@ survDataPlotFull <- function(data, xlab, ylab, style = "generic",
 
 #' @import ggplot2
 #' @importFrom dplyr %>% filter
+#' @importFrom grid arrow unit
 survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
                                    style, log.scale, addlegend,
-                                   remove.someLabels) {
+                                   remove.someLabels, pool.replicate) {
   if (missing(xlab)) xlab <- "Concentration"
   ylab <- "Survival rate"
 
@@ -340,6 +342,8 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
   x$resp <- x$Nsurv / x$Ninit
   # select the target.time
   xf <- filter(x, x$time == target.time)
+  
+  if (pool.replicate) conf.int <- survConfInt(xf, log.scale)
 
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) xf$conc > 0 else TRUE
@@ -356,7 +360,9 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
   x$color <- as.numeric(as.factor(x$replicate))
 
   if (style == "generic") {
-    plot(transf_data_conc, seq(0, max(x$resp),
+    plot(transf_data_conc, seq(0, ifelse(pool.replicate,
+                                         max(conf.int["qsup95",]),
+                                         max(x$resp)),
                                length.out = length(transf_data_conc)),
          type = "n",
          xaxt = "n",
@@ -375,6 +381,31 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
       # points
       points(transf_data_conc, x$resp,
              pch = 16)
+      
+      # segment CI
+      
+      segments(transf_data_conc, x$resp,
+               transf_data_conc, conf.int["qsup95", ])
+      
+      Bond <- if (log.scale) {
+        0.03 * (max(transf_data_conc) - min(transf_data_conc))
+      } else {
+        0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
+      }
+      
+      segments(transf_data_conc - Bond,
+               conf.int["qsup95", ],
+               transf_data_conc + Bond,
+               conf.int["qsup95", ])
+      
+      segments(transf_data_conc, x$resp,
+               transf_data_conc, conf.int["qinf95", ])
+      
+      segments(transf_data_conc - Bond,
+               conf.int["qinf95", ],
+               transf_data_conc + Bond,
+               conf.int["qinf95", ])
+      
     } else {
       tt <- xyTable(transf_data_conc, x$resp)
       points(tt$x, tt$y,
@@ -394,9 +425,19 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
     df <- data.frame(x,
                      transf_data_conc,
                      display.conc)
+    if (pool.replicate)
+    dfCI <- data.frame(conc = transf_data_conc,
+                       qinf95 = conf.int["qinf95",],
+                       qsup95 = conf.int["qsup95",],
+                       Conf.Int = "Confidence interval")
 
     if (length(unique(df$replicate)) == 1) {
-      gp <- ggplot(df, aes(x = transf_data_conc, y = resp))
+      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
+        geom_segment(aes(x = conc, xend = conc, y = qinf95,
+                         yend = qsup95,
+                         linetype = Conf.Int),
+                     arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
+                                   ends = "both"), dfCI)
     } else {
       gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
         stat_sum(aes(size = factor(..n..))) +
@@ -677,5 +718,29 @@ survDataPlotByConc <- function(x,
     }
     return(fd)
   } else stop("Unknown plot style")
+}
+
+#' @importFrom stats aggregate binom.test
+survConfInt <- function(x, log.scale) {
+  # create confidente interval on observed data for the log logistic
+  # binomial model by a binomial test
+  # INPUT:
+  # - x : object of class survFitTT
+  # - log.scale : boolean
+  # OUTPUT:
+  
+  # - ci : confidente interval
+  x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
+             Ninit = aggregate(Ninit ~ time + conc, x, sum)$Ninit)
+  
+  ci <- apply(x, 1, function(x) {
+    binom.test(x["Nsurv"], x["Ninit"])$conf.int
+  })
+  rownames(ci) <- c("qinf95", "qsup95")
+  colnames(ci) <- x$conc
+  
+  if (log.scale) ci <- ci[ ,colnames(ci) != 0]
+  
+  return(ci)
 }
 
