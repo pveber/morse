@@ -14,7 +14,11 @@ BUG FIXES
   unconstrained time and concentration. They used to display a misleading
   "replicate" legend, which would not correspond to a real replication unit
   (beaker).
-- the DIC is not calulated in survFiTT
+
+IMPROVEMENTS
+- the DIC is not calculated in survFiTT anymore. Since we don't
+  perform model selection, this was not really useful and we thus
+  obtain a significant speed-up.
 
 Version 2.1.0
 =============
