@@ -109,7 +109,6 @@ test_that("survData", {
     dat <- survData(x)
     expect_is(dat, c("survData", "data.frame"))
     expect_is(dat$conc, c("numeric", "integer"))
-    expect_true("ID" %in% names(dat))
     expect_true(!is.null(dat))
     expect_true(any(!is.na(dat)))
     expect_true(all(dat[-1] >= 0))
