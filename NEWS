@@ -1,5 +1,12 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+version dev
+===========
+
+BUG FIXIES
+- survDataCheck and reproDataCheck would fail on datasets with integer-only
+  concentrations
+
 Version 2.1.0
 =============
 
