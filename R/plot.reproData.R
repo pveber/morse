@@ -73,7 +73,7 @@ plot.reproData <- function(x,
   }
 
   if (is.null(target.time) && is.null(concentration)) {
-    reproDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabels)
+    reproDataPlotFull(x, xlab, ylab, style, remove.someLabels)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
     reproDataPlotTargetTime(x, xlab, ylab, main, target.time,
@@ -93,8 +93,8 @@ plot.reproData <- function(x,
 
 
 reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                              addlegend = TRUE, remove.someLabels) {
-  dataPlotFull(data, xlab, ylab, "Nreprocumul", style, addlegend,
+                              remove.someLabels) {
+  dataPlotFull(data, xlab, ylab, "Nreprocumul", style,
                remove.someLabels)
 }
 

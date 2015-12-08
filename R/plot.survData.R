@@ -77,7 +77,7 @@ plot.survData <- function(x,
   }
 
   if (is.null(target.time) && is.null(concentration)) {
-    survDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabels)
+    survDataPlotFull(x, xlab, ylab, style, remove.someLabels)
   }
   else if (! is.null(target.time) && is.null(concentration)) {
     survDataPlotTargetTime(x, xlab, ylab, main, target.time,
@@ -124,7 +124,7 @@ plotMatrixGeometry <- function(nblevels) {
 
 # General full plot: one subplot for each concentration, and one color for
 # each replicate (for generic graphics)
-dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend) {
+dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
   replicate.index <- ReplicateIndex(data)
 
   # creation of a vector of colors
@@ -162,46 +162,20 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp, addlegend) {
     # title
     title(paste("Conc: ", unique(x$conc), sep = ""))
   })
-
-  if (addlegend) {
-    # creation of an empty plot to display legend
-    plot(0, 0,
-         xlab = "",
-         ylab = "",
-         xlim = c(0,5),
-         ylim = c(0,5),
-         type = "n",
-         xaxt = "n",
-         yaxt = "n")
-
-    # Display legend
-    title.legend <- "Replicate"
-    mat <- matrix(nrow = length(unique(data$replicate)), ncol = 2)
-    mat[, 1] <- rep(title.legend, length(unique(data$replicate)))
-    mat[, 2] <- unique(as.character(data$replicate))
-    name <- apply(mat, 1, function(x) {paste(x[1], x[2], sep = ": ")})
-
-    legend("top", name,
-           lty = rep(1, length(unique(data$replicate))),
-           pch = pchs,
-           col = colors,
-           bty = "n",
-           cex = 1)
-  }
+  
   par(mfrow = c(1, 1))
 }
 
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels) {
-
+dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
+  
   time = NULL
   Nsurv = NULL
-  title.legend <- "Replicate"
-
+  
   data$response <- data[,resp]
-
+  
   # create ggplot object Nsurv / time / replicate / conc
   fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
     geom_point() +
@@ -212,36 +186,32 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, addlegend, remove.someLabels)
                        labels = if (remove.someLabels) {
                          exclude_labels(unique(data$time))
                        } else {
-                           unique(data$time)
-                         }
-                       ) +
+                         unique(data$time)
+                       }
+    ) +
     scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
     theme_minimal()
-
-  # legend option
-  if (addlegend){
-    fd <- fg + scale_colour_hue(title.legend) # the default legend
-  } else {
-    fd <- fg + theme(legend.position = "none") # remove legend
-  }
+  
+  fd <- fg + theme(legend.position = "none") # remove legend
+  
   return(fd)
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
-                         addlegend = FALSE, remove.someLabels = FALSE) {
+                         remove.someLabels = FALSE) {
 
   if (missing(xlab)) xlab <- "Time"
 
   if (style == "generic")
-    dataPlotFullGeneric(data, xlab, ylab, resp, addlegend)
+    dataPlotFullGeneric(data, xlab, ylab, resp)
   else if (style == "ggplot")
-    dataPlotFullGG(data, xlab, ylab, resp, addlegend, remove.someLabels)
+    dataPlotFullGG(data, xlab, ylab, resp, remove.someLabels)
   else stop("Unknown plot style")
 }
 
 survDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                             addlegend = FALSE, remove.someLabels = FALSE) {
-  dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend, remove.someLabels)
+                             remove.someLabels = FALSE) {
+  dataPlotFull(data, xlab, ylab, "Nsurv", style, remove.someLabels)
 }
 
 #' @import ggplot2
