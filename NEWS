@@ -1,5 +1,11 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+version dev
+===========
+
+NEW FEATURE:
+- the column ID was removed in survData and reproData objects.
+
 Version 2.1.0
 =============
 
