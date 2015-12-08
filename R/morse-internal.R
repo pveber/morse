@@ -143,7 +143,7 @@ estimXCX <- function(mcmc, xcx, varx) {
 }
 
 optLogTransform <- function(log.scale, x) {
-  if(log.scale) log(x) else x
+  if (log.scale) log(x) else x
 }
 
 legendGgplotFit <- function(a.gplot) {
