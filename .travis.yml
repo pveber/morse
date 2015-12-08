@@ -1,4 +1,4 @@
-language: R
+language: r
 warnings_are_errors: true
 sudo: required
 bioc_required: false
@@ -7,13 +7,24 @@ install:
  - mkdir ~/.R
 
 before_script:
-- R CMD INSTALL .
-- Rscript -e "library(coda); library(dplyr); library(graphics); library(grDevices); library(ggplot2); library(grid); library(gridExtra); library(methods); library(rjags); library(stats); library(stringr)"
-- Rscript -e "library(knitr); library(rmarkdown); library(testthat)"
+ - git config --global user.name "travis"
+ - git config --global user.email "travis@example.org"
 
-env:
-  global:
-    - CRAN: http://cran.rstudio.com
-    - R_BUILD_ARGS="--no-build-vignettes --no-manual"
-    - R_CHECK_ARGS="--no-build-vignettes --no-manual --as-cran"
-    - BOOTSTRAP_LATEX=""
+r_binary_packages:
+ - coda
+ - dplyr
+ - graphics
+ - grDevices
+ - ggplot2
+ - grid
+ - gridExtra
+ - methods
+ - rjags
+ - stats
+ - stringr
+ - knitr
+ - rmarkdown
+ - testthat
+
+after_succes:
+ - Rscript -e 'covr::codecov()'
