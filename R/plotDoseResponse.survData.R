@@ -22,8 +22,8 @@ survConfInt <- function(x, log.scale) {
 
 #' Plotting method for \code{survData} objects
 #'
-#' Plots the survival rate as a
-#' function of either concentration (for a given target time).
+#' Plots the survival rate as a function of concentration (for a given target
+#' time).
 #'
 #' @param x an object of class \code{survData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
