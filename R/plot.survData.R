@@ -314,23 +314,24 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
     df <- data.frame(x,
                      transf_data_conc,
                      display.conc)
-    if (pool.replicate)
-    dfCI <- data.frame(conc = transf_data_conc,
-                       qinf95 = conf.int["qinf95",],
-                       qsup95 = conf.int["qsup95",],
-                       Conf.Int = "Confidence interval")
-
-    if (length(unique(df$replicate)) == 1) {
+    if (pool.replicate) {
+      dfCI <- data.frame(conc = transf_data_conc,
+                         qinf95 = conf.int["qinf95",],
+                         qsup95 = conf.int["qsup95",],
+                         Conf.Int = "Confidence interval")
+      
       gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
         geom_segment(aes(x = conc, xend = conc, y = qinf95,
                          yend = qsup95,
                          linetype = Conf.Int),
                      arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                   ends = "both"), dfCI)
+                                   ends = "both"), dfCI) +
+        expand_limits(x = 0, y = 0)
     } else {
       gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
         stat_sum(aes(size = factor(..n..))) +
-        scale_size_discrete("Replicate")
+        scale_size_discrete("Replicate") +
+        expand_limits(x = 0, y = 0)
     }
     fd <- gp + geom_point() + ggtitle(main) +
       theme_minimal() +
