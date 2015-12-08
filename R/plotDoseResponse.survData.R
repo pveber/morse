@@ -20,7 +20,7 @@ survConfInt <- function(x, log.scale) {
 }
 
 
-#' Plotting method for \code{survData} objects
+#' Plotting \code{survData} objects
 #'
 #' Plots the survival rate as a function of concentration (for a given target
 #' time).
@@ -62,15 +62,19 @@ survConfInt <- function(x, log.scale) {
 #' @importFrom stats aggregate
 #'
 #' @export
-plotDoseResponse.survData <- function(x,
-                                      xlab = "Concentration",
-                                      ylab = "Survival rate",
-                                      main = NULL,
-                                      target.time = NULL,
-                                      style = "generic",
-                                      log.scale = FALSE,
-                                      remove.someLabels = FALSE,
-                                      ...) {
+plotDoseResponse <- function(x,
+                             xlab = "Concentration",
+                             ylab = "Survival rate",
+                             main = NULL,
+                             target.time = NULL,
+                             style = "generic",
+                             log.scale = FALSE,
+                             remove.someLabels = FALSE,
+                             ...) {
+  # test class object
+  if (!is(x, "survData"))
+    stop("plotDoseResponse: object of class survData expected")
+  
   if (is.null(target.time)) target.time <- max(x$time)
   
   if (!target.time %in% x$time)
