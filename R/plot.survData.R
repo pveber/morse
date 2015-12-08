@@ -1,16 +1,13 @@
 #' Plotting method for \code{survData} objects
 #'
 #' Plots the number of survivors as a
-#' function of either time and concentration, time only (for a fixed
-#' concentration), concentration only (for a given target time). If both
-#' concentration and target time are fixed, the function additionally plots
-#' the experimental values for the minimum available concentration.
+#' function of either time, time only (for a fixed
+#' concentration).
 #'
 #' @param x an object of class \code{survData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
-#' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
@@ -43,10 +40,6 @@
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
 #'
-#' # (5) Plot survival data for a fixed concentration and
-#' # target.time with ggplot style
-#' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
-#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot axis legend lines par points polygon
@@ -59,7 +52,6 @@ plot.survData <- function(x,
                           xlab,
                           ylab = "Number of surviving individuals",
                           main = NULL,
-                          target.time = NULL,
                           concentration = NULL,
                           style = "generic",
                           pool.replicate = FALSE,
@@ -76,21 +68,12 @@ plot.survData <- function(x,
                replicate = 1)
   }
 
-  if (is.null(target.time) && is.null(concentration)) {
+  if (is.null(concentration)) {
     survDataPlotFull(x, xlab, ylab, style, addlegend, remove.someLabels)
   }
-  else if (! is.null(target.time) && is.null(concentration)) {
-    survDataPlotTargetTime(x, xlab, ylab, main, target.time,
-                           style, log.scale, addlegend, remove.someLabels,
-                           pool.replicate)
-  }
-  else if (is.null(target.time) && ! is.null(concentration)) {
+  else {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
                           style, addlegend, remove.someLabels)
-  }
-  else {
-    survDataPlotReplicates(x, xlab, ylab, target.time, concentration, style,
-                           addlegend)
   }
 }
 
@@ -245,147 +228,6 @@ survDataPlotFull <- function(data, xlab, ylab, style = "generic",
   dataPlotFull(data, xlab, ylab, "Nsurv", style, addlegend, remove.someLabels)
 }
 
-#' @import ggplot2
-#' @importFrom dplyr %>% filter
-#' @importFrom grid arrow unit
-survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
-                                   style, log.scale, addlegend,
-                                   remove.someLabels, pool.replicate) {
-  if (missing(xlab)) xlab <- "Concentration"
-  ylab <- "Survival rate"
-
-  if (!target.time %in% x$time)
-    stop("[target.time] is not one of the possible time !")
-
-  x$resp <- x$Nsurv / x$Ninit
-  # select the target.time
-  xf <- filter(x, x$time == target.time)
-  
-  if (pool.replicate) conf.int <- survConfInt(xf, log.scale)
-
-  # Selection of datapoints that can be displayed given the type of scale
-  sel <- if(log.scale) xf$conc > 0 else TRUE
-  x <- xf[sel, ]
-  transf_data_conc <- optLogTransform(log.scale, x$conc)
-
-  # Concentration values used for display in linear scale
-  display.conc <- (function() {
-    x <- optLogTransform(log.scale, x$conc)
-    if(log.scale) exp(x) else x
-  })()
-
-  # vector color
-  x$color <- as.numeric(as.factor(x$replicate))
-
-  if (style == "generic") {
-    plot(transf_data_conc, seq(0, ifelse(pool.replicate,
-                                         max(conf.int["qsup95",]),
-                                         max(x$resp)),
-                               length.out = length(transf_data_conc)),
-         type = "n",
-         xaxt = "n",
-         yaxt = "n",
-         main = main,
-         xlab = xlab,
-         ylab = ylab)
-
-    axis(side = 1, at = transf_data_conc,
-         labels = display.conc)
-    axis(side = 2, at = unique(round(pretty(c(0, max(x$resp))))),
-         labels = unique(round(pretty(c(0, max(x$resp))))))
-
-    # points
-    if (length(unique(x$replicate)) == 1) {
-      # points
-      points(transf_data_conc, x$resp,
-             pch = 16)
-      
-      # segment CI
-      
-      segments(transf_data_conc, x$resp,
-               transf_data_conc, conf.int["qsup95", ])
-      
-      Bond <- if (log.scale) {
-        0.03 * (max(transf_data_conc) - min(transf_data_conc))
-      } else {
-        0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
-      }
-      
-      segments(transf_data_conc - Bond,
-               conf.int["qsup95", ],
-               transf_data_conc + Bond,
-               conf.int["qsup95", ])
-      
-      segments(transf_data_conc, x$resp,
-               transf_data_conc, conf.int["qinf95", ])
-      
-      segments(transf_data_conc - Bond,
-               conf.int["qinf95", ],
-               transf_data_conc + Bond,
-               conf.int["qinf95", ])
-      
-    } else {
-      tt <- xyTable(transf_data_conc, x$resp)
-      points(tt$x, tt$y,
-             cex = (tt$number) / 3,
-             pch = 16)
-      if (addlegend) {
-        legend("bottomleft",
-               legend = sort(unique(tt$number)),
-               pt.cex = sort(unique((tt$number) / 3)),
-               title = "Overplotted replicates",
-               pch = 16,
-               bty = "n")
-      }
-    }
-  }
-  else if (style == "ggplot") {
-    df <- data.frame(x,
-                     transf_data_conc,
-                     display.conc)
-    if (pool.replicate) {
-      dfCI <- data.frame(conc = transf_data_conc,
-                         qinf95 = conf.int["qinf95",],
-                         qsup95 = conf.int["qsup95",],
-                         Conf.Int = "Confidence interval")
-      
-      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
-        geom_segment(aes(x = conc, xend = conc, y = qinf95,
-                         yend = qsup95,
-                         linetype = Conf.Int),
-                     arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                   ends = "both"), dfCI) +
-        expand_limits(x = 0, y = 0)
-    } else {
-      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
-        stat_sum(aes(size = factor(..n..))) +
-        scale_size_discrete("Replicate") +
-        expand_limits(x = 0, y = 0)
-    }
-    fd <- gp + geom_point() + ggtitle(main) +
-      theme_minimal() +
-      labs(x = xlab,
-           y = ylab) +
-      scale_x_continuous(breaks = df$transf_data_conc,
-                         labels = if (remove.someLabels) {
-                           exclude_labels(df$display.conc)
-                         } else {
-                           df$display.conc
-                         }
-      ) +
-      scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$resp)))))) +
-      expand_limits(x = 0, y = 0)
-
-    # legend option
-    if (addlegend) {
-      fd
-    } else {
-      fd + theme(legend.position = "none") # remove legend
-    }
-  }
-  else stop("Unknown plot style")
-}
-
 dataPlotFixedConc <- function(x,
                               xlab,
                               ylab,
@@ -488,178 +330,3 @@ survDataPlotFixedConc <- function(x,
                     style, addlegend, remove.someLabels)
 }
 
-#' @importFrom dplyr %>% filter
-dataPlotReplicates <- function(x,
-                               xlab,
-                               ylab,
-                               resp,
-                               target.time,
-                               concentration,
-                               style,
-                               addlegend) {
-
-  if (missing(xlab)) xlab <- "Replicate"
-
-  # check [target.time] and [concentration]
-  if (!target.time %in% x$time)
-    stop("The argument [target.time] should correspond to one of the observed time points")
-
-  if (!concentration %in% x$conc)
-    stop("The argument [concentration] should correspond to one of the tested concentrations")
-
-  # select for concentration and target.time
-  xtt <- filter(x, conc == concentration & time == target.time)
-  control <- filter(x, conc == min(x$conc) & time == target.time)
-
-  if (style == "generic") {
-    par(mfrow = c(1, ifelse(concentration == 0, 1, 2)))
-
-    plot(as.numeric(control$replicate), control[,resp],
-         xlab = xlab,
-         ylab = ylab,
-         main = "Control",
-         pch = 16,
-         ylim = c(0, max(control[, resp])),
-         xaxt = "n",
-         yaxt = "n")
-
-    # axis
-    axis(side = 1, at = sort(unique(control[, "replicate"])))
-    axis(side = 2, at = unique(round(pretty(c(0, max(control[, resp]))))))
-
-    # fixed concentration
-    if (! concentration == 0) {
-      plot(as.numeric(xtt$replicate), xtt[,resp],
-           xlab = xlab,
-           ylab = ylab,
-           main = paste("Concentration: ", concentration, sep = ""),
-           pch = 16,
-           ylim = c(0, max(control[, resp])),
-           xaxt = "n",
-           yaxt = "n")
-
-      # axis
-      axis(side = 1, at = sort(unique(xtt[, "replicate"])))
-      axis(side = 2, at = unique(round(pretty(c(0, max(xtt[, resp]))))))
-    }
-  }
-
-  else if (style == "ggplot") {
-    dataall <- rbind(control, xtt)
-    dataall$response <- dataall[,resp]
-    df <- ggplot(dataall, aes(x = replicate, y = response))
-    df + geom_point() + labs(x = xlab, y = ylab) +
-      scale_x_discrete(breaks = dataall$replicate,
-                       labels = dataall$replicate) +
-      scale_y_discrete(breaks = unique(round(pretty(c(0, max(dataall$response)))))) +
-      expand_limits(x = 0, y = 0) +
-      facet_wrap(~conc) + theme_minimal()
-  }
-  else stop("Unknown plot style")
-}
-
-survDataPlotReplicates <- function(x,
-                                   xlab,
-                                   ylab,
-                                   target.time,
-                                   concentration,
-                                   style,
-                                   addlegend) {
-  dataPlotReplicates(x, xlab, ylab, "Nsurv", target.time, concentration, style,
-                     addlegend)
-}
-
-survDataPlotByConc <- function(x,
-                               xlab,
-                               ylab,
-                               main = NULL,
-                               style,
-                               addlegend) {
-  
-  if (missing(xlab)) xlab <- "Concentration"
-  if (missing(ylab)) ylab <- "Number of survivor"
-  
-  time.index <- TimeIndex(x)
-  # vectors of colors and pch
-  colors <- rainbow(length(unique(x$time)))
-  pchs <- as.numeric(as.factor(unique(x$time)))
-  
-  if (style == "generic") {
-    # background
-    plot(x$conc,
-         x$Nsurv,
-         xlab = xlab,
-         ylab = ylab,
-         ylim = c(0, max(x$Nsurv)),
-         xaxt = "n",
-         yaxt = "n",
-         type = "n")
-    
-    # axis
-    axis(side = 1, at = sort(unique(x[, "conc"])))
-    axis(side = 2, at = unique(round(pretty(c(0, max(x[, "Nsurv"]))))))
-    
-    # lines and points
-    by(x, x$time, function(y) {
-      by(y, y$replicate, function(z) {
-        index <- time.index[[as.character(z$time[1])]]
-        points(z$conc, z$Nsurv,
-               col = colors[index],
-               pch = pchs[index])
-      })
-    })
-    
-    if (addlegend) {
-      legend("bottomleft",
-             legend = unique(x$time),
-             pch = pchs,
-             col = colors,
-             bty = "n",
-             cex = 1,
-             ncol = 2)
-    }
-  } else if (style == "ggplot") {
-    title.legend <- "Time"
-    
-    fg <- ggplot(x, aes(conc, Nsurv, color = factor(time),
-                 group = interaction(factor(time), factor(replicate)))) +
-      geom_point() +
-      labs(x = xlab, y = ylab) +
-      scale_x_continuous(breaks = unique(x$conc)) +
-      scale_y_continuous(breaks = unique(round(pretty(c(0,
-                                                        max(x[, "Nsurv"])))))) +
-      theme_minimal()
-    
-    # legend option
-    if (addlegend) {
-      fd <- fg + scale_colour_hue(title.legend) # the default legend
-    } else {
-      fd <- fg + theme(legend.position = "none") # remove legend
-    }
-    return(fd)
-  } else stop("Unknown plot style")
-}
-
-#' @importFrom stats aggregate binom.test
-survConfInt <- function(x, log.scale) {
-  # create confidente interval on observed data for the log logistic
-  # binomial model by a binomial test
-  # INPUT:
-  # - x : object of class survFitTT
-  # - log.scale : boolean
-  # OUTPUT:
-  
-  # - ci : confidente interval
-  x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
-             Ninit = aggregate(Ninit ~ time + conc, x, sum)$Ninit)
-  
-  ci <- apply(x, 1, function(x) {
-    binom.test(x["Nsurv"], x["Ninit"])$conf.int
-  })
-  rownames(ci) <- c("qinf95", "qsup95")
-  colnames(ci) <- x$conc
-  
-  if (log.scale) ci <- ci[ ,colnames(ci) != 0]
-  
-  return(ci)
-}
