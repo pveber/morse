@@ -8,9 +8,6 @@ survConfInt <- function(x, log.scale) {
   # OUTPUT:
   
   # - ci : confidente interval
-  x <- cbind(aggregate(Nsurv ~ time + conc, x, sum),
-             Ninit = aggregate(Ninit ~ time + conc, x, sum)$Ninit)
-  
   ci <- apply(x, 1, function(x) {
     binom.test(x["Nsurv"], x["Ninit"])$conf.int
   })
