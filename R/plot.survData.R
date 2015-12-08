@@ -1,7 +1,6 @@
 #' Plotting method for \code{survData} objects
 #'
-#' Plots the number of survivors as a
-#' function of either time, time only (for a fixed
+#' Plots the number of survivors as a function of time (for a fixed
 #' concentration).
 #'
 #' @param x an object of class \code{survData}
