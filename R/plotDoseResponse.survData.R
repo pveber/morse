@@ -1,6 +1,6 @@
 #' @importFrom stats aggregate binom.test
 survConfInt <- function(x, log.scale) {
-  # create confidente interval on observed data for the log logistic
+  # compute confidente interval on observed data
   # binomial model by a binomial test
   # INPUT:
   # - x : object of class survFitTT
