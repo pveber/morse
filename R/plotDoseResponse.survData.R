@@ -32,7 +32,6 @@ survConfInt <- function(x, log.scale) {
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
-#' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -48,7 +47,7 @@ survConfInt <- function(x, log.scale) {
 #' zinc <- survData(zinc)
 #'
 #' # (2) Plot dose-response
-#' plotDoseResponse(zinc, addlegend = TRUE)
+#' plotDoseResponse(zinc)
 #'
 #' # (3) Plot dose-response with a ggplot style
 #' plotDoseResponse(zinc, style = "ggplot")
@@ -57,7 +56,7 @@ survConfInt <- function(x, log.scale) {
 #' @import grDevices
 #' @importFrom dplyr %>% filter
 #' @importFrom grid arrow unit
-#' @importFrom graphics plot axis legend lines par points polygon
+#' @importFrom graphics plot axis lines par points polygon
 #' segments title
 #' @importFrom methods is
 #' @importFrom stats aggregate
@@ -70,7 +69,6 @@ plotDoseResponse.survData <- function(x,
                                       target.time = NULL,
                                       style = "generic",
                                       log.scale = FALSE,
-                                      addlegend = FALSE,
                                       remove.someLabels = FALSE,
                                       ...) {
   if (is.null(target.time)) target.time <- max(x$time)
@@ -176,12 +174,8 @@ plotDoseResponse.survData <- function(x,
       scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$resp)))))) +
       expand_limits(x = 0, y = 0)
     
-    # legend option
-    if (addlegend) {
-      fd
-    } else {
-      fd + theme(legend.position = "none") # remove legend
-    }
+    fd + theme(legend.position = "none") # remove legend
+    
   }
   else stop("Unknown plot style")
 }
