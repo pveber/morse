@@ -10,8 +10,6 @@
 #' @return The function returns a list with the following fields:
 #' \item{NbrepTimeConc}{nb of replicates for all concentrations and time points}
 #' \item{NbsurvTimeConc}{nb of surviving ind. for all concentrations and time points}
-#' \item{NbdataConc}{nb of datapoints per concentration}
-#' \item{NbdataTime}{nb of datapoints per time}
 
 #' @seealso \code{\link{survData}}
 #' 
@@ -36,17 +34,7 @@ summary.survData <- function(object, quiet = FALSE, ...) {
   ans2 <- tapply(object$Nsurv, list(as.factor(object$conc),
                                     as.factor(object$time)), sum)
   
-  # table of datapoints per concentration
-  ans3 <- table(object$conc)
-  
-  # table of datapoints per time
-  ans4 <- table(object$time)
-  
   if (! quiet) {
-    cat("Number of datapoints per concentration: \n")
-    print(ans3)
-    cat("\nNumber of datapoints per time: \n")
-    print(ans4)
     cat("\nNumber of replicate per time and concentration: \n")
     print(ans1)
     cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
@@ -54,7 +42,5 @@ summary.survData <- function(object, quiet = FALSE, ...) {
   }
   
   invisible(list(NbrepTimeConc = ans1,
-                 NbsurvTimeConc = ans2,
-                 NbdataConc = ans3,
-                 NbdataTime = ans4))
+                 NbsurvTimeConc = ans2))
 }
