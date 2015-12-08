@@ -31,8 +31,6 @@ survConfInt <- function(x, log.scale) {
 #' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
-#' summed for a same concentration
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods.
@@ -74,24 +72,21 @@ plotDoseResponse.survData <- function(x,
                                       log.scale = FALSE,
                                       addlegend = FALSE,
                                       remove.someLabels = FALSE,
-                                      pool.replicate = FALSE,
                                       ...) {
   if (is.null(target.time)) target.time <- max(x$time)
   
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
   
-  if (pool.replicate) {
-    # agregate by sum of replicate
-    x <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, x, sum),
-               replicate = 1)
-  }
+  # agregate by sum of replicate
+  x <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, x, sum),
+             replicate = 1)
   
   x$resp <- x$Nsurv / x$Ninit
   # select the target.time
   xf <- filter(x, x$time == target.time)
   
-  if (pool.replicate) conf.int <- survConfInt(xf, log.scale)
+  conf.int <- survConfInt(xf, log.scale)
   
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) xf$conc > 0 else TRUE
@@ -108,9 +103,7 @@ plotDoseResponse.survData <- function(x,
   x$color <- as.numeric(as.factor(x$replicate))
   
   if (style == "generic") {
-    plot(transf_data_conc, seq(0, ifelse(pool.replicate,
-                                         max(conf.int["qsup95",]),
-                                         max(x$resp)),
+    plot(transf_data_conc, seq(0, max(conf.int["qsup95",]),
                                length.out = length(transf_data_conc)),
          type = "n",
          xaxt = "n",
@@ -125,73 +118,50 @@ plotDoseResponse.survData <- function(x,
          labels = unique(round(pretty(c(0, max(x$resp))))))
     
     # points
-    if (pool.replicate) {
-      # points
-      points(transf_data_conc, x$resp,
-             pch = 16)
-      
-      # segment CI
-      
-      segments(transf_data_conc, x$resp,
-               transf_data_conc, conf.int["qsup95", ])
-      
-      Bond <- if (log.scale) {
-        0.03 * (max(transf_data_conc) - min(transf_data_conc))
-      } else {
-        0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
-      }
-      
-      segments(transf_data_conc - Bond,
-               conf.int["qsup95", ],
-               transf_data_conc + Bond,
-               conf.int["qsup95", ])
-      
-      segments(transf_data_conc, x$resp,
-               transf_data_conc, conf.int["qinf95", ])
-      
-      segments(transf_data_conc - Bond,
-               conf.int["qinf95", ],
-               transf_data_conc + Bond,
-               conf.int["qinf95", ])
-      
+    points(transf_data_conc, x$resp,
+           pch = 16)
+    
+    # segment CI
+    
+    segments(transf_data_conc, x$resp,
+             transf_data_conc, conf.int["qsup95", ])
+    
+    Bond <- if (log.scale) {
+      0.03 * (max(transf_data_conc) - min(transf_data_conc))
     } else {
-      tt <- xyTable(transf_data_conc, x$resp)
-      points(tt$x, tt$y,
-             cex = (tt$number) / 3,
-             pch = 16)
-      if (addlegend) {
-        legend("bottomleft",
-               legend = sort(unique(tt$number)),
-               pt.cex = sort(unique((tt$number) / 3)),
-               title = "Overplotted replicates",
-               pch = 16,
-               bty = "n")
-      }
+      0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
     }
+    
+    segments(transf_data_conc - Bond,
+             conf.int["qsup95", ],
+             transf_data_conc + Bond,
+             conf.int["qsup95", ])
+    
+    segments(transf_data_conc, x$resp,
+             transf_data_conc, conf.int["qinf95", ])
+    
+    segments(transf_data_conc - Bond,
+             conf.int["qinf95", ],
+             transf_data_conc + Bond,
+             conf.int["qinf95", ])
   }
   else if (style == "ggplot") {
     df <- data.frame(x,
                      transf_data_conc,
                      display.conc)
-    if (pool.replicate) {
-      dfCI <- data.frame(conc = transf_data_conc,
-                         qinf95 = conf.int["qinf95",],
-                         qsup95 = conf.int["qsup95",],
-                         Conf.Int = "Confidence interval")
-      
-      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
-        geom_segment(aes(x = conc, xend = conc, y = qinf95,
-                         yend = qsup95,
-                         linetype = Conf.Int),
-                     arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                   ends = "both"), dfCI) +
-        expand_limits(x = 0, y = 0)
-    } else {
-      gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
-        stat_sum(aes(size = factor(..n..))) +
-        scale_size_discrete("Replicate") +
-        expand_limits(x = 0, y = 0)
-    }
+    dfCI <- data.frame(conc = transf_data_conc,
+                       qinf95 = conf.int["qinf95",],
+                       qsup95 = conf.int["qsup95",],
+                       Conf.Int = "Confidence interval")
+    
+    gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
+      geom_segment(aes(x = conc, xend = conc, y = qinf95,
+                       yend = qsup95,
+                       linetype = Conf.Int),
+                   arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
+                                 ends = "both"), dfCI) +
+      expand_limits(x = 0, y = 0)
+    
     fd <- gp + geom_point() + ggtitle(main) +
       theme_minimal() +
       labs(x = xlab,
