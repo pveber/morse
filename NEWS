@@ -15,6 +15,11 @@ BUG FIXES
   "replicate" legend, which would not correspond to a real replication unit
   (beaker).
 
+IMPROVEMENTS
+- the DIC is not calculated in survFiTT anymore. Since we don't
+  perform model selection, this was not really useful and we thus
+  obtain a significant speed-up.
+
 Version 2.1.0
 =============
 

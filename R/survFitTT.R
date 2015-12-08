@@ -25,11 +25,6 @@
 # there is a point estimate and a 95 \% credible interval (Delignette-Muller
 # et al., 2014).
 #
-# DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
-# al. (2002) is provided by the \code{dic.samples} function. The DIC is a
-# goodness-of-fit criterion penalized by the complexity of the model
-# (Delignette-Muller et al., 2014).
-#
 # Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
 # control diagnostic based on a criterion that calculates the appropriate
 # number of iterations required to accurately estimate the parameter
@@ -50,7 +45,6 @@
 #'
 #' @return The function returns an object of class \code{survFitTT}, which is a
 #' list with the following fields:
-#' \item{DIC}{DIC value of the selected model}
 #' \item{estim.LCx}{a table of the estimated LCX along with their 95 \%
 #' credible intervals}
 #' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
@@ -68,8 +62,7 @@
 #'
 #'
 # FIXME
-# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-# \code{\link[rjags]{dic.samples}},
+# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}}
 # \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
 # \code{\link[ggplot2]{ggplot}}
 #
@@ -167,9 +160,6 @@ survFitTT <- function(data,
   if (sampling.parameters$niter > 100000)
     stop("The model needs too many iterations to provide reliable parameter estimates !")
 
-  # calcul DIC
-  modelDIC <- calcDIC(model, sampling.parameters, quiet)
-
   # Sampling
   prog.b <- ifelse(quiet == TRUE, "none", "text")
 
@@ -194,8 +184,7 @@ survFitTT <- function(data,
   }
 
   # output
-  OUT <- list(DIC = modelDIC,
-              estim.LCx = estim.LCx,
+  OUT <- list(estim.LCx = estim.LCx,
               estim.par = estim.par,
               det.part = det.part,
               mcmc = mcmc,
