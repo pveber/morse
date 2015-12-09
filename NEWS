@@ -15,10 +15,11 @@ BUG FIXES
   "replicate" legend, which would not correspond to a real replication unit
   (beaker).
 
-IMPROVEMENTS
+OTHER CHANGES
 - the DIC is not calculated in survFiTT anymore. Since we don't
   perform model selection, this was not really useful and we thus
   obtain a significant speed-up.
+- the column ID was removed in survData and reproData objects.
 
 Version 2.1.0
 =============
