@@ -6,18 +6,14 @@ bioc_required: false
 before_script:
  - git config --global user.name "travis"
  - git config --global user.email "travis@example.org"
+ - sudo apt-get install jags
 
 r_packages:
  - coda
  - dplyr
- - graphics
- - grDevices
  - ggplot2
- - grid
  - gridExtra
- - methods
  - rjags
- - stats
  - stringr
  - knitr
  - rmarkdown
