@@ -92,7 +92,6 @@ The function `summary` provides some descriptive statistics on the experimental 
 summary(dat)
 ```
 
-
 ## Step 4: fit an exposure-response model to the survival data at target time
 
 Now we are ready to fit a probabilistic model for the survival data, which aims
@@ -191,11 +190,8 @@ dat <- reproData(cadmium2)
 
 # (4) represent the cumulated number of offspring as a function time
 plot(dat, style = "ggplot", pool.replicate = FALSE)
-plot(dat, target.time = 21, addlegend = TRUE, style = "ggplot",
-     pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
-plot(dat, concentration = 124, target.time = 21, style = "ggplot")
 
 # (5) check information on the experimental design
 summary(dat)
