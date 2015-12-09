@@ -75,7 +75,7 @@ plot(dat, style = "ggplot", pool.replicate = FALSE)
 
 Two graphical styles are available, `"generic"` for standar `R` plots or
 `"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`
-is `TRUE` the datapoints for a given time and concentration are pooled
+is `TRUE` the datapoints for a given concentration are pooled
 and only the mean number of survivors is plotted. To observe the full
 dataset, we set this option to `FALSE`.
 
@@ -84,23 +84,6 @@ in particular:
 ```{r, cache=TRUE}
 plot(dat, concentration = 124, addlegend = TRUE,
      pool.replicate = FALSE, style = "ggplot")
-```
-
-
-We can also plot the number of surviving individuals at a given time point as a function
-of the concentration, by fixing `target.time` instead of `concentration`:
-  
-```{r, cache=TRUE}
-plot(dat, target.time = 21, pool.replicate = FALSE, style = "ggplot",
-     addlegend = TRUE)
-```
-
-
-Finally, when fixing both `concentration` and `target.time`, we can compare one condition
-to the control:
-
-```{r, cache=TRUE}
-plot(dat, concentration = 232, target.time = 21)
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
