@@ -1,6 +1,6 @@
 #' Plotting method for \code{survData} objects
 #'
-#' Plots the number of survivors as a function of time (for a fixed
+#' Plots the number of survivors as a function of time (possibly for a fixed
 #' concentration).
 #'
 #' @param x an object of class \code{survData}
@@ -12,7 +12,7 @@
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
-#' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot when \code{concentration} is set
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods.
