@@ -39,7 +39,7 @@
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
-#' @importFrom graphics plot axis legend lines par points polygon
+#' @importFrom graphics plot axis legend lines par points polygon segments
 #' @importFrom stats aggregate
 #'
 #' @export
