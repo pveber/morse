@@ -3,6 +3,11 @@
 Version 2.1.1
 =============
 
+NEW FEATURES
+- the method plotDoseResponse replaces the plot.survData and plot.reproData
+  when the argument target.time was set. Now te response is expressed in
+  survival rate or in number of offspring per individual-days.
+
 BUG FIXES
 - update the cross-references link to ggplot2 package
 
