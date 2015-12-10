@@ -1,16 +1,12 @@
 #' Plotting method for \code{reproData} objects
 #'
-#' Plots the cumulated number of offspring as a
-#' function of either time and concentration, time only (for a fixed
-#' concentration), concentration only (for a given target time). If both
-#' concentration and target time are fixed, the function additionally plots
-#' the experimental values for the minimum available concentration.
+#' Plots the cumulated number of offspring as a function time (for a fixed
+#' concentration)
 #'
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a title for the \eqn{y}-axis
 #' @param main main title for the plot
-#' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param concentration a numeric value corresponding to some concentration in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
@@ -35,14 +31,8 @@
 #' # (2) Plot the reproduction data
 #' plot(cadmium1)
 #'
-#' # (3) Plot the reproduction data for a fixed time with a ggplot style
-#' plot(cadmium1, target.time = 21, style = "ggplot")
-#'
-#' # (4) Plot the reproduction data for a fixed concentration
+#' # (3) Plot the reproduction data for a fixed concentration
 #' plot(cadmium1, concentration = 4.36, style = "ggplot")
-#'
-#' # (5) Plot the reproduction data for a fixed concentration and target.time
-#' plot(cadmium1, target.time = 21, concentration = 0.86)
 #'
 #' @import ggplot2
 #' @import grDevices
@@ -56,7 +46,6 @@ plot.reproData <- function(x,
                            xlab,
                            ylab = "Cumulated Number of offspring",
                            main = NULL,
-                           target.time = NULL,
                            concentration = NULL,
                            style = "generic",
                            pool.replicate = FALSE,
@@ -65,32 +54,21 @@ plot.reproData <- function(x,
                            remove.someLabels = FALSE, ...) {
   if(! is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
-
+  
   if (pool.replicate) {
     # agregate by sum of replicate
     x <- cbind(aggregate(cbind(Nreprocumul, Nsurv, Ninit) ~ time + conc, x, sum),
                replicate = 1)
   }
-
-  if (is.null(target.time) && is.null(concentration)) {
+  
+  if (is.null(concentration)) {
     reproDataPlotFull(x, xlab, ylab, style, remove.someLabels)
   }
-  else if (! is.null(target.time) && is.null(concentration)) {
-    reproDataPlotTargetTime(x, xlab, ylab, main, target.time,
-                            style, log.scale, addlegend,
-                            remove.someLabels)
-  }
-  else if (is.null(target.time) && ! is.null(concentration)) {
+  else {
     reproDataPlotFixedConc(x, xlab, ylab, main, concentration, style, addlegend,
                            remove.someLabels)
   }
-  else {
-    reproDataPlotReplicates(x, xlab, ylab, target.time, concentration,
-                            style, addlegend)
-  }
 }
-
-
 
 reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
                               remove.someLabels) {
@@ -98,6 +76,7 @@ reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
                remove.someLabels)
 }
 
+<<<<<<< HEAD
 
 #' @import ggplot2
 #' @importFrom dplyr filter
@@ -230,13 +209,3 @@ reproDataPlotFixedConc <- function(x,
                     concentration, style, addlegend, remove.someLabels)
 }
 
-reproDataPlotReplicates <- function(x,
-                                    xlab,
-                                    ylab,
-                                    target.time,
-                                    concentration,
-                                    style,
-                                    addlegend) {
-  dataPlotReplicates(x, xlab, ylab, "Nreprocumul", target.time,
-                     concentration, style, addlegend)
-}
