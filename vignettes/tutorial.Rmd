@@ -86,6 +86,14 @@ plot(dat, concentration = 124, addlegend = TRUE,
      pool.replicate = FALSE, style = "ggplot")
 ```
 
+The method `plotDoseResponse` can be used to represent the survival rate as a
+fonction of concentration for a fixed time. In the case the replicats are poolled
+and the confidence interval for each concentration is drawing.
+
+```{r, cache=TRUE}
+plotDoseResponse(dat, target.time = 56, style = "ggplot")
+```
+
 The function `summary` provides some descriptive statistics on the experimental design.
 
 ```{r, cache=TRUE}
@@ -193,10 +201,13 @@ plot(dat, style = "ggplot", pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
 
-# (5) check information on the experimental design
+# (5) represent the reproduction rate as a function concentration for a fixed time
+plotDoseResponse(dat, style = "ggplot")
+
+# (6) check information on the experimental design
 summary(dat)
 
-# (6) fit an exposure-response model at target-time
+# (7) fit an exposure-response model at target-time
 fit <- reproFitTT(dat, stoc.part = "bestfit",
                   target.time = 21,
                   ecx = c(10, 20, 30, 40, 50),
