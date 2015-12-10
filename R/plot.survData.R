@@ -34,15 +34,17 @@
 #'
 #' # (3) Plot survival data with a ggplot style
 #' plot(zinc, style = "ggplot")
+#' 
+#' # (4) Plot the reproduction data for a fixed concentration
+#' plot(zinc, concentration = 0.66, style = "ggplot")
 #'
-#' # (4) To build a specific legend with a ggplot type
+#' # (5) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
 #' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
 #'
 #' @import ggplot2
 #' @import grDevices
-#' @importFrom graphics plot axis legend lines par points polygon
-#' segments title
+#' @importFrom graphics plot axis legend lines par points title
 #' @importFrom methods is
 #' @importFrom stats aggregate
 #'

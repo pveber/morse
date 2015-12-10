@@ -10,6 +10,9 @@
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
+#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
+#' \code{'ggplot'} style to avoid the label overlap
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
@@ -32,8 +35,8 @@
 #'
 #' @import ggplot2
 #' @import grDevices
-#' @importFrom dplyr %>% filter
-#' @importFrom graphics plot axis lines par points polygon
+#' @importFrom dplyr filter
+#' @importFrom graphics plot axis lines points
 #' title
 #' @importFrom methods is
 #' @importFrom stats aggregate
