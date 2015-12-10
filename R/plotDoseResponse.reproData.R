@@ -47,7 +47,9 @@ plotDoseResponse.reproData <- function(x,
                                        style = "generic",
                                        log.scale = FALSE,
                                        remove.someLabels = FALSE,
+                                       addlegend = TRUE,
                                        ...) {
+  if (is.null(target.time)) target.time <- max(x$time)
   
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
