@@ -72,7 +72,7 @@ plot.survData <- function(x,
   }
 
   if (is.null(concentration)) {
-    survDataPlotFull(x, xlab, ylab, style, remove.someLabels, one.plot)
+    survDataPlotFull(x, xlab, ylab, style, remove.someLabels, one.plot, addlegend)
   }
   else {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
@@ -120,7 +120,7 @@ plotMatrixGeometry <- function(nblevels) {
 
 # General full plot: one subplot for each concentration, and one color for
 # each replicate (for generic graphics)
-dataPlotFullGeneric <- function(data, xlab, ylab, resp, one.plot) {
+dataPlotFullGeneric <- function(data, xlab, ylab, resp, one.plot, addlegend) {
   replicate.index <- ReplicateIndex(data)
   concentration.index <- ConcentrationIndex(data)
 
@@ -192,13 +192,22 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp, one.plot) {
                pch = pchs[index],
                col = colors[index])
       })
+      if (addlegend) {
+        legend("bottomleft", legend = unique(data$conc),
+               lty = rep(1, length(unique(data$conc))),
+               pch = pchs,
+               col = colors,
+               bty = "n",
+               cex = 1)
+      }
   }
 }
 
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels, one.plot) {
+dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels, one.plot,
+                           addlegend) {
   
   time = NULL
   Nsurv = NULL
@@ -232,20 +241,21 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels, one.plot) 
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
-                         remove.someLabels = FALSE, one.plot) {
+                         remove.someLabels = FALSE, one.plot, addlegend) {
 
   if (missing(xlab)) xlab <- "Time"
 
   if (style == "generic")
-    dataPlotFullGeneric(data, xlab, ylab, resp, one.plot)
+    dataPlotFullGeneric(data, xlab, ylab, resp, one.plot, addlegend)
   else if (style == "ggplot")
-    dataPlotFullGG(data, xlab, ylab, resp, remove.someLabels, one.plot)
+    dataPlotFullGG(data, xlab, ylab, resp, remove.someLabels, one.plot, addlegend)
   else stop("Unknown plot style")
 }
 
 survDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                             remove.someLabels = FALSE, one.plot) {
-  dataPlotFull(data, xlab, ylab, "Nsurv", style, remove.someLabels, one.plot)
+                             remove.someLabels = FALSE, one.plot, addlegend) {
+  dataPlotFull(data, xlab, ylab, "Nsurv", style, remove.someLabels, one.plot,
+               addlegend)
 }
 
 dataPlotFixedConc <- function(x,
