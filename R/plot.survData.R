@@ -235,9 +235,14 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels, one.plot,
     ) +
     scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
     expand_limits(x = 0, y = 0) +
-    theme_minimal() + theme(legend.position = "none")
+    theme_minimal()
   
-  return(fd)
+  if (!one.plot) {
+    fe <- fd + theme(legend.position = "none")
+  } else {
+    fe <- fd + scale_color_hue("Concentration")
+  }
+  return(fe)
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
