@@ -205,12 +205,18 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels, one.plot) 
   
   data$response <- data[,resp]
   
-  # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
+  if (!one.plot) {
+    # create ggplot object Nsurv / time / replicate / conc
+    fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
+      facet_wrap(~conc, ncol = 2)
+  } else {
+    fg <- ggplot(data, aes(time, response, colour = factor(conc)))
+  }
+  
+  fd <- fg +
     geom_point() +
     geom_line() +
     labs(x = xlab, y = ylab) +
-    facet_wrap(~conc, ncol = 2) +
     scale_x_continuous(breaks = unique(data$time),
                        labels = if (remove.someLabels) {
                          exclude_labels(unique(data$time))
@@ -220,9 +226,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels, one.plot) 
     ) +
     scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
     expand_limits(x = 0, y = 0) +
-    theme_minimal()
-  
-  fd <- fg + theme(legend.position = "none") # remove legend
+    theme_minimal() + theme(legend.position = "none")
   
   return(fd)
 }
