@@ -14,6 +14,9 @@
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot when \code{concentration} is set
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
+#' @param one.plot if \code{TRUE}, and \code{concentration} is set NULL, the
+#' datapoints of each replicate are summed for a same concentration and the response
+#' of each concentration are plotted in one graphic.
 #' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
@@ -32,8 +35,8 @@
 #' # (2) Plot survival data
 #' plot(zinc, addlegend = TRUE)
 #'
-#' # (3) Plot survival data with a ggplot style
-#' plot(zinc, style = "ggplot")
+#' # (3) Plot survival data with a ggplot style in one plot
+#' plot(zinc, style = "ggplot", one.plot = TRUE)
 #'
 #' # (4) To build a specific legend with a ggplot type
 #' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
@@ -56,19 +59,20 @@ plot.survData <- function(x,
                           pool.replicate = FALSE,
                           log.scale = FALSE,
                           addlegend = FALSE,
-                          remove.someLabels = FALSE, ...) {
+                          remove.someLabels = FALSE,
+                          one.plot = FALSE, ...) {
 
   if(! is(x,"survData"))
     stop("plot.survData: object of class survData expected")
 
-  if (pool.replicate) {
+  if (pool.replicate || one.plot) {
     # agregate by sum of replicate
     x <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, x, sum),
                replicate = 1)
   }
 
   if (is.null(concentration)) {
-    survDataPlotFull(x, xlab, ylab, style, remove.someLabels)
+    survDataPlotFull(x, xlab, ylab, style, remove.someLabels, one.plot)
   }
   else {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
@@ -87,6 +91,15 @@ ReplicateIndex <- function(data) {
   return(r)
 }
 
+# [ConcentrationIndex(data)] builds a list of indices, each one named after
+# a concentration of [data], thus providing a dictionary from concentration
+# values to integer keys.
+ConcentrationIndex <- function(data) {
+  concentration <- unique(data$conc)
+  r <- as.list(seq(1, length(concentration)))
+  names(r) <- as.character(concentration)
+  return(r)
+}
 
 # [plotMatrixGeometry(n)] returns a vector [c(w,h)] such that a matrix of plots
 # of dimension ([w], [h]) is big enough to display [n] plots in a pretty way.
@@ -107,52 +120,85 @@ plotMatrixGeometry <- function(nblevels) {
 
 # General full plot: one subplot for each concentration, and one color for
 # each replicate (for generic graphics)
-dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
+dataPlotFullGeneric <- function(data, xlab, ylab, resp, one.plot) {
   replicate.index <- ReplicateIndex(data)
+  concentration.index <- ConcentrationIndex(data)
 
-  # creation of a vector of colors
-  colors <- rainbow(length(unique(data$replicate)))
-  pchs <- as.numeric(unique(data$replicate))
   # split of the graphical window in subplots
-  par(mfrow = plotMatrixGeometry(length(unique(data$conc))))
-
-  by(data, data$conc, function(x) {
-    # bakground
-    plot(x$time, rep(0, length(x$time)),
-         xlab = xlab,
-         ylab = ylab,
-         ylim = c(0, max(x[, resp])),
-         type = "n",
-         col = 'white',
-         xaxt = "n",
-         yaxt = "n")
-
-    # axis
-    axis(side = 1, at = sort(unique(x[, "time"])))
-    axis(side = 2, at = unique(round(pretty(c(0, max(x[, resp]))))))
-
-    # lines and points
-    by(x, x$replicate, function(y) {
-      index <- replicate.index[[y$replicate[1]]]
-      lines(y$time, y[, resp],
-            type = "l",
-            col = colors[index])
-      points(y$time, y[, resp],
-             pch = pchs[index],
-             col = colors[index])
+  if (!one.plot) {
+    # creation of a vector of colors
+    colors <- rainbow(length(unique(data$replicate)))
+    pchs <- as.numeric(unique(data$replicate))
+    
+    par(mfrow = plotMatrixGeometry(length(unique(data$conc))))
+    
+    by(data, data$conc, function(x) {
+      # bakground
+      plot(x$time, rep(0, length(x$time)),
+           xlab = xlab,
+           ylab = ylab,
+           ylim = c(0, max(x[, resp])),
+           type = "n",
+           col = 'white',
+           xaxt = "n",
+           yaxt = "n")
+      
+      # axis
+      axis(side = 1, at = sort(unique(x[, "time"])))
+      axis(side = 2, at = unique(round(pretty(c(0, max(x[, resp]))))))
+      
+      # lines and points
+      by(x, x$replicate, function(y) {
+        index <- replicate.index[[y$replicate[1]]]
+        lines(y$time, y[, resp],
+              type = "l",
+              col = colors[index])
+        points(y$time, y[, resp],
+               pch = pchs[index],
+               col = colors[index])
+      })
+      
+      # title
+      title(paste("Conc: ", unique(x$conc), sep = ""))
     })
-
-    # title
-    title(paste("Conc: ", unique(x$conc), sep = ""))
-  })
-  
-  par(mfrow = c(1, 1))
+    
+    par(mfrow = c(1, 1))
+  } else {
+    # creation of a vector of colors
+    colors <- rainbow(length(unique(data$conc)))
+    pchs <- as.numeric(unique(data$conc))
+    
+      # bakground
+      plot(data$time, rep(0, length(data$time)),
+           xlab = xlab,
+           ylab = ylab,
+           ylim = c(0, max(data[, resp])),
+           type = "n",
+           col = 'white',
+           xaxt = "n",
+           yaxt = "n")
+      
+      # axis
+      axis(side = 1, at = sort(unique(data[, "time"])))
+      axis(side = 2, at = unique(round(pretty(c(0, max(data[, resp]))))))
+      
+      # lines and points
+      by(data, data$conc, function(x) {
+        index <- concentration.index[[as.character(x$conc[1])]]
+        lines(x$time, x[, resp],
+              type = "l",
+              col = colors[index])
+        points(x$time, x[, resp],
+               pch = pchs[index],
+               col = colors[index])
+      })
+  }
 }
 
 # general full plot (ggplot variant): one subplot for each concentration,
 # and one color for each replicate
 #' @import ggplot2
-dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
+dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels, one.plot) {
   
   time = NULL
   Nsurv = NULL
@@ -182,20 +228,20 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
-                         remove.someLabels = FALSE) {
+                         remove.someLabels = FALSE, one.plot) {
 
   if (missing(xlab)) xlab <- "Time"
 
   if (style == "generic")
-    dataPlotFullGeneric(data, xlab, ylab, resp)
+    dataPlotFullGeneric(data, xlab, ylab, resp, one.plot)
   else if (style == "ggplot")
-    dataPlotFullGG(data, xlab, ylab, resp, remove.someLabels)
+    dataPlotFullGG(data, xlab, ylab, resp, remove.someLabels, one.plot)
   else stop("Unknown plot style")
 }
 
 survDataPlotFull <- function(data, xlab, ylab, style = "generic",
-                             remove.someLabels = FALSE) {
-  dataPlotFull(data, xlab, ylab, "Nsurv", style, remove.someLabels)
+                             remove.someLabels = FALSE, one.plot) {
+  dataPlotFull(data, xlab, ylab, "Nsurv", style, remove.someLabels, one.plot)
 }
 
 dataPlotFixedConc <- function(x,
