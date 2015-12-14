@@ -289,7 +289,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
     } else {
       gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv)) +
         stat_sum(aes(size = factor(..n..))) +
-        scale_size_discrete("Replicate")
+        scale_size_discrete("Overplotted replicates")
     }
     fd <- gp + geom_point() + ggtitle(main) +
       theme_minimal() +
