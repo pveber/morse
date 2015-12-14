@@ -364,7 +364,7 @@ dataPlotFixedConc <- function(x,
     axis(side = 1, at = sort(unique(x[, "time"])))
     axis(side = 2, at = unique(round(pretty(c(0, max(x[, resp]))))))
 
-    if (addlegend) {
+    if (addlegend && !unique(x$replicate) == 1) {
       legend(legend.position, legend = unique(x$replicate) ,
              col = unique(x$color),
              pch = 16,
