@@ -39,11 +39,7 @@
 #' # (3) Plot survival data with a ggplot style
 #' plot(zinc, style = "ggplot")
 #'
-#' # (4) To build a specific legend with a ggplot type
-#' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
-#' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
-#'
-#' # (5) Plot survival data for a fixed concentration and
+#' # (4) Plot survival data for a fixed concentration and
 #' # target.time with ggplot style
 #' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
 #'
