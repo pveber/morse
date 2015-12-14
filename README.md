@@ -3,20 +3,22 @@
 Companion R package for MOSAIC website
  - need `Rtools 3.3` and last `R` version.
 
-### Compilation (for command-line users (Don't build the vignette
-### correctly for now ==> use RStudio only)) 
+### Compilation (for command-line users)
 
+
+- `cd` to source directory
 - Build from sources (creates vignette and archive)
-  `R CMD build mosaic-r`
-- need `Rtools 3.3`:
-  - generate the documentation
-  - in the package directory under the R interpreter: `devtools::test()`
-  
-- Generate documentation
-  - under the R interpreter: `roxygen2::roxygenise(".")`
-  - for a PDF pversion: `R CMD Rd2pdf morse`
+  `R CMD build .`
 - Check the package
   `R CMD check --as-cran morse_X.X.X.tar.gz`
+- Update package description/NAMESPACE
+  - under the R interpreter: `roxygen2::roxygenise(".")`
+- Generate documentation
+  - reference manual: `R CMD Rd2pdf .`
+  - vignettes (using the R interpreter):
+    `devtools::document(roclets=c('rd', 'collate', 'namespace', 'vignette'))`
+- Run unit tests
+  - under the R interpreter: `devtools::test()`
 
 ### Compilation (with RStudio)
 

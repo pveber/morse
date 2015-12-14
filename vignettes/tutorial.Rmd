@@ -182,7 +182,7 @@ considered unreliable.
 
 
 
-## Step 5: validate the model with posterior predictive check
+## Step 5: validate the model with a posterior predictive check
 
 The estimation can be further validated using so-called posterior
 predictive checks: the idea is to plot the observed values against the
