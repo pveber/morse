@@ -24,7 +24,7 @@
 #' \dontrun{
 #' # (3) Run the survFitTT function with the log-logistic
 #' # binomial model
-#' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
+#' out <- survFitTT(cadmium1, lcx = c(5, 10, 15, 20, 30, 50, 80),
 #'                  quiet = TRUE)
 #'
 #' # (4) summarize the survFitTT object
