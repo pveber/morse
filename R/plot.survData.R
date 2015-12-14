@@ -42,7 +42,7 @@
 #' # (4) Plot the survival data for a fixed time with a ggplot style
 #' plot(zinc, target.time = 21, style = "ggplot")
 #'
-#' # (5) Plot te survival data for a fixed concentration
+#' # (5) Plot the survival data for a fixed concentration
 #' plot(zinc, concentration = 0.66, addlegend = TRUE)
 #'
 #' # (6) Plot survival data for a fixed concentration and
