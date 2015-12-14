@@ -34,12 +34,18 @@
 #' zinc <- survData(zinc)
 #'
 #' # (2) Plot survival data
-#' plot(zinc, addlegend = TRUE)
+#' plot(zinc)
 #'
 #' # (3) Plot survival data with a ggplot style
-#' plot(zinc, style = "ggplot")
+#' plot(zinc, style = "ggplot", remove.someLabels = TRUE)
+#' 
+#' # (4) Plot the survival data for a fixed time with a ggplot style
+#' plot(zinc, target.time = 21, style = "ggplot")
 #'
-#' # (4) Plot survival data for a fixed concentration and
+#' # (5) Plot te survival data for a fixed concentration
+#' plot(zinc, concentration = 0.66, addlegend = TRUE)
+#'
+#' # (6) Plot survival data for a fixed concentration and
 #' # target.time with ggplot style
 #' plot(zinc, style = "ggplot", target.time = 21, concentration = 0.66)
 #'
