@@ -273,7 +273,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
         legend("bottomleft",
                legend = sort(unique(tt$number)),
                pt.cex = sort(unique((tt$number) / 3)),
-               title = "Overplotted replicates",
+               title = "Number of replicates",
                pch = 16,
                bty = "n")
       }
@@ -289,7 +289,7 @@ survDataPlotTargetTime <- function(x, xlab, ylab, main, target.time,
     } else {
       gp <- ggplot(df, aes(x = transf_data_conc, y = Nsurv)) +
         stat_sum(aes(size = factor(..n..))) +
-        scale_size_discrete("Overplotted replicates")
+        scale_size_discrete("Number of replicates")
     }
     fd <- gp + geom_point() + ggtitle(main) +
       theme_minimal() +
