@@ -1,27 +1,5 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
-version dev
-===========
-
-BUG FIXES
-- survDataCheck and reproDataCheck would fail on datasets with integer-only
-  concentrations.
-- the summary functions for survData and reproData now don't show the
-  number of datapoints per concentration and the number of datapoints
-  per time. This was considered misleading in the case where some
-  replicates have a different initial number of individuals.
-- plot.survData (and plot.reproData) don't display a legend anymore with
-  unconstrained time and concentration. They used to display a misleading
-  "replicate" legend, which would not correspond to a real replication unit
-  (beaker).
-- in plot.survData all ggplot style graphique start at 0,0.
-
-OTHER CHANGES
-- the DIC is not calculated in survFiTT anymore. Since we don't
-  perform model selection, this was not really useful and we thus
-  obtain a significant speed-up.
-- the column ID was removed in survData and reproData objects.
-
 Version 2.1.0
 =============
 
@@ -44,6 +22,23 @@ BUG FIXES
 - remove titles in legend of plot.reproFitTT and plot.survFitTT in
   ggplot style.
 - remove observed value points in plot.reproFitTT.
+- survDataCheck and reproDataCheck would fail on datasets with integer-only
+  concentrations.
+- the summary functions for survData and reproData now don't show the
+  number of datapoints per concentration and the number of datapoints
+  per time. This was considered misleading in the case where some
+  replicates have a different initial number of individuals.
+- plot.survData (and plot.reproData) don't display a legend anymore with
+  unconstrained time and concentration. They used to display a misleading
+  "replicate" legend, which would not correspond to a real replication unit
+  (beaker).
+- in plot.survData all ggplot style graphique start at 0,0.
+
+OTHER CHANGES
+- the DIC is not calculated in survFiTT anymore. Since we don't
+  perform model selection, this was not really useful and we thus
+  obtain a significant speed-up.
+- the column ID was removed in survData and reproData objects.
 
 
 Version 2.0.0
