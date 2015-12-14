@@ -188,7 +188,15 @@ reproDataPlotTargetTime <- function(x,
     gp <- ggplot(df, aes(transf_data_conc, Nreprocumul,
                          fill = Mortality)) +
       geom_point(size = 3, pch = 21) +
-      scale_fill_manual(values = c("black", "white")) +
+      scale_fill_manual(values = if (
+        length(levels(df$Mortality)) == 1 && levels(df$Mortality) == "Yes") {
+        "white"
+        } else if (length(levels(df$Mortality)) == 1 &&
+                   levels(df$Mortality) == "No") {
+          "black"
+        } else {
+          c("black", "white")
+        }) +
       labs(x = xlab, y = ylab) +
       ggtitle(main) +
       theme_minimal() +
