@@ -163,24 +163,15 @@ probable value of the survival rate for a tested concentration. In favorable
 situations, we expect that the credible interval around the estimated curve
 and the confidence interval around experimental points will largely overlap.
 
-
-<!--
-* Step five, check the obseved versus predicted values
-  
-```{r,cache=TRUE, eval=FALSE}
-ppc(out2, style = "ggplot")
-```
--->
-
 Note that `survFitTT` will warn you if the estimated $LC_{50}$ lies outside the
 range of tested concentrations, as in the following example:
 
 ```{r, results="hide", cache=TRUE}
 data("cadmium1")
-fit <- survFitTT(survData(cadmium1),
-                 target.time = 21,
-                 lcx = c(10, 20, 30, 40, 50))
-plot(fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
+wrong_fit <- survFitTT(survData(cadmium1),
+                       target.time = 21,
+                       lcx = c(10, 20, 30, 40, 50))
+plot(wrong_fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
      addlegend = TRUE)
 ```
 
@@ -188,6 +179,32 @@ In this example, the experimental design did not include sufficiently high
 concentrations, and we are missing measurements that would have a major 
 influence on the final estimation. For this reason this result should be 
 considered unreliable.
+
+
+
+## Step 5: validate the model with posterior predictive check
+
+The estimation can be further validated using so-called posterior
+predictive checks: the idea is to plot the observed values against the
+corresponding estimated predictions, along with their 95% credible
+interval. If the fit is correct, we expect to see 95% of the data
+inside the intervals.
+
+```{r,cache=TRUE, results="hide"}
+ppc(fit, style = "ggplot")
+```
+
+In this plot, each black dot represents an observation made at some
+concentration, and the number of survivors at target time is given by
+the value on X-axis. Using the concentration and the fitted model, we
+can produce a corresponding prediction of the expected number of
+survivors at that concentration. This prediction is given by the
+Y-axis. Ideally observations and predictions should coincide, so we'd
+expect to see the black dots on the points of coordinate $Y = X$. Our
+model provides a tolerable variation around the predited mean value
+as an interval where we expect 95% of the dots to be in average. The
+intervals are represented in green if they overlap with the line $Y=X$,
+and in red otherwise.
 
 # Reproduction data analyses
   
@@ -223,8 +240,15 @@ fit <- reproFitTT(dat, stoc.part = "bestfit",
                   ecx = c(10, 20, 30, 40, 50),
                   quiet = TRUE)
 summary(fit)
-plot(fit, log.scale = TRUE, ci = TRUE, 
-     style = "ggplot", addlegend = TRUE)
+```
+
+```{r, cache=TRUE}
+plot(fit, log.scale = TRUE, ci = TRUE,
+     style = "ggplot")
+```
+
+```{r, cache=TRUE}
+ppc(fit, style = "ggplot")
 ```
 As in survival analysis, we assume that the reproduction rate per individual-day
 is a log-logistic function of the concentration. More details and parameter
