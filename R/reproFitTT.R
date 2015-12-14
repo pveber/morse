@@ -125,11 +125,6 @@
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
 #'      fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
 #'      main = "Log-logistic response to concentration")
-#'
-#' # (7) Add a specific legend with generic type
-#' plot(out, addlegend = FALSE)
-#' legend("bottomleft", legend = c("Without mortality", "With mortality"),
-#' pch = c(19, 1))
 #' }
 #'
 #' @import rjags
