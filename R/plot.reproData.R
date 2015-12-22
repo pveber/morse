@@ -74,8 +74,6 @@ reproDataPlotFull <- function(data, xlab, ylab, style = "generic",
                remove.someLabels)
 }
 
-<<<<<<< HEAD
-
 #' @import ggplot2
 #' @importFrom dplyr filter
 reproDataPlotTargetTime <- function(x,
@@ -88,7 +86,7 @@ reproDataPlotTargetTime <- function(x,
                                     addlegend,
                                     remove.someLabels) {
 
-  if (missing(xlab)) xlab <-"Concentration"
+  if (missing(xlab)) xlab <- "Concentration"
 
   # plot of cumulated number of offspring as a funtion of concentration
   # for a fixed time
