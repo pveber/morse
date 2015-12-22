@@ -15,7 +15,7 @@
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
-#' \code{\link[ggplot2]{ggplot2}} and returns an object of class \code{ggplot}.
+#' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #'
 #' @keywords plot
 #'
