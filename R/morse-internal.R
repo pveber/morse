@@ -193,3 +193,30 @@ exclude_labels <- function(x) {
   x[-seq.int(1, length(x), 4)] <- ""
   return(x)
 }
+
+
+stepCalc <- function(obs_val) {
+  # calculation of steps coordinate
+  sObs <- sort(obs_val)
+  stepX <- c(0, sapply(2:length(sObs), function(i) {
+    sObs[i-1] + (sObs[i] - sObs[i-1]) / 2}), max(sObs))
+  return(list(sObs = sObs, stepX = stepX))
+}
+
+jitterObsGenerator <- function(stepX, tab, obs_val) {
+  # uniform jittering of observed values
+  allSpaceX <- sapply(2:length(stepX),
+                      function(i) { stepX[i] - stepX[i-1] })
+  spaceX <- min(allSpaceX[which(allSpaceX != 0)])/2
+  lengthX <- table(tab[, "Obs"])
+  jitterObs <- mapply(function(x, y) {
+    if (y == 1) {
+      seq(x, x, length.out = y)
+    } else {
+      seq(x - spaceX + (2 * spaceX / (y + 1)),
+          x + spaceX - (2 * spaceX / (y + 1)), length.out = y)
+    }
+  }, x = sort(obs_val), y = lengthX)
+  return(list(spaceX = spaceX,
+              jitterObs = unlist(jitterObs)))
+}
