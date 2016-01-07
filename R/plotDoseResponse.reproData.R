@@ -1,3 +1,30 @@
+reproDoseResponseCIGeneric <- function(x) {
+  ICpois <- pois.exact(x$Nreprocumul, x$Nindtime)
+  x$reproRateInf <- ICpois$lower
+  x$reproRateSup <- ICpois$upper
+  conc_val <- unique(x$conc)
+  sConc <- stepCalc(conc_val)$sObs
+  stepX <- stepCalc(conc_val)$stepX
+  x$Obs <- x$conc
+  jittered_conc <- jitterObsGenerator(stepX, x, conc_val)$jitterObs
+  spaceX <- jitterObsGenerator(stepX, x, conc_val)$spaceX
+  
+  plot(jittered_conc, x$resp,
+       ylim = c(0, max(x$reproRateSup)),
+       type = "n")
+  
+  x0 <- x[order(x$conc),]
+  delta <- 0.01 * (max(conc_val) - min(conc_val))
+  segments(jittered_conc, x0[, "reproRateInf"],
+           jittered_conc, x0[, "reproRateSup"])
+  segments(jittered_conc - delta, x0[, "reproRateInf"],
+           jittered_conc + delta, x0[, "reproRateInf"])
+  segments(jittered_conc - delta, x0[, "reproRateSup"],
+           jittered_conc + delta, x0[, "reproRateSup"])
+  
+  points(jittered_conc, x0$resp, pch = 16)
+}
+
 #' Plotting method for \code{reproData} objects
 #'
 #' Plots the reproduction rate as a function of concentration (for a given target
@@ -76,84 +103,87 @@ plotDoseResponse.reproData <- function(x,
   })()
   
   if (ci) {
-    ICpois <- pois.exact(x$Nreprocumul, x$Nindtime)
-    x$reproRateInf <- ICpois$lower
-    x$reproRateSup <- ICpois$upper
-  }
-  
-  # Define visual parameters
-  mortality <- c(0, 1) # code 0/1 mortality
-  nomortality <- match(x$Nsurv == x$Ninit, c(TRUE, FALSE))
-  
-  # without mortality
-  mortality <- mortality[nomortality] # vector of 0 and 1
-  
-  # encodes mortality empty dots (1) and not mortality solid dots (19)
-  if (style == "generic") {
-    mortality[which(mortality == 0)] <- 19
-  }
-  if (style == "ggplot") {
-    mortality[which(mortality == 0)] <- "No"
-    mortality[which(mortality == 1)] <- "Yes"
-  }
-  
-  # default legend argument
-  legend.position <- "right"
-  legend.title <- "Mortality"
-  legend.name.no <- "No"
-  legend.name.yes <- "Yes"
-  
-  # generic
-  if (style == "generic") {
-    plot(transf_data_conc,
-         x$resp,
-         xlab = xlab,
-         ylab = ylab,
-         main = main,
-         pch = mortality,
-         yaxt = "n",
-         xaxt = "n")
-    # axis
-    axis(side = 2, at = pretty(c(0, max(x$resp))))
-    axis(side = 1, at = transf_data_conc,
-         labels = display.conc)
+    if (style == "generic")
+      reproDoseResponseCIGeneric(x)
+    else if (style == "ggplot")
+      reproDoseResponseCIGG(x)
+    else stop("Unknown style")
+  } else {
     
-    # legend
-    if (addlegend) {
-      legend(legend.position,title = legend.title, pch = c(19, 1), bty = "n",
-             legend = c(legend.name.no, legend.name.yes))
+    # Define visual parameters
+    mortality <- c(0, 1) # code 0/1 mortality
+    nomortality <- match(x$Nsurv == x$Ninit, c(TRUE, FALSE))
+    
+    # without mortality
+    mortality <- mortality[nomortality] # vector of 0 and 1
+    
+    # encodes mortality empty dots (1) and not mortality solid dots (19)
+    if (style == "generic") {
+      mortality[which(mortality == 0)] <- 19
     }
-  }
-  
-  #ggplot2
-  if (style == "ggplot") {
-    df <- data.frame(x,
-                     transf_data_conc,
-                     display.conc,
-                     Mortality = mortality)
+    if (style == "ggplot") {
+      mortality[which(mortality == 0)] <- "No"
+      mortality[which(mortality == 1)] <- "Yes"
+    }
     
-    # plot
-    gp <- ggplot(df, aes(transf_data_conc, resp,
-                         fill = Mortality)) +
-      geom_point(size = 3, pch = 21) +
-      scale_fill_manual(values = c("black", "white")) +
-      labs(x = xlab, y = ylab) +
-      ggtitle(main) +
-      theme_minimal() +
-      scale_colour_hue(legend.title, breaks = c("No","Yes"),
-                       labels = c(legend.name.no, legend.name.yes)) +
-      scale_x_continuous(breaks = df$transf_data_conc,
-                         labels = if (remove.someLabels) {
-                           exclude_labels(df$display.conc)
-                         } else {
-                           df$display.conc
-                         })
+    # default legend argument
+    legend.position <- "right"
+    legend.title <- "Mortality"
+    legend.name.no <- "No"
+    legend.name.yes <- "Yes"
     
-    if (addlegend) {
-      return(gp)
-    } else {
-      gp <- gp + theme(legend.position = "none")
-      return(gp)
+    # generic
+    if (style == "generic") {
+      plot(transf_data_conc,
+           x$resp,
+           xlab = xlab,
+           ylab = ylab,
+           main = main,
+           pch = mortality,
+           yaxt = "n",
+           xaxt = "n")
+      # axis
+      axis(side = 2, at = pretty(c(0, max(x$resp))))
+      axis(side = 1, at = transf_data_conc,
+           labels = display.conc)
+      
+      # legend
+      if (addlegend) {
+        legend(legend.position,title = legend.title, pch = c(19, 1), bty = "n",
+               legend = c(legend.name.no, legend.name.yes))
+      }
+    }
+    
+    #ggplot2
+    if (style == "ggplot") {
+      df <- data.frame(x,
+                       transf_data_conc,
+                       display.conc,
+                       Mortality = mortality)
+      
+      # plot
+      gp <- ggplot(df, aes(transf_data_conc, resp,
+                           fill = Mortality)) +
+        geom_point(size = 3, pch = 21) +
+        scale_fill_manual(values = c("black", "white")) +
+        labs(x = xlab, y = ylab) +
+        ggtitle(main) +
+        theme_minimal() +
+        scale_colour_hue(legend.title, breaks = c("No","Yes"),
+                         labels = c(legend.name.no, legend.name.yes)) +
+        scale_x_continuous(breaks = df$transf_data_conc,
+                           labels = if (remove.someLabels) {
+                             exclude_labels(df$display.conc)
+                           } else {
+                             df$display.conc
+                           })
+      
+      if (addlegend) {
+        return(gp)
+      } else {
+        gp <- gp + theme(legend.position = "none")
+        return(gp)
+      }
     }
   }
 }
