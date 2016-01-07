@@ -40,6 +40,7 @@
 #' title
 #' @importFrom methods is
 #' @importFrom stats aggregate
+#' @importFrom epitools pois.exact
 #'
 #' @export
 plotDoseResponse.reproData <- function(x,
@@ -47,6 +48,7 @@ plotDoseResponse.reproData <- function(x,
                                        ylab = "Nb of offspring / Nb individual-days",
                                        main = NULL,
                                        target.time = NULL,
+                                       ci = FALSE,
                                        style = "generic",
                                        log.scale = FALSE,
                                        remove.someLabels = FALSE,
@@ -72,6 +74,12 @@ plotDoseResponse.reproData <- function(x,
     x <- optLogTransform(log.scale, x$conc)
     if(log.scale) exp(x) else x
   })()
+  
+  if (ci) {
+    ICpois <- pois.exact(x$Nreprocumul, x$Nindtime)
+    x$reproRateInf <- ICpois$lower
+    x$reproRateSup <- ICpois$upper
+  }
   
   # Define visual parameters
   mortality <- c(0, 1) # code 0/1 mortality
