@@ -1,17 +1,17 @@
-reproDoseResponseCIGeneric <- function(x) {
-  ICpois <- pois.exact(x$Nreprocumul, x$Nindtime)
-  x$reproRateInf <- ICpois$lower
-  x$reproRateSup <- ICpois$upper
-  conc_val <- unique(x$conc)
-  sConc <- stepCalc(conc_val)$sObs
-  stepX <- stepCalc(conc_val)$stepX
-  x$Obs <- x$conc
-  jittered_conc <- jitterObsGenerator(stepX, x, conc_val)$jitterObs
-  spaceX <- jitterObsGenerator(stepX, x, conc_val)$spaceX
-  
+reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
+                                       transf_data_conc, display.conc) {
   plot(jittered_conc, x$resp,
        ylim = c(0, max(x$reproRateSup)),
-       type = "n")
+       type = "n",
+       xaxt = "n",
+       yaxt = "n",
+       xlab = "Concentration",
+       ylab = "Reproduction rate")
+  
+  # axis
+  axis(side = 2, at = pretty(c(0, max(x$resp))))
+  axis(side = 1, at = transf_data_conc,
+       labels = display.conc)
   
   x0 <- x[order(x$conc),]
   delta <- 0.01 * (max(conc_val) - min(conc_val))
@@ -25,6 +25,25 @@ reproDoseResponseCIGeneric <- function(x) {
   points(jittered_conc, x0$resp, pch = 16)
 }
 
+reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
+                                  display.conc) {
+
+  x0 <- cbind(x[order(x$conc),], jittered_conc = as.vector(jittered_conc))
+  gf <- ggplot(x0) + geom_segment(aes(x = jittered_conc, xend = jittered_conc,
+                                      y = reproRateInf, yend = reproRateSup),
+                                  data = x0,
+                                  arrow = arrow(length = unit(0.1, "cm"),
+                                                angle = 90, ends = "both")) +
+    geom_point(aes(x = jittered_conc, y = resp), x0) +
+    scale_x_continuous(breaks = transf_data_conc,
+                       labels = display.conc) +
+    expand_limits(y = 0) +
+    labs(x = "Concentration", y = "Reproduction rate") +
+    theme_minimal()
+  
+  return(gf)
+}
+
 #' Plotting method for \code{reproData} objects
 #'
 #' Plots the reproduction rate as a function of concentration (for a given target
@@ -35,6 +54,7 @@ reproDoseResponseCIGeneric <- function(x) {
 #' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
+#' @param ci if \code{TRUE}, draws the 95 \% confidence interval
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
@@ -103,10 +123,20 @@ plotDoseResponse.reproData <- function(x,
   })()
   
   if (ci) {
+    ICpois <- pois.exact(x$Nreprocumul, x$Nindtime)
+    x$reproRateInf <- ICpois$lower
+    x$reproRateSup <- ICpois$upper
+    conc_val <- unique(transf_data_conc)
+    x$Obs <- x$conc
+    stepX <- stepCalc(conc_val)$stepX
+    jittered_conc <- jitterObsGenerator(stepX, x, conc_val)$jitterObs
+    
     if (style == "generic")
-      reproDoseResponseCIGeneric(x)
+      reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
+                                 display.conc)
     else if (style == "ggplot")
-      reproDoseResponseCIGG(x)
+      reproDoseResponseCIGG(x, conc_val, jittered_conc, transf_data_conc,
+                            display.conc)
     else stop("Unknown style")
   } else {
     
