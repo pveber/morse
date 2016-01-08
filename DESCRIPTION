@@ -16,6 +16,7 @@ SystemRequirements: jags (>= 4.0.0) (see http://mcmc-jags.sourceforge.net)
 Imports:
     coda,
     dplyr,
+    epitools,
     graphics,
     grDevices,
     ggplot2,
