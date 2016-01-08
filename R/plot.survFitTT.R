@@ -99,7 +99,7 @@ plot.survFitTT <- function(x,
   curv_resp <- survEvalFit(x, display.conc)
 
   conf.int <- if(ci) { survLlbinomConfInt(x, log.scale) } else NULL
-  cred.int <- if(ci) { survMeanCredInt(x, display.conc) } else NULL
+  cred.int <- survMeanCredInt(x, display.conc)
 
   if (style == "generic") {
     survFitPlotGeneric(x,
@@ -220,7 +220,7 @@ survMeanCredInt <- function(fit, x) {
 
 survFitPlotGenericNoCredInt <- function(x,
                                    data_conc, transf_data_conc, data_resp,
-                                   curv_conc, curv_resp,
+                                   curv_conc, curv_resp, cred.int,
                                    xlab, ylab, fitcol, fitlty, fitlwd,
                                    main, addlegend)
 {
@@ -243,6 +243,8 @@ survFitPlotGenericNoCredInt <- function(x,
        labels = data_conc)
 
   # fitted curve
+  lines(curv_conc, cred.int$q50, col = "blue",
+        lty = 2, lwd = fitlwd, type = "l")
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
 
@@ -287,6 +289,7 @@ survFitPlotGenericCredInt <- function(x,
   # CI ribbon + lines
   polygon(c(curv_conc, rev(curv_conc)), c(cred.int[["qinf95"]], rev(cred.int[["qsup95"]])),
           col = cicol)
+  
   lines(curv_conc, cred.int[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, cred.int[["qinf95"]], type = "l", col = cicol, lty = cilty,
@@ -356,17 +359,19 @@ survFitPlotGeneric <- function(x,
   else {
     survFitPlotGenericNoCredInt(x,
                                 data_conc, transf_data_conc, data_resp,
-                                curv_conc, curv_resp,
+                                curv_conc, curv_resp, cred.int,
                                 xlab, ylab, fitcol, fitlty, fitlwd,
                                 main, addlegend)
   }
 }
 
 
-survFitPlotGGNoCredInt <- function(data, curv, valCols,
+survFitPlotGGNoCredInt <- function(data, curv, curv50, valCols,
                                    fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(data) +
     geom_point(data = data, aes(transf_conc, resp)) +
+    geom_line(aes(conc, resp), curv50,
+              linetype = fitlty, size = fitlwd, color = "blue") +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     scale_color_discrete(guide = "none") +
@@ -378,7 +383,7 @@ survFitPlotGGNoCredInt <- function(data, curv, valCols,
 }
 
 #' @importFrom grid arrow unit
-survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd,
+survFitPlotGGCredInt <- function(x, data, curv, curv50, conf.int, cred.int, cilty, cilwd,
                                  valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   data.three <- data.frame(conc = data$transf_conc,
@@ -387,7 +392,7 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
                            Conf.Int = "Confidence interval")
   data.four <- data.frame(conc = curv$conc,
                           qinf95 = cred.int[["qinf95"]],
-                          q50 = cred.int[["q50"]],
+                          q50 = curv50[["resp"]],
                           qsup95 = cred.int[["qsup95"]],
                           Cred.Lim = "Credible limits")
 
@@ -405,7 +410,7 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
-    geom_line(data = data.four, aes(conc, q50, color = Cred.Lim),
+    geom_line(data = data.four, aes(conc, q50, color = "blue"),
               linetype = 2, size = cilwd) +
     scale_color_manual(name = "", values = valCols$cols4) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
@@ -463,6 +468,8 @@ survFitPlotGG <- function(x,
   data <- data.frame(conc = data_conc, transf_conc = transf_data_conc,
                      resp = data_resp, Points = "Observed values")
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
+  curv50 <- data.frame(conc = curv_conc, resp = cred.int[["q50"]],
+                       Line = "loglogistic")
 
   # colors
   valCols <- fCols(data, fitcol, cicol, "surv")
@@ -475,6 +482,8 @@ survFitPlotGG <- function(x,
 
   # curve (to create the legend)
   plt_2 <- ggplot(data) +
+    geom_line(data = curv50, aes(conc, resp, color = Line),
+              linetype = "dashed", size = fitlwd) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
     scale_color_manual(name = "", values = valCols$cols2) +
@@ -482,10 +491,10 @@ survFitPlotGG <- function(x,
 
   plt_4 <-
     if (! is.null(conf.int)) {
-      survFitPlotGGCredInt(x, data, curv, conf.int, cred.int, cilty, cilwd,
+      survFitPlotGGCredInt(x, data, curv, curv50, conf.int, cred.int, cilty, cilwd,
                       valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
-      survFitPlotGGNoCredInt(data, curv, valCols, fitlty, fitlwd,
+      survFitPlotGGNoCredInt(data, curv, curv50, valCols, fitlty, fitlwd,
                         xlab, ylab, main)
     }
 
@@ -502,9 +511,9 @@ survFitPlotGG <- function(x,
                    ncol = 2, widths = c(6, 2))
     }
     else {
-      plt_3 <- survFitPlotGGCredInt(x, data, curv, conf.int, cred.int, cilty, cilwd,
+      plt_3 <- survFitPlotGGCredInt(x, data, curv, curv50, conf.int, cred.int, cilty, cilwd,
                                valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
-      plt_32 <- survFitPlotGGCredInt(x, data, curv, conf.int, cred.int, cilty, cilwd,
+      plt_32 <- survFitPlotGGCredInt(x, data, curv, curv50, conf.int, cred.int, cilty, cilwd,
                                 valCols, fitlty, fitlwd, xlab, ylab, main)$plt_32
       mylegend_3 <- legendGgplotFit(plt_3)
       mylegend_32 <- legendGgplotFit(plt_32)
