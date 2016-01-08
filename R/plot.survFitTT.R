@@ -191,6 +191,7 @@ survMeanCredInt <- function(fit, x) {
 
   # quantiles
   qinf95 = NULL
+  q50 = NULL
   qsup95 = NULL
 
   for (i in 1:length(x)) {
@@ -205,11 +206,13 @@ survMeanCredInt <- function(fit, x) {
     }
     # IC 95%
     qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
+    q50[i] <- quantile(theomean, probs = 0.5, na.rm = TRUE)
     qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
   }
 
   # values for CI
   ci <- list(qinf95 = qinf95,
+             q50 = q50,
              qsup95 = qsup95)
 
   return(ci)
@@ -318,6 +321,8 @@ survFitPlotGenericCredInt <- function(x,
   # fitted curve
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
+  lines(curv_conc, cred.int[["q50"]], type = "l", col = "blue", lty = 2,
+        lwd = cilwd)
 
   # legend
   if (addlegend) {
@@ -382,6 +387,7 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
                            Conf.Int = "Confidence interval")
   data.four <- data.frame(conc = curv$conc,
                           qinf95 = cred.int[["qinf95"]],
+                          q50 = cred.int[["q50"]],
                           qsup95 = cred.int[["qsup95"]],
                           Cred.Lim = "Credible limits")
 
@@ -399,6 +405,8 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
+    geom_line(data = data.four, aes(conc, q50, color = Cred.Lim),
+              linetype = 2, size = cilwd) +
     scale_color_manual(name = "", values = valCols$cols4) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                       ymax = qsup95),
@@ -418,6 +426,8 @@ survFitPlotGGCredInt <- function(x, data, curv, conf.int, cred.int, cilty, cilwd
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
+    geom_line(data = data.four, aes(conc, q50, color = Cred.Lim),
+              linetype = 2) +
     geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                       ymax = qsup95),
                 fill = valCols$cols4,
