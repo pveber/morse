@@ -151,6 +151,7 @@ reproLlmCI <- function(fit, x) {
       # IC 95%
       qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
+      q50[i] <- quantile(teomean, probs = 0.5, na.rm = TRUE)
     }
   }
 
@@ -166,11 +167,13 @@ reproLlmCI <- function(fit, x) {
       # IC 95%
       qinf95[i] <- quantile(theo, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theo, probs = 0.975, na.rm = TRUE)
+      q50[i] <- quantile(teomean, probs = 0.5, na.rm = TRUE)
     }
   }
   # values for CI
   ci <- list(qinf95 = qinf95,
-             qsup95 = qsup95)
+             qsup95 = qsup95,
+             q50 = q50)
 
   return(ci)
 }
