@@ -81,12 +81,12 @@ plot.reproFitTT <- function(x,
 
   curv_resp <- reproEvalFit(x, display.conc)
 
-  CI <- if (ci) { CI <- reproLlmCI(x, display.conc) } else NULL
+  CI <- reproLlmCI(x, display.conc)
 
   if (style == "generic") {
     reproFitPlotGeneric(dataTT$conc, transf_data_conc, dataTT$resp,
                         curv_conc, curv_resp,
-                        CI,
+                        CI, ci,
                         xlab, ylab, fitcol, fitlty, fitlwd,
                         main, addlegend,
                         cicol, cilty, cilwd)
@@ -94,7 +94,7 @@ plot.reproFitTT <- function(x,
   else if (style == "ggplot") {
     reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
                    curv_conc, curv_resp,
-                   CI,
+                   CI, ci,
                    xlab, ylab, fitcol, fitlty, fitlwd,
                    main, addlegend,
                    cicol, cilty, cilwd)
@@ -143,6 +143,7 @@ reproLlmCI <- function(fit, x) {
   # quantiles
   qinf95 = NULL
   qsup95 = NULL
+  q50 = NULL
 
   # poisson
   if (fit$model.label == "P") {
@@ -151,7 +152,7 @@ reproLlmCI <- function(fit, x) {
       # IC 95%
       qinf95[i] <- quantile(theomean, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theomean, probs = 0.975, na.rm = TRUE)
-      q50[i] <- quantile(teomean, probs = 0.5, na.rm = TRUE)
+      q50[i] <- quantile(theomean, probs = 0.5, na.rm = TRUE)
     }
   }
 
@@ -167,7 +168,7 @@ reproLlmCI <- function(fit, x) {
       # IC 95%
       qinf95[i] <- quantile(theo, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theo, probs = 0.975, na.rm = TRUE)
-      q50[i] <- quantile(teomean, probs = 0.5, na.rm = TRUE)
+      q50[i] <- quantile(theomean, probs = 0.5, na.rm = TRUE)
     }
   }
   # values for CI
@@ -179,7 +180,7 @@ reproLlmCI <- function(fit, x) {
 }
 
 reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
-                                    curv_conc, curv_resp,
+                                    curv_conc, curv_resp, CI,
                                     xlab, ylab, fitcol, fitlty, fitlwd,
                                     main, addlegend) {
   # plot the fitted curve estimated by reproFitTT
@@ -199,6 +200,8 @@ reproFitPlotGenericNoCI <- function(data_conc, transf_data_conc, data_resp,
        labels = data_conc)
 
   # fitted curve
+  lines(curv_conc, CI[["q50"]], col = "blue",
+        lty = 2, lwd = fitlwd, type = "l")
   lines(curv_conc, curv_resp, col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
 
@@ -241,6 +244,8 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
   # CI ribbon + lines
   polygon(c(curv_conc, rev(curv_conc)), c(CI[["qinf95"]], rev(CI[["qsup95"]])),
           col = cicol)
+  lines(curv_conc, CI[["q50"]], col = "blue",
+        lty = 2, lwd = fitlwd, type = "l")
   lines(curv_conc, CI[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, CI[["qinf95"]], type = "l", col = cicol, lty = cilty,
@@ -262,12 +267,12 @@ reproFitPlotGenericCI <- function(data_conc, transf_data_conc, data_resp,
 
 reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
                                 curv_conc, curv_resp,
-                                CI,
+                                CI, ci,
                                 xlab, ylab, fitcol, fitlty, fitlwd,
                                 main, addlegend,
                                 cicol, cilty, cilwd) {
 
-  if(!is.null(CI)) reproFitPlotGenericCI(data_conc, transf_data_conc,
+  if(ci) reproFitPlotGenericCI(data_conc, transf_data_conc,
                                          data_resp,
                                          curv_conc, curv_resp,
                                          CI,
@@ -276,15 +281,17 @@ reproFitPlotGeneric <- function(data_conc, transf_data_conc, data_resp,
                                          cicol, cilty, cilwd)
   else {
     reproFitPlotGenericNoCI(data_conc, transf_data_conc, data_resp,
-                            curv_conc, curv_resp,
+                            curv_conc, curv_resp, CI,
                             xlab, ylab, fitcol, fitlty, fitlwd,
                             main, addlegend)
   }
 }
 
-reproFitPlotGGNoCI <- function(curv, valCols,
+reproFitPlotGGNoCI <- function(curv, curv50, CI, valCols,
                                fitlty, fitlwd, xlab, ylab, main) {
   plt_4 <- ggplot(curv) +
+    geom_line(aes(conc, resp), curv50,
+              linetype = "dashed", size = fitlwd, color = "blue") +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     ylim(0, max(curv$resp) + 1) +
@@ -294,13 +301,14 @@ reproFitPlotGGNoCI <- function(curv, valCols,
   return(plt_4)
 }
 
-reproFitPlotGGCI <- function(curv, CI, cicol, cilty, cilwd,
+reproFitPlotGGCI <- function(curv, curv50, CI, cicol, cilty, cilwd,
                              valCols, fitlty, fitlwd, xlab, ylab, main) {
   # IC
   cri <- data.frame(conc = curv$conc,
-                           qinf95 = CI[["qinf95"]],
-                           qsup95 = CI[["qsup95"]],
-                           CI = "Credible limits")
+                    qinf95 = CI[["qinf95"]],
+                    qsup95 = CI[["qsup95"]],
+                    q50 = CI[["q50"]],
+                    CI = "Credible limits")
 
   plt_3 <- ggplot(cri) +
     geom_line(data = cri, aes(conc, qinf95, color = CI),
@@ -325,6 +333,8 @@ reproFitPlotGGCI <- function(curv, CI, cicol, cilty, cilwd,
                                 ymax = qsup95), fill = valCols$cols3,
                 col = valCols$cols3,
                 alpha = 0.4) +
+    geom_line(data = cri, aes(conc, q50),
+              linetype = "dashed", size = fitlwd, color = "blue") +
     geom_line(aes(conc, resp), curv,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     ylim(0, max(CI[["qsup95"]]) + 0.2) +
@@ -337,7 +347,7 @@ reproFitPlotGGCI <- function(curv, CI, cicol, cilty, cilwd,
 
 reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                            curv_conc, curv_resp,
-                           CI,
+                           CI, ci,
                            xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend,
                            cicol, cilty, cilwd) {
@@ -349,23 +359,26 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
 
   # dataframes points (data) and curve (curv)
   curv <- data.frame(conc = curv_conc, resp = curv_resp, Line = "loglogistic")
+  curv50 <- data.frame(conc = curv_conc, resp = CI[["q50"]], Line = "loglogistic")
 
   # colors
   valCols <- fCols(curv, fitcol, cicol, "repro")
 
   # curve (to create the legend)
     plt_2 <- ggplot(curv) +
+    geom_line(data = curv50, aes(conc, resp, color = "blue"),
+              linetype = "dashed", size = fitlwd) +
     geom_line(data = curv, aes(conc, resp, color = Line),
               linetype = fitlty, size = fitlwd) +
     scale_color_manual(name = "", values = valCols$cols2) +
     theme_minimal()
 
   plt_4 <-
-    if (! is.null(CI)) {
-      reproFitPlotGGCI(curv, CI, cicol, cilty, cilwd,
+    if (ci) {
+      reproFitPlotGGCI(curv, curv50, CI, cicol, cilty, cilwd,
                        valCols, fitlty, fitlwd, xlab, ylab, main)$plt_4
     } else {
-      reproFitPlotGGNoCI(curv, valCols, fitlty, fitlwd,
+      reproFitPlotGGNoCI(curv, curv50, CI, valCols, fitlty, fitlwd,
                          xlab, ylab, main)
     }
 
@@ -381,7 +394,7 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                    ncol = 2, widths = c(6, 2))
     }
     else {
-      plt_3 <- reproFitPlotGGCI(curv, CI, cicol, cilty, cilwd,
+      plt_3 <- reproFitPlotGGCI(curv, curv50, CI, cicol, cilty, cilwd,
                                 valCols, fitlty, fitlwd, xlab, ylab, main)$plt_3
       mylegend_3 <- legendGgplotFit(plt_3)
       grid.arrange(plt_5, arrangeGrob(mylegend_2, mylegend_3,
