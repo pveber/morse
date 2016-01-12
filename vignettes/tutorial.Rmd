@@ -212,7 +212,6 @@ plot(dat, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
-plot(dat, concentration = 124, target.time = 21, style = "ggplot")
 
 # (5) check information on the experimental design
 summary(dat)
