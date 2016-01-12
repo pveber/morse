@@ -8,12 +8,14 @@ before_script:
  - git config --global user.email "travis@example.org"
  - sudo apt-get install jags
 
+before_install:
+ - sudo apt-get install r-cran-rjags -y
+
 r_packages:
  - coda
  - dplyr
  - ggplot2
  - gridExtra
- - rjags
  - stringr
  - knitr
  - rmarkdown
