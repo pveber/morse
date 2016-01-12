@@ -41,7 +41,7 @@
 #' described in the tutorial vignette.
 #'
 #' \tabular{ll}{ Package: \tab morse\cr Type: \tab Package\cr Version: \tab
-#' 2.1.0\cr Date: \tab 2015-11-06\cr License: \tab GPL (>=2)\cr }
+#' 2.1.0\cr Date: \tab 2015-11-17\cr License: \tab GPL (>=2)\cr }
 #'
 #' @name morse-package
 #' @aliases morse-package morse
@@ -63,8 +63,8 @@
 #' modelling}.
 #' \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
 #'
-#' Plummer, M. (2013) \emph{JAGS Version 3.4.0 user manual}.
-#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/3.x/jags_user_manual.pdf/download}.
+#' Plummer, M. (2013) \emph{JAGS Version 4.0.0 user manual}.
+#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}.
 #' @keywords package
 #'
 NULL

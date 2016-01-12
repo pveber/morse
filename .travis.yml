@@ -1,0 +1,20 @@
+language: r
+warnings_are_errors: true
+sudo: required
+bioc_required: false
+
+before_script:
+ - sudo apt-get install jags
+
+before_install:
+ - sudo apt-get install r-cran-rjags -y
+
+r_packages:
+ - coda
+ - dplyr
+ - ggplot2
+ - gridExtra
+ - stringr
+ - knitr
+ - rmarkdown
+ - testthat

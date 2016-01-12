@@ -14,12 +14,12 @@ vignette: >
 
 knitr::opts_chunk$set(fig.width = 7, 
                       fig.height = 4, 
-                      cache = TRUE)
+                      cache = FALSE)
 
 ```
 
 
-```{r, echo=FALSE, cache=TRUE, results='hide'}
+```{r, echo=FALSE, cache=FALSE, results='hide'}
 library(morse)
 library(ggplot2)
 ```
@@ -47,7 +47,7 @@ reference manual, and you can also inspect one of the datasets provided in
 the package (like `cadmium2`). First, we load the dataset and use the function
 `survDataCheck` to verify that it has the expected layout:
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 data(cadmium2)
 survDataCheck(cadmium2)
 ```
@@ -59,7 +59,7 @@ basic representation used for the subsequent operations. Note that if the
 call to `survDataCheck` reports no error, it is guaranteed that `survData`
 will not fail.
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 dat <- survData(cadmium2)
 head(dat)
 ```
@@ -69,7 +69,7 @@ head(dat)
 The function `plot` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 plot(dat, style = "ggplot", pool.replicate = FALSE)
 ```
 
@@ -81,7 +81,7 @@ dataset, we set this option to `FALSE`.
 
 By fixing the concentration to a (tested) value, we can visualize one subplot 
 in particular:
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 plot(dat, concentration = 124, addlegend = TRUE,
      pool.replicate = FALSE, style = "ggplot")
 ```
@@ -90,8 +90,8 @@ plot(dat, concentration = 124, addlegend = TRUE,
 We can also plot the number of surviving individuals at a given time point as a function
 of the concentration, by fixing `target.time` instead of `concentration`:
   
-```{r, cache=TRUE}
-plot(dat, target.time = 21, pool.replicate = FALSE, style = "ggplot",
+```{r, cache=FALSE}
+plot(dat, style = "ggplot",
      addlegend = TRUE)
 ```
 
@@ -99,13 +99,13 @@ plot(dat, target.time = 21, pool.replicate = FALSE, style = "ggplot",
 Finally, when fixing both `concentration` and `target.time`, we can compare one condition
 to the control:
 
-```{r, cache=TRUE}
-plot(dat, concentration = 232, target.time = 21)
+```{r, cache=FALSE}
+plot(dat, concentration = 232)
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 summary(dat)
 ```
 
@@ -120,7 +120,7 @@ function. Once we have estimated the parameters, we can then calculate the $LC_x
 for any $x$. All this work is performed by the `survFitTT` function, which requires
 a `survData` object and the levels of $LC_x$ we need:
 
-```{r, results="hide", cache=TRUE}
+```{r, results="hide", cache=FALSE}
 fit <- survFitTT(dat,
                  target.time = 21,
                  lcx = c(10, 20, 30, 40, 50))
@@ -134,7 +134,7 @@ quantiles of the posterior (as a measure of uncertainty, a.k.a. credible
 intervals). These can seen using the `summary` method:
 
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 summary(fit)
 ```
 
@@ -144,7 +144,7 @@ that the data was helpful to reduce the uncertainty on the true value of
 the parameters. This simple check can be performed using the summary function.
 
 The fit can also be plotted:
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 plot(fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
      addlegend = TRUE)
 ```
@@ -167,7 +167,7 @@ and the confidence interval around experimental points will largely overlap.
 <!--
 * Step five, check the obseved versus predicted values
   
-```{r,cache=TRUE, eval=FALSE}
+```{r,cache=FALSE, eval=FALSE}
 ppc(out2, style = "ggplot")
 ```
 -->
@@ -175,7 +175,7 @@ ppc(out2, style = "ggplot")
 Note that `survFitTT` will warn you if the estimated $LC_{50}$ lies outside the
 range of tested concentrations, as in the following example:
 
-```{r, results="hide", cache=TRUE}
+```{r, results="hide", cache=FALSE}
 data("cadmium1")
 fit <- survFitTT(survData(cadmium1),
                  target.time = 21,
@@ -196,7 +196,7 @@ described for survival data. This time the goal is to estimate the relation
 between pollutant concentration and reproduction rate per individual-day. 
 
 Here is a typical session:
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 # (1) load dataset
 data(cadmium2)
 
@@ -208,11 +208,10 @@ dat <- reproData(cadmium2)
 
 # (4) represent the cumulated number of offspring as a function time
 plot(dat, style = "ggplot", pool.replicate = FALSE)
-plot(dat, target.time = 21, addlegend = TRUE, style = "ggplot",
+plot(dat, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
-plot(dat, concentration = 124, target.time = 21, style = "ggplot")
 
 # (5) check information on the experimental design
 summary(dat)
@@ -238,7 +237,7 @@ variability (named "Poisson") and another one which takes it into account
 (named "gamma Poisson"). You can choose either one using the option `stoc.part`,
 but by setting it to `"bestfit"`, you let `reproFitTT` decide which models fits the
 data best. The choice can be seen by calling the `summary` function:
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 summary(fit)
 ```
 When the gamma Poisson model is selected, the summary shows an additional
@@ -256,7 +255,7 @@ object is legal on a `reproData` object. In particular, to use the plot function
 related to survival analysis on `reproData` object, we can use the `as.survData`
 conversion function:
 
-```{r, cache=TRUE}
+```{r, cache=FALSE}
 dat <- reproData(cadmium2)
 plot(as.survData(dat))
 ```
@@ -277,7 +276,7 @@ deviation or inter-quantile distance.
 The function `ppc()` plots the observed versus predicted values with the 95 \% 
 credible intervale for each predicted values.
 
-```{r, cache=TRUE, eval=FALSE}
+```{r, cache=FALSE, eval=FALSE}
 ppc(out, style = "ggplot")
 ```
 
