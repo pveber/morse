@@ -4,8 +4,6 @@ sudo: required
 bioc_required: false
 
 before_script:
- - git config --global user.name "travis"
- - git config --global user.email "travis@example.org"
  - sudo apt-get install jags
 
 before_install:
@@ -20,6 +18,3 @@ r_packages:
  - knitr
  - rmarkdown
  - testthat
-
-after_succes:
- - Rscript -e 'covr::codecov()'
