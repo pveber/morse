@@ -91,7 +91,7 @@ We can also plot the number of surviving individuals at a given time point as a 
 of the concentration, by fixing `target.time` instead of `concentration`:
   
 ```{r, cache=FALSE}
-plot(dat, target.time = 21, pool.replicate = FALSE, style = "ggplot",
+plot(dat, style = "ggplot",
      addlegend = TRUE)
 ```
 
@@ -100,7 +100,7 @@ Finally, when fixing both `concentration` and `target.time`, we can compare one 
 to the control:
 
 ```{r, cache=FALSE}
-plot(dat, concentration = 232, target.time = 21)
+plot(dat, concentration = 232)
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
@@ -208,7 +208,7 @@ dat <- reproData(cadmium2)
 
 # (4) represent the cumulated number of offspring as a function time
 plot(dat, style = "ggplot", pool.replicate = FALSE)
-plot(dat, target.time = 21, addlegend = TRUE, style = "ggplot",
+plot(dat, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
