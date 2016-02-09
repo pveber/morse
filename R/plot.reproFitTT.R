@@ -10,6 +10,8 @@
 #' @param cicol color for the 95 \% credible limits of the fitted curve
 #' @param cilty line type for the 95 \% credible limits of the fitted curve
 #' @param cilwd width of the 95 \% credible limits of the fitted curve
+#' @param adddata if \code{TRUE}, adds the observed data with confidence interval
+#' to the plot
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
@@ -40,6 +42,7 @@ plot.reproFitTT <- function(x,
                             cicol = "pink1",
                             cilty = 1,
                             cilwd = 1,
+                            adddata = FALSE,
                             addlegend = FALSE,
                             log.scale = FALSE,
                             style = "generic", ...) {
@@ -92,7 +95,7 @@ plot.reproFitTT <- function(x,
                                curv_conc, curv_resp,
                                cred.int, spaghetti.CI, dataCIm,
                                xlab, ylab, fitcol, fitlty, fitlwd,
-                               main, addlegend,
+                               main, addlegend, adddata,
                                cicol, cilty, cilwd)
   }
   else if (style == "ggplot") {
@@ -100,7 +103,7 @@ plot.reproFitTT <- function(x,
                    curv_conc, curv_resp,
                    cred.int, spaghetti.CI, dataCIm,
                    xlab, ylab, fitcol, fitlty, fitlwd,
-                   main, addlegend,
+                   main, addlegend, adddata,
                    cicol, cilty, cilwd)
   }
   else stop("Unknown style")
@@ -189,7 +192,7 @@ reproFitPlotGenericCredInt <- function(data_conc, transf_data_conc, data_resp,
                                        curv_conc, curv_resp,
                                        cred.int, spaghetti.CI, dataCIm,
                                        xlab, ylab, fitcol, fitlty, fitlwd,
-                                       main, addlegend,
+                                       main, addlegend, adddata,
                                        cicol, cilty, cilwd) {
   # plot the fitted curve estimated by reproFitTT
   # with generic style with credible interval
@@ -228,28 +231,74 @@ reproFitPlotGenericCredInt <- function(data_conc, transf_data_conc, data_resp,
   lines(curv_conc, cred.int[["qinf95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   
+  if (adddata) {
+    # segment CI
+    segments(transf_data_conc, data_resp,
+             transf_data_conc, conf.int["qsup95", ])
+    Bond <- if (log.scale) {
+      0.03 * (max(transf_data_conc) - min(transf_data_conc))
+    } else {
+      0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
+    }
+    
+    segments(transf_data_conc - Bond,
+             conf.int["qsup95", ],
+             transf_data_conc + Bond,
+             conf.int["qsup95", ])
+    
+    segments(transf_data_conc, data_resp,
+             transf_data_conc, conf.int["qinf95", ])
+    segments(transf_data_conc - Bond,
+             conf.int["qinf95", ],
+             transf_data_conc + Bond,
+             conf.int["qinf95", ])
+    
+    # points
+    points(transf_data_conc, data_resp, pch = 16)
+  }
+  
   # fitted curve
   lines(curv_conc, curv_resp[, "resp"], col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
   
   # legend
-  if(addlegend)
+  if(addlegend)  {
     legend("bottomleft",
-           lty = c(fitlty, cilty),
-           lwd = c(fitlwd, cilwd),
-           col = c(fitcol, cicol),
-           legend = c("loglogistic", "95% Credible limits"),
+           pch = c(ifelse(adddata, 16, NA), NA, NA, NA),
+           lty = c(NA, ifelse(adddata, 1, NA), cilty, fitlty),
+           lwd = c(NA, ifelse(adddata, 1, NA), cilwd, fitlwd),
+           col = c(ifelse(adddata, 1, NA), 1, fitcol, cicol),
+           legend = c(ifelse(adddata, "Observed values", NA),
+                      ifelse(adddata, "Confidence interval", NA),
+                      "Credible limits", "loglogistic"),
            bty = "n")
+  }
 }
 
-reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
+reproFitPlotGGCredInt <- function(data, curv_resp, cred.int, spaghetti.CI, dataCIm,
                                   cicol, cilty, cilwd, valCols, fitlty, fitlwd,
-                                  xlab, ylab, main) {
+                                  xlab, ylab, main, adddata) {
   # IC
   data.three <- data.frame(conc = curv_resp$conc,
                            qinf95 = cred.int[["qinf95"]],
                            qsup95 = cred.int[["qsup95"]],
                            Cred.Lim = "Credible limits")
+  
+  data.four <- data.frame(conc = data$transf_conc,
+                           qinf95 = conf.int["qinf95",],
+                           qsup95 = conf.int["qsup95",],
+                           Conf.Int = "Confidence interval")
+  
+  if (adddata) {
+    plt_3 <- ggplot(data) +
+      geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
+                       linetype = COnf.Int),
+                   arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
+                                 ends = "both"), data.four,
+                   color = valCols$cols2) +
+      scale_linetype(name = "") +
+      theme_minimal()
+    }
   
   plt_31 <- ggplot(data.three) +
     geom_line(data = data.three, aes(conc, qinf95, color = Cred.Lim),
@@ -271,6 +320,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
   
   # plot IC
   # final plot
+
   plt_40 <- ggplot(data.three) +
     geom_line(data = data.three, aes(conc, qinf95),
               linetype = cilty, size = cilwd, color = valCols$cols3) +
