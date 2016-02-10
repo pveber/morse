@@ -155,7 +155,7 @@ reproMeanCredInt <- function(fit, x) {
       # IC 95%
       qinf95[i] <- quantile(theo, probs = 0.025, na.rm = TRUE)
       qsup95[i] <- quantile(theo, probs = 0.975, na.rm = TRUE)
-      q50[i] <- quantile(theomean, probs = 0.5, na.rm = TRUE)
+      q50[i] <- quantile(theo, probs = 0.5, na.rm = TRUE)
     }
   }
   # values for cred.int
@@ -176,11 +176,22 @@ reproSpaghetti <- function(fit, x) {
   b2 <- 10^log10b2
   log10e2 <- mctot[, "log10e"][sel]
   e2 <- 10^log10e2
+  if (fit$model.label == "GP") {
+    log10omega2 <- mctot[, "log10omega"][sel]
+    omega2 <- 10^(log10omega2)
+  }
   
   # all theorical
   dtheo <- array(data = NA, dim = c(length(x), length(e2)))
+  if (fit$model.label == "GP") dtheotemp <- dtheo
   for (i in 1:length(e2)) {
-    dtheo[, i] <- d2[i] / (1 + (x / e2[i])^(b2[i])) # mean curve
+    if (fit$model.label == "P") {
+      dtheo[, i] <- d2[i] / (1 + (x / e2[i])^(b2[i])) # mean curve
+    }
+    else if (fit$model.label == "GP") {
+      dtheotemp[, i] <- d2[i] / (1 + (x / e2[i])^(b2[i])) # mean curve
+      dtheo[, i] <- rgamma(n = length(x), shape = dtheotemp[, i] / omega2[i], rate = 1 / omega2[i])
+    }
   }
   dtheof <- as.data.frame(cbind(x, dtheo))
   names(dtheof) <- c("conc", paste0("X", 1:length(sel)))
@@ -272,18 +283,7 @@ reproFitPlotGGCredInt <- function(data, curv_resp, cred.int, spaghetti.CI, dataC
                            qinf95 = conf.int["qinf95",],
                            qsup95 = conf.int["qsup95",],
                            Conf.Int = "Confidence interval")
-  
-  if (adddata) {
-    plt_3 <- ggplot(data) +
-      geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
-                       linetype = COnf.Int),
-                   arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                 ends = "both"), data.four,
-                   color = valCols$cols2) +
-      scale_linetype(name = "") +
-      theme_minimal()
-    }
-  
+
   plt_31 <- ggplot(data.three) +
     geom_line(data = data.three, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
