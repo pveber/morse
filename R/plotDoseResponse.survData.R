@@ -1,25 +1,3 @@
-#' @importFrom stats aggregate binom.test
-survConfInt <- function(x, log.scale) {
-  # compute confidente interval on observed data
-  # binomial model by a binomial test
-  # INPUT:
-  # - x : object of class survFitTT
-  # - log.scale : boolean
-  # OUTPUT:
-  
-  # - ci : confidente interval
-  ci <- apply(x, 1, function(x) {
-    binom.test(x["Nsurv"], x["Ninit"])$conf.int
-  })
-  rownames(ci) <- c("qinf95", "qsup95")
-  colnames(ci) <- x$conc
-  
-  if (log.scale) ci <- ci[ ,colnames(ci) != 0]
-  
-  return(ci)
-}
-
-
 #' Plotting method for \code{survData} objects
 #'
 #' Plots the survival rate as a function of concentration (for a given target
@@ -181,3 +159,23 @@ plotDoseResponse.survData <- function(x,
   else stop("Unknown plot style")
 }
 
+#' @importFrom stats aggregate binom.test
+survConfInt <- function(x, log.scale) {
+  # compute confidente interval on observed data
+  # binomial model by a binomial test
+  # INPUT:
+  # - x : object of class survFitTT
+  # - log.scale : boolean
+  # OUTPUT:
+  
+  # - ci : confidente interval
+  ci <- apply(x, 1, function(x) {
+    binom.test(x["Nsurv"], x["Ninit"])$conf.int
+  })
+  rownames(ci) <- c("qinf95", "qsup95")
+  colnames(ci) <- x$conc
+  
+  if (log.scale) ci <- ci[ ,colnames(ci) != 0]
+  
+  return(ci)
+}
