@@ -7,11 +7,13 @@
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
+#' @param ylim Y-axis limits.
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
+#' @param axis if \code{TRUE} displays ticks and label axis
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods.
 #' @note When \code{style = "ggplot"}, the function calls package
@@ -47,10 +49,12 @@ plotDoseResponse.reproData <- function(x,
                                        xlab = "Concentration",
                                        ylab = "Nb of offspring / Nb individual-days",
                                        main = NULL,
+                                       ylim = NULL,
                                        target.time = NULL,
                                        style = "generic",
                                        log.scale = FALSE,
                                        remove.someLabels = FALSE,
+                                       axis = TRUE,
                                        addlegend = TRUE,
                                        ...) {
   if (is.null(target.time)) target.time <- max(x$time)
@@ -84,7 +88,7 @@ plotDoseResponse.reproData <- function(x,
   
   if (style == "generic")
     reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
-                               display.conc)
+                               display.conc, ylim, axis)
   else if (style == "ggplot")
     reproDoseResponseCIGG(x, conc_val, jittered_conc, transf_data_conc,
                           display.conc)
@@ -92,19 +96,24 @@ plotDoseResponse.reproData <- function(x,
 }
 
 reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
-                                       transf_data_conc, display.conc) {
+                                       transf_data_conc, display.conc, ylim,
+                                       axis) {
+  
+  if (is.null(ylim)) ylim <- c(0, max(x$reproRateSup))
   plot(jittered_conc, x$resp,
-       ylim = c(0, max(x$reproRateSup)),
+       ylim = ylim,
        type = "n",
        xaxt = "n",
        yaxt = "n",
-       xlab = "Concentration",
-       ylab = "Reproduction rate")
+       xlab = if (axis) { "Concentration" } else "",
+       ylab = if (axis) { "Reproduction rate"} else "")
   
   # axis
-  axis(side = 2, at = pretty(c(0, max(x$resp))))
-  axis(side = 1, at = transf_data_conc,
-       labels = display.conc)
+  if (axis) {
+    axis(side = 2, at = pretty(c(0, max(x$resp))))
+    axis(side = 1, at = transf_data_conc,
+         labels = display.conc)
+  }
   
   x0 <- x[order(x$conc),]
   delta <- 0.01 * (max(conc_val) - min(conc_val))
