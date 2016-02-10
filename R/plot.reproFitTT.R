@@ -235,6 +235,16 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
   lines(curv_conc, curv_resp[, "resp"], col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
   
+  if (adddata) {
+    par(new = TRUE)
+    plotDoseResponse.reproData(x = x$transformed.data,
+                               ylim = c(0, max(c(data_resp,
+                                                 cred.int[["qsup95"]])) + 0.01),
+                               target.time = unique(x$dataTT$time),
+                               log.scale = log.scale, addlegend = FALSE, 
+                               axis = FALSE)
+  }
+  
   # legend
   if(addlegend)  {
     legend("bottomleft",
