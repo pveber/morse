@@ -99,12 +99,12 @@ plot.reproFitTT <- function(x,
                                cicol, cilty, cilwd, log.scale)
   }
   else if (style == "ggplot") {
-    reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
+    reproFitPlotGG(x, dataTT$conc, transf_data_conc, dataTT$resp,
                    curv_conc, curv_resp,
                    cred.int, spaghetti.CI, dataCIm,
                    xlab, ylab, fitcol, fitlty, fitlwd,
                    main, addlegend, adddata,
-                   cicol, cilty, cilwd)
+                   cicol, cilty, cilwd, log.scale)
   }
   else stop("Unknown style")
 }
@@ -252,6 +252,7 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
                                ylim = c(0, max(c(data_resp,
                                                  cred.int[["qsup95"]])) + 0.01),
                                target.time = unique(x$dataTT$time),
+                               style = "generic",
                                log.scale = log.scale, addlegend = FALSE, 
                                axis = FALSE)
   }
@@ -270,19 +271,14 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
   }
 }
 
-reproFitPlotGGCredInt <- function(data, curv_resp, cred.int, spaghetti.CI, dataCIm,
+reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
                                   cicol, cilty, cilwd, valCols, fitlty, fitlwd,
-                                  xlab, ylab, main, adddata) {
+                                  xlab, ylab, main) {
   # IC
   data.three <- data.frame(conc = curv_resp$conc,
                            qinf95 = cred.int[["qinf95"]],
                            qsup95 = cred.int[["qsup95"]],
                            Cred.Lim = "Credible limits")
-  
-  data.four <- data.frame(conc = data$transf_conc,
-                           qinf95 = conf.int["qinf95",],
-                           qsup95 = conf.int["qsup95",],
-                           Conf.Int = "Confidence interval")
 
   plt_31 <- ggplot(data.three) +
     geom_line(data = data.three, aes(conc, qinf95, color = Cred.Lim),
@@ -331,12 +327,12 @@ reproFitPlotGGCredInt <- function(data, curv_resp, cred.int, spaghetti.CI, dataC
               plt_4 = plt_4))
 }
 
-reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
+reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
                            curv_conc, curv_resp,
                            cred.int, spaghetti.CI, dataCIm,
                            xlab, ylab, fitcol, fitlty, fitlwd,
-                           main, addlegend,
-                           cicol, cilty, cilwd) {
+                           main, addlegend, adddata,
+                           cicol, cilty, cilwd, log.scale) {
   
   if (Sys.getenv("RSTUDIO") == "") {
     dev.new() # create a new page plot
@@ -347,20 +343,39 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
   # colors
   valCols <- fCols(curv_resp, fitcol, cicol, "repro")
   
-  # curve (to create the legend)
-  plt_2 <- ggplot(curv_resp) +
-    geom_line(data = curv_resp, aes(conc, resp, colour = Line),
-              linetype = fitlty, size = fitlwd) +
-    scale_color_manual("", values = valCols$cols2) +
-    theme_minimal()
+  if (adddata) {
+    plt_1 <- plotDoseResponse.reproData(x = x$transformed.data,
+                                        target.time = unique(x$dataTT$time),
+                                        style = "ggplot",
+                                        log.scale = log.scale, addlegend = TRUE)
+  }
   
   plt_4 <-
     reproFitPlotGGCredInt(curv_resp, cred.int, spaghetti.CI, dataCIm,
                           cicol, cilty, cilwd, valCols, fitlty, fitlwd, xlab,
                           ylab, main)$plt_4
   
+  if (adddata) {
+    plt_4 <- plt_4 +
+      geom_segment(aes(x = jittered_conc, xend = jittered_conc,
+                       y = reproRateInf, yend = reproRateSup),
+                   data = plt_1$data,
+                   arrow = arrow(length = unit(0.1, "cm"),
+                                 angle = 90, ends = "both")) +
+      geom_point(aes(x = jittered_conc, y = resp), plt_1$data)
+  }
+  
   if (addlegend) {
+    
     # create legends
+    
+    # curve (to create the legend)
+    plt_2 <- ggplot(curv_resp) +
+      geom_line(data = curv_resp, aes(conc, resp, colour = Line),
+                linetype = fitlty, size = fitlwd) +
+      scale_color_manual("", values = valCols$cols2) +
+      theme_minimal()
+    
     mylegend_2 <- legendGgplotFit(plt_2) # mean line legend
     
     plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
@@ -371,14 +386,16 @@ reproFitPlotGG <- function(data_conc, transf_data_conc, data_resp,
                                    fitlwd, xlab, ylab, main)$plt_3
     
     mylegend_3 <- legendGgplotFit(plt_3)
+    
     grid.arrange(plt_5, arrangeGrob(mylegend_2, mylegend_3,
                                     nrow = 6), ncol = 2,
                  widths = c(6, 2))
+
   }
   else { # no legend
     plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
                                         labels = data_conc)
-    return(plt_5)
   }
+  return(plt_5)
 }
 
