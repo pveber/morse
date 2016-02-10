@@ -91,12 +91,12 @@ plot.reproFitTT <- function(x,
                           Line = "loglogistic")
   
   if (style == "generic") {
-    reproFitPlotGenericCredInt(dataTT$conc, transf_data_conc, dataTT$resp,
+    reproFitPlotGenericCredInt(x, dataTT$conc, transf_data_conc, dataTT$resp,
                                curv_conc, curv_resp,
                                cred.int, spaghetti.CI, dataCIm,
                                xlab, ylab, fitcol, fitlty, fitlwd,
                                main, addlegend, adddata,
-                               cicol, cilty, cilwd)
+                               cicol, cilty, cilwd, log.scale)
   }
   else if (style == "ggplot") {
     reproFitPlotGG(dataTT$conc, transf_data_conc, dataTT$resp,
@@ -188,12 +188,12 @@ reproSpaghetti <- function(fit, x) {
   return(dtheof)
 }
 
-reproFitPlotGenericCredInt <- function(data_conc, transf_data_conc, data_resp,
+reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp,
                                        curv_conc, curv_resp,
                                        cred.int, spaghetti.CI, dataCIm,
                                        xlab, ylab, fitcol, fitlty, fitlwd,
                                        main, addlegend, adddata,
-                                       cicol, cilty, cilwd) {
+                                       cicol, cilty, cilwd, log.scale) {
   # plot the fitted curve estimated by reproFitTT
   # with generic style with credible interval
   
@@ -230,32 +230,6 @@ reproFitPlotGenericCredInt <- function(data_conc, transf_data_conc, data_resp,
         lwd = cilwd)
   lines(curv_conc, cred.int[["qinf95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
-  
-  if (adddata) {
-    # segment CI
-    segments(transf_data_conc, data_resp,
-             transf_data_conc, conf.int["qsup95", ])
-    Bond <- if (log.scale) {
-      0.03 * (max(transf_data_conc) - min(transf_data_conc))
-    } else {
-      0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
-    }
-    
-    segments(transf_data_conc - Bond,
-             conf.int["qsup95", ],
-             transf_data_conc + Bond,
-             conf.int["qsup95", ])
-    
-    segments(transf_data_conc, data_resp,
-             transf_data_conc, conf.int["qinf95", ])
-    segments(transf_data_conc - Bond,
-             conf.int["qinf95", ],
-             transf_data_conc + Bond,
-             conf.int["qinf95", ])
-    
-    # points
-    points(transf_data_conc, data_resp, pch = 16)
-  }
   
   # fitted curve
   lines(curv_conc, curv_resp[, "resp"], col = fitcol,
