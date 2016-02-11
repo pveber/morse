@@ -1,4 +1,9 @@
 #' Plotting method for \code{reproFitTT} objects
+#' 
+#' This function plots exposure-response fits for target time reproduction
+#' analysis (a.k.a. \code{reproFitTT} objects).
+#' 
+#' See \code{\link{plot.survFitTT}} for details.
 #'
 #' @param x an object of class \code{reproFitTT}
 #' @param xlab a title for the \eqn{x}-label
