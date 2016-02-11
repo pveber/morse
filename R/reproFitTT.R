@@ -43,7 +43,6 @@
 #' the end of monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #'
-# FIXME
 # \describe{
 #
 # Credible limits: For 100 values of concentrations regularly spread within
@@ -117,13 +116,13 @@
 #' out$estim.par
 #'
 #' # (5) Plot the fitted curve with credible limits
-#' plot(out, log.scale = TRUE, ci = TRUE,
+#' plot(out, log.scale = TRUE, adddata = TRUE,
 #'      main = "log-logistic gamma-poisson model")
 #'
 #' # (6) Plot the fitted curve with ggplot style
 #' require("ggplot2")
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
+#'      fitcol = "blue", adddata = TRUE, cicol = "blue", style = "ggplot",
 #'      main = "Log-logistic response to concentration")
 #' }
 #'

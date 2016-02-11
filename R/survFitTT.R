@@ -16,7 +16,6 @@
 #'
 #'
 # \describe{
-# FIXME
 # Credible limits: For 100 values of concentrations regularly spread within
 # the range of tested concentrations the joint posterior distribution of
 # parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
@@ -61,7 +60,6 @@
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #'
 #'
-# FIXME
 # @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}}
 # \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
 # \code{\link[ggplot2]{ggplot}}
@@ -94,12 +92,13 @@
 #' out$estim.par
 #'
 #' # (5) Plot the fitted curve
-#' plot(out, log.scale = TRUE, ci = TRUE)
+#' plot(out, log.scale = TRUE, adddata = TRUE)
 #'
 #' # (6) Plot the fitted curve with ggplot style
 #' require(ggplot2)
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
+#'      fitcol = "blue", adddata = TRUE, cicol = "blue",
+#'      style = "ggplot")
 #' }
 #'
 #' @import rjags
