@@ -7,6 +7,8 @@
 #' @param fitcol color used for the fitted curve
 #' @param fitlty line type for the fitted curve
 #' @param fitlwd width of the fitted curve
+#' @param spaghetti if \code{TRUE}, the credible interval is draw by  multiple
+#' curves
 #' @param cicol color for the 95 \% credible limits of the fitted curve
 #' @param cilty line type for the 95 \% credible limits of the fitted curve
 #' @param cilwd width of the 95 \% credible limits of the fitted curve
