@@ -21,6 +21,8 @@
 #' @param fitcol color of the fitted curve
 #' @param fitlty line type of the fitted curve
 #' @param fitlwd width of the fitted curve
+#' @param spaghetti if \code{TRUE}, the credible interval is draw by  multiple
+#' curves
 #' @param cicol color of the 95 \% credible interval limits
 #' @param cilty line type for the 95 \% credible interval limits
 #' @param cilwd width of the 95 \% credible interval limits
