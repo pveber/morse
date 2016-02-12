@@ -89,16 +89,16 @@ plotDoseResponse.reproData <- function(x,
   
   if (style == "generic")
     reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
-                               display.conc, ylim, axis)
+                               display.conc, ylim, axis, addlegend)
   else if (style == "ggplot")
     reproDoseResponseCIGG(x, conc_val, jittered_conc, transf_data_conc,
-                          display.conc)
+                          display.conc, addlegend)
   else stop("Unknown style")
 }
 
 reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
                                        transf_data_conc, display.conc, ylim,
-                                       axis) {
+                                       axis, addlegend) {
   
   if (is.null(ylim)) ylim <- c(0, max(x$reproRateSup))
   plot(jittered_conc, x$resp,
@@ -126,23 +126,55 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
            jittered_conc + delta, x0[, "reproRateSup"])
   
   points(jittered_conc, x0$resp, pch = 16)
+  
+  if (addlegend) {
+    legend("bottomleft", pch = c(16, NA),
+           lty = c(NA, 1),
+           lwd = c(NA, 1),
+           col = c(1, 1),
+           legend = c("Observed values", "Confidence interval"),
+           bty = "n")
+  }
 }
 
 reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
-                                  display.conc) {
+                                  display.conc, addlegend) {
   
   x0 <- cbind(x[order(x$conc),], jittered_conc = as.vector(jittered_conc))
-  gf <- ggplot(x0) + geom_segment(aes(x = jittered_conc, xend = jittered_conc,
-                                      y = reproRateInf, yend = reproRateSup),
-                                  data = x0,
+  
+  df <- data.frame(x0,
+                   transf_data_conc,
+                   display.conc,
+                   Points = "Observed values")
+  
+  dfCI <- data.frame(x0,
+                     transf_data_conc,
+                     display.conc,
+                     Conf.Int = "Confidence interval")
+  
+  # colors
+  valCols <- fCols(df, fitcol = NA, cicol = NA, "repro")
+  
+  gf <- ggplot(dfCI) + geom_segment(aes(x = jittered_conc, xend = jittered_conc,
+                                      y = reproRateInf, yend = reproRateSup,
+                                      linetype = Conf.Int),
+                                  data = dfCI,
                                   arrow = arrow(length = unit(0.1, "cm"),
-                                                angle = 90, ends = "both")) +
-    geom_point(aes(x = jittered_conc, y = resp), x0) +
+                                                angle = 90, ends = "both"),
+                                  col = valCols$cols4) +
+    geom_point(aes(x = jittered_conc, y = resp, fill = Points), df,
+               col = valCols$cols1) +
+    scale_fill_hue("") +
+    scale_linetype(name = "") +
     scale_x_continuous(breaks = transf_data_conc,
                        labels = display.conc) +
     expand_limits(y = 0) +
     labs(x = "Concentration", y = "Reproduction rate") +
     theme_minimal()
   
-  return(gf)
+  if (addlegend) {
+    gf
+  } else {
+    gf + theme(legend.position = "none") # remove legend
+  }
 }
