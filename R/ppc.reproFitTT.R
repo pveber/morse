@@ -13,8 +13,8 @@
 #' and overlapped ones are shifted on the X-axis to a better visualitation.
 #'
 #' @param x An object of class \code{reproFitTT}
-#' @param style Graphical package method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param style Graphical package method: \code{generic} or \code{ggplot}
+#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @examples
 #'

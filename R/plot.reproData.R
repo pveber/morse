@@ -1,13 +1,13 @@
 #' Plotting method for \code{reproData} objects
 #'
-#' Plots the cumulated number of offspring as a function time (for a fixed
-#' concentration).
+#' Plots the cumulated number of offspring as a function time.
 #'
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a title for the \eqn{y}-axis
 #' @param main main title for the plot
-#' @param concentration a numeric value corresponding to some concentration in \code{data}
+#' @param concentration a numeric value corresponding to some concentration in
+#' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
@@ -15,9 +15,9 @@
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #' @note When \code{style = "ggplot"}, the function calls package
-#' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
+#' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}
 #' @keywords plot
 #'
 #' @examples

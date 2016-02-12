@@ -1,8 +1,8 @@
 Package: morse
 Type: Package
 Title: MOdelling Tools for Reproduction and Survival Data in Ecotoxicology
-Version: 2.1.1
-Date: 2015-12-21
+Version: 2.2.0
+Date: 2016-02-12
 Author: Marie Laure Delignette-Muller [aut], Philippe Ruiz [aut], Sandrine
     Charles [aut], Wandrille Duchemin [ctb], Christelle Lopes [ctb], Guillaume Kon-
     Kam-king [ctb], Philippe Veber [aut]

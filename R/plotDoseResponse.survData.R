@@ -12,7 +12,8 @@
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
+#' 
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #'
