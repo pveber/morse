@@ -2,10 +2,18 @@
 #'
 #' The \code{ppc} function plot the observed versus predicted values for the
 #' \code{survFitTT} objects.
+#' 
+#' The coordinates of black points are the obseved value of the number of survivor
+#' (poolled replicates) for a given concentration versus the point estimates
+#' (predicted value).
+#' The 95 \% prediction intervals containing the corresponding observed value are
+#' colored in green and the others are colored in red.
+#' To do a better representation, the line 0, 1 is represented by steps if the
+#' number of observed values is less than 20.
 #'
 #' @param x An object of class \code{survFitTT}
-#' @param style Graphical package method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param style Graphical package method: \code{generic} or \code{ggplot}
+#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @examples
 #'

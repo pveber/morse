@@ -23,7 +23,7 @@
 #' @param target.time defines the observation period. By default the last time point
 #' @param ecx desired values of \eqn{x} (in percent) for which to compute
 #' \eqn{EC_{x}}{ECx}
-#' @param n.chains number of MCMC chains. The minimum required number of chains is
+#' @param n.chains number of MCMC chains. The minimum required number of chains is 2
 #' @param quiet if \code{TRUE}, does not print messages and progress bars from JAGS
 #'
 #'
@@ -38,12 +38,11 @@
 #' \item{model}{a JAGS model object}
 #' \item{parameters}{a list of the parameters names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
-#' for the MCMC computation.}
+#' for the MCMC computation}
 #' \item{n.iter}{a list of two indices indicating the beginning and
 #' the end of monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #'
-# FIXME
 # \describe{
 #
 # Credible limits: For 100 values of concentrations regularly spread within
@@ -117,13 +116,13 @@
 #' out$estim.par
 #'
 #' # (5) Plot the fitted curve with credible limits
-#' plot(out, log.scale = TRUE, ci = TRUE,
+#' plot(out, log.scale = TRUE, adddata = TRUE,
 #'      main = "log-logistic gamma-poisson model")
 #'
 #' # (6) Plot the fitted curve with ggplot style
 #' require("ggplot2")
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
+#'      fitcol = "blue", adddata = TRUE, cicol = "blue", style = "ggplot",
 #'      main = "Log-logistic response to concentration")
 #' }
 #'

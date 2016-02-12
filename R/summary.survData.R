@@ -5,7 +5,7 @@
 #' 
 #' @param object an object of class \code{survData}
 #' @param quiet when \code{FALSE}, prints summary on standard output
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @return The function returns a list with the following fields:
 #' \item{NbrepTimeConc}{nb of replicates for all concentrations and time points}

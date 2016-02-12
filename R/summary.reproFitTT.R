@@ -5,7 +5,7 @@
 #'
 #' @param object an object of class \code{reproFitTT}
 #' @param quiet when \code{FALSE}, prints summary on standard output
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns a list with the following fields:
 #' \item{Qpriors}{quantiles for the model's prior}

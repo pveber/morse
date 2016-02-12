@@ -1,4 +1,9 @@
 #' Plotting method for \code{reproFitTT} objects
+#' 
+#' This function plots exposure-response fits for target time reproduction
+#' analysis (a.k.a. \code{reproFitTT} objects).
+#' 
+#' See \code{\link{plot.survFitTT}} for details.
 #'
 #' @param x an object of class \code{reproFitTT}
 #' @param xlab a title for the \eqn{x}-label
@@ -17,7 +22,8 @@
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
+#' 
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #' @note For an example, see the paragraph on \code{\link{reproFitTT}}.

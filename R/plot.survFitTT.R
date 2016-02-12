@@ -5,14 +5,19 @@
 #'
 #' The fitted curve represents the \strong{estimated survival rate} after
 #' the target time has passed as a function of the concentration of pollutant;
-#' the black dots depict the \strong{observed survival rate} at each tested
-#' concentration. Note that since our model does not take inter-replicate
-#' variability into consideration, replicates are systematically pooled in this
-#' plot. When \code{ci = TRUE}, the function plots both credible intervals for
-#' the estimated survival rate (by default the red area around the fitted
-#' curve) and confidence intervals for the observed survival rate (as black
-#' error bars). Both types of intervals are taken at the same level. Typically
+#' When \code{adddata = TRUE} the black dots depict the \strong{observed survival
+#' rate} at each tested concentration. Note that since our model does not take
+#' inter-replicate variability into consideration, replicates are systematically
+#' pooled in this plot.
+#' The function plots both credible intervals for the estimated survival rate
+#' (by default the red area around the fitted curve) and confidence intervals for
+#' the observed survival rate (as black error bars if \code{adddata = TRUE}).
+#' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two intervals.
+#' If \code{spaghetti = TRUE} the credible intervals for the estimated survival
+#' rate is represented by multiple curve estimated from 10 \% of the mcmc chains.
+#' The opacity / transparency of the ribbon give a estimation of the density of
+#' estimated survival rate.
 #'
 #' @param x an object of class \code{survFitTT}
 #' @param xlab a title for the \eqn{x}-axis
@@ -31,7 +36,7 @@
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #' @note For an example, see the paragraph on \code{\link{reproFitTT}}.

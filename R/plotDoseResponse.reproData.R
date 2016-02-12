@@ -7,7 +7,7 @@
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
-#' @param ylim Y-axis limits.
+#' @param ylim Y-axis limits
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
@@ -15,7 +15,8 @@
 #' \code{'ggplot'} style to avoid the label overlap
 #' @param axis if \code{TRUE} displays ticks and label axis
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
+#' 
 #' @note When \code{style = "ggplot"}, the function calls package
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #'

@@ -5,7 +5,7 @@
 #' inference procedure.
 #' 
 #' @param x An object of class \code{reproFitTT}
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @seealso \code{\link{reproFitTT}}
 #' 
