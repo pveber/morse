@@ -356,6 +356,7 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
                                         target.time = unique(x$dataTT$time),
                                         style = "ggplot",
                                         log.scale = log.scale, addlegend = TRUE)
+    mylegend_1 <- legendGgplotFit(plt_1) # mean line legend
   }
   
   plt_4 <-
@@ -395,15 +396,20 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
     
     mylegend_3 <- legendGgplotFit(plt_3)
     
-    grid.arrange(plt_5, arrangeGrob(mylegend_2, mylegend_3,
-                                    nrow = 6), ncol = 2,
-                 widths = c(6, 2))
-
+    if (adddata) {
+      grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_2, mylegend_3,
+                                      nrow = 6), ncol = 2,
+                   widths = c(6, 2))
+    } else {
+      grid.arrange(plt_5, arrangeGrob(mylegend_2, mylegend_3,
+                                      nrow = 6), ncol = 2,
+                   widths = c(6, 2))
+    }
   }
   else { # no legend
     plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
                                         labels = data_conc)
+    return(plt_5)
   }
-  return(plt_5)
 }
 
