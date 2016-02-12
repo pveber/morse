@@ -12,6 +12,7 @@
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @note When \code{style = "ggplot"}, the function calls package
@@ -50,6 +51,7 @@ plotDoseResponse.survData <- function(x,
                                       style = "generic",
                                       log.scale = FALSE,
                                       remove.someLabels = FALSE,
+                                      addlegend = TRUE,
                                       ...) {
   if (is.null(target.time)) target.time <- max(x$time)
   
@@ -122,25 +124,41 @@ plotDoseResponse.survData <- function(x,
              conf.int["qinf95", ],
              transf_data_conc + Bond,
              conf.int["qinf95", ])
+    
+    # add legend
+    if (addlegend) {
+      legend("bottomleft", pch = c(16, NA),
+             lty = c(NA, 1),
+             lwd = c(NA, 1),
+             col = c(1, 1),
+             legend = c("Observed values", "Confidence interval"),
+             bty = "n")
+    }
   }
   else if (style == "ggplot") {
+    # colors
+    valCols <- fCols(x, fitcol = NA, cicol = NA, "surv")
+    
     df <- data.frame(x,
                      transf_data_conc,
-                     display.conc)
+                     display.conc,
+                     Points = "Observed values")
     dfCI <- data.frame(conc = transf_data_conc,
                        qinf95 = conf.int["qinf95",],
                        qsup95 = conf.int["qsup95",],
                        Conf.Int = "Confidence interval")
     
-    gp <- ggplot(df, aes(x = transf_data_conc, y = resp)) +
+    fd <- ggplot(df) +
+      geom_point(aes(x = transf_data_conc, y = resp, fill = Points),
+                 data = df, col = valCols$cols1) +
       geom_segment(aes(x = conc, xend = conc, y = qinf95,
                        yend = qsup95,
                        linetype = Conf.Int),
                    arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                 ends = "both"), dfCI) +
-      expand_limits(x = 0, y = 0)
-    
-    fd <- gp + geom_point() + ggtitle(main) +
+                                 ends = "both"), dfCI, col = valCols$cols3) +
+      scale_fill_hue("") +
+      scale_linetype(name = "") +
+      expand_limits(x = 0, y = 0) + ggtitle(main) +
       theme_minimal() +
       labs(x = xlab,
            y = ylab) +
@@ -154,8 +172,11 @@ plotDoseResponse.survData <- function(x,
       scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$resp)))))) +
       expand_limits(x = 0, y = 0)
     
-    fd + theme(legend.position = "none") # remove legend
-    
+if (addlegend) {
+  fd
+} else {
+  fd + theme(legend.position = "none") # remove legend
+}
   }
   else stop("Unknown plot style")
 }
