@@ -155,7 +155,7 @@ plotDoseResponse.survData <- function(x,
                        yend = qsup95,
                        linetype = Conf.Int),
                    arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                 ends = "both"), dfCI) +
+                                 ends = "both"), dfCI, col = valCols$cols3) +
       scale_fill_hue("") +
       scale_linetype(name = "") +
       expand_limits(x = 0, y = 0) + ggtitle(main) +
