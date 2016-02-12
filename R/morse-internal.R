@@ -177,15 +177,23 @@ fCols <- function(data, fitcol, cicol, analyse) {
                 cols4 = cols4))
            
     } else if (analyse == "repro") {
+      #points
+      cols1 <- "black"
+      names(cols1) <- unique(data$Points)
     # fitted curve
     cols2 <- fitcol
     names(cols2) <- "loglogistic"
     # CI
     cols3 <- cicol
     names(cols3) <- "Credible limits"
+    # CI2
+    cols4 <- "black"
+    names(cols4) <- "Confidence interval"
     
-    return(list(cols2 = cols2,
-                cols3 = cols3))
+    return(list(cols1 = cols1,
+                cols2 = cols2,
+                cols3 = cols3,
+                cols4 = cols4))
     }
 }
 
