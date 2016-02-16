@@ -2,6 +2,10 @@
 #'
 #' Plots the survival rate as a function of concentration (for a given target
 #' time).
+#' 
+#' The function plots the observed values of the survival rate for a given
+#' time as a function of mesured concentration with the 95 \% confidence
+#' interval. Note replicates are systematically pooled in this plot.
 #'
 #' @param x an object of class \code{survData}
 #' @param xlab a title for the \eqn{x}-axis (optional)

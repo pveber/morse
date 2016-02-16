@@ -2,6 +2,10 @@
 #'
 #' Plots the reproduction rate as a function of concentration (for a given target
 #' time).
+#' 
+#' The function plots the observed values of the repoduction rate for a given
+#' time as a function of mesured concentration with the 95 \% confidence
+#' interval.
 #'
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
