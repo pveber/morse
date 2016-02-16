@@ -145,7 +145,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
            col = as.character(tab0[, "col"]))
 
   points(jittered_obs, tab0[, "P50"],
-         pch = 16)
+         pch = 20)
 }
 
 #' @import ggplot2
