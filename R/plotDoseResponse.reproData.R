@@ -125,10 +125,10 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
   segments(jittered_conc - delta, x0[, "reproRateSup"],
            jittered_conc + delta, x0[, "reproRateSup"])
   
-  points(jittered_conc, x0$resp, pch = 16)
+  points(jittered_conc, x0$resp, pch = 20)
   
   if (addlegend) {
-    legend("bottomleft", pch = c(16, NA),
+    legend("bottomleft", pch = c(20, NA),
            lty = c(NA, 1),
            lwd = c(NA, 1),
            col = c(1, 1),
