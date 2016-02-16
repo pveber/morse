@@ -3,7 +3,19 @@
 #' This function plots exposure-response fits for target time reproduction
 #' analysis (a.k.a. \code{reproFitTT} objects).
 #' 
-#' See \code{\link{plot.survFitTT}} for details.
+#' The fitted curve represents the \strong{estimated reproduction rate} after
+#' the target time has passed as a function of the concentration of pollutant;
+#' When \code{adddata = TRUE} the black dots depict the \strong{observed reproduction
+#' rate} at each tested concentration.
+#' The function plots both credible intervals for the estimated reproduction rate
+#' (by default the red area around the fitted curve) and confidence intervals for
+#' the observed reproduction rate (as black error bars if \code{adddata = TRUE}).
+#' Both types of intervals are taken at the same level. Typically
+#' a good fit is expected to display a large overlap between the two intervals.
+#' If \code{spaghetti = TRUE} the credible intervals for the estimated reproduction
+#' rate is represented by multiple curve estimated from 10 \% of the mcmc chains.
+#' The opacity / transparency of the ribbon give a estimation of the density of
+#' estimated reproduction rate.
 #'
 #' @param x an object of class \code{reproFitTT}
 #' @param xlab a title for the \eqn{x}-label

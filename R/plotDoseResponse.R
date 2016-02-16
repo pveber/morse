@@ -1,6 +1,6 @@
 #' Plot Dose-response from raw data
 #' 
-#' Plots the survival rate as a function of the concentration (for a given
+#' Plots the response as a function of the concentration (for a given
 #' target time).
 #' 
 #' @param x an object used to select a method
