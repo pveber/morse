@@ -99,7 +99,7 @@ plotDoseResponse.survData <- function(x,
     
     # points
     points(transf_data_conc, x$resp,
-           pch = 16)
+           pch = 20)
     
     # segment CI
     
@@ -127,7 +127,7 @@ plotDoseResponse.survData <- function(x,
     
     # add legend
     if (addlegend) {
-      legend("bottomleft", pch = c(16, NA),
+      legend("bottomleft", pch = c(20, NA),
              lty = c(NA, 1),
              lwd = c(NA, 1),
              col = c(1, 1),
