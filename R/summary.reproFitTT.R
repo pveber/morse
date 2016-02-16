@@ -24,7 +24,7 @@
 #' \dontrun{
 #' # (3) Run the reproFitTT function with the log-logistic
 #' # model
-#' out <- reproFitTT(dat, ecx = c(5, 10, 15, 20, 30, 50, 80),
+#' out <- reproFitTT(cadmium1, ecx = c(5, 10, 15, 20, 30, 50, 80),
 #' quiet = TRUE)
 #'
 #' # (4) summarize the reproFitTT object

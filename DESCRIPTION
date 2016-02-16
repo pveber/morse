@@ -23,6 +23,7 @@ Imports:
     grid,
     gridExtra,
     methods,
+    reshape2,
     rjags,
     stats,
     stringr
