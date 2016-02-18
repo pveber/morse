@@ -274,7 +274,7 @@ survFitPlotGenericCredInt <- function(x,
     color_transparent <- adjustcolor(color, alpha.f = 0.05)
     by(dataCIm, dataCIm$variable, function(x) {
       lines(x$curv_conc, x$value, col = color_transparent)
-      })
+    })
   } else {
     polygon(c(curv_conc, rev(curv_conc)), c(cred.int[["qinf95"]],
                                             rev(cred.int[["qsup95"]])),
@@ -313,7 +313,7 @@ survFitPlotGenericCredInt <- function(x,
     # points
     points(transf_data_conc, data_resp, pch = 16)
   }
-
+  
   # fitted curve
   lines(curv_conc, curv_resp[, "resp"], type = "l", col = fitcol, lty = fitlty,
         lwd = fitlwd)
@@ -357,7 +357,17 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
       theme_minimal()
   }
   
-  plt_302 <- ggplot(data) +
+  plt_302 <- if (!is.null(spaghetti.CI)) {
+    ggplot(data) + geom_line(data = dataCIm, aes(x = curv_conc, y = value,
+                                                 group = variable),
+                             col = "gray", alpha = 0.05)
+  } else {
+    ggplot(data) + geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
+                                                     ymax = qsup95),
+                               fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
+  }
+  
+  plt_32 <- plt_302 +
     geom_line(data = data.four, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
@@ -367,19 +377,20 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
     scale_color_discrete(name = "") +
     theme_minimal()
   
-  plt_32 <- if (!is.null(spaghetti.CI)) {
-    plt_302 + geom_line(data = dataCIm, aes(x = curv_conc, y = value,
-                                            group = variable),
-                        alpha = 0.05)
-  } else {
-    plt_302 + geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
-                                                ymax = qsup95),
-                          fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
-  }
-  
   # plot IC
   # final plot
-  plt_401 <- ggplot(data) +
+  if (!is.null(spaghetti.CI)) {
+    plt_40 <- ggplot(data) +
+      geom_line(data = dataCIm, aes(x = curv_conc, y = value, group = variable),
+                col = "gray", alpha = 0.05)
+  } else {
+    plt_40 <- ggplot(data) + geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
+                                                               ymax = qsup95),
+                                         fill = valCols$cols4,
+                                         col = valCols$cols4, alpha = 0.4)
+  }
+  
+  plt_401 <- plt_40 +
     geom_line(data = data.four, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     geom_line(data = data.four, aes(conc, qsup95, color = Cred.Lim),
@@ -392,7 +403,7 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
     ggtitle(main) + theme_minimal()
   
   if (adddata) {
-    plt_40 <- plt_401 + geom_point(data = data, aes(transf_conc, resp)) +
+    plt_4 <- plt_401 + geom_point(data = data, aes(transf_conc, resp)) +
       geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
                        color = Conf.Int),
                    arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
@@ -400,18 +411,7 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
                    data.three, linetype = cilty,
                    size = cilwd, col = valCols$cols3)
   } else {
-    plt_40 <- plt_401
-  }
-  
-  if (!is.null(spaghetti.CI)) {
-    plt_4 <- plt_40 +
-      geom_line(data = dataCIm, aes(x = curv_conc, y = value, group = variable),
-                alpha = 0.05)
-  } else {
-    plt_4 <- plt_40 + geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
-                                                        ymax = qsup95),
-                                  fill = valCols$cols4,
-                                  col = valCols$cols4, alpha = 0.4)
+    plt_4 <- plt_401
   }
   
   return(list(plt_3 = if (adddata) plt_3 else NULL,
@@ -482,8 +482,8 @@ survFitPlotGG <- function(x,
     
     if (adddata) {
       grid.arrange(plt_5, arrangeGrob(mylegend_1, mylegend_3, mylegend_32,
-                                    mylegend_2, nrow = 6), ncol = 2,
-                 widths = c(6, 2))
+                                      mylegend_2, nrow = 6), ncol = 2,
+                   widths = c(6, 2))
     } else {
       grid.arrange(plt_5, arrangeGrob(mylegend_32,
                                       mylegend_2, nrow = 6), ncol = 2,
