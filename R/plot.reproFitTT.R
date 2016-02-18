@@ -303,7 +303,17 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
                            qsup95 = cred.int[["qsup95"]],
                            Cred.Lim = "Credible limits")
 
-  plt_31 <- ggplot(data.three) +
+  plt_31 <- if (!is.null(spaghetti.CI)) {
+    ggplot(data.three) + geom_line(data = dataCIm, aes(x = curv_conc, y = value,
+                                                       group = variable),
+                                   col = "gray", alpha = 0.05)
+  } else {
+    ggplot(data.three) + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
+                                                            ymax = qsup95),
+                                     fill = valCols$cols3, col = valCols$cols3, alpha = 0.4)
+  }
+  
+  plt_3 <- plt_31 +
     geom_line(data = data.three, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
     geom_line(data = data.three, aes(conc, qsup95, color = Cred.Lim),
@@ -311,20 +321,21 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
     scale_color_discrete(name = "") +
     theme_minimal()
   
-  plt_32 <- if (!is.null(spaghetti.CI)) {
-    plt_31 + geom_line(data = dataCIm, aes(x = curv_conc, y = value,
-                                           group = variable),
-                       col = "gray", alpha = 0.05)
-  } else {
-    plt_31 + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
-                                                ymax = qsup95),
-                         fill = valCols$cols3, col = valCols$cols3, alpha = 0.4)
-  }
-  
   # plot IC
   # final plot
+  
+  if (!is.null(spaghetti.CI)) {
+    plt_40 <- ggplot(data.three) +
+      geom_line(data = dataCIm, aes(x = curv_conc, y = value, group = variable),
+                col = "gray", alpha = 0.05)
+  } else {
+    plt_40 <- ggplot(data.three) + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
+                                                         ymax = qsup95),
+                                  fill = valCols$cols3,
+                                  col = valCols$cols3, alpha = 0.4)
+  }
 
-  plt_40 <- ggplot(data.three) +
+  plt_4 <- plt_40 +
     geom_line(data = data.three, aes(conc, qinf95),
               linetype = cilty, size = cilwd, color = valCols$cols3) +
     geom_line(data = data.three, aes(conc, qsup95),
@@ -335,18 +346,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
   
-  if (!is.null(spaghetti.CI)) {
-    plt_4 <- plt_40 +
-      geom_line(data = dataCIm, aes(x = curv_conc, y = value, group = variable),
-                col = "gray", alpha = 0.05)
-  } else {
-    plt_4 <- plt_40 + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
-                                                         ymax = qsup95),
-                                  fill = valCols$cols3,
-                                  col = valCols$cols3, alpha = 0.4)
-  }
-  
-  return(list(plt_32 = plt_32,
+  return(list(plt_3 = plt_3,
               plt_4 = plt_4))
 }
 
