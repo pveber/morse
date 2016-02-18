@@ -13,6 +13,8 @@
 #' prediction interval contains each observed value. 
 #' 
 #' @param x An object of class \code{survFitTT}
+#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
+#' \code{'ggplot'} style to avoid the label overlap
 #' @param style Graphical package method: \code{generic} or \code{ggplot}
 #' @param \dots Further arguments to be passed to generic methods
 #'
@@ -38,40 +40,41 @@
 #' @importFrom graphics plot
 #' 
 #' @export
-ppc.survFitTT <- function(x, style = "generic", ...) {
+ppc.survFitTT <- function(x, remove.someLabels = FALSE,
+                          style = "generic", ...) {
   if (!is(x, "survFitTT"))
     stop("x is not of class 'survFitTT'!")
   
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
-
-  ppc_gen(EvalsurvPpc(x), style, xlab, ylab)
+  
+  ppc_gen(EvalsurvPpc(x), style, xlab, ylab, remove.someLabels)
 }
 
-ppc_gen <- function(tab, style, xlab, ylab) {
-
+ppc_gen <- function(tab, style, xlab, ylab, remove.someLabels) {
+  
   if (style == "generic") PpcGeneric(tab, xlab, ylab)
-  else if (style == "ggplot") PpcGG(tab, xlab, ylab)
+  else if (style == "ggplot") PpcGG(tab, xlab, ylab, remove.someLabels)
   else stop("Unknown style")
 }
 
 #' @importFrom stats rbinom quantile
 EvalsurvPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
-
+  
   if (x$det.part == "loglogisticbinom_3") {
     d <- sample(tot.mcmc[, "d"], 5000)
   }
-
+  
   b <- 10^sample(tot.mcmc[, "log10b"], 5000)
   e <- 10^sample(tot.mcmc[, "log10e"], 5000)
-
+  
   n <- x$jags.data$n
   xconc <- x$jags.data$xconc
   Ninit <- x$jags.data$Ninit
   NsurvObs <- x$jags.data$Nsurv
   NsurvPred <- matrix(NA, nrow = 5000, ncol = n)
-
+  
   if (x$det.part == "loglogisticbinom_2") {
     for (i in 1:n) {
       p <- 1 / (1 + (xconc[i]/e)^b)
@@ -92,7 +95,7 @@ EvalsurvPpc <- function(x) {
                                    QNsurvPred[,"97.5%"] < NsurvObs,
                                  "red", "green"))
   colnames(tab) <- c("P2.5", "P50", "P97.5", "Ninit", "Obs", "col")
-
+  
   return(tab)
 }
 
@@ -103,7 +106,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
   stepX <- stepCalc(obs_val)$stepX
   jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)$jitterObs
   spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
-
+  
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
        type = "n",
@@ -140,14 +143,14 @@ PpcGeneric <- function(tab, xlab, ylab) {
   segments(jittered_obs - delta, tab0[, "P97.5"],
            jittered_obs + delta, tab0[, "P97.5"],
            col = as.character(tab0[, "col"]))
-
+  
   points(jittered_obs, tab0[, "P50"],
          pch = 20)
 }
 
 #' @import ggplot2
 #' @importFrom  grid arrow unit
-PpcGG <- function(tab, xlab, ylab) {
+PpcGG <- function(tab, xlab, ylab, remove.someLabels) {
   obs_val <- unique(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
@@ -155,17 +158,25 @@ PpcGG <- function(tab, xlab, ylab) {
   spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
   
   tab0 <- cbind(tab[order(tab$Obs),], jittered_obs)
-
+  
   df <- data.frame(sObs, spaceX)
   
   gf1 <- ggplot(df) +
     geom_segment(aes(x = sObs - (spaceX * 1.25),
                      xend = sObs + (spaceX * 1.25),
                      y = sObs, yend = sObs)) +
-    scale_x_continuous(breaks = c(0, tab0[, "Obs"]),
-                       labels = c(0, tab0[, "Obs"])) +
-    scale_y_continuous(breaks = c(0, tab0[, "Obs"]),
-                       labels = c(0, tab0[, "Obs"]))
+    scale_x_continuous(breaks = unique(c(0, tab0[, "Obs"])),
+                       labels = if (remove.someLabels) {
+                         exclude_labels(unique(c(0, tab0[, "Obs"])))
+                       } else {
+                         unique(c(0, tab0[, "Obs"]))
+                       }) +
+    scale_y_continuous(breaks = unique(c(0, tab0[, "Obs"])),
+                       labels = if (remove.someLabels) {
+                         exclude_labels(unique(c(0, tab0[, "Obs"])))
+                       } else {
+                         unique(c(0, tab0[, "Obs"]))
+                       })
   
   gf2 <- gf1 +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
