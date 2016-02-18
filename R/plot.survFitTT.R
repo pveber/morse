@@ -9,15 +9,17 @@
 #' rate} at each tested concentration. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
-#' The function plots both credible intervals for the estimated survival rate
-#' (by default the red area around the fitted curve) and confidence intervals for
-#' the observed survival rate (as black error bars if \code{adddata = TRUE}).
+#' The function plots both 95 \% credible intervals for the estimated survival
+#' rate (by default the red area around the fitted curve) and 95 \% confidence
+#' intervals for the observed survival rate (as black error bars if
+#' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two intervals.
-#' If \code{spaghetti = TRUE} the credible intervals for the estimated survival
-#' rate is represented by multiple curve estimated from 10 \% of the mcmc chains.
-#' The opacity / transparency of the ribbon give a estimation of the density of
-#' estimated survival rate.
+#' If spaghetti = TRUE, the credible intervals are represented by two dotted
+#' lines limiting the credible band, and a spaghetti plot is added to this band.
+#' It consists of the representation of simulated curves using parameter values
+#' sampled in the posterior distribution (10% of the MCMC chains are randomly
+#' taken for this sample).
 #'
 #' @param x an object of class \code{survFitTT}
 #' @param xlab a title for the \eqn{x}-axis
@@ -26,7 +28,7 @@
 #' @param fitcol color of the fitted curve
 #' @param fitlty line type of the fitted curve
 #' @param fitlwd width of the fitted curve
-#' @param spaghetti if \code{TRUE}, the credible interval is draw by  multiple
+#' @param spaghetti if \code{TRUE}, the credible interval is drawn by  multiple
 #' curves
 #' @param cicol color of the 95 \% credible interval limits
 #' @param cilty line type for the 95 \% credible interval limits

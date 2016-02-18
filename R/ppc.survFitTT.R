@@ -1,15 +1,16 @@
 #' Posterior predictive check plot for survFitTT objects
 #'
-#' The \code{ppc} function plot the observed versus predicted values for the
-#' \code{survFitTT} objects.
+#' The \code{ppc} function plots the predicted values with 95% credible intervals
+#' versus the observed values for \code{survFitTT} objects.
 #' 
-#' The coordinates of black points are the obseved value of the number of survivor
-#' (poolled replicates) for a given concentration versus the point estimates
-#' (predicted value).
-#' The 95 \% prediction intervals containing the corresponding observed value are
-#' colored in green and the others are colored in red.
-#' To do a better representation, the line 0, 1 is represented by steps if the
-#' number of observed values is less than 20.
+#' The coordinates of black points are the observed values of the number of survivor
+#' (poolled replicates) for a given concentration (x-scale) and the corresponding 
+#' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
+#' value, colored in green if this interval contains the observed value and in red
+#' in the other case.
+#' The bisecting line (y = x) is added to the plot in order to see if each
+#' prediction interval contains each observed value. As replicates are shifted
+#' on the x-axis, this line is represented by steps.
 #'
 #' @param x An object of class \code{survFitTT}
 #' @param style Graphical package method: \code{generic} or \code{ggplot}

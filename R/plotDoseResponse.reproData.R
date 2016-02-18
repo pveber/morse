@@ -1,11 +1,14 @@
 #' Plotting method for \code{reproData} objects
 #'
-#' Plots the reproduction rate as a function of concentration (for a given target
-#' time).
+#' Plots the number of offspring per individual-days as a function of concentration
+#' (for a given target time).
 #' 
-#' The function plots the observed values of the repoduction rate for a given
-#' time as a function of mesured concentration with the 95 \% confidence
-#' interval.
+#' The function plots the observed values of the reproduction rate (number of
+#' reproduction outputs per individual-day) for a given time as a function of
+#' concentration. The 95% Poisson confidence interval is added to each reproduction
+#' rate. It is calculated using function pois.exact{epitools}. As replicates are
+#' not pooled in this plot, overlapped points are shifted on the x-axis to help
+#' the visualization of replicates.
 #'
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
