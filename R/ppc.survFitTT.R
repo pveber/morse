@@ -1,16 +1,17 @@
 #' Posterior predictive check plot for survFitTT objects
 #'
-#' The \code{ppc} function plot the observed versus predicted values for the
-#' \code{survFitTT} objects.
+#' The \code{ppc} function plots the predicted values with 95% credible intervals
+#' versus the observed values for \code{survFitTT} objects.
 #' 
-#' The coordinates of black points are the obseved value of the number of survivor
-#' (poolled replicates) for a given concentration versus the point estimates
-#' (predicted value).
-#' The 95 \% prediction intervals containing the corresponding observed value are
-#' colored in green and the others are colored in red.
-#' To do a better representation, the line 0, 1 is represented by steps if the
-#' number of observed values is less than 20.
-#'
+#' The coordinates of black points are the observed values of the number of survivor
+#' (poolled replicates) for a given concentration (x-scale) and the corresponding 
+#' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
+#' value, colored in green if this interval contains the observed value and in red
+#' in the other case.
+#' As replicates are shifted on the x-axis, the bisecting line (y = x), is
+#' represented by steps, and is added to the plot in order to see if each
+#' prediction interval contains each observed value. 
+#' 
 #' @param x An object of class \code{survFitTT}
 #' @param style Graphical package method: \code{generic} or \code{ggplot}
 #' @param \dots Further arguments to be passed to generic methods
@@ -123,14 +124,10 @@ PpcGeneric <- function(tab, xlab, ylab) {
     pretty(c(0, max(tab[, "P97.5"])))
   })
   
-  if (max(sObs) < 20) {
-    sapply(1:length(sObs), function(i) {
-      segments(sObs[i] - (spaceX * 1.25), sObs[i],
-               sObs[i] + (spaceX * 1.25), sObs[i])
-    })
-  } else {
-    abline(0, 1)
-  }
+  sapply(1:length(sObs), function(i) {
+    segments(sObs[i] - (spaceX * 1.25), sObs[i],
+             sObs[i] + (spaceX * 1.25), sObs[i])
+  })
   
   tab0 <- tab[order(tab$Obs),]
   delta <- 0.01 * (max(obs_val) - min(obs_val))
@@ -161,19 +158,14 @@ PpcGG <- function(tab, xlab, ylab) {
 
   df <- data.frame(sObs, spaceX)
   
-  if (max(sObs) < 20) {
-    gf1 <- ggplot(df) +
-      geom_segment(aes(x = sObs - (spaceX * 1.25),
-                       xend = sObs + (spaceX * 1.25),
-                       y = sObs, yend = sObs)) +
-      scale_x_continuous(breaks = c(0, tab0[, "Obs"]),
-                         labels = c(0, tab0[, "Obs"])) +
-      scale_y_continuous(breaks = c(0, tab0[, "Obs"]),
-                         labels = c(0, tab0[, "Obs"]))
-  } else {
-    gf1 <- ggplot(tab0) +
-      geom_abline(intercept = 0, slope = 1)
-  }
+  gf1 <- ggplot(df) +
+    geom_segment(aes(x = sObs - (spaceX * 1.25),
+                     xend = sObs + (spaceX * 1.25),
+                     y = sObs, yend = sObs)) +
+    scale_x_continuous(breaks = c(0, tab0[, "Obs"]),
+                       labels = c(0, tab0[, "Obs"])) +
+    scale_y_continuous(breaks = c(0, tab0[, "Obs"]),
+                       labels = c(0, tab0[, "Obs"]))
   
   gf2 <- gf1 +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
