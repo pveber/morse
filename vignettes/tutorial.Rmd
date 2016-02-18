@@ -283,16 +283,3 @@ a point estimate of the parameters, it is typical to compute the mean or median
 of the posterior and quantify the uncertainty by reporting the standard
 deviation or inter-quantile distance.
 
-
-<!--
-* Step five, check the obseved versus predicted values
-  
-The function `ppc()` plots the observed versus predicted values with the 95 \% 
-credible intervale for each predicted values.
-
-```{r, cache=TRUE, eval=FALSE}
-ppc(out, style = "ggplot")
-```
-
--->
-
