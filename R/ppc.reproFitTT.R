@@ -14,6 +14,8 @@
 #' in order to see if each prediction interval contains each observed value.
 #'
 #' @param x An object of class \code{reproFitTT}
+#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
+#' \code{'ggplot'} style to avoid the label overlap
 #' @param style Graphical package method: \code{generic} or \code{ggplot}
 #' @param \dots Further arguments to be passed to generic methods
 #'
@@ -39,14 +41,15 @@
 #' @importFrom graphics plot
 #'
 #' @export
-ppc.reproFitTT <- function(x, style = "generic", ...) {
+ppc.reproFitTT <- function(x, remove.someLabels = FALSE,
+                           style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
   
   xlab <- "Observed Cumul. Nbr. of offspring"
   ylab <- "Predicted Cumul. Nbr. of offspring"
 
-  ppc_gen(EvalreproPpc(x), style, xlab, ylab)
+  ppc_gen(EvalreproPpc(x), style, xlab, ylab, remove.someLabels)
 }
 
 

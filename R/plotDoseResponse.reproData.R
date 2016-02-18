@@ -99,7 +99,7 @@ plotDoseResponse.reproData <- function(x,
                                display.conc, ylim, axis, addlegend)
   else if (style == "ggplot")
     reproDoseResponseCIGG(x, conc_val, jittered_conc, transf_data_conc,
-                          display.conc, addlegend)
+                          display.conc, addlegend, remove.someLabels)
   else stop("Unknown style")
 }
 
@@ -145,7 +145,7 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
 }
 
 reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
-                                  display.conc, addlegend) {
+                                  display.conc, addlegend, remove.someLabels) {
   
   x0 <- cbind(x[order(x$conc),], jittered_conc = as.vector(jittered_conc))
   
@@ -163,20 +163,25 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
   valCols <- fCols(df, fitcol = NA, cicol = NA, "repro")
   
   gf <- ggplot(dfCI) + geom_segment(aes(x = jittered_conc, xend = jittered_conc,
-                                      y = reproRateInf, yend = reproRateSup,
-                                      linetype = Conf.Int),
-                                  data = dfCI,
-                                  arrow = arrow(length = unit(0.1, "cm"),
-                                                angle = 90, ends = "both"),
-                                  col = valCols$cols4) +
+                                        y = reproRateInf, yend = reproRateSup,
+                                        linetype = Conf.Int),
+                                    data = dfCI,
+                                    arrow = arrow(length = unit(0.1, "cm"),
+                                                  angle = 90, ends = "both"),
+                                    col = valCols$cols4) +
     geom_point(aes(x = jittered_conc, y = resp, fill = Points), df,
                col = valCols$cols1) +
     scale_fill_hue("") +
     scale_linetype(name = "") +
-    scale_x_continuous(breaks = transf_data_conc,
-                       labels = display.conc) +
     expand_limits(y = 0) +
     labs(x = "Concentration", y = "Reproduction rate") +
+    scale_x_continuous(breaks = unique(transf_data_conc),
+                       labels = if (remove.someLabels) {
+                         exclude_labels(unique(display.conc))
+                       } else {
+                         unique(display.conc)
+                       }
+    ) +
     theme_minimal()
   
   if (addlegend) {

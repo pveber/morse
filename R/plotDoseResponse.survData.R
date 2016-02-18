@@ -167,11 +167,11 @@ plotDoseResponse.survData <- function(x,
       theme_minimal() +
       labs(x = xlab,
            y = ylab) +
-      scale_x_continuous(breaks = df$transf_data_conc,
+      scale_x_continuous(breaks = unique(df$transf_data_conc),
                          labels = if (remove.someLabels) {
-                           exclude_labels(df$display.conc)
+                           exclude_labels(unique(df$display.conc))
                          } else {
-                           df$display.conc
+                           unique(df$display.conc)
                          }
       ) +
       scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$resp)))))) +

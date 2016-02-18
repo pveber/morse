@@ -275,7 +275,8 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
                                                  cred.int[["qsup95"]])) + 0.01),
                                target.time = unique(x$dataTT$time),
                                style = "generic",
-                               log.scale = log.scale, addlegend = FALSE, 
+                               log.scale = log.scale, addlegend = FALSE,
+                               remove.someLabels = FALSE,
                                axis = FALSE)
   }
   

@@ -237,7 +237,7 @@ plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE)
 ```
 
 ```{r, cache=TRUE}
-ppc(fit, style = "ggplot")
+ppc(fit, style = "ggplot", remove.someLabels = TRUE)
 ```
 As in survival analysis, we assume that the reproduction rate per individual-day
 is a log-logistic function of the concentration. More details and parameter
@@ -282,17 +282,4 @@ the parameters after seeing the data and combining it with the prior. To obtain
 a point estimate of the parameters, it is typical to compute the mean or median
 of the posterior and quantify the uncertainty by reporting the standard
 deviation or inter-quantile distance.
-
-
-<!--
-* Step five, check the obseved versus predicted values
-  
-The function `ppc()` plots the observed versus predicted values with the 95 \% 
-credible intervale for each predicted values.
-
-```{r, cache=TRUE, eval=FALSE}
-ppc(out, style = "ggplot")
-```
-
--->
 
