@@ -12,25 +12,7 @@
 #' parameter estimates of the exposure-response model and estimates of the so-called
 #' LCx, that is the concentration of pollutant required to obtain an 1 - x survival
 #' rate.
-#'
-#'
-#'
-# \describe{
-# Credible limits: For 100 values of concentrations regularly spread within
-# the range of tested concentrations the joint posterior distribution of
-# parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
-# offspring per individual-day for various replicates. For each concentration,
-# 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
-# there is a point estimate and a 95 \% credible interval (Delignette-Muller
-# et al., 2014).
-#
-# Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
-# control diagnostic based on a criterion that calculates the appropriate
-# number of iterations required to accurately estimate the parameter
-# quantiles. The Raftery and Lewis's diagnostic value used in the
-# \code{surFitTT} function is the \code{resmatrix} object. See the
-# \code{\link[coda]{raftery.diag}} help for more details.
-#
+#' 
 #' @param data an object of class \code{survData}
 #' @param target.time the chosen endpoint to evaluate the effect of a given
 #' concentration of pollutant, by default the last time point available for
@@ -58,7 +40,9 @@
 #' \item{n.iter}{a list of two indices indicating the beginning and end of
 #' monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
-#'
+#' \item{jags.data}{a list a the data passed to the jags model}
+#' \item{transformed.data}{the \code{survData} object passed to the function}
+#' \item{dataTT}{the dataset with which one the parameters are estimated}
 #'
 # @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}}
 # \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
