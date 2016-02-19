@@ -18,7 +18,7 @@
 #' If spaghetti = TRUE, the credible intervals are represented by two dotted
 #' lines limiting the credible band, and a spaghetti plot is added to this band.
 #' It consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (10% of the MCMC chains are randomly
+#' sampled in the posterior distribution (10 \% of the MCMC chains are randomly
 #' taken for this sample).
 #'
 #' @param x an object of class \code{survFitTT}
