@@ -44,17 +44,6 @@
 #' \item{transformed.data}{the \code{survData} object passed to the function}
 #' \item{dataTT}{the dataset with which one the parameters are estimated}
 #'
-# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}}
-# \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
-# \code{\link[ggplot2]{ggplot}}
-#
-# @references Plummer, M. (2013) JAGS Version 4.0.0 user manual.
-# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
-#
-# Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
-# measures of model complexity and fit (with discussion).  \emph{Journal of
-# the Royal Statistical Society}, Series B 64, 583-639.
-#
 #' @keywords estimation
 #
 #' @examples
