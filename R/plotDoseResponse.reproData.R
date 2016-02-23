@@ -5,10 +5,11 @@
 #' 
 #' The function plots the observed values of the reproduction rate (number of
 #' reproduction outputs per individual-day) for a given time as a function of
-#' concentration. The 95% Poisson confidence interval is added to each reproduction
-#' rate. It is calculated using function pois.exact{epitools}. As replicates are
-#' not pooled in this plot, overlapped points are shifted on the x-axis to help
-#' the visualization of replicates.
+#' concentration. The 95 \% Poisson confidence interval is added to each reproduction
+#' rate. It is calculated using function \code{\link[epitools]{pois.exact}}
+#' from package \code{epitools}.
+#' As replicates are not pooled in this plot, overlapped points are shifted on
+#' the x-axis to help the visualization of replicates.
 #'
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)
@@ -24,8 +25,10 @@
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @note When \code{style = "ggplot"}, the function calls package
+#' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
+#' 
+#' @seealso \code{\link[epitools]{pois.exact}}
 #'
 #' @keywords plot
 #'

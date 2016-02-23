@@ -17,7 +17,7 @@
 #' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @note When \code{style = "ggplot"}, the function calls package
+#' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #'
 #' @keywords plot

@@ -5,7 +5,8 @@
 #' 
 #' The function plots the observed values of the survival rate for a given time
 #' as a function of concentration. The 95 \% binomial confidence interval is added
-#' to each survival rate. It is calculated using function binom.test{stats}.
+#' to each survival rate. It is calculated using function
+#' \code{\link[stats]{binom.test}} from package \code{stats}.
 #' Replicates are systematically pooled in this plot.
 #'
 #' @param x an object of class \code{survData}
@@ -20,8 +21,10 @@
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @note When \code{style = "ggplot"}, the function calls package
+#' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
+#' 
+#' @seealso \code{\link[stats]{binom.test}}
 #'
 #' @keywords plot
 #'

@@ -38,7 +38,7 @@
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @note When \code{style = "ggplot"}, the function calls package
+#' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
 #' 

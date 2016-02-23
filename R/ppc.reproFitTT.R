@@ -1,11 +1,11 @@
 #' Posterior predictive check plot for reproFitTT objects
 #'
-#' The \code{ppc} function plots the predicted values with 95\% credible intervals
+#' The \code{ppc} function plots the predicted values with 95 \% credible intervals
 #' versus the observed values for \code{reproFitTT} objects.
 #' 
 #' The coordinates of black points are the observed values of the cumulated number
 #' of reproduction outputs for a given concentration (x-scale) and the corresponding 
-#' predicted values (y-scale). 95% prediction intervals are added to each predicted
+#' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
 #' value, colored in green if this interval contains the observed value and in red
 #' in the other case.
 #' As replicates are not pooled in this plot, overlapped points
