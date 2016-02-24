@@ -5,7 +5,7 @@ Version 2.2.0
 
 NEW FEATURES
 - the method plotDoseResponse replaces the plot.survData and plot.reproData
-  when the argument target.time was set. Now te response is expressed in
+  when the argument target.time was set. Now the response is expressed in
   survival rate or in number of offspring per individual-days.
 - the calcul of the mean fitted curve of 'plot.reproFitTT' and 'plot.survFitTT'
   is the same of the 95 % Credible limits.
@@ -13,8 +13,8 @@ NEW FEATURES
   credible limites was allways plotted.
 - added a new argument 'adddata' in 'plot.reproFitTT' and 'plot.survFitTT'
   to draw the datas with theyre confidence interval.
-- added a new argument 'spaghetti' in 'plot.reproFitTT' and 'plot.survFitTT'
-  to draw the credible interval as as multiple curve.
+- add a new argument 'spaghetti' in 'plot.reproFitTT' and 'plot.survFitTT'
+  to draw the credible interval as multiple curves.
 
 Version 2.1.1
 =============
