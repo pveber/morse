@@ -99,16 +99,16 @@ plotDoseResponse.reproData <- function(x,
   
   if (style == "generic")
     reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
-                               display.conc, ylim, axis, addlegend)
+                               display.conc, ylim, axis, main, addlegend)
   else if (style == "ggplot")
     reproDoseResponseCIGG(x, conc_val, jittered_conc, transf_data_conc,
-                          display.conc, addlegend, remove.someLabels)
+                          display.conc, main, addlegend, remove.someLabels)
   else stop("Unknown style")
 }
 
 reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
                                        transf_data_conc, display.conc, ylim,
-                                       axis, addlegend) {
+                                       axis, main, addlegend) {
   
   if (is.null(ylim)) ylim <- c(0, max(x$reproRateSup))
   plot(jittered_conc, x$resp,
@@ -116,6 +116,7 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
        type = "n",
        xaxt = "n",
        yaxt = "n",
+       main = main,
        xlab = if (axis) { "Concentration" } else "",
        ylab = if (axis) { "Reproduction rate"} else "")
   
@@ -148,7 +149,8 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
 }
 
 reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
-                                  display.conc, addlegend, remove.someLabels) {
+                                  display.conc, main, addlegend,
+                                  remove.someLabels) {
   
   x0 <- cbind(x[order(x$conc),], jittered_conc = as.vector(jittered_conc))
   
@@ -177,6 +179,7 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
     scale_fill_hue("") +
     scale_linetype(name = "") +
     expand_limits(y = 0) +
+    ggtitle(main) +
     labs(x = "Concentration", y = "Reproduction rate") +
     scale_x_continuous(breaks = unique(transf_data_conc),
                        labels = if (remove.someLabels) {
