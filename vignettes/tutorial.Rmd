@@ -218,7 +218,7 @@ plot(dat, style = "ggplot", pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
 
-# (5) represente the reproduction rate as a function of concentration
+# (5) represent the reproduction rate as a function of concentration
 plotDoseResponse(dat, target.time = 56, style = "ggplot")
 
 # (6) check information on the experimental design
@@ -233,7 +233,8 @@ summary(fit)
 ```
 
 ```{r, cache=TRUE}
-plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE)
+plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
+     addlegend = TRUE)
 ```
 
 ```{r, cache=TRUE}
