@@ -145,7 +145,7 @@ plotDoseResponse.survData <- function(x,
   }
   else if (style == "ggplot") {
     # colors
-    valCols <- fCols(x, fitcol = NA, cicol = NA, "surv")
+    valCols <- fCols(x, fitcol = NA, cicol = NA)
     
     df <- data.frame(x,
                      transf_data_conc,

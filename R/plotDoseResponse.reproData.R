@@ -165,7 +165,7 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
                      Conf.Int = "Confidence interval")
   
   # colors
-  valCols <- fCols(df, fitcol = NA, cicol = NA, "repro")
+  valCols <- fCols(df, fitcol = NA, cicol = NA)
   
   gf <- ggplot(dfCI) + geom_segment(aes(x = jittered_conc, xend = jittered_conc,
                                         y = reproRateInf, yend = reproRateSup,
@@ -173,7 +173,7 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
                                     data = dfCI,
                                     arrow = arrow(length = unit(0.1, "cm"),
                                                   angle = 90, ends = "both"),
-                                    col = valCols$cols4) +
+                                    col = valCols$cols3) +
     geom_point(aes(x = jittered_conc, y = resp, fill = Points), df,
                col = valCols$cols1) +
     scale_fill_hue("") +
