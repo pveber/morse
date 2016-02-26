@@ -156,46 +156,25 @@ legendGgplotFit <- function(a.gplot) {
   return(legend)
 }
 
-fCols <- function(data, fitcol, cicol, analyse) {
+fCols <- function(data, fitcol, cicol) {
   
-  if (analyse == "surv") {
-    #points
-    cols1 <- "black"
-    names(cols1) <- unique(data$Points)
-    # curve
-    cols2 <- fitcol
-    names(cols2) <- "loglogistic"
-    # CI
-    cols3 <- "black"
-    names(cols3) <- "Confidence interval"
-    # CI2
-    cols4 <- cicol
-    names(cols4) <- "Credible limits"
-    
-    return(list(cols1 = cols1,
-                cols2 = cols2,
-                cols3 = cols3,
-                cols4 = cols4))
-           
-    } else if (analyse == "repro") {
-      #points
-      cols1 <- "black"
-      names(cols1) <- unique(data$Points)
-    # fitted curve
-    cols2 <- fitcol
-    names(cols2) <- "loglogistic"
-    # CI
-    cols3 <- cicol
-    names(cols3) <- "Credible limits"
-    # CI2
-    cols4 <- "black"
-    names(cols4) <- "Confidence interval"
-    
-    return(list(cols1 = cols1,
-                cols2 = cols2,
-                cols3 = cols3,
-                cols4 = cols4))
-    }
+  # points
+  cols1 <- "black"
+  names(cols1) <- unique(data$Points)
+  # curve
+  cols2 <- fitcol
+  names(cols2) <- "loglogistic"
+  # Conf Int
+  cols3 <- "black"
+  names(cols3) <- "Confidence interval"
+  # Cred Int
+  cols4 <- cicol
+  names(cols4) <- "Credible limits"
+  
+  return(list(cols1 = cols1,
+              cols2 = cols2,
+              cols3 = cols3,
+              cols4 = cols4))
 }
 
 exclude_labels <- function(x) {
