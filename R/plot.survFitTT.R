@@ -258,11 +258,12 @@ survFitPlotGenericCredInt <- function(x,
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(conf.int["qsup95",]) + 0.01),
+       ylim = c(0, 1.01),
        type = "n")
   
   # axis
-  axis(side = 2, at = pretty(c(0, max(conf.int["qsup95",]))))
+  axis(side = 2, at = pretty(c(0, max(c(conf.int["qsup95",],
+                                        cred.int[["qsup95"]])))))
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
@@ -325,7 +326,7 @@ survFitPlotGenericCredInt <- function(x,
            lwd = c(NA, ifelse(adddata,1, NA), cilwd, fitlwd),
            col = c(ifelse(adddata, 1, NA), 1, cicol, fitcol),
            legend = c(ifelse(adddata, "Observed values", NA),
-                      ifelse(adddata, "Confidence interval", "NA"),
+                      ifelse(adddata, "Confidence interval", NA),
                       "Credible limits", x$det.part),
            bty = "n")
   }
