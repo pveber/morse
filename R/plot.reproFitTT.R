@@ -310,7 +310,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
   } else {
     ggplot(data.three) + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
                                                             ymax = qsup95),
-                                     fill = valCols$cols3, col = valCols$cols3, alpha = 0.4)
+                                     fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
   }
   
   plt_3 <- plt_31 +
@@ -318,7 +318,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
               linetype = cilty, size = cilwd) +
     geom_line(data = data.three, aes(conc, qsup95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
-    scale_color_discrete(name = "") +
+    scale_color_manual("", values = valCols$cols4) +
     theme_minimal()
   
   # plot IC
@@ -331,15 +331,15 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
   } else {
     plt_40 <- ggplot(data.three) + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
                                                          ymax = qsup95),
-                                  fill = valCols$cols3,
-                                  col = valCols$cols3, alpha = 0.4)
+                                  fill = valCols$cols4,
+                                  col = valCols$cols4, alpha = 0.4)
   }
 
   plt_4 <- plt_40 +
     geom_line(data = data.three, aes(conc, qinf95),
-              linetype = cilty, size = cilwd, color = valCols$cols3) +
+              linetype = cilty, size = cilwd, color = valCols$cols4) +
     geom_line(data = data.three, aes(conc, qsup95),
-              linetype = cilty, size = cilwd, color = valCols$cols3) +
+              linetype = cilty, size = cilwd, color = valCols$cols4) +
     geom_line(aes(conc, resp), curv_resp,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
     ylim(0, max(cred.int[["qsup95"]]) + 0.2) +
@@ -364,7 +364,7 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
   
   # dataframes points (data) and curve (curv)
   # colors
-  valCols <- fCols(curv_resp, fitcol, cicol, "repro")
+  valCols <- fCols(curv_resp, fitcol, cicol)
   
   if (adddata) {
     plt_1 <- plotDoseResponse.reproData(x = x$transformed.data,
