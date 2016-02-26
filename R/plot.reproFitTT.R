@@ -212,7 +212,8 @@ reproSpaghetti <- function(fit, x) {
     }
     else if (fit$model.label == "GP") {
       dtheotemp[, i] <- d2[i] / (1 + (x / e2[i])^(b2[i])) # mean curve
-      dtheo[, i] <- rgamma(n = length(x), shape = dtheotemp[, i] / omega2[i], rate = 1 / omega2[i])
+      dtheo[, i] <- rgamma(n = length(x), shape = dtheotemp[, i] / omega2[i],
+                           rate = 1 / omega2[i])
     }
   }
   dtheof <- as.data.frame(cbind(x, dtheo))
@@ -236,11 +237,15 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, max(c(data_resp, cred.int[["qsup95"]])) + 0.01),
+       ylim = c(0, ifelse(!is.null(dataCIm),
+                          max(dataCIm$value),
+                          max(cred.int$qsup95)) + 0.01),
        type = "n")
   
   # axis
-  axis(side = 2, at = pretty(c(0, max(cred.int[["qsup95"]]))))
+  axis(side = 2, at = pretty(c(0, ifelse(!is.null(dataCIm),
+                                         max(dataCIm$value),
+                                         max(cred.int$qsup95)))))
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
@@ -271,8 +276,10 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
   if (adddata) {
     par(new = TRUE)
     plotDoseResponse.reproData(x = x$transformed.data,
-                               ylim = c(0, max(c(data_resp,
-                                                 cred.int[["qsup95"]])) + 0.01),
+                               ylim = c(0,
+                                        ifelse(!is.null(dataCIm),
+                                               max(dataCIm$value),
+                                               max(cred.int$qsup95)) + 0.01),
                                target.time = unique(x$dataTT$time),
                                style = "generic",
                                log.scale = log.scale, addlegend = FALSE,
@@ -302,15 +309,17 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
                            qinf95 = cred.int[["qinf95"]],
                            qsup95 = cred.int[["qsup95"]],
                            Cred.Lim = "Credible limits")
-
+  
   plt_31 <- if (!is.null(spaghetti.CI)) {
     ggplot(data.three) + geom_line(data = dataCIm, aes(x = curv_conc, y = value,
                                                        group = variable),
                                    col = "gray", alpha = 0.05)
   } else {
-    ggplot(data.three) + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
+    ggplot(data.three) + geom_ribbon(data = data.three, aes(x = conc,
+                                                            ymin = qinf95,
                                                             ymax = qsup95),
-                                     fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
+                                     fill = valCols$cols4, col = valCols$cols4,
+                                     alpha = 0.4)
   }
   
   plt_3 <- plt_31 +
@@ -329,12 +338,14 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
       geom_line(data = dataCIm, aes(x = curv_conc, y = value, group = variable),
                 col = "gray", alpha = 0.05)
   } else {
-    plt_40 <- ggplot(data.three) + geom_ribbon(data = data.three, aes(x = conc, ymin = qinf95,
-                                                         ymax = qsup95),
-                                  fill = valCols$cols4,
-                                  col = valCols$cols4, alpha = 0.4)
+    plt_40 <- ggplot(data.three) + geom_ribbon(data = data.three,
+                                               aes(x = conc,
+                                                   ymin = qinf95,
+                                                   ymax = qsup95),
+                                               fill = valCols$cols4,
+                                               col = valCols$cols4, alpha = 0.4)
   }
-
+  
   plt_4 <- plt_40 +
     geom_line(data = data.three, aes(conc, qinf95),
               linetype = cilty, size = cilwd, color = valCols$cols4) +
@@ -342,7 +353,9 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
               linetype = cilty, size = cilwd, color = valCols$cols4) +
     geom_line(aes(conc, resp), curv_resp,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
-    ylim(0, max(cred.int[["qsup95"]]) + 0.2) +
+    ylim(0, ifelse(!is.null(dataCIm),
+                   max(dataCIm$value),
+                   max(cred.int$qsup95)) + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
   
