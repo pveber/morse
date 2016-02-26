@@ -99,7 +99,7 @@ NULL
 #' value of dynamic modelling in predictive ecotoxicology, \emph{Ecotoxicology
 #' and Environmental Safety}, 75, 80-86.
 #' @keywords datasets
-NULL
+"cadmium1"
 
 
 
@@ -139,7 +139,7 @@ NULL
 #' the pond snail Lymnaea stagnalis (Mollusca, Gastropoda),
 #' \emph{Regulatory Toxicology and Pharmacology}, 70(3), 605-14.
 #' @keywords datasets
-NULL
+"cadmium2"
 
 
 
@@ -173,7 +173,7 @@ NULL
 #' and bioaccumulation of chlordan in Daphnia magna, \emph{Environmental
 #' Toxicology and Chemistry}, 28, 2150-2159.
 #' @keywords datasets
-NULL
+"chlordan"
 
 
 
@@ -207,7 +207,7 @@ NULL
 #' Charles, S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords datasets
-NULL
+"copper"
 
 
 
@@ -245,4 +245,4 @@ NULL
 #' Charles S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords datasets
-NULL
+"zinc"
