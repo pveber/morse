@@ -31,7 +31,6 @@
 #'
 #' # (2) Create an object of class "reproData"
 #' dat <- reproData(cadmium1)
-#' dat
 #' class(dat)
 #'
 #' @export
