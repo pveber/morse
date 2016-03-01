@@ -52,6 +52,29 @@
 #'
 #' @keywords plot
 #' 
+#' @examples
+#'
+#' # (1) Load the data
+#' data(cadmium1)
+#'
+#' # (2) Create an object of class "reproData"
+#' dat <- reproData(cadmium1)
+#'
+#' \dontrun{
+#' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
+#' out <- reproFitTT(dat, stoc.part = "gammapoisson",
+#'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
+#'
+#' # (4) Plot the fitted curve with credible limits
+#' plot(out, log.scale = TRUE, adddata = TRUE,
+#'      main = "log-logistic gamma-poisson model")
+#'
+#' # (5) Plot the fitted curve with ggplot style
+#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
+#'      fitcol = "blue", adddata = TRUE, cicol = "blue", style = "ggplot",
+#'      main = "Log-logistic response to concentration")
+#' }
+#' 
 #' @export
 plot.reproFitTT <- function(x,
                             xlab = "Concentration",

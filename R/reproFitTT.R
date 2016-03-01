@@ -62,20 +62,6 @@
 #' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
 #' out <- reproFitTT(dat, stoc.part = "gammapoisson",
 #'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
-#'
-#' # (4) Summary look the estimated values (ECx and parameters)
-#' out$estim.ECx
-#' out$estim.par
-#'
-#' # (5) Plot the fitted curve with credible limits
-#' plot(out, log.scale = TRUE, adddata = TRUE,
-#'      main = "log-logistic gamma-poisson model")
-#'
-#' # (6) Plot the fitted curve with ggplot style
-#' require("ggplot2")
-#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", adddata = TRUE, cicol = "blue", style = "ggplot",
-#'      main = "Log-logistic response to concentration")
 #' }
 #'
 #' @import rjags
