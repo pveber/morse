@@ -59,19 +59,6 @@
 #' #     binomial model
 #' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
 #'                  quiet = TRUE)
-#'
-#' # (4) Summary look the estimated values (LCx and parameters)
-#' out$estim.LCx
-#' out$estim.par
-#'
-#' # (5) Plot the fitted curve
-#' plot(out, log.scale = TRUE, adddata = TRUE)
-#'
-#' # (6) Plot the fitted curve with ggplot style
-#' require(ggplot2)
-#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", adddata = TRUE, cicol = "blue",
-#'      style = "ggplot")
 #' }
 #'
 #' @import rjags

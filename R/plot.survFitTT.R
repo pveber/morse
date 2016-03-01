@@ -43,6 +43,29 @@
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
 #'
+#' @examples
+#'
+#' # (1) Load the data
+#' data(cadmium1)
+#'
+#' # (2) Create an object of class "survData"
+#' dat <- survData(cadmium1)
+#'
+#' \dontrun{
+#' # (3) Run the survFitTT function with the log-logistic
+#' #     binomial model
+#' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
+#'                  quiet = TRUE)
+#'
+#' # (4) Plot the fitted curve
+#' plot(out, log.scale = TRUE, adddata = TRUE)
+#'
+#' # (5) Plot the fitted curve with ggplot style
+#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
+#'      fitcol = "blue", adddata = TRUE, cicol = "blue",
+#'      style = "ggplot")
+#' }
+#'
 #' @keywords plot
 #'
 #' @import grDevices
