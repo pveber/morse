@@ -33,9 +33,8 @@
 #' # (2) Plot survival data with a ggplot style
 #' plot(zinc, style = "ggplot")
 #'
-#' # (3) To build a specific legend with a ggplot type
-#' fu <- plot(zinc, style = "ggplot", addlegend = FALSE)
-#' fu + theme(legend.position = "left") + scale_colour_hue("Replicate")
+#' # (3) Plot the survival data for a fixed concentration
+#' plot(zinc, concentration = 0.66, style = "ggplot")
 #'
 #' @import ggplot2
 #' @import grDevices
