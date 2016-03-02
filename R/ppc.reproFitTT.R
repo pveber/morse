@@ -1,7 +1,8 @@
-#' Posterior predictive check plot for reproFitTT objects
+#' Posterior predictive check plot for \code{reproFitTT} objects
 #'
-#' The \code{ppc} function plots the predicted values with 95 \% credible intervals
-#' versus the observed values for \code{reproFitTT} objects.
+#' This is the generic \code{ppc} S3 method for the \code{reproFitTT} class.
+#' It Plots the predicted values with 95 \% credible intervals versus the observed
+#' values.
 #' 
 #' The coordinates of black points are the observed values of the cumulated number
 #' of reproduction outputs for a given concentration (x-scale) and the corresponding 
@@ -16,7 +17,7 @@
 #' @param x An object of class \code{reproFitTT}
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
-#' @param style Graphical package method: \code{generic} or \code{ggplot}
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @examples

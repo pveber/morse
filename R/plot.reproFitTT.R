@@ -1,7 +1,8 @@
 #' Plotting method for \code{reproFitTT} objects
 #' 
-#' This function plots exposure-response fits for target time reproduction
-#' analysis (a.k.a. \code{reproFitTT} objects).
+#' This is the generic \code{plot} S3 method for the \code{reproFitTT} class.
+#' It plots exposure-response fits for target time reproduction
+#' analysis.
 #' 
 #' The fitted curve represents the \strong{estimated reproduction rate} after
 #' the target time has passed as a function of the concentration of pollutant;
@@ -26,8 +27,8 @@
 #' @param fitcol color used for the fitted curve
 #' @param fitlty line type for the fitted curve
 #' @param fitlwd width of the fitted curve
-#' @param spaghetti if \code{TRUE}, the credible interval is drawn by  multiple
-#' curves
+#' @param spaghetti if \code{TRUE}, the credible interval is represented by 
+#' multiple curves
 #' @param cicol color for the 95 \% credible limits of the fitted curve
 #' @param cilty line type for the 95 \% credible limits of the fitted curve
 #' @param cilwd width of the 95 \% credible limits of the fitted curve
@@ -40,7 +41,6 @@
 #' 
 #' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
-#' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
 #' 
 #' @import ggplot2
 #' @import grDevices

@@ -1,6 +1,7 @@
-#' Summary for reproFitTT objects
+#' Summary for \code{reproFitTT} objects
 #'
-#' The summary shows the quantiles of priors and posteriors on parameters
+#' This is the generic \code{summary} S3 method for the \code{reproFitTT} class.
+#' It shows the quantiles of priors and posteriors on parameters
 #' and the quantiles of the posterior on the ECx.
 #'
 #' @param object an object of class \code{reproFitTT}
@@ -11,8 +12,6 @@
 #' \item{Qpriors}{quantiles for the model's prior}
 #' \item{Qposteriors}{quantiles for the model's posteriors}
 #' \item{QECx}{quantiles for ECx values}
-#'
-#' @seealso reproFitTT
 #'
 #' @examples
 #' # (1) Load the data

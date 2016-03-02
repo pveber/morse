@@ -1,6 +1,8 @@
 #' Fits a Bayesian exposure-response model for target-time reproduction analysis
 #'
-#' This function estimates a model of the cumulated reproduction outputs of a
+#' This function estimates the parameters of an exposure-response model for
+#' target-time reproduction analysis using Bayesian inference.
+#' In this model the response is the cumulated reproduction outputs of a
 #' population in a given time period in presence of mortality.
 #'
 #' Because some individuals may die during the observation period, the
