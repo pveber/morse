@@ -1,6 +1,7 @@
 #' Plotting method for \code{reproData} objects
 #'
-#' Plots the cumulated number of offspring as a function of time.
+#' This is the generic \code{plot} S3 method for the \code{reproData} class.
+#' It plots the cumulated number of offspring as a function of time.
 #'
 #' @param x an object of class \code{reproData}
 #' @param xlab a title for the \eqn{x}-axis (optional)

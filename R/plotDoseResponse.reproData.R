@@ -1,7 +1,8 @@
 #' Plotting method for \code{reproData} objects
 #'
-#' Plots the number of offspring per individual-days as a function of concentration
-#' (for a given target time).
+#' This is the generic \code{plotDoseResponse} S3 method for the \code{reproData}
+#' class. It plots the number of offspring per individual-days as a function of
+#' concentration (for a given target time).
 #' 
 #' The function plots the observed values of the reproduction rate (number of
 #' reproduction outputs per individual-day) for a given time as a function of
