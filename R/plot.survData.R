@@ -1,6 +1,7 @@
 #' Plotting method for \code{survData} objects
 #'
-#' Plots the number of survivors as a function of time.
+#' This is the generic \code{plot} S3 method for the \code{survData} class.
+#' It plots the number of survivors as a function of time.
 #'
 #' @param x an object of class \code{survData}
 #' @param xlab a title for the \eqn{x}-axis (optional)

@@ -1,7 +1,8 @@
 #' Plotting method for \code{survData} objects
 #'
-#' Plots the survival rate as a function of concentration (for a given target
-#' time).
+#' This is the generic \code{plotDoseResponse} S3 method for the \code{survData}
+#' class. It plots the survival rate as a function of concentration (for a given
+#' target time).
 #' 
 #' The function plots the observed values of the survival rate for a given time
 #' as a function of concentration. The 95 \% binomial confidence interval is added
