@@ -1,7 +1,8 @@
-#' Posterior predictive check plot for survFitTT objects
+#' Posterior predictive check plot for \code{survFitTT} objects
 #'
-#' The \code{ppc} function plots the predicted values with 95 \% credible intervals
-#' versus the observed values for \code{survFitTT} objects.
+#' This is the generic \code{ppc} S3 method for the \code{survFitTT} class. It
+#' plots the predicted values with 95 \% credible intervals versus the observed
+#' values for \code{survFitTT} objects.
 #' 
 #' The coordinates of black points are the observed values of the number of survivor
 #' (poolled replicates) for a given concentration (x-scale) and the corresponding 

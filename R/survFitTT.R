@@ -1,6 +1,6 @@
 #' Fits a Bayesian exposure-response model for target-time survival analysis
 #'
-#' The \code{survFitTT} function estimates the parameters of an exposure-response
+#' This function estimates the parameters of an exposure-response
 #' model for target-time survival analysis using Bayesian inference. In this model,
 #' the survival rate of individuals after some time (called target time) is modeled
 #' as a function of the pollutant's concentration. The actual number of

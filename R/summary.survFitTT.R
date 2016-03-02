@@ -1,7 +1,8 @@
-#' Summary for survFitTT objects
+#' Summary for \code{survFitTT} objects
 #'
-#' The summary shows the quantiles of priors and posteriors on parameters
-#' and the quantiles of the posterior on the LCx.
+#' This is the gnenric \code{summary} S3 method for the \code{survFitTT} class.
+#' It shows the quantiles of priors and posteriors on parameters and the quantiles
+#' of the posterior on the LCx.
 #'
 #' @param object an object of class \code{survFitTT}
 #' @param quiet when \code{FALSE}, prints summary on standard output
@@ -11,8 +12,6 @@
 #' \item{Qpriors}{quantiles for the model's prior}
 #' \item{Qposteriors}{quantiles for the model's posteriors}
 #' \item{QLCx}{quantiles for LCx values}
-#'
-#' @seealso survFitTT
 #'
 #' @examples
 #' # (1) Load the data

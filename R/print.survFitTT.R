@@ -7,8 +7,6 @@
 #' @param x An object of class \code{survFitTT}
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @seealso \code{\link{survFitTT}}
-#' 
 #' @examples
 #' # (1) Load the data
 #' data(cadmium1)

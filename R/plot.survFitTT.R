@@ -1,7 +1,7 @@
 #' Plotting method for \code{survFitTT} objects
 #'
-#' This function plots exposure-response fits for target time survival
-#' analysis (a.k.a. \code{survFitTT} objects).
+#' This is the generic \code{plot} S3 method for the \code{survFitTT} class. It
+#' plots exposure-response fits for target time survival analysis.
 #'
 #' The fitted curve represents the \strong{estimated survival rate} after
 #' the target time has passed as a function of the concentration of pollutant;
@@ -28,8 +28,8 @@
 #' @param fitcol color of the fitted curve
 #' @param fitlty line type of the fitted curve
 #' @param fitlwd width of the fitted curve
-#' @param spaghetti if \code{TRUE}, the credible interval is drawn by  multiple
-#' curves
+#' @param spaghetti if \code{TRUE}, the credible interval is represented by 
+#' multiple curves
 #' @param cicol color of the 95 \% credible interval limits
 #' @param cilty line type for the 95 \% credible interval limits
 #' @param cilwd width of the 95 \% credible interval limits
@@ -41,7 +41,6 @@
 #' @param \dots Further arguments to be passed to generic methods
 #' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
-#' @note For an example, see the paragraph on \code{\link{reproFitTT}}.
 #'
 #' @examples
 #'
