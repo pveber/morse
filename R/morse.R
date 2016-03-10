@@ -7,6 +7,8 @@
 #' \eqn{EC_{x}} (x\% Effect Concentration) values by fitting exposure-response
 #' curves. The \eqn{LC_{x}}/\eqn{EC_{x}} and parameters of the curve are
 #' provided along with an indication of the uncertainty of the estimation.
+#' It can be used to perform an estimation of \eqn{NEC} (No Effect Concentration)
+#' value by fitting time-exposure-response curves (TKTD).
 #'
 #' Estimation procedures in MORSE can be used without a deep knowledge of
 #' their underlying probabilistic model or inference methods. Rather, they
@@ -216,7 +218,6 @@ NULL
 
 
 
-
 #' Reproduction and survival datasets for \emph{Daphnia magna} exposed to zinc
 #' during 21 days
 #'
@@ -246,3 +247,69 @@ NULL
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords datasets
 "zinc"
+
+
+
+
+#' Survival datasets for \emph{Daphnia magna} exposed to dichromate
+#' during 21 days
+#'
+#' Survival datasets of chronic laboratory bioassays with
+#' \emph{Daphnia magna} freshwater invertebrate exposed to six concentrations
+#' of one oxidizing agent (potassium dichromate) during 21 days. Six
+#' concentrations were tested with one replicate of 50 organisms per concentration.
+#' Survival is monitored at 10 time points.
+#'
+#'
+#' @name dichromate
+#' @docType data
+#' @usage data(dichromate)
+#' @format A data frame with 60 observations on the following four variables:
+#' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
+#' replicate code (\code{1}).} \item{\code{conc}}{A vector of
+#' class \code{numeric} with dichromate concentrations in \eqn{mg.L^{-1}}.}
+#' \item{\code{time}}{A vector of class \code{integer} with the time points
+#' (in days from the beginning of the experiment \eqn{t = 0}).}
+#' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
+#' alive individuals at each time point for each concentration and each
+#' replicate.}}
+#' @references Bedaux, J., Kooijman, SALM (1994) Statistical analysis of bioassays,
+#' based on hazard modeling, \emph{Environmental and Ecological Statistics}, 1,
+#' 303-314.
+#' @keywords datasets
+"dichromate"
+
+
+
+
+#' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
+#' during 4 days
+#'
+#' Survival datasets of chronic laboratory bioassays with
+#' \emph{Gammarus pulex} freshwater invertebrate exposed to eight concentrations
+#' of one fungicide (propiconazole) during 4 days. Height
+#' concentrations were tested with two replicates of 10 organisms per concentration.
+#' Survival is monitored at 5 time points.
+#'
+#'
+#' @name propiconazole
+#' @docType data
+#' @usage data(propiconazole)
+#' @format A data frame with 75 observations on the following four variables:
+#' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
+#' replicate code (\code{SC} for the control and \code{A1} to code {G2}).}
+#' \item{\code{conc}}{A vector of class \code{numeric} with propiconazole
+#' concentrations in \eqn{mg.L^{-1}}.}
+#' \item{\code{time}}{A vector of class \code{integer} with the time points
+#' (in days from the beginning of the experiment \eqn{t = 0}).}
+#' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
+#' alive individuals at each time point for each concentration and each
+#' replicate.}}
+#' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
+#' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
+#' propiconazole: model assumptions, calibration data requirements and predictive 
+#' power, \emph{Ecotoxicology}, (21), 1828-1840.
+#' 
+#' @keywords datasets
+"propiconazole"
+

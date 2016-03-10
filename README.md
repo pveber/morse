@@ -11,7 +11,7 @@ Companion R package for MOSAIC website
 
 ### Build status for development version
 
-[![Build Status](https://api.travis-ci.org/philipperuiz/morse.svg?branch=v2.2.0Complet)](https://api.travis-ci.org/philipperuiz/morse.svg)
+[![Build Status](https://api.travis-ci.org/philipperuiz/morse.svg?branch=v2.3.0Comp)](https://api.travis-ci.org/philipperuiz/morse.svg)
 
 ## Report a problem
 

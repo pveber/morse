@@ -275,6 +275,42 @@ dat <- reproData(cadmium2)
 plot(as.survData(dat))
 ```
 
+# Toxico-kinetic toxico-dynamic data analyses
+  
+The steps in TKTD data analysis are absolutely analogous to what we
+described for survival data. This time the goal is to estimate the relation 
+between pollutant concentration, time and survival rate. 
+
+Here is a typical session:
+```{r, cache=TRUE}
+# (1) load dataset
+data(propiconazole)
+
+# (2) check structure and integrity of the dataset
+survDataCheck(propiconazole)
+
+# (3) create a `survData` object
+dat <- survData(propiconazole)
+
+# (4) represent the number of survivor as a function time
+plot(dat, style = "ggplot", pool.replicate = FALSE)
+
+# (5) check information on the experimental design
+summary(dat)
+
+# (6) fit an time-exposure-response model at
+fit <- survFitTKTD(dat, quiet = TRUE)
+summary(fit)
+```
+
+```{r, cache=TRUE}
+plot(fit, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+```
+
+```{r, cache=TRUE}
+ppc(fit, style = "ggplot", remove.someLabels = TRUE)
+```
+
 [^1]: In Bayesian inference, the parameters of a model are estimated
 from the data starting from a so-called *prior*, which is a probability
 distribution representing an initial guess on the true parameters, before

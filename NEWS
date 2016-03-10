@@ -4,6 +4,11 @@ Version 2.2.0
 =============
 
 NEW FEATURES
+- add the 'survFitTKTD' function to analyse 'survData' object with a time-exposure-
+  -response model.
+- add the S3 'plot', 'print', 'summary' and 'ppc' methods for the 'survFitTKTD'
+  class.
+- add two survival datasets : dichromate and propiconazole.
 - the method plotDoseResponse replaces the plot.survData and plot.reproData
   when the argument target.time was set. Now the response is expressed in
   survival rate or in number of offspring per individual-days.
