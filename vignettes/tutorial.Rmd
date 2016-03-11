@@ -195,6 +195,9 @@ model provides a tolerable variation around the predited mean value
 as an interval where we expect 95% of the dots to be in average. The
 intervals are represented in green if they overlap with the line $Y=X$,
 and in red otherwise.
+As replicates are shifted on the x-axis, the bisecting line (y = x), is
+represented by steps, and is added to the plot in order to see if each
+prediction interval contains each observed value. 
 
 # Reproduction data analyses
   
