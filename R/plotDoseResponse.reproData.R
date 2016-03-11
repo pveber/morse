@@ -74,6 +74,9 @@ plotDoseResponse.reproData <- function(x,
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
   
+  if (style == "generic" && remove.someLabels)
+    warning("'remove.someLabels' argument is valid only in 'ggplot' style.")
+  
   x$resp <- x$Nreprocumul / x$Nindtime
   
   # select the target.time
