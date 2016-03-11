@@ -9,10 +9,10 @@
 #' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
 #' value, colored in green if this interval contains the observed value and in red
 #' in the other case.
-#' As replicates are shifted on the x-axis, the bisecting line (y = x), is
-#' represented by steps, and is added to the plot in order to see if each
-#' prediction interval contains each observed value. 
-#' 
+#' The bisecting line (y = x) is added to the plot in order to see if each
+#' prediction interval contains each observed value. As replicates are shifted
+#' on the x-axis, this line is represented by steps.
+#'
 #' @param x An object of class \code{survFitTT}
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
@@ -128,10 +128,14 @@ PpcGeneric <- function(tab, xlab, ylab) {
     pretty(c(0, max(tab[, "P97.5"])))
   })
   
-  sapply(1:length(sObs), function(i) {
-    segments(sObs[i] - (spaceX * 1.25), sObs[i],
-             sObs[i] + (spaceX * 1.25), sObs[i])
-  })
+  if (max(sObs) < 20) {
+    sapply(1:length(sObs), function(i) {
+      segments(sObs[i] - (spaceX * 1.25), sObs[i],
+               sObs[i] + (spaceX * 1.25), sObs[i])
+    })
+  } else {
+    abline(0, 1)
+  }
   
   tab0 <- tab[order(tab$Obs),]
   delta <- 0.01 * (max(obs_val) - min(obs_val))
@@ -162,22 +166,27 @@ PpcGG <- function(tab, xlab, ylab, remove.someLabels) {
   
   df <- data.frame(sObs, spaceX)
   
-  gf1 <- ggplot(df) +
-    geom_segment(aes(x = sObs - (spaceX * 1.25),
-                     xend = sObs + (spaceX * 1.25),
-                     y = sObs, yend = sObs)) +
-    scale_x_continuous(breaks = unique(c(0, tab0[, "Obs"])),
-                       labels = if (remove.someLabels) {
-                         exclude_labels(unique(c(0, tab0[, "Obs"])))
-                       } else {
-                         unique(c(0, tab0[, "Obs"]))
-                       }) +
-    scale_y_continuous(breaks = unique(c(0, tab0[, "Obs"])),
-                       labels = if (remove.someLabels) {
-                         exclude_labels(unique(c(0, tab0[, "Obs"])))
-                       } else {
-                         unique(c(0, tab0[, "Obs"]))
-                       })
+  if (max(sObs) < 20) {
+    gf1 <- ggplot(df) +
+      geom_segment(aes(x = sObs - (spaceX * 1.25),
+                       xend = sObs + (spaceX * 1.25),
+                       y = sObs, yend = sObs)) +
+      scale_x_continuous(breaks = unique(c(0, tab0[, "Obs"])),
+                         labels = if (remove.someLabels) {
+                           exclude_labels(unique(c(0, tab0[, "Obs"])))
+                         } else {
+                           unique(c(0, tab0[, "Obs"]))
+                         }) +
+      scale_y_continuous(breaks = unique(c(0, tab0[, "Obs"])),
+                         labels = if (remove.someLabels) {
+                           exclude_labels(unique(c(0, tab0[, "Obs"])))
+                         } else {
+                           unique(c(0, tab0[, "Obs"]))
+                         })
+  } else {
+    gf1 <- ggplot(tab0) +
+      geom_abline(intercept = 0, slope = 1)
+  }
   
   gf2 <- gf1 +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
