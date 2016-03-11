@@ -67,6 +67,9 @@ plotDoseResponse.survData <- function(x,
   if (!target.time %in% x$time)
     stop("[target.time] is not one of the possible time !")
   
+  if (style == "generic" && remove.someLabels)
+    warning("'remove.someLabels' argument is valid only in 'ggplot' style.")
+
   # agregate by sum of replicate
   x <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, x, sum),
              replicate = 1)
