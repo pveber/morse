@@ -66,11 +66,11 @@ summary.survFitTKTD <- function(object, quiet = FALSE, ...) {
   
   res <- rbind(kd, ks, nec, m0)
   
-  ans1 <- round(data.frame(res), digits = 3)
+  ans1 <- format(round(data.frame(res), digits = 3), scientific = TRUE)
   colnames(ans1) <- c("50%", "2.5%", "97.5%")
   
   # quantiles of estimated model parameters
-  ans2 <- round(object$estim.par, digits = 3)
+  ans2 <- format(round(object$estim.par, digits = 3), scientific = TRUE)
   colnames(ans2) <- c("50%", "2.5%", "97.5%")
   
   # print
