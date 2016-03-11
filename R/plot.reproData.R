@@ -46,6 +46,7 @@ plot.reproData <- function(x,
                            main = NULL,
                            concentration = NULL,
                            style = "generic",
+                           pool.replicate = FALSE,
                            addlegend = FALSE,
                            remove.someLabels = FALSE, ...) {
   if (!is(x, "reproData"))
