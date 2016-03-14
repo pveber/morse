@@ -15,8 +15,6 @@
 #' line is represented by steps.
 #'
 #' @param x An object of class \code{reproFitTT}
-#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
-#' \code{'ggplot'} style to avoid the label overlap
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods
 #'
@@ -42,8 +40,7 @@
 #' @importFrom graphics plot
 #'
 #' @export
-ppc.reproFitTT <- function(x, remove.someLabels = FALSE,
-                           style = "generic", ...) {
+ppc.reproFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
   
@@ -54,7 +51,7 @@ ppc.reproFitTT <- function(x, remove.someLabels = FALSE,
   xlab <- "Observed Cumul. Nbr. of offspring"
   ylab <- "Predicted Cumul. Nbr. of offspring"
 
-  ppc_gen(EvalreproPpc(x), style, xlab, ylab, remove.someLabels)
+  ppc_gen(EvalreproPpc(x), style, xlab, ylab)
 }
 
 
