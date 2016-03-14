@@ -19,12 +19,12 @@ Imports:
     epitools,
     graphics,
     grDevices,
-    ggplot2,
+    ggplot2 (>= 2.1.0),
     grid,
     gridExtra,
     methods,
     reshape2,
-    rjags,
+    rjags (>= 4.0),
     stats,
     stringr
 License: GPL (>=2)
