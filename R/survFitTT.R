@@ -133,7 +133,8 @@ survFitTT <- function(data,
   # check if estimated LC50 lies in the tested concentration range
   LC50 <- log10(estim.par["e", "median"])
   if (!(min(log10(data$conc)) < LC50 & LC50 < max(log10(data$conc))))
-    warning("The LC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !")
+    warning("The LC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
+            call. = FALSE)
 
   # output
   OUT <- list(estim.LCx = estim.LCx,

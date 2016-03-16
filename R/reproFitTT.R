@@ -247,7 +247,8 @@ reproFitTT <- function(data,
   # 95% percentile
   EC50 <- log10(estim.par["e", "median"])
   if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc))))
-    warning("The EC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !")
+    warning("The EC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
+            call. = FALSE)
 
   # output
   OUT <- list(DIC = coda.arg$DIC,

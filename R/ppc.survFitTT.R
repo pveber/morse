@@ -47,7 +47,8 @@ ppc.survFitTT <- function(x, remove.someLabels = FALSE,
     stop("x is not of class 'survFitTT'!")
   
   if (style == "generic" && remove.someLabels)
-    warning("'remove.someLabels' argument is valid only in 'ggplot' style.")
+    warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
+            call. = FALSE)
   
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
