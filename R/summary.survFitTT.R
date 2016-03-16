@@ -66,15 +66,15 @@ summary.survFitTT <- function(object, quiet = FALSE, ...) {
     res <- rbind(b, e)
   }
 
-  ans1 <- format(round(data.frame(res), digits = 3), scientific = TRUE)
+  ans1 <- format(data.frame(res), scientific = TRUE, digits = 4)
   colnames(ans1) <- c("50%", "2.5%", "97.5%")
 
   # quantiles of estimated model parameters
-  ans2 <- format(round(object$estim.par, digits = 3), scientific = TRUE)
+  ans2 <- format(object$estim.par, scientific = TRUE, digits = 4)
   colnames(ans2) <- c("50%", "2.5%", "97.5%")
 
   # estimated ECx and their CIs 95%
-  ans3 <- format(round(object$estim.LCx, digits = 3), scientific = TRUE)
+  ans3 <- format(object$estim.LCx, scientific = TRUE, digits = 4)
   colnames(ans3) <- c("50%", "2.5%", "97.5%")
 
   # print
