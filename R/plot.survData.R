@@ -57,10 +57,12 @@ plot.survData <- function(x,
     stop("plot.survData: object of class survData expected")
   
   if (style == "generic" && remove.someLabels)
-    warning("'remove.someLabels' argument is valid only in 'ggplot' style.")
+    warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
+            call. = FALSE)
   
   if (is.null(concentration) && addlegend)
-    warning("'addlegend' argument is valid only when 'concentration' is not null.")
+    warning("'addlegend' argument is valid only when 'concentration' is not null.",
+            call. = FALSE)
 
   if (pool.replicate) {
     # agregate by sum of replicate
