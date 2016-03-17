@@ -248,7 +248,7 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
     points(data[["dobs"]][["time"]],
            data[["dobs"]][["psurv"]],
            pch = 20,
-           col = data[["dobs"]]$color)
+           col = "black")
   }
   if (addlegend) {
     legend("bottomleft",
@@ -258,7 +258,7 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
            bty = "n",
            cex = 1,
            ncol = 2,
-           col = unique(data[["dobs"]]$color),
+           col = "black",
            title = "Concentrations")
   }
 }
@@ -305,16 +305,16 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
       points(y[, "time"],
              y[, "psurv"],
              pch = 20,
-             col = y[, "color"]) # points
+             col = "black") # points
       segments(y[, "time"], y[, "qinf95"],
                y[, "time"], y[, "qsup95"],
-               col = y[, "color"])
+               col = "gray")
       segments(y[, "time"] - delta, y[, "qinf95"],
                y[, "time"] + delta, y[, "qinf95"],
-               col = y[, "color"])
+               col = "gray")
       segments(y[, "time"] - delta, y[, "qsup95"],
                y[, "time"] + delta, y[, "qsup95"],
-               col = y[, "color"])
+               col = "gray")
     }
   }, x = dtheoQ, y = dobs, z = dataCIm)
 }
