@@ -134,15 +134,8 @@ PpcGeneric <- function(tab, xlab, ylab) {
   })
   
   tab0 <- tab[order(tab$Obs),]
-  delta <- 0.01 * (max(obs_val) - min(obs_val))
   segments(jittered_obs, tab0[, "P2.5"],
            jittered_obs, tab0[, "P97.5"],
-           col = as.character(tab0[, "col"]))
-  segments(jittered_obs - delta, tab0[, "P2.5"],
-           jittered_obs + delta, tab0[, "P2.5"],
-           col = as.character(tab0[, "col"]))
-  segments(jittered_obs - delta, tab0[, "P97.5"],
-           jittered_obs + delta, tab0[, "P97.5"],
            col = as.character(tab0[, "col"]))
   
   points(jittered_obs, tab0[, "P50"],
@@ -182,8 +175,6 @@ PpcGG <- function(tab, xlab, ylab, remove.someLabels) {
   gf2 <- gf1 +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
                      y = P2.5, yend = P97.5), data = tab0,
-                 arrow = arrow(length = unit(0.1, "cm"), angle = 90,
-                               ends = "both"),
                  color = tab0$col) +
     geom_point(aes(x = jittered_obs, y = P50), tab0) +
     expand_limits(y = 0) +
