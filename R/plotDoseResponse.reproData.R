@@ -96,7 +96,7 @@ plotDoseResponse.reproData <- function(x,
   conc_val <- unique(transf_data_conc)
   x$Obs <- x$conc
   stepX <- stepCalc(conc_val)$stepX
-  jittered_conc <- jitterObsGenerator(stepX, x, conc_val, log.scale)$jitterObs
+  jittered_conc <- jitterObsGenerator(stepX, x, conc_val)$jitterObs
   
   if (style == "generic")
     reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
