@@ -265,9 +265,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
   dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
   dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
   dataCIm <- split(dataCIm, dataCIm$conc)
-  
-  delta <- 0.01 * (max(data[["dobs"]]$time) - min(data[["dobs"]]$time))
-  
+
   mapply(function(x, y, z) {
     plot(x[, "time"],
          x[, "q50"],
@@ -304,12 +302,6 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
              col = y[, "color"]) # points
       segments(y[, "time"], y[, "qinf95"],
                y[, "time"], y[, "qsup95"],
-               col = y[, "color"])
-      segments(y[, "time"] - delta, y[, "qinf95"],
-               y[, "time"] + delta, y[, "qinf95"],
-               col = y[, "color"])
-      segments(y[, "time"] - delta, y[, "qsup95"],
-               y[, "time"] + delta, y[, "qsup95"],
                col = y[, "color"])
     }
   }, x = dtheoQ, y = dobs, z = dataCIm)
@@ -372,8 +364,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
       geom_point(aes(x = time, y = psurv, colour = factor(conc)),
                  data = data[["obs"]], color = "black") +
       geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95),
-                   arrow = arrow(length = unit(0.1, "cm"), angle = 90,
-                                 ends = "both"), data[["obs"]], color = "gray",
+                   data[["obs"]], color = "gray",
                    size = 0.5)
   } else {
     gf
