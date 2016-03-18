@@ -5,7 +5,7 @@
 #' inference procedure.
 #' 
 #' @param x An object of class \code{survFitTKTD}
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples
 #' # (1) Load the data
