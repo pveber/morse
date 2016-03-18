@@ -1,9 +1,11 @@
-#' Cast for classes derived from survData
+#' Cast for classes derived from \code{survData}
 #' 
 #' Use this function to access \code{survData} methods on an object of a 
 #' derived class (e.g. \code{reproData})
 #' 
 #' @param x an S3 object of a class derived from \code{survData}
+#' 
+#' @seealso \code{\link{reproData}} and \code{\link{survData}}
 #' 
 #' @examples 
 #' data(zinc)

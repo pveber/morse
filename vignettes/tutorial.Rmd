@@ -86,21 +86,12 @@ plot(dat, concentration = 124, addlegend = TRUE,
      pool.replicate = FALSE, style = "ggplot")
 ```
 
-
-We can also plot the number of surviving individuals at a given time point as a function
-of the concentration, by fixing `target.time` instead of `concentration`:
+We can also plot the survival rate with the confidence intervale on the data
+at a given time point as a function of the concentration, by using the function
+`plot.DoseResponse` and by fixing `target.time`:
   
 ```{r, cache=TRUE}
-plot(dat, target.time = 21, pool.replicate = FALSE, style = "ggplot",
-     addlegend = TRUE)
-```
-
-
-Finally, when fixing both `concentration` and `target.time`, we can compare one condition
-to the control:
-
-```{r, cache=TRUE}
-plot(dat, concentration = 232, target.time = 21)
+plotDoseResponse(dat, target.time = 21, style = "ggplot", addlegend = TRUE)
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
@@ -108,7 +99,6 @@ The function `summary` provides some descriptive statistics on the experimental 
 ```{r, cache=TRUE}
 summary(dat)
 ```
-
 
 ## Step 4: fit an exposure-response model to the survival data at target time
 
@@ -145,7 +135,7 @@ the parameters. This simple check can be performed using the summary function.
 
 The fit can also be plotted:
 ```{r, cache=TRUE}
-plot(fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
+plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
      addlegend = TRUE)
 ```
 This representation shows the estimated relation between concentration of
@@ -171,7 +161,7 @@ data("cadmium1")
 wrong_fit <- survFitTT(survData(cadmium1),
                        target.time = 21,
                        lcx = c(10, 20, 30, 40, 50))
-plot(wrong_fit, log.scale = TRUE, ci = TRUE, style = "ggplot",
+plot(wrong_fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
      addlegend = TRUE)
 ```
 
@@ -225,16 +215,16 @@ dat <- reproData(cadmium2)
 
 # (4) represent the cumulated number of offspring as a function time
 plot(dat, style = "ggplot", pool.replicate = FALSE)
-plot(dat, target.time = 21, addlegend = TRUE, style = "ggplot",
-     pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
-plot(dat, concentration = 124, target.time = 21, style = "ggplot")
 
-# (5) check information on the experimental design
+# (5) represent the reproduction rate as a function of concentration
+plotDoseResponse(dat, target.time = 56, style = "ggplot")
+
+# (6) check information on the experimental design
 summary(dat)
 
-# (6) fit an exposure-response model at target-time
+# (7) fit an exposure-response model at target-time
 fit <- reproFitTT(dat, stoc.part = "bestfit",
                   target.time = 21,
                   ecx = c(10, 20, 30, 40, 50),
@@ -243,12 +233,12 @@ summary(fit)
 ```
 
 ```{r, cache=TRUE}
-plot(fit, log.scale = TRUE, ci = TRUE,
-     style = "ggplot")
+plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
+     addlegend = TRUE)
 ```
 
 ```{r, cache=TRUE}
-ppc(fit, style = "ggplot")
+ppc(fit, style = "ggplot", remove.someLabels = TRUE)
 ```
 As in survival analysis, we assume that the reproduction rate per individual-day
 is a log-logistic function of the concentration. More details and parameter
@@ -293,17 +283,4 @@ the parameters after seeing the data and combining it with the prior. To obtain
 a point estimate of the parameters, it is typical to compute the mean or median
 of the posterior and quantify the uncertainty by reporting the standard
 deviation or inter-quantile distance.
-
-
-<!--
-* Step five, check the obseved versus predicted values
-  
-The function `ppc()` plots the observed versus predicted values with the 95 \% 
-credible intervale for each predicted values.
-
-```{r, cache=TRUE, eval=FALSE}
-ppc(out, style = "ggplot")
-```
-
--->
 

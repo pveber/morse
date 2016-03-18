@@ -1,6 +1,6 @@
 #' Fits a Bayesian exposure-response model for target-time survival analysis
 #'
-#' The \code{survFitTT} function estimates the parameters of an exposure-response
+#' This function estimates the parameters of an exposure-response
 #' model for target-time survival analysis using Bayesian inference. In this model,
 #' the survival rate of individuals after some time (called target time) is modeled
 #' as a function of the pollutant's concentration. The actual number of
@@ -12,26 +12,7 @@
 #' parameter estimates of the exposure-response model and estimates of the so-called
 #' LCx, that is the concentration of pollutant required to obtain an 1 - x survival
 #' rate.
-#'
-#'
-#'
-# \describe{
-# FIXME
-# Credible limits: For 100 values of concentrations regularly spread within
-# the range of tested concentrations the joint posterior distribution of
-# parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
-# offspring per individual-day for various replicates. For each concentration,
-# 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
-# there is a point estimate and a 95 \% credible interval (Delignette-Muller
-# et al., 2014).
-#
-# Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
-# control diagnostic based on a criterion that calculates the appropriate
-# number of iterations required to accurately estimate the parameter
-# quantiles. The Raftery and Lewis's diagnostic value used in the
-# \code{surFitTT} function is the \code{resmatrix} object. See the
-# \code{\link[coda]{raftery.diag}} help for more details.
-#
+#' 
 #' @param data an object of class \code{survData}
 #' @param target.time the chosen endpoint to evaluate the effect of a given
 #' concentration of pollutant, by default the last time point available for
@@ -59,20 +40,10 @@
 #' \item{n.iter}{a list of two indices indicating the beginning and end of
 #' monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
+#' \item{jags.data}{a list a the data passed to the jags model}
+#' \item{transformed.data}{the \code{survData} object passed to the function}
+#' \item{dataTT}{the dataset with which one the parameters are estimated}
 #'
-#'
-# FIXME
-# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}}
-# \code{\link{survData}}, \code{\link[coda]{raftery.diag}} and
-# \code{\link[ggplot2]{ggplot}}
-#
-# @references Plummer, M. (2013) JAGS Version 4.0.0 user manual.
-# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
-#
-# Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
-# measures of model complexity and fit (with discussion).  \emph{Journal of
-# the Royal Statistical Society}, Series B 64, 583-639.
-#
 #' @keywords estimation
 #
 #' @examples
@@ -88,18 +59,6 @@
 #' #     binomial model
 #' out <- survFitTT(dat, lcx = c(5, 10, 15, 20, 30, 50, 80),
 #'                  quiet = TRUE)
-#'
-#' # (4) Summary look the estimated values (LCx and parameters)
-#' out$estim.LCx
-#' out$estim.par
-#'
-#' # (5) Plot the fitted curve
-#' plot(out, log.scale = TRUE, ci = TRUE)
-#'
-#' # (6) Plot the fitted curve with ggplot style
-#' require(ggplot2)
-#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", ci = TRUE, cicol = "blue",  style = "ggplot")
 #' }
 #'
 #' @import rjags
@@ -172,11 +131,9 @@ survFitTT <- function(data,
   estim.LCx <- estimXCX(mcmc, lcx, "LC")
 
   # check if estimated LC50 lies in the tested concentration range
-  if (50 %in% lcx) {
-    LC50 <- log10(estim.LCx["LC50", "median"])
-    if (!(min(log10(data$conc)) < LC50 & LC50 < max(log10(data$conc))))
-      warning("The LC50 estimation lies outsides the range of tested concentration and may be unreliable !")
-  }
+  LC50 <- log10(estim.par["e", "median"])
+  if (!(min(log10(data$conc)) < LC50 & LC50 < max(log10(data$conc))))
+    warning("The LC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !")
 
   # output
   OUT <- list(estim.LCx = estim.LCx,

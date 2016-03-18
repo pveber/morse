@@ -1,11 +1,24 @@
-#' Posterior predictive check plot for reproFitTT objects
+#' Posterior predictive check plot for \code{reproFitTT} objects
 #'
-#' The \code{ppc} function plot the observed versus predicted values for the
-#' \code{reporFitTT} objects.
+#' This is the generic \code{ppc} S3 method for the \code{reproFitTT} class.
+#' It Plots the predicted values with 95 \% credible intervals versus the observed
+#' values.
+#' 
+#' The coordinates of black points are the observed values of the cumulated number
+#' of reproduction outputs for a given concentration (x-scale) and the corresponding 
+#' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
+#' value, colored in green if this interval contains the observed value and in red
+#' in the other case.
+#' As replicates are not pooled in this plot, overlapped points
+#' are shifted on the x-axis to help the visualization of replicates.
+#' The bisecting line (y = x), is represented by steps, and is added to the plot
+#' in order to see if each prediction interval contains each observed value.
 #'
 #' @param x An object of class \code{reproFitTT}
-#' @param style Graphical package method: \code{generic} or \code{ggplot}.
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
+#' \code{'ggplot'} style to avoid the label overlap
+#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @examples
 #'
@@ -29,14 +42,15 @@
 #' @importFrom graphics plot
 #'
 #' @export
-ppc.reproFitTT <- function(x, style = "generic", ...) {
+ppc.reproFitTT <- function(x, remove.someLabels = FALSE,
+                           style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
   
   xlab <- "Observed Cumul. Nbr. of offspring"
   ylab <- "Predicted Cumul. Nbr. of offspring"
 
-  ppc_gen(EvalreproPpc(x), style, xlab, ylab)
+  ppc_gen(EvalreproPpc(x), style, xlab, ylab, remove.someLabels)
 }
 
 

@@ -1,10 +1,10 @@
 #' Posterior predictive check plot
 #' 
-#' Plot posterior predictive check for \code{reproFitTT} and \code{survFitTT}
+#' Plots posterior predictive check for \code{reproFitTT} and \code{survFitTT}
 #' objects.
 #' 
-#' @param x an object used to select a method.
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param x an object used to select a method
+#' @param \dots Further arguments to be passed to generic methods
 
 #' @export
 ppc <- function(x, ...){

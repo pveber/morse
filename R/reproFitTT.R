@@ -1,6 +1,8 @@
 #' Fits a Bayesian exposure-response model for target-time reproduction analysis
 #'
-#' This function estimates a model of the cumulated reproduction outputs of a
+#' This function estimates the parameters of an exposure-response model for
+#' target-time reproduction analysis using Bayesian inference.
+#' In this model the response is the cumulated reproduction outputs of a
 #' population in a given time period in presence of mortality.
 #'
 #' Because some individuals may die during the observation period, the
@@ -23,7 +25,7 @@
 #' @param target.time defines the observation period. By default the last time point
 #' @param ecx desired values of \eqn{x} (in percent) for which to compute
 #' \eqn{EC_{x}}{ECx}
-#' @param n.chains number of MCMC chains. The minimum required number of chains is
+#' @param n.chains number of MCMC chains. The minimum required number of chains is 2
 #' @param quiet if \code{TRUE}, does not print messages and progress bars from JAGS
 #'
 #'
@@ -36,66 +38,17 @@
 #' credible intervals}
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior distributions}
 #' \item{model}{a JAGS model object}
+#' \item{model.label}{a character string, \code{"P"} if the poisson model is used,
+#' \code{"GP"} if the gamma-poisson is used}
 #' \item{parameters}{a list of the parameters names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
-#' for the MCMC computation.}
+#' for the MCMC computation}
 #' \item{n.iter}{a list of two indices indicating the beginning and
 #' the end of monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
-#'
-# FIXME
-# \describe{
-#
-# Credible limits: For 100 values of concentrations regularly spread within
-# the range of tested concentrations the joint posterior distribution of
-# parameters is used to simulate 5000 values of \eqn{f_{ij}}, the number of
-# offspring per individual-day for various replicates. For each concentration,
-# 2.5, 50 and 97.5 percentiles of simulated values are calculated, from which
-# there is a point estimate and a 95 \% credible interval (Delignette-Muller
-# et al., 2014).
-#
-# DIC: The Deviance Information Criterium (DIC) as defined by Spiegelhalter et
-# al. (2002) is provided by the \code{dic.samples} function. The DIC is a
-# goodness-of-fit criterion penalized by the complexity of the model
-# (Delignette-Muller et al., 2014).
-#
-# Raftery and Lewis's diagnostic: The \code{raftery.diag} is a run length
-# control diagnostic based on a criterion that calculates the appropriate
-# number of iterations required to accurately estimate the parameter
-# quantiles. The Raftery and Lewis's diagnostic value used in the
-# \code{reproFitTT} function is the \code{resmatrix} object. See the
-# \code{\link[coda]{raftery.diag}} help for more details.
-#
-# Model selection: When \code{stoc.part = "bestfit"}, the \code{reproFitTT}
-# function chooses itself between the Poisson and the Gamma-Poisson model
-# depending on the number of MCMC samples and on the DIC values.  The minimum
-# number of MCMC samples for the pilot run is provided by the Raftery and
-# Lewis's diagnostic (Raftery and Lewis 1992). If this number is less than 100
-# 000 for the Poisson and the Gamma-Poisson model and if the DIC difference
-# between Poisson and Gamma-poisson models is small (typically less than 10),
-# then the Poisson model is selected. If this number is more than 100 000 for
-# only one model, the other one is selected.
-# }
-# @seealso \code{\link[rjags]{rjags}}, \code{\link[rjags]{coda.samples}},
-# \code{\link[rjags]{dic.samples}}, \code{\link[coda]{raftery.diag}}
-# and \code{\link[ggplot2]{ggplot}}
-#
-# @references Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
-# (2014) Statistical handling of reproduction data for exposure-response
-# modelling.
-# \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
-#
-# Plummer, M. (2013) JAGS Version 4.0.0 user manual.
-# \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
-#
-# Raftery A.E. and Lewis, S.M. (1992) One long run with diagnostics:
-# Implementation strategies for Markov chain Monte Carlo. \emph{Statistical
-# Science}, 7, 493-497.
-#
-# Spiegelhalter, D., N. Best, B. Carlin, and A. van der Linde (2002) Bayesian
-# measures of model complexity and fit (with discussion).  \emph{Journal of
-# the Royal Statistical Society}, Series B 64, 583-639.
-#
+#' \item{jags.data}{a list a the data passed to the jags model}
+#' \item{transformed.data}{the \code{survData} object passed to the function}
+#' \item{dataTT}{the dataset with which one the parameters are estimated}
 #'
 #' @keywords estimation
 #'
@@ -111,20 +64,6 @@
 #' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
 #' out <- reproFitTT(dat, stoc.part = "gammapoisson",
 #'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
-#'
-#' # (4) Summary look the estimated values (ECx and parameters)
-#' out$estim.ECx
-#' out$estim.par
-#'
-#' # (5) Plot the fitted curve with credible limits
-#' plot(out, log.scale = TRUE, ci = TRUE,
-#'      main = "log-logistic gamma-poisson model")
-#'
-#' # (6) Plot the fitted curve with ggplot style
-#' require("ggplot2")
-#' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", ci = TRUE, cicol = "blue", style = "ggplot",
-#'      main = "Log-logistic response to concentration")
 #' }
 #'
 #' @import rjags
@@ -306,11 +245,9 @@ reproFitTT <- function(data,
 
   # check if the maximum measured concentration is in the EC50's range of
   # 95% percentile
-  if (50 %in% ecx) {
-    EC50 <- log10(estim.ECx["EC50", "median"])
-    if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc))))
-      warning("The EC50 estimation lies outsides the range of tested concentration and may be unreliable !")
-  }
+  EC50 <- log10(estim.par["e", "median"])
+  if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc))))
+    warning("The EC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !")
 
   # output
   OUT <- list(DIC = coda.arg$DIC,

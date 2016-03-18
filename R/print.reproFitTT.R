@@ -1,13 +1,11 @@
 #' Print of \code{reproFitTT} object
 #' 
-#' This is the generic \code{print} S3 method for the \code{survFitTT} class.
+#' This is the generic \code{print} S3 method for the \code{reproFitTT} class.
 #' It prints the underlying JAGS model and some information on the Bayesian 
 #' inference procedure.
 #' 
 #' @param x An object of class \code{reproFitTT}
-#' @param \dots Further arguments to be passed to generic methods.
-#' 
-#' @seealso \code{\link{reproFitTT}}
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples
 #' # (1) Load the data

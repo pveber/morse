@@ -22,7 +22,7 @@ r-mosaic.Rproj
 
 # some generated files
 man/*.Rd
-NAMESPACE
+# NAMESPACE
 vignettes/*.log
 vignettes/*.pdf
 vignettes/*.html

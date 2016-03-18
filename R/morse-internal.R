@@ -3,7 +3,8 @@
 if(getRversion() >= "2.15.1")  utils::globalVariables(c(
   "response", "Nreprocumul", "resp", "Mortality", "qinf95", "qsup95",
   "transf_conc", "obs", "pred", "..n..", "Points", "conc", "Line", "Nsurv",
-  "time", "Conf.Int", "Cred.Lim", "Obs", "P50", "P2.5", "P97.5"
+  "time", "Conf.Int", "Cred.Lim", "Obs", "P50", "P2.5", "P97.5", "variable",
+  "value", "jittered_conc", "reproRateInf", "reproRateSup", "curv_conc"
 ))
 
 
@@ -155,41 +156,55 @@ legendGgplotFit <- function(a.gplot) {
   return(legend)
 }
 
-fCols <- function(data, fitcol, cicol, analyse) {
+fCols <- function(data, fitcol, cicol) {
   
-  if (analyse == "surv") {
-    #points
-    cols1 <- "black"
-    names(cols1) <- unique(data$Points)
-    # curve
-    cols2 <- fitcol
-    names(cols2) <- "loglogistic"
-    # CI
-    cols3 <- "black"
-    names(cols3) <- "Confidence interval"
-    # CI2
-    cols4 <- cicol
-    names(cols4) <- "Credible limits"
-    
-    return(list(cols1 = cols1,
-                cols2 = cols2,
-                cols3 = cols3,
-                cols4 = cols4))
-           
-    } else if (analyse == "repro") {
-    # fitted curve
-    cols2 <- fitcol
-    names(cols2) <- "loglogistic"
-    # CI
-    cols3 <- cicol
-    names(cols3) <- "Credible limits"
-    
-    return(list(cols2 = cols2,
-                cols3 = cols3))
-    }
+  # points
+  cols1 <- "black"
+  names(cols1) <- unique(data$Points)
+  # curve
+  cols2 <- fitcol
+  names(cols2) <- "loglogistic"
+  # Conf Int
+  cols3 <- "black"
+  names(cols3) <- "Confidence interval"
+  # Cred Int
+  cols4 <- cicol
+  names(cols4) <- "Credible limits"
+  
+  return(list(cols1 = cols1,
+              cols2 = cols2,
+              cols3 = cols3,
+              cols4 = cols4))
 }
 
 exclude_labels <- function(x) {
   x[-seq.int(1, length(x), 4)] <- ""
   return(x)
+}
+
+
+stepCalc <- function(obs_val) {
+  # calculation of steps coordinate
+  sObs <- sort(obs_val)
+  stepX <- c(0, sapply(2:length(sObs), function(i) {
+    sObs[i-1] + (sObs[i] - sObs[i-1]) / 2}), max(sObs))
+  return(list(sObs = sObs, stepX = stepX))
+}
+
+jitterObsGenerator <- function(stepX, tab, obs_val, log.scale = FALSE) {
+  # uniform jittering of observed values
+  allSpaceX <- sapply(2:length(stepX),
+                      function(i) { stepX[i] - stepX[i-1] })
+  spaceX <- min(allSpaceX[which(allSpaceX != 0)]) / ifelse(!log.scale, 2, exp(2))
+  lengthX <- table(tab[, "Obs"])
+  jitterObs <- mapply(function(x, y) {
+    if (y == 1) {
+      seq(x, x, length.out = y)
+    } else {
+      seq(x - spaceX + (2 * spaceX / (y + 1)),
+          x + spaceX - (2 * spaceX / (y + 1)), length.out = y)
+    }
+  }, x = sort(obs_val), y = lengthX)
+  return(list(spaceX = spaceX,
+              jitterObs = unlist(jitterObs)))
 }

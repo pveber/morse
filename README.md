@@ -3,8 +3,23 @@
 Companion R package for MOSAIC website
  - need `Rtools 3.3` and last `R` version.
 
-### Compilation (for command-line users)
+## Versions
 
+### CRAN release version
+
+[![CRAN version](http://www.r-pkg.org/badges/version/morse)](http://cran.rstudio.com/web/packages/morse/index.html) [![](http://cranlogs.r-pkg.org/badges/grand-total/morse)](http://cran.rstudio.com/web/packages/morse/index.html)
+
+### Build status for development version
+
+[![Build Status](https://api.travis-ci.org/philipperuiz/morse.svg?branch=v2.2.0Complet)](https://api.travis-ci.org/philipperuiz/morse.svg)
+
+## Report a problem
+
+Use the [issue tracker](https://github.com/pveber/morse/issues)
+to report a problem.
+
+
+## Compilation (for command-line users)
 
 - `cd` to source directory
 - Build from sources (creates vignette and archive)
@@ -20,7 +35,7 @@ Companion R package for MOSAIC website
 - Run unit tests
   - under the R interpreter: `devtools::test()`
 
-### Compilation (with RStudio)
+## Compilation (with RStudio)
 
 - need `devtools`, `ROxygen2 v5.0.1 or higgher`
 - RStudio builder configuration:
@@ -39,13 +54,13 @@ Companion R package for MOSAIC website
   - build the source file :
     `More : Build Source Package`
 
-### Install the package from source
+## Install the package from source
 R: remove.packages("morse", lib="~/Documents/R/R-X.X.X/library")
 R: install.packages("~/Documents/morse_X.X.X.tar.gz", repos = NULL, type = "source")
 R: library("morse")
 R: ?morse
 
-### Tests
+## Tests
 - Build from sources: `Build & Reload`
 - Test: `Build > More > Test package` (Ctrl + Shift + T). Note that you must activate the option "Use devtools package functions if available" in `Project Options > Build Tools`.
 - Generate the documentation: `Build & Reload or Build > More > Document` (Ctrl + Shift + D)

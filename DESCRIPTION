@@ -1,8 +1,8 @@
 Package: morse
 Type: Package
 Title: MOdelling Tools for Reproduction and Survival Data in Ecotoxicology
-Version: 2.1.0
-Date: 2015-12-14
+Version: 2.2.0
+Date: 2016-03-03
 Author: Marie Laure Delignette-Muller [aut], Philippe Ruiz [aut], Sandrine
     Charles [aut], Wandrille Duchemin [ctb], Christelle Lopes [ctb], Guillaume Kon-
     Kam-king [ctb], Philippe Veber [aut]
@@ -16,12 +16,14 @@ SystemRequirements: jags (>= 4.0.0) (see http://mcmc-jags.sourceforge.net)
 Imports:
     coda,
     dplyr,
+    epitools,
     graphics,
     grDevices,
     ggplot2,
     grid,
     gridExtra,
     methods,
+    reshape2,
     rjags,
     stats,
     stringr

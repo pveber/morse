@@ -5,9 +5,7 @@
 #' inference procedure.
 #' 
 #' @param x An object of class \code{survFitTT}
-#' @param \dots Further arguments to be passed to generic methods.
-#' 
-#' @seealso \code{\link{survFitTT}}
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples
 #' # (1) Load the data
