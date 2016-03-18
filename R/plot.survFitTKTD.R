@@ -23,18 +23,20 @@
 #' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
 #' taken for this sample).
 #' 
-#' @param x An object of class \code{survFitTKTD}.
-#' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
-#' @param main A main title for the plot.
+#' @param x An object of class \code{survFitTKTD}
+#' @param xlab A label for the \eqn{X}-axis, by default \code{Time}
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}
+#' @param main A main title for the plot
+#' @param concentration a numeric value corresponding to some concentration in
+#' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration
 #' @param spaghetti if \code{TRUE}, the credible interval is represented by 
 #' multiple curves
-#' @param one.plot if \code{TRUE}, draws all the estimeted curves in one plot.
+#' @param one.plot if \code{TRUE}, draws all the estimeted curves in one plot
 #' @param adddata if \code{TRUE}, adds the observed data with confidence interval
 #' to the plot
-#' @param addlegend if \code{TRUE}, adds a default legend to the plot.
+#' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @keywords plot 
 #' 
@@ -58,12 +60,16 @@
 #' # and with a ggplot style
 #' plot(out, spaghetti = TRUE , adddata = TRUE, one.plot = FALSE,
 #'      style = "ggplot")
+#'
+#' # (6) Plt fitted curve for one specific concentration
+#' plot(out, concentration = 36, style = "ggplot")
 #' }
 #' 
 #' @export
 #' 
 #' @import ggplot2
 #' @import grDevices
+#' @importFrom dplyr filter
 #' @importFrom reshape2 melt
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
@@ -73,11 +79,16 @@ plot.survFitTKTD <- function(x,
                              xlab = "Time",
                              ylab = "Survival rate",
                              main = NULL,
+                             concentration = NULL,
                              spaghetti = FALSE,
-                             one.plot = TRUE,
+                             one.plot = FALSE,
                              adddata = FALSE,
                              addlegend = FALSE,
                              style = "generic", ...) {
+  
+  if (one.plot && !is.null(concentration)) {
+    warning("If argument 'concentration' is specified 'one.plot' must be set FALSE")
+  }
   
   conf.int <- survTKTDConfInt(x)
   
@@ -98,12 +109,13 @@ plot.survFitTKTD <- function(x,
   
   
   if (style == "generic") {
-    survFitPlotTKTDGeneric(data.credInt, xlab, ylab, main, one.plot, spaghetti,
+    survFitPlotTKTDGeneric(data.credInt, xlab, ylab, main, concentration,
+                           one.plot, spaghetti,
                            dataCIm, adddata, addlegend)
   }
   else if (style == "ggplot") {
-    survFitPlotTKTDGG(data.credInt, xlab, ylab, main, one.plot, spaghetti,
-                      dataCIm, adddata, addlegend)
+    survFitPlotTKTDGG(data.credInt, xlab, ylab, main, concentration, one.plot,
+                      spaghetti, dataCIm, adddata, addlegend)
   }
   else stop("Unknown style")
 }
@@ -177,8 +189,8 @@ survFitPlotCITKTD <- function(x) {
   
   dtheoSp <- do.call("rbind", dtheo)
   dtheoSp <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
-                                rep(tfin, length(concobs)),
-                                dtheoSp))
+                                 rep(tfin, length(concobs)),
+                                 dtheoSp))
   names(dtheoSp) <- c("conc", "time", paste0("X", 1:length(sel)))
   
   # quantile
@@ -207,19 +219,22 @@ survFitPlotCITKTD <- function(x) {
               dobs = dobs))
 }
 
-survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, one.plot,
-                                   spaghetti, dataCIm, adddata,
+survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, concentration,
+                                   one.plot, spaghetti, dataCIm, adddata,
                                    addlegend) {
-
+  
   if (one.plot) {
     survFitPlotTKTDGenericOnePlot(data, xlab, ylab, main, adddata, addlegend)
-  } else {
+  } else if (!one.plot && is.null(concentration)) {
     par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
     
     survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
-                                    dataCIm, adddata)
+                                    dataCIm, adddata, concentration)
     
     par(mfrow = c(1, 1))
+  } else {
+    survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
+                                    dataCIm, adddata, concentration)
   }
 }
 
@@ -260,11 +275,18 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
 }
 
 survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
-                                            dataCIm, adddata) {
+                                            dataCIm, adddata, concentration) {
   
-  dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
-  dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
-  dataCIm <- split(dataCIm, dataCIm$conc)
+  if (is.null(concentration)) {
+    dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
+    dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
+    dataCIm <- split(dataCIm, dataCIm$conc)
+  } else {
+    dobs <- list(filter(data[["dobs"]], conc == concentration))
+    dtheoQ <- list(filter(data[["dtheoQ"]], conc == concentration))
+    dataCIm <- list(filter(dataCIm, conc == concentration))
+  }
+
   
   delta <- 0.01 * (max(data[["dobs"]]$time) - min(data[["dobs"]]$time))
   
@@ -315,14 +337,17 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
   }, x = dtheoQ, y = dobs, z = dataCIm)
 }
 
-survFitPlotTKTDGG <- function(data, xlab, ylab, main, one.plot, spaghetti,
-                              dataCIm, adddata, addlegend) {
+survFitPlotTKTDGG <- function(data, xlab, ylab, main, concentration, one.plot,
+                              spaghetti, dataCIm, adddata, addlegend) {
   
   if (one.plot) {
     survFitPlotTKTDGGOnePlot(data, xlab, ylab, main, adddata, addlegend)
+  } else if (!one.plot && is.null(concentration)) {
+    survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
+                               dataCIm, adddata, concentration)
   } else {
     survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
-                               dataCIm, adddata)
+                               dataCIm, adddata, concentration)
   }
 }
 
@@ -345,7 +370,13 @@ survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend)
 }
 
 survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
-                                       dataCIm, adddata) {
+                                       dataCIm, adddata, concentration) {
+  if (!is.null(concentration)){
+    data[["dobs"]] <- filter(data[["dobs"]], conc == concentration)
+    data[["dtheoQ"]] <- filter(data[["dtheoQ"]], conc == concentration)
+    dataCIm <- filter(dataCIm, conc == concentration)
+  }
+  
   if (spaghetti) {
     gf <- ggplot(data[["dobs"]]) +
       geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
