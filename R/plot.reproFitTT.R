@@ -312,7 +312,7 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
                                style = "generic",
                                log.scale = log.scale, addlegend = FALSE,
                                remove.someLabels = FALSE,
-                               axis = FALSE)
+                               axis = FALSE, rect = TRUE)
   }
   
   # legend
@@ -409,7 +409,8 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
     plt_1 <- plotDoseResponse.reproData(x = x$transformed.data,
                                         target.time = unique(x$dataTT$time),
                                         style = "ggplot",
-                                        log.scale = log.scale, addlegend = TRUE)
+                                        log.scale = log.scale, addlegend = TRUE,
+                                        rect = TRUE)
     mylegend_1 <- legendGgplotFit(plt_1) # mean line legend
   }
   
@@ -419,13 +420,25 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
                           ylab, main, ylim_CI)$plt_4
   
   if (adddata) {
-    plt_4 <- plt_4 +
-      geom_segment(aes(x = jittered_conc, xend = jittered_conc,
-                       y = reproRateInf, yend = reproRateSup),
-                   data = plt_1$data,
-                   arrow = arrow(length = unit(0.1, "cm"),
-                                 angle = 90, ends = "both")) +
-      geom_point(aes(x = jittered_conc, y = resp), plt_1$data)
+    # plt_4 <- plt_4 +
+    #   geom_segment(aes(x = jittered_conc, xend = jittered_conc,
+    #                    y = reproRateInf, yend = reproRateSup),
+    #                data = plt_1$data,
+    #                arrow = arrow(length = unit(0.1, "cm"),
+    #                              angle = 90, ends = "both")) +
+    #   geom_point(aes(x = jittered_conc, y = resp), plt_1$data)
+    delta <- 0.01 * (max(transf_data_conc) - min(transf_data_conc))
+
+    plt_4 <- plt_4 + geom_rect(aes(xmin = sort(transf_data_conc) - delta,
+                                   xmax = sort(transf_data_conc) + delta,
+                                   ymin = reproRateInf,
+                                   ymax = reproRateSup,
+                                   fill = Conf.Int),
+                               alpha = 0.2,
+                               data = cbind(plt_1$data, delta = delta)) +
+      geom_point(aes(x = sort(transf_data_conc), y = resp), plt_1$data,
+                 col = valCols$cols1)
+    
   }
   
   if (addlegend) {
