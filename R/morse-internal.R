@@ -37,7 +37,7 @@ selectDataTT <- function(data, target.time) {
     }
 
     # correct target time
-    if (!any(data$time == target.time))
+    if (!any(data$time == target.time) || target.time == 0)
       stop("target.time is not one of the possible time !")
 
     dataTT <- filter(data, time == target.time)
