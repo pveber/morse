@@ -106,7 +106,7 @@ plotDoseResponse.reproData <- function(x,
                                display.conc, ylim, axis, main, addlegend, rect)
   else if (style == "ggplot")
     reproDoseResponseCIGG(x, conc_val, jittered_conc, transf_data_conc,
-                          display.conc, main, addlegend, remove.someLabels,
+                          display.conc, ylim, main, addlegend, remove.someLabels,
                           rect)
   else stop("Unknown style")
 }
@@ -165,9 +165,10 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
 }
 
 reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
-                                  display.conc, main, addlegend,
+                                  display.conc, ylim, main, addlegend,
                                   remove.someLabels, rect) {
   
+  if (is.null(ylim)) ylim <- max(x$reproRateSup)
   x0 <- cbind(x[order(x$conc),], jittered_conc = as.vector(jittered_conc))
   
   df <- data.frame(x0,
@@ -221,6 +222,7 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
                          unique(display.conc)
                        }
     ) +
+    ylim(0, max(ylim) + 0.2) +
     theme_minimal()
   
   if (addlegend) {
