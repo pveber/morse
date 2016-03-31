@@ -408,14 +408,14 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
   
   # dataframes points (data) and curve (curv)
   # colors
-  valCols <- fCols(curv_resp, fitcol, cicol)
+  valCols <- fCols(curv_resp, fitcol, cicol, rect = TRUE)
   
   if (adddata) {
     plt_1 <- plotDoseResponse.reproData(x = x$transformed.data,
                                         target.time = unique(x$dataTT$time),
                                         style = "ggplot",
                                         log.scale = log.scale, addlegend = TRUE,
-                                        rect = TRUE)
+                                        rect = TRUE, cicol = cicol)
     mylegend_1 <- legendGgplotFit(plt_1) # mean line legend
   }
   
@@ -425,22 +425,18 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
                           ylab, main, ylim_CI)$plt_4
   
   if (adddata) {
-    # plt_4 <- plt_4 +
-    #   geom_segment(aes(x = jittered_conc, xend = jittered_conc,
-    #                    y = reproRateInf, yend = reproRateSup),
-    #                data = plt_1$data,
-    #                arrow = arrow(length = unit(0.1, "cm"),
-    #                              angle = 90, ends = "both")) +
-    #   geom_point(aes(x = jittered_conc, y = resp), plt_1$data)
+    color_rect <- valCols$cols3
+    color_transparent_rect <- adjustcolor(color_rect, alpha.f = 0.3)
+    
     delta <- 0.01 * (max(transf_data_conc) - min(transf_data_conc))
 
     plt_4 <- plt_4 + geom_rect(aes(xmin = sort(transf_data_conc) - delta,
                                    xmax = sort(transf_data_conc) + delta,
                                    ymin = reproRateInf,
-                                   ymax = reproRateSup,
-                                   fill = Conf.Int),
+                                   ymax = reproRateSup),
                                alpha = 0.2,
-                               data = cbind(plt_1$data, delta = delta)) +
+                               data = cbind(plt_1$data, delta = delta),
+                               fill = color_transparent_rect) +
       geom_point(aes(x = sort(transf_data_conc), y = resp), plt_1$data,
                  col = valCols$cols1)
     
@@ -449,7 +445,6 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
   if (addlegend) {
     
     # create legends
-    
     # curve (to create the legend)
     plt_2 <- ggplot(curv_resp) +
       geom_line(data = curv_resp, aes(conc, resp, colour = Line),
@@ -480,7 +475,8 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
   }
   else { # no legend
     plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
-                                        labels = data_conc)
+                                        labels = data_conc) +
+      theme(legend.position = "none")
     return(plt_5)
   }
 }
