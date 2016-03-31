@@ -306,6 +306,9 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
   
   if (adddata) {
     par(new = TRUE)
+    color_rect <- "gray"
+    color_transparent_rect <- adjustcolor(color_rect, alpha.f = 0.3)
+    
     plotDoseResponse.reproData(x = x$transformed.data,
                                ylim = c(0, ylim_CI + 0.01),
                                target.time = unique(x$dataTT$time),
@@ -321,10 +324,12 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
            pch = c(ifelse(adddata, 16, NA), NA, NA, NA),
            lty = c(NA, ifelse(adddata, 1, NA), cilty, fitlty),
            lwd = c(NA, ifelse(adddata, 1, NA), cilwd, fitlwd),
-           col = c(ifelse(adddata, 1, NA), 1, fitcol, cicol),
+           col = c(ifelse(adddata, 1, NA),
+                   ifelse(adddata, color_transparent_rect, NA),
+                   fitcol, cicol),
            legend = c(ifelse(adddata, "Observed values", NA),
                       ifelse(adddata, "Confidence interval", NA),
-                      "Credible limits", "loglogistic"),
+                      "loglogistic", "Credible limits"),
            bty = "n")
   }
 }
