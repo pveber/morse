@@ -24,6 +24,8 @@
 #' \code{'ggplot'} style to avoid the label overlap
 #' @param axis if \code{TRUE} displays ticks and label axis
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
+#' @param rect if \code{TRUE}, confidence interval on data are represented by 
+#' rectangles, else by segments
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @note When \code{style = "ggplot"}, the function calls function
@@ -68,6 +70,7 @@ plotDoseResponse.reproData <- function(x,
                                        remove.someLabels = FALSE,
                                        axis = TRUE,
                                        addlegend = TRUE,
+                                       rect = FALSE,
                                        ...) {
   if (is.null(target.time)) target.time <- max(x$time)
   
@@ -100,16 +103,17 @@ plotDoseResponse.reproData <- function(x,
   
   if (style == "generic")
     reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
-                               display.conc, ylim, axis, main, addlegend)
+                               display.conc, ylim, axis, main, addlegend, rect)
   else if (style == "ggplot")
     reproDoseResponseCIGG(x, conc_val, jittered_conc, transf_data_conc,
-                          display.conc, main, addlegend, remove.someLabels)
+                          display.conc, ylim, main, addlegend, remove.someLabels,
+                          rect)
   else stop("Unknown style")
 }
 
 reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
                                        transf_data_conc, display.conc, ylim,
-                                       axis, main, addlegend) {
+                                       axis, main, addlegend, rect) {
   
   if (is.null(ylim)) ylim <- c(0, max(x$reproRateSup))
   plot(jittered_conc, x$resp,
@@ -130,29 +134,41 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
   
   x0 <- x[order(x$conc),]
   delta <- 0.01 * (max(conc_val) - min(conc_val))
-  segments(jittered_conc, x0[, "reproRateInf"],
-           jittered_conc, x0[, "reproRateSup"])
-  segments(jittered_conc - delta, x0[, "reproRateInf"],
-           jittered_conc + delta, x0[, "reproRateInf"])
-  segments(jittered_conc - delta, x0[, "reproRateSup"],
-           jittered_conc + delta, x0[, "reproRateSup"])
-  
-  points(jittered_conc, x0$resp, pch = 20)
+  if (rect) {
+    color <- "gray"
+    color_transparent <- adjustcolor(color, alpha.f = 0.3)
+    
+    points(sort(transf_data_conc), x0$resp, pch = 20)
+    
+    rect(sort(transf_data_conc) - delta, x0[, "reproRateInf"],
+         sort(transf_data_conc) + delta, x0[, "reproRateSup"],
+         col = color_transparent, border = NA)
+  } else {
+    segments(jittered_conc, x0[, "reproRateInf"],
+             jittered_conc, x0[, "reproRateSup"])
+    segments(jittered_conc - delta, x0[, "reproRateInf"],
+             jittered_conc + delta, x0[, "reproRateInf"])
+    segments(jittered_conc - delta, x0[, "reproRateSup"],
+             jittered_conc + delta, x0[, "reproRateSup"])
+    
+    points(jittered_conc, x0$resp, pch = 20)
+  }
   
   if (addlegend) {
     legend("bottomleft", pch = c(20, NA),
            lty = c(NA, 1),
-           lwd = c(NA, 1),
-           col = c(1, 1),
+           lwd = c(NA, ifelse(rect, 5, 1)),
+           col = c(1, ifelse(rect, "gray80", 1)),
            legend = c("Observed values", "Confidence interval"),
            bty = "n")
   }
 }
 
 reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
-                                  display.conc, main, addlegend,
-                                  remove.someLabels) {
+                                  display.conc, ylim, main, addlegend,
+                                  remove.someLabels, rect) {
   
+  if (is.null(ylim)) ylim <- max(x$reproRateSup)
   x0 <- cbind(x[order(x$conc),], jittered_conc = as.vector(jittered_conc))
   
   df <- data.frame(x0,
@@ -168,17 +184,34 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
   # colors
   valCols <- fCols(df, fitcol = NA, cicol = NA)
   
-  gf <- ggplot(dfCI) + geom_segment(aes(x = jittered_conc, xend = jittered_conc,
-                                        y = reproRateInf, yend = reproRateSup,
-                                        linetype = Conf.Int),
-                                    data = dfCI,
-                                    arrow = arrow(length = unit(0.1, "cm"),
-                                                  angle = 90, ends = "both"),
-                                    col = valCols$cols3) +
-    geom_point(aes(x = jittered_conc, y = resp, fill = Points), df,
-               col = valCols$cols1) +
-    scale_fill_hue("") +
+  if (rect) {
+    delta <- 0.01 * (max(conc_val) - min(conc_val))
+    
+    gf_1 <- ggplot(dfCI) + geom_rect(aes(xmin = sort(transf_data_conc) - delta,
+                                         xmax = sort(transf_data_conc) + delta,
+                                         ymin = reproRateInf,
+                                         ymax = reproRateSup,
+                                         fill = Conf.Int),
+                                     alpha = 0.2) +
+      geom_point(aes(x = sort(transf_data_conc), y = resp, shape = Points), df,
+                 col = valCols$cols1)
+  } else {
+    gf_1 <- ggplot(dfCI) + geom_segment(aes(x = jittered_conc,
+                                            xend = jittered_conc,
+                                            y = reproRateInf,
+                                            yend = reproRateSup,
+                                            linetype = Conf.Int),
+                                        arrow = arrow(length = unit(0.1, "cm"),
+                                                      angle = 90, ends = "both"),
+                                        col = valCols$cols3) +
+      geom_point(aes(x = jittered_conc, y = resp, shape = Points), df,
+                 col = valCols$cols1)
+  }
+  
+  gf <- gf_1 +
+    scale_shape(name = "") +
     scale_linetype(name = "") +
+    scale_fill_hue("") +
     expand_limits(y = 0) +
     ggtitle(main) +
     labs(x = "Concentration", y = "Reproduction rate") +
@@ -189,6 +222,7 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
                          unique(display.conc)
                        }
     ) +
+    ylim(0, max(ylim) + 0.2) +
     theme_minimal()
   
   if (addlegend) {

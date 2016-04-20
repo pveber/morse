@@ -157,7 +157,7 @@ legendGgplotFit <- function(a.gplot) {
   return(legend)
 }
 
-fCols <- function(data, fitcol, cicol) {
+fCols <- function(data, fitcol, cicol, rect = FALSE) {
   
   # points
   cols1 <- "black"
@@ -166,7 +166,7 @@ fCols <- function(data, fitcol, cicol) {
   cols2 <- fitcol
   names(cols2) <- "loglogistic"
   # Conf Int
-  cols3 <- "black"
+  cols3 <- ifelse(rect, cicol, "black")
   names(cols3) <- "Confidence interval"
   # Cred Int
   cols4 <- cicol

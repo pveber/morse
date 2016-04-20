@@ -135,13 +135,23 @@ plot.reproFitTT <- function(x,
   curv_resp <- data.frame(conc = curv_conc, resp = cred.int[["q50"]],
                           Line = "loglogistic")
   
+  # ylim
+  ylim_CI <- if (spaghetti) { max(c(pois.exact(dataTT$Nreprocumul,
+                                               dataTT$Nindtime)$upper,
+                                    dataCIm$value, cred.int$qsup95))
+  } else {
+    max(c(pois.exact(dataTT$Nreprocumul,
+                     dataTT$Nindtime)$upper,
+          cred.int$qsup95))
+  }
+
   if (style == "generic") {
     reproFitPlotGenericCredInt(x, dataTT$conc, transf_data_conc, dataTT$resp,
                                curv_conc, curv_resp,
                                cred.int, spaghetti.CI, dataCIm,
                                xlab, ylab, fitcol, fitlty, fitlwd,
                                main, addlegend, adddata,
-                               cicol, cilty, cilwd, log.scale)
+                               cicol, cilty, cilwd, log.scale, ylim_CI)
   }
   else if (style == "ggplot") {
     reproFitPlotGG(x, dataTT$conc, transf_data_conc, dataTT$resp,
@@ -149,7 +159,7 @@ plot.reproFitTT <- function(x,
                    cred.int, spaghetti.CI, dataCIm,
                    xlab, ylab, fitcol, fitlty, fitlwd,
                    main, addlegend, adddata,
-                   cicol, cilty, cilwd, log.scale)
+                   cicol, cilty, cilwd, log.scale, ylim_CI)
   }
   else stop("Unknown style")
 }
@@ -245,12 +255,14 @@ reproSpaghetti <- function(fit, x) {
   return(dtheof)
 }
 
+#' @importFrom epitools pois.exact
 reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp,
                                        curv_conc, curv_resp,
                                        cred.int, spaghetti.CI, dataCIm,
                                        xlab, ylab, fitcol, fitlty, fitlwd,
                                        main, addlegend, adddata,
-                                       cicol, cilty, cilwd, log.scale) {
+                                       cicol, cilty, cilwd, log.scale, ylim_CI) {
+
   # plot the fitted curve estimated by reproFitTT
   # with generic style with credible interval
   
@@ -260,15 +272,11 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
        main = main,
        xaxt = "n",
        yaxt = "n",
-       ylim = c(0, ifelse(!is.null(dataCIm),
-                          max(dataCIm$value),
-                          max(cred.int$qsup95)) + 0.01),
+       ylim = c(0, ylim_CI + 0.01),
        type = "n")
   
   # axis
-  axis(side = 2, at = pretty(c(0, ifelse(!is.null(dataCIm),
-                                         max(dataCIm$value),
-                                         max(cred.int$qsup95)))))
+  axis(side = 2, at = pretty(c(0, ylim_CI)))
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
@@ -298,16 +306,16 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
   
   if (adddata) {
     par(new = TRUE)
+    color_rect <- "gray"
+    color_transparent_rect <- adjustcolor(color_rect, alpha.f = 0.3)
+    
     plotDoseResponse.reproData(x = x$transformed.data,
-                               ylim = c(0,
-                                        ifelse(!is.null(dataCIm),
-                                               max(dataCIm$value),
-                                               max(cred.int$qsup95)) + 0.01),
+                               ylim = c(0, ylim_CI + 0.01),
                                target.time = unique(x$dataTT$time),
                                style = "generic",
                                log.scale = log.scale, addlegend = FALSE,
                                remove.someLabels = FALSE,
-                               axis = FALSE)
+                               axis = FALSE, rect = TRUE)
   }
   
   # legend
@@ -316,17 +324,19 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
            pch = c(ifelse(adddata, 16, NA), NA, NA, NA),
            lty = c(NA, ifelse(adddata, 1, NA), cilty, fitlty),
            lwd = c(NA, ifelse(adddata, 1, NA), cilwd, fitlwd),
-           col = c(ifelse(adddata, 1, NA), 1, fitcol, cicol),
+           col = c(ifelse(adddata, 1, NA),
+                   ifelse(adddata, color_transparent_rect, NA),
+                   fitcol, cicol),
            legend = c(ifelse(adddata, "Observed values", NA),
                       ifelse(adddata, "Confidence interval", NA),
-                      "Credible limits", "loglogistic"),
+                      "loglogistic", "Credible limits"),
            bty = "n")
   }
 }
 
 reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
                                   cicol, cilty, cilwd, valCols, fitlty, fitlwd,
-                                  xlab, ylab, main) {
+                                  xlab, ylab, main, ylim_CI) {
   # IC
   data.three <- data.frame(conc = curv_resp$conc,
                            qinf95 = cred.int[["qinf95"]],
@@ -376,9 +386,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
               linetype = cilty, size = cilwd, color = valCols$cols4) +
     geom_line(aes(conc, resp), curv_resp,
               linetype = fitlty, size = fitlwd, color = valCols$cols2) +
-    ylim(0, ifelse(!is.null(dataCIm),
-                   max(dataCIm$value),
-                   max(cred.int$qsup95)) + 0.2) +
+    ylim(0, ylim_CI + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
   
@@ -391,7 +399,7 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
                            cred.int, spaghetti.CI, dataCIm,
                            xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend, adddata,
-                           cicol, cilty, cilwd, log.scale) {
+                           cicol, cilty, cilwd, log.scale, ylim_CI) {
   
   if (Sys.getenv("RSTUDIO") == "") {
     dev.new() # create a new page plot
@@ -400,35 +408,43 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
   
   # dataframes points (data) and curve (curv)
   # colors
-  valCols <- fCols(curv_resp, fitcol, cicol)
+  valCols <- fCols(curv_resp, fitcol, cicol, rect = TRUE)
   
   if (adddata) {
     plt_1 <- plotDoseResponse.reproData(x = x$transformed.data,
                                         target.time = unique(x$dataTT$time),
                                         style = "ggplot",
-                                        log.scale = log.scale, addlegend = TRUE)
+                                        log.scale = log.scale, addlegend = TRUE,
+                                        rect = TRUE, cicol = cicol)
     mylegend_1 <- legendGgplotFit(plt_1) # mean line legend
   }
   
   plt_4 <-
     reproFitPlotGGCredInt(curv_resp, cred.int, spaghetti.CI, dataCIm,
                           cicol, cilty, cilwd, valCols, fitlty, fitlwd, xlab,
-                          ylab, main)$plt_4
+                          ylab, main, ylim_CI)$plt_4
   
   if (adddata) {
-    plt_4 <- plt_4 +
-      geom_segment(aes(x = jittered_conc, xend = jittered_conc,
-                       y = reproRateInf, yend = reproRateSup),
-                   data = plt_1$data,
-                   arrow = arrow(length = unit(0.1, "cm"),
-                                 angle = 90, ends = "both")) +
-      geom_point(aes(x = jittered_conc, y = resp), plt_1$data)
+    color_rect <- valCols$cols3
+    color_transparent_rect <- adjustcolor(color_rect, alpha.f = 0.3)
+    
+    delta <- 0.01 * (max(transf_data_conc) - min(transf_data_conc))
+
+    plt_4 <- plt_4 + geom_rect(aes(xmin = sort(transf_data_conc) - delta,
+                                   xmax = sort(transf_data_conc) + delta,
+                                   ymin = reproRateInf,
+                                   ymax = reproRateSup),
+                               alpha = 0.2,
+                               data = cbind(plt_1$data, delta = delta),
+                               fill = color_transparent_rect) +
+      geom_point(aes(x = sort(transf_data_conc), y = resp), plt_1$data,
+                 col = valCols$cols1)
+    
   }
   
   if (addlegend) {
     
     # create legends
-    
     # curve (to create the legend)
     plt_2 <- ggplot(curv_resp) +
       geom_line(data = curv_resp, aes(conc, resp, colour = Line),
@@ -443,7 +459,7 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
     
     plt_3 <- reproFitPlotGGCredInt(curv_resp, cred.int, spaghetti.CI, dataCIm,
                                    cicol, cilty, cilwd, valCols, fitlty,
-                                   fitlwd, xlab, ylab, main)$plt_3
+                                   fitlwd, xlab, ylab, main, ylim_CI)$plt_3
     
     mylegend_3 <- legendGgplotFit(plt_3)
     
@@ -459,7 +475,8 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
   }
   else { # no legend
     plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
-                                        labels = data_conc)
+                                        labels = data_conc) +
+      theme(legend.position = "none")
     return(plt_5)
   }
 }
