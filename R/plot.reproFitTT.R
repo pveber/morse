@@ -126,13 +126,9 @@ plot.reproFitTT <- function(x,
                           Line = "loglogistic")
   
   # ylim
-  ylim_CI <- if (spaghetti) { max(c(pois.exact(dataTT$Nreprocumul,
-                                               dataTT$Nindtime)$upper,
-                                    dataCIm$value, cred.int$qsup95))
+  ylim_CI <- if (spaghetti) { max(dataCIm$value, cred.int$qsup95)
   } else {
-    max(c(pois.exact(dataTT$Nreprocumul,
-                     dataTT$Nindtime)$upper,
-          cred.int$qsup95))
+    max(cred.int$qsup95)
   }
 
   if (style == "generic") {
