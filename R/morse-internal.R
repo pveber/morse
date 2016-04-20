@@ -191,11 +191,11 @@ stepCalc <- function(obs_val) {
   return(list(sObs = sObs, stepX = stepX))
 }
 
-jitterObsGenerator <- function(stepX, tab, obs_val) {
+jitterObsGenerator <- function(stepX, tab, obs_val, log.scale = FALSE) {
   # uniform jittering of observed values
   allSpaceX <- sapply(2:length(stepX),
-                      function(i) { obs_val[i] - obs_val[i-1] })
-  spaceX <- min(allSpaceX[which(allSpaceX != 0)]) / 4
+                      function(i) { stepX[i] - stepX[i-1] })
+  spaceX <- min(allSpaceX[which(allSpaceX != 0)]) / ifelse(!log.scale, 4, exp(4))
   lengthX <- table(tab[, "Obs"])
   jitterObs <- mapply(function(x, y) {
     if (y == 1) {
