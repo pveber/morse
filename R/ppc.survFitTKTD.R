@@ -14,7 +14,6 @@
 #' prediction interval contains each observed value. 
 #'
 #' @param x An object of class \code{survFitTKTD}
-#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods
@@ -40,15 +39,14 @@
 #' @importFrom graphics plot
 #' 
 #' @export
-ppc.survFitTKTD <- function(x, remove.someLabels = FALSE,
-                            style = "generic", ...) {
+ppc.survFitTKTD <- function(x, style = "generic", ...) {
   if (!is(x, "survFitTKTD"))
     stop("x is not of class 'survFitTKTD'!")
   
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
   
-  ppc_gen(EvalsurvTKTDPpc(x), style, xlab, ylab, remove.someLabels)
+  ppc_gen(EvalsurvTKTDPpc(x), style, xlab, ylab)
 }
 
 #' @importFrom stats rbinom quantile
