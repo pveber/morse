@@ -44,10 +44,6 @@ ppc.reproFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
   
-  if (style == "generic" && remove.someLabels)
-    warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
-            call. = FALSE)
-  
   xlab <- "Observed Cumul. Nbr. of offspring"
   ylab <- "Predicted Cumul. Nbr. of offspring"
 
