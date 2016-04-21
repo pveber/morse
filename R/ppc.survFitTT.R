@@ -102,8 +102,8 @@ PpcGeneric <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
-  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)$jitterObs
-  spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$jitterObs
+  spaceX <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$spaceX
   
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
@@ -149,8 +149,8 @@ PpcGG <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
-  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)$jitterObs
-  spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$jitterObs
+  spaceX <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$spaceX
   
   tab0 <- cbind(tab[order(tab$Obs),], jittered_obs)
   
