@@ -419,9 +419,7 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
     plt_4 <- plt_4 +
       geom_segment(aes(x = jittered_conc, xend = jittered_conc,
                        y = reproRateInf, yend = reproRateSup),
-                   data = plt_1$data,
-                   arrow = arrow(length = unit(0.1, "cm"),
-                                 angle = 90, ends = "both")) +
+                   data = plt_1$data) +
       geom_point(aes(x = jittered_conc, y = resp), plt_1$data)
   }
   

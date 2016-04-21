@@ -119,24 +119,8 @@ plotDoseResponse.survData <- function(x,
     segments(transf_data_conc, x$resp,
              transf_data_conc, conf.int["qsup95", ])
     
-    Bond <- if (log.scale) {
-      0.03 * (max(transf_data_conc) - min(transf_data_conc))
-    } else {
-      0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
-    }
-    
-    segments(transf_data_conc - Bond,
-             conf.int["qsup95", ],
-             transf_data_conc + Bond,
-             conf.int["qsup95", ])
-    
     segments(transf_data_conc, x$resp,
              transf_data_conc, conf.int["qinf95", ])
-    
-    segments(transf_data_conc - Bond,
-             conf.int["qinf95", ],
-             transf_data_conc + Bond,
-             conf.int["qinf95", ])
     
     # add legend
     if (addlegend) {
@@ -167,8 +151,7 @@ plotDoseResponse.survData <- function(x,
       geom_segment(aes(x = conc, xend = conc, y = qinf95,
                        yend = qsup95,
                        linetype = Conf.Int),
-                   arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                 ends = "both"), dfCI, col = valCols$cols3) +
+                   dfCI, col = valCols$cols3) +
       scale_fill_hue("") +
       scale_linetype(name = "") +
       expand_limits(x = 0, y = 0) + ggtitle(main) +
