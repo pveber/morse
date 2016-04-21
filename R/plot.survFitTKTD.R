@@ -90,6 +90,9 @@ plot.survFitTKTD <- function(x,
     warning("If argument 'concentration' is specified 'one.plot' must be set FALSE")
   }
   
+  if (!is.null(concentration) && !any(x$transformed.data$conc == concentration))
+    stop("The [concentration] argument is not one of the possible concentration !")
+  
   conf.int <- survTKTDConfInt(x)
   
   data.credInt <- survFitPlotCITKTD(x)
