@@ -156,11 +156,11 @@ survTKTDPARAMS <- function(mcmc) {
 #' The function returns
 #' parameter estimates of the time-exposure-response model.
 #' 
-#' @param data An object of class \code{survData}.
+#' @param data An object of class \code{survData}
 #' @param n.chains Number of MCMC chains. The minimum required number of chains
-#' is 2.
+#' is 2
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
-#' JAGS compilation.
+#' JAGS compilation
 #' 
 #' @return The function returns an object of class \code{survFitTKTD}, which is
 #' a list with the following fields:
