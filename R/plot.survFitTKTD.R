@@ -280,18 +280,9 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
 }
 
 survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
-<<<<<<< HEAD
-                                            dataCIm, adddata) {
-=======
                                             dataCIm, adddata, concentration,
                                             addlegend = FALSE) {
->>>>>>> 5d45808... a legend for one conc plot generic
   
-<<<<<<< HEAD
-  dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
-  dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
-  dataCIm <- split(dataCIm, dataCIm$conc)
-=======
   if (is.null(concentration)) {
     dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
     dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
@@ -301,7 +292,6 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
     dtheoQ <- list(filter(data[["dtheoQ"]], conc == concentration))
     dataCIm <- list(filter(dataCIm, conc == concentration))
   }
->>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
   
   delta <- 0.01 * (max(data[["dobs"]]$time) - min(data[["dobs"]]$time))
   
@@ -371,11 +361,7 @@ survFitPlotTKTDGG <- function(data, xlab, ylab, main, one.plot, spaghetti,
     survFitPlotTKTDGGOnePlot(data, xlab, ylab, main, adddata, addlegend)
   } else {
     survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
-<<<<<<< HEAD
-                               dataCIm, adddata)
-=======
                                dataCIm, adddata, concentration, addlegend)
->>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
   }
 }
 
@@ -398,9 +384,6 @@ survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend)
 }
 
 survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
-<<<<<<< HEAD
-                                       dataCIm, adddata) {
-=======
                                        dataCIm, adddata, concentration,
                                        addlegend = FALSE) {
   if (!is.null(concentration)) {
@@ -412,7 +395,6 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                             Line = "Mean curve")
   }
   
->>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
   if (spaghetti) {
     gf <- ggplot(data[["dobs"]]) +
       geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
@@ -447,15 +429,6 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
     theme_minimal()
   
   if (adddata) {
-<<<<<<< HEAD
-    gf +
-      geom_point(aes(x = time, y = psurv, colour = factor(conc)),
-                 data = data[["obs"]], color = "black") +
-      geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95),
-                   arrow = arrow(length = unit(0.1, "cm"), angle = 90,
-                                 ends = "both"), data[["obs"]], color = "gray",
-                   size = 0.5)
-=======
     # dataframes points (data) and curve (curv)
     gf <- gf +
       geom_point(aes(x = time, y = psurv, fill = Points),
@@ -464,9 +437,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                        linetype = "Conf.Int"),
                    data[["dobs"]], col = "gray",
                    size = 0.5) +
-      scale_fill_hue("") +
-      scale_color_hue("")
->>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
+      scale_fill_hue("")
   } else {
      gf <- gf
   }
