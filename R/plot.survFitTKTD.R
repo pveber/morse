@@ -329,7 +329,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
     if (adddata) {
       points(y[, "time"],
              y[, "psurv"],
-             pch = 16,
+             pch = 20,
              col = y[, "color"]) # points
       segments(y[, "time"], y[, "qinf95"],
                y[, "time"], y[, "qsup95"],
@@ -343,7 +343,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
     }
     
     if (addlegend) {
-      legend("bottomleft", pch = c(ifelse(adddata, 16, NA), NA, NA, NA),
+      legend("bottomleft", pch = c(ifelse(adddata, 20, NA), NA, NA, NA),
              lty = c(NA, ifelse(adddata, 1, NA), 1, 2),
              col = c(ifelse(adddata, "black", NA),
                      ifelse(adddata, "gray", NA),
