@@ -356,9 +356,7 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
   if (adddata) {
     plt_3 <- ggplot(data) +
       geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
-                       linetype = Conf.Int),
-                   arrow = arrow(length = unit(0.1 , "cm"), angle = 90,
-                                 ends = "both"), data.three,
+                       linetype = Conf.Int), data.three,
                    color = valCols$cols3) +
       scale_linetype(name = "") +
       theme_minimal()
