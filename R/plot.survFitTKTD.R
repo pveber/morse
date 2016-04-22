@@ -86,9 +86,12 @@ plot.survFitTKTD <- function(x,
                              addlegend = FALSE,
                              style = "generic", ...) {
   
-  if (one.plot && !is.null(concentration)) {
-    warning("If argument 'concentration' is specified 'one.plot' must be set FALSE")
-  }
+  if (one.plot && !is.null(concentration))
+    one.plot <- FALSE
+  
+  if ((addlegend && is.null(concentration)) ||
+      (addlegend && !one.plot))
+    warning("The legend is available only if [one.plot] is TRUE or if [concentration] is not NULL !", call. = FALSE)
   
   if (!is.null(concentration) && !any(x$transformed.data$conc == concentration))
     stop("The [concentration] argument is not one of the possible concentration !")
@@ -237,7 +240,7 @@ survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, concentration,
     par(mfrow = c(1, 1))
   } else {
     survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
-                                    dataCIm, adddata, concentration)
+                                    dataCIm, adddata, concentration, addlegend)
   }
 }
 
@@ -278,7 +281,8 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
 }
 
 survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
-                                            dataCIm, adddata, concentration) {
+                                            dataCIm, adddata, concentration,
+                                            addlegend = FALSE) {
   
   if (is.null(concentration)) {
     dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
@@ -330,6 +334,18 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
       segments(y[, "time"], y[, "qinf95"],
                y[, "time"], y[, "qsup95"],
                col = "gray")
+    }
+    
+    if (addlegend) {
+      legend("bottomleft", pch = c(ifelse(adddata, 16, NA), NA, NA, NA),
+             lty = c(NA, ifelse(adddata, 1, NA), 1, 2),
+             col = c(ifelse(adddata, y[, "color"], NA),
+                     ifelse(adddata, y[, "color"], NA),
+                     x[, "color"], x[, "color"]),
+             legend = c(ifelse(adddata, "Observed values", NA),
+                        ifelse(adddata, "Confidence interval", NA),
+                        "Credible limits", "Mean curve"),
+             bty = "n")
     }
   }, x = dtheoQ, y = dobs, z = dataCIm)
 }
