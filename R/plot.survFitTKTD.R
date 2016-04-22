@@ -99,7 +99,11 @@ plot.survFitTKTD <- function(x,
   
   data.credInt[["dobs"]] <- data.frame(data.credInt[["dobs"]],
                                        qinf95 = conf.int["qinf95", ],
-                                       qsup95 = conf.int["qsup95",])
+                                       qsup95 = conf.int["qsup95",],
+                                       Conf.Int = "Confidence interval",
+                                       Points = "Observed values")
+  
+  data.credInt[["dtheoQ"]]$Cred.Lim <- "Credible limits"
   
   # vector color
   data.credInt[["dobs"]]$color <-
@@ -109,7 +113,6 @@ plot.survFitTKTD <- function(x,
   
   dataCIm <- melt(data.credInt[["dtheoSp"]],
                   id.vars = c("conc", "time"))
-  
   
   if (style == "generic") {
     survFitPlotTKTDGeneric(data.credInt, xlab, ylab, main, one.plot, spaghetti,
@@ -225,22 +228,19 @@ survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, one.plot,
                                    spaghetti, dataCIm, adddata,
                                    addlegend) {
 
-  if (one.plot) {
-    survFitPlotTKTDGenericOnePlot(data, xlab, ylab, main, adddata, addlegend)
-  } else {
-    par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
-    
-    survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
-                                    dataCIm, adddata)
-    
-    par(mfrow = c(1, 1))
-<<<<<<< HEAD
-=======
-  } else {
-    survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
-                                    dataCIm, adddata, concentration, addlegend)
->>>>>>> 5d45808... a legend for one conc plot generic
-  }
+    if (one.plot) {
+        survFitPlotTKTDGenericOnePlot(data, xlab, ylab, main, adddata, addlegend)
+    } else if (!one.plot && is.null(concentration)) {
+        par(mfrow = plotMatrixGeometry(length(unique(data[["dobs"]][["conc"]]))))
+
+        survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
+                                        dataCIm, adddata, concentration)
+        
+        par(mfrow = c(1, 1))
+    } else {
+        survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
+                                        dataCIm, adddata, concentration, addlegend)
+    }
 }
 
 survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
@@ -287,9 +287,21 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
                                             addlegend = FALSE) {
 >>>>>>> 5d45808... a legend for one conc plot generic
   
+<<<<<<< HEAD
   dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
   dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
   dataCIm <- split(dataCIm, dataCIm$conc)
+=======
+  if (is.null(concentration)) {
+    dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
+    dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
+    dataCIm <- split(dataCIm, dataCIm$conc)
+  } else {
+    dobs <- list(filter(data[["dobs"]], conc == concentration))
+    dtheoQ <- list(filter(data[["dtheoQ"]], conc == concentration))
+    dataCIm <- list(filter(dataCIm, conc == concentration))
+  }
+>>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
   
   delta <- 0.01 * (max(data[["dobs"]]$time) - min(data[["dobs"]]$time))
   
@@ -359,7 +371,11 @@ survFitPlotTKTDGG <- function(data, xlab, ylab, main, one.plot, spaghetti,
     survFitPlotTKTDGGOnePlot(data, xlab, ylab, main, adddata, addlegend)
   } else {
     survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
+<<<<<<< HEAD
                                dataCIm, adddata)
+=======
+                               dataCIm, adddata, concentration, addlegend)
+>>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
   }
 }
 
@@ -382,7 +398,21 @@ survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend)
 }
 
 survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
+<<<<<<< HEAD
                                        dataCIm, adddata) {
+=======
+                                       dataCIm, adddata, concentration,
+                                       addlegend = FALSE) {
+  if (!is.null(concentration)) {
+    data[["dobs"]] <- filter(data[["dobs"]], conc == concentration)
+    data[["dtheoQ"]] <- filter(data[["dtheoQ"]], conc == concentration)
+    dataCIm <- filter(dataCIm, conc == concentration)
+    curv_resp <- data.frame(time = data[["dtheoQ"]]$time,
+                            resp = data[["dtheoQ"]]$q50,
+                            Line = "Mean curve")
+  }
+  
+>>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
   if (spaghetti) {
     gf <- ggplot(data[["dobs"]]) +
       geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
@@ -393,18 +423,31 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                                                ymax = qsup95),
                   fill = "pink", col = "pink", alpha = 0.4)
   }
-  gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
-                       linetype = 'dashed', color = data[["dtheoQ"]]$color) +
-    geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95),
-              linetype = 'dashed', color = data[["dtheoQ"]]$color) +
-    geom_line(data = data[["dtheoQ"]], aes(x = time, y = qsup95),
-              linetype = 'dashed', color = data[["dtheoQ"]]$color) +
+  
+  if (!is.null(concentration)) {
+    gf <- gf + geom_line(data = curv_resp, aes(x = time, y = resp,
+                                               color = Line),
+                         linetype = 'dashed')  +
+      scale_color_hue("")
+  } else {
+    gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
+                                                      color = data[["dtheoQ"]]$color,
+                         linetype = 'dashed')
+  }
+  gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95,
+                                                    color = Cred.Lim),
+                       linetype = 'dashed') +
+    geom_line(data = data[["dtheoQ"]], aes(x = time, y = qsup95,
+                                           color = Cred.Lim),
+              linetype = 'dashed') +
     facet_wrap(~conc) +
+    scale_linetype(name = "") +
     labs(x = xlab, y = ylab) + ggtitle(main) +
     ylim(c(0, 1)) +
-    theme_minimal() +
-    scale_color_discrete(guide = "none")
+    theme_minimal()
+  
   if (adddata) {
+<<<<<<< HEAD
     gf +
       geom_point(aes(x = time, y = psurv, colour = factor(conc)),
                  data = data[["obs"]], color = "black") +
@@ -412,7 +455,26 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                    arrow = arrow(length = unit(0.1, "cm"), angle = 90,
                                  ends = "both"), data[["obs"]], color = "gray",
                    size = 0.5)
+=======
+    # dataframes points (data) and curve (curv)
+    gf <- gf +
+      geom_point(aes(x = time, y = psurv, fill = Points),
+                 data = data[["dobs"]], col = "black") +
+      geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95,
+                       linetype = "Conf.Int"),
+                   data[["dobs"]], col = "gray",
+                   size = 0.5) +
+      scale_fill_hue("") +
+      scale_color_hue("")
+>>>>>>> e9bce1a... a legend for ggplot concentration fixed with one message see later
   } else {
-    gf
+     gf <- gf
   }
+  
+  if (addlegend) {
+    gf
+  } else {
+    gf + theme(legend.position = "none")
+  }
+  
 }
