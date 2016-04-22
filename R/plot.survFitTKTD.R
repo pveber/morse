@@ -79,13 +79,20 @@ plot.survFitTKTD <- function(x,
                              addlegend = FALSE,
                              style = "generic", ...) {
   
-  if (one.plot)
-    warning("The credible limits and confidence intervals are not drawn when 'one.plot' = TRUE.",
-            call. = FALSE)
+  if (one.plot && !is.null(concentration))
+    one.plot <- FALSE
   
+  if ((addlegend && is.null(concentration)) ||
+      (addlegend && !one.plot))
+    warning("The legend is available only if [one.plot] is TRUE or if [concentration] is not NULL !", call. = FALSE)
+
   if (!is.null(concentration) && !any(x$transformed.data$conc == concentration))
     stop("The [concentration] argument is not one of the possible concentration !")
   
+  if (one.plot)
+    warning("The credible limits and confidence intervals are not drawn when 'one.plot' = TRUE.",
+            call. = FALSE)
+
   conf.int <- survTKTDConfInt(x)
   
   data.credInt <- survFitPlotCITKTD(x)
@@ -227,6 +234,12 @@ survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, one.plot,
                                     dataCIm, adddata)
     
     par(mfrow = c(1, 1))
+<<<<<<< HEAD
+=======
+  } else {
+    survFitPlotTKTDGenericNoOnePlot(data, xlab, ylab, spaghetti,
+                                    dataCIm, adddata, concentration, addlegend)
+>>>>>>> 5d45808... a legend for one conc plot generic
   }
 }
 
@@ -267,7 +280,12 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
 }
 
 survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
+<<<<<<< HEAD
                                             dataCIm, adddata) {
+=======
+                                            dataCIm, adddata, concentration,
+                                            addlegend = FALSE) {
+>>>>>>> 5d45808... a legend for one conc plot generic
   
   dobs <- split(data[["dobs"]], data[["dobs"]]$conc)
   dtheoQ <- split(data[["dtheoQ"]], data[["dtheoQ"]]$conc)
@@ -318,6 +336,18 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
       segments(y[, "time"] - delta, y[, "qsup95"],
                y[, "time"] + delta, y[, "qsup95"],
                col = "gray")
+    }
+    
+    if (addlegend) {
+      legend("bottomleft", pch = c(ifelse(adddata, 16, NA), NA, NA, NA),
+             lty = c(NA, ifelse(adddata, 1, NA), 1, 2),
+             col = c(ifelse(adddata, y[, "color"], NA),
+                     ifelse(adddata, y[, "color"], NA),
+                     x[, "color"], x[, "color"]),
+             legend = c(ifelse(adddata, "Observed values", NA),
+                        ifelse(adddata, "Confidence interval", NA),
+                        "Credible limits", "Mean curve"),
+             bty = "n")
     }
   }, x = dtheoQ, y = dobs, z = dataCIm)
 }
