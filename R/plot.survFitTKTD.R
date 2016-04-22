@@ -438,8 +438,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                        linetype = "Conf.Int"),
                    data[["dobs"]], col = "gray",
                    size = 0.5) +
-      scale_fill_hue("") +
-      scale_color_hue("")
+      scale_fill_hue("")
   } else {
      gf <- gf
   }
