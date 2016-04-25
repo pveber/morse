@@ -96,6 +96,9 @@ plot.survFitTKTD <- function(x,
   if (!is.null(concentration) && !any(x$transformed.data$conc == concentration))
     stop("The [concentration] argument is not one of the possible concentration !")
   
+  if (one.plot)
+    warning("The credible limits and confidence intervals are not drawn when 'one.plot' = TRUE.", call. = FALSE)
+  
   conf.int <- survTKTDConfInt(x)
   
   data.credInt <- survFitPlotCITKTD(x)
