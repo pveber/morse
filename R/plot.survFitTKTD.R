@@ -268,13 +268,15 @@ survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
   }
   if (addlegend) {
     legend("bottomleft",
-           legend = unique(data[["dobs"]]$conc),
-           pch = ifelse(adddata, 20, NA),
-           lty = 1,
+           legend = c(ifelse(adddata, "Observed values", NA),
+           unique(data[["dobs"]]$conc)),
+           pch = c(ifelse(adddata, 20, NA),
+                   rep(NA, length(unique(data[["dobs"]]$conc)))),
+           lty = c(NA, rep(1, length(unique(data[["dobs"]]$conc)))),
            bty = "n",
            cex = 1,
            ncol = 2,
-           col = "black",
+           col = unique(data[["dobs"]]$color),
            title = "Concentrations")
   }
 }
