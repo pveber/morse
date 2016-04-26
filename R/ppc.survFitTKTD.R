@@ -46,11 +46,11 @@ ppc.survFitTKTD <- function(x, meth = "for", style = "generic", ...) {
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
   
-  ppc_gen(EvalsurvTKTDPpc(x, meth), style, xlab, ylab)
+  ppc_gen(EvalsurvTKTDPpc(x), style, xlab, ylab)
 }
 
 #' @importFrom stats rbinom quantile
-EvalsurvTKTDPpc <- function(x, meth) {
+EvalsurvTKTDPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
 
   kd <- 10^sample(tot.mcmc[, "log10kd"], 5000)
@@ -67,42 +67,22 @@ EvalsurvTKTDPpc <- function(x, meth) {
   Nprec <- x$jags.data$Nprec
   bigtime <- x$jags.data$bigtime
   NsurvPred <- matrix(NA, nrow = 5000, ncol = n)
-  
-  if (meth == "for") {
-    for (i in 1:n) {
-      for (j in 1:length(kd)) {
-        xcor <- ifelse(xconc[i] > 0, xconc[i], 10)
-        R <- ifelse(xconc[i] > nec[j], nec[j]/xcor, 0.1)
-        tNEC <- ifelse(xconc[i] > nec[j], -1 / kd[j] * log(1 - R), bigtime)
-        tref <- max(tprec[i], tNEC)
-        psurv <- exp(-m0 * (t[i] - tprec[i]) +
-                       if (t[i] > tNEC) {
-                         -ks * ((xconc[i] - nec[j]) * (t[i] - tref) +
-                                  xconc[i]/kd[j] * (exp(-kd[j] * t[i]) - exp(-kd[j] * tref)))
-                       } else {
-                         0
-                       })
-      }
-      NsurvPred[, i] <- rbinom(5000, Nprec[i], psurv)
+  psurv = NULL
+  for (i in 1:n) {
+    for (j in 1:length(kd)) {
+      xcor <- ifelse(xconc[i] > 0, xconc[i], 10)
+      R <- ifelse(xconc[i] > nec[j], nec[j]/xcor, 0.1)
+      tNEC <- ifelse(xconc[i] > nec[j], -1 / kd[j] * log(1 - R), bigtime)
+      tref <- max(tprec[i], tNEC)
+      psurv[j] <- exp(-m0[j] * (t[i] - tprec[i]) +
+                        if (t[i] > tNEC) {
+                          -ks[j] * ((xconc[i] - nec[j]) * (t[i] - tref) +
+                                      xconc[i]/kd[j] * (exp(-kd[j] * t[i]) - exp(-kd[j] * tref)))
+                        } else {
+                          0
+                        })
     }
-  } else {
-    i <- 1:n
-    j <- 1:length(kd)
-    NsurvPred[, 1] <- sapply(j, function(x) {
-        xcor <- ifelse(xconc[1] > 0, xconc[1], 10)
-        R <- ifelse(xconc[1] > nec[x], nec[x]/xcor, 0.1)
-        tNEC <- ifelse(xconc[1] > nec[x], -1 / kd[x] * log(1 - R), bigtime)
-        tref <- max(tprec[1], tNEC)
-        psurv <- exp(-m0 * (t[1] - tprec[1]) +
-                       if (t[1] > tNEC) {
-                         -ks * ((xconc[1] - nec[x]) * (t[1] - tref) +
-                                  xconc[1]/kd[x] * (exp(-kd[x] * t[1]) - exp(-kd[x] * tref)))
-                       } else {
-                         0
-                       })
-        rbinom(5000, Nprec[1], psurv)
-    }, y = i, x = j)
-    return(NsurvPred)
+    NsurvPred[, i] <- rbinom(5000, Nprec[i], psurv)
   }
 
   QNsurvPred <- t(apply(NsurvPred, 2, quantile,
