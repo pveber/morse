@@ -20,7 +20,7 @@
 #' identification
 #' \item \code{conc}: a vector of class \code{numeric} with tested concentrations
 #' (positive values)
-#' \item \code{time}: a vector of class \code{integer} with time points, min value must be 0
+#' \item \code{time}: a vector of class \code{numeric} with time points, min value must be 0
 #' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
 #' alive individuals at each time point for each concentration and each replicate
 #' }
