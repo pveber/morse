@@ -47,7 +47,7 @@ test_that("survDataCheck", {
 
   zinc2 <- zinc
   zinc2[46, "time"] <- 1
-  zinc2$time <- as.integer(zinc2$time)
+  zinc2$time <- as.numeric(zinc2$time)
   expect_equal(survDataCheck(zinc2,
                              diagnosis.plot = FALSE)$id[1],
                "firstTime0")
