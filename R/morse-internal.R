@@ -37,7 +37,7 @@ selectDataTT <- function(data, target.time) {
     }
 
     # correct target time
-    if (!any(data$time == target.time))
+    if (!any(data$time == target.time) || target.time == 0)
       stop("target.time is not one of the possible time !")
 
     dataTT <- filter(data, time == target.time)
@@ -191,11 +191,18 @@ stepCalc <- function(obs_val) {
   return(list(sObs = sObs, stepX = stepX))
 }
 
-jitterObsGenerator <- function(stepX, tab, obs_val, log.scale = FALSE) {
+jitterObsGenerator <- function(stepX, tab, obs_val, ppc = FALSE) {
   # uniform jittering of observed values
-  allSpaceX <- sapply(2:length(stepX),
-                      function(i) { stepX[i] - stepX[i-1] })
-  spaceX <- min(allSpaceX[which(allSpaceX != 0)]) / ifelse(!log.scale, 2, exp(2))
+  if (ppc) {
+    allSpaceX <- sapply(2:length(stepX),
+                        function(i) { stepX[i] - stepX[i-1] })
+    spaceX <- min(allSpaceX[which(allSpaceX != 0)]) / 2
+  } else {
+    allSpaceX <- sapply(2:length(stepX),
+                        function(i) { obs_val[i] - obs_val[i-1] })
+    spaceX <- min(allSpaceX[which(allSpaceX != 0)]) / 4
+  }
+  
   lengthX <- table(tab[, "Obs"])
   jitterObs <- mapply(function(x, y) {
     if (y == 1) {

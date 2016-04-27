@@ -156,11 +156,11 @@ survTKTDPARAMS <- function(mcmc) {
 #' The function returns
 #' parameter estimates of the time-exposure-response model.
 #' 
-#' @param data An object of class \code{survData}.
+#' @param data An object of class \code{survData}
 #' @param n.chains Number of MCMC chains. The minimum required number of chains
-#' is 2.
+#' is 2
 #' @param quiet If \code{TRUE}, make silent all prints and progress bars of
-#' JAGS compilation.
+#' JAGS compilation
 #' 
 #' @return The function returns an object of class \code{survFitTKTD}, which is
 #' a list with the following fields:
@@ -271,17 +271,21 @@ survFitTKTD <- function(data,
   priorBonds <- survTKTDCreateJagsData(data, TRUE)
   
   if (log10(estim.par["ks", "Q97.5"]) > priorBonds$log10ksmax)
-    warning("The estimation of the killing rate (model parameter ks) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !")
+    warning("The estimation of the killing rate (model parameter ks) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+            call. = FALSE)
   
   if (log10(estim.par["kd", "Q97.5"]) > priorBonds$log10kdmax)
-    warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !")
+    warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+            call. = FALSE)
   
   if (log10(estim.par["m0", "Q2.5"]) < priorBonds$log10m0min)
-    warning("The estimation of the natural instantaneous mortality rate (model parameter m0) lies outside the range used to define its prior distribution which indicates that this rate is very low and so difficult to estimate from this experiment !")
+    warning("The estimation of the natural instantaneous mortality rate (model parameter m0) lies outside the range used to define its prior distribution which indicates that this rate is very low and so difficult to estimate from this experiment !",
+            call. = FALSE)
   
   if (log10(estim.par["nec", "Q2.5"]) < priorBonds$log10necmin ||
       log10(estim.par["nec", "Q97.5"]) > priorBonds$log10necmax)
-    warning("The NEC estimation (model parameter nec) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !")
+    warning("The NEC estimation (model parameter nec) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
+            call. = FALSE)
   
   #OUTPUT
   OUT <- list(estim.par = estim.par,

@@ -5,7 +5,7 @@
 #'
 #' @param object an object of class \code{survFitTKTD}
 #' @param quiet when \code{FALSE}, prints summary on standard output
-#' @param \dots Further arguments to be passed to generic methods.
+#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns a list with the following fields:
 #' \item{Qpriors}{quantiles for the model's prior}
@@ -66,11 +66,11 @@ summary.survFitTKTD <- function(object, quiet = FALSE, ...) {
   
   res <- rbind(kd, ks, nec, m0)
   
-  ans1 <- format(round(data.frame(res), digits = 3), scientific = TRUE)
+  ans1 <- format(data.frame(res), scientific = TRUE, digits = 4)
   colnames(ans1) <- c("50%", "2.5%", "97.5%")
   
   # quantiles of estimated model parameters
-  ans2 <- format(round(object$estim.par, digits = 3), scientific = TRUE)
+  ans2 <- format(object$estim.par, scientific = TRUE, digits = 4)
   colnames(ans2) <- c("50%", "2.5%", "97.5%")
   
   # print

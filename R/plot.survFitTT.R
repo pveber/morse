@@ -314,24 +314,8 @@ survFitPlotGenericCredInt <- function(x,
     segments(transf_data_conc, data_resp,
              transf_data_conc, conf.int["qsup95", ])
     
-    Bond <- if (log.scale) {
-      0.03 * (max(transf_data_conc) - min(transf_data_conc))
-    } else {
-      0.03 * (max(transf_data_conc) - min(transf_data_conc[which(transf_data_conc != 0)]))
-    }
-    
-    segments(transf_data_conc - Bond,
-             conf.int["qsup95", ],
-             transf_data_conc + Bond,
-             conf.int["qsup95", ])
-    
     segments(transf_data_conc, data_resp,
              transf_data_conc, conf.int["qinf95", ])
-    
-    segments(transf_data_conc - Bond,
-             conf.int["qinf95", ],
-             transf_data_conc + Bond,
-             conf.int["qinf95", ])
     
     # points
     points(transf_data_conc, data_resp, pch = 16)
@@ -372,9 +356,7 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
   if (adddata) {
     plt_3 <- ggplot(data) +
       geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
-                       linetype = Conf.Int),
-                   arrow = arrow(length = unit(0.1 , "cm"), angle = 90,
-                                 ends = "both"), data.three,
+                       linetype = Conf.Int), data.three,
                    color = valCols$cols3) +
       scale_linetype(name = "") +
       theme_minimal()
@@ -427,8 +409,6 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
   if (adddata) {
     plt_4 <- plt_401 + geom_point(data = data, aes(transf_conc, resp)) +
       geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95),
-                   arrow = arrow(length = unit(0.25 , "cm"), angle = 90,
-                                 ends = "both"),
                    data.three, col = valCols$cols3)
   } else {
     plt_4 <- plt_401

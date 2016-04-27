@@ -12,7 +12,6 @@
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
-#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
@@ -48,11 +47,18 @@ plot.reproData <- function(x,
                            concentration = NULL,
                            style = "generic",
                            pool.replicate = FALSE,
-                           log.scale = FALSE,
                            addlegend = FALSE,
                            remove.someLabels = FALSE, ...) {
-  if(! is(x, "reproData"))
+  if (!is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
+  
+  if (style == "generic" && remove.someLabels)
+    warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
+            call. = FALSE)
+  
+  if (is.null(concentration) && addlegend)
+    warning("'addlegend' argument is valid only when 'concentration' is not null.",
+            call. = FALSE)
   
   if (pool.replicate) {
     # agregate by sum of replicate
