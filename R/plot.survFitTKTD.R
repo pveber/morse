@@ -79,6 +79,10 @@ plot.survFitTKTD <- function(x,
                              addlegend = FALSE,
                              style = "generic", ...) {
   
+  if (one.plot)
+    warning("The credible limits and confidence intervals are not drawn when 'one.plot' = TRUE.",
+            call. = FALSE)
+  
   conf.int <- survTKTDConfInt(x)
   
   data.credInt <- survFitPlotCITKTD(x)
