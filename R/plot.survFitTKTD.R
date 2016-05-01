@@ -27,6 +27,8 @@
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
+#' @param concentration A numeric value corresponding to some concentration in
+#' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration.
 #' @param spaghetti if \code{TRUE}, the credible interval is represented by 
 #' multiple curves
 #' @param one.plot if \code{TRUE}, draws all the estimeted curves in one plot.
@@ -58,12 +60,16 @@
 #' # and with a ggplot style
 #' plot(out, spaghetti = TRUE , adddata = TRUE, one.plot = FALSE,
 #'      style = "ggplot")
+#'
+#' # (6) Plt fitted curve for one specific concentration
+#' plot(out, concentration = 36, style = "ggplot")
 #' }
 #' 
 #' @export
 #' 
 #' @import ggplot2
 #' @import grDevices
+#' @importFrom dplyr filter
 #' @importFrom reshape2 melt
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
@@ -73,8 +79,9 @@ plot.survFitTKTD <- function(x,
                              xlab = "Time",
                              ylab = "Survival rate",
                              main = NULL,
+                             concentration = NULL,
                              spaghetti = FALSE,
-                             one.plot = TRUE,
+                             one.plot = FALSE,
                              adddata = FALSE,
                              addlegend = FALSE,
                              style = "generic", ...) {
@@ -114,12 +121,13 @@ plot.survFitTKTD <- function(x,
                   id.vars = c("conc", "time"))
   
   if (style == "generic") {
-    survFitPlotTKTDGeneric(data.credInt, xlab, ylab, main, one.plot, spaghetti,
+    survFitPlotTKTDGeneric(data.credInt, xlab, ylab, main, concentration,
+                           one.plot, spaghetti,
                            dataCIm, adddata, addlegend)
   }
   else if (style == "ggplot") {
-    survFitPlotTKTDGG(data.credInt, xlab, ylab, main, one.plot, spaghetti,
-                      dataCIm, adddata, addlegend)
+    survFitPlotTKTDGG(data.credInt, xlab, ylab, main, concentration, one.plot,
+                      spaghetti, dataCIm, adddata, addlegend)
   }
   else stop("Unknown style")
 }
@@ -223,8 +231,8 @@ survFitPlotCITKTD <- function(x) {
               dobs = dobs))
 }
 
-survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, one.plot,
-                                   spaghetti, dataCIm, adddata,
+survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, concentration,
+                                   one.plot, spaghetti, dataCIm, adddata,
                                    addlegend) {
 
     if (one.plot) {
@@ -333,12 +341,6 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
       segments(y[, "time"], y[, "qinf95"],
                y[, "time"], y[, "qsup95"],
                col = "gray")
-      segments(y[, "time"] - delta, y[, "qinf95"],
-               y[, "time"] + delta, y[, "qinf95"],
-               col = "gray")
-      segments(y[, "time"] - delta, y[, "qsup95"],
-               y[, "time"] + delta, y[, "qsup95"],
-               col = "gray")
     }
     
     if (addlegend) {
@@ -355,11 +357,14 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
   }, x = dtheoQ, y = dobs, z = dataCIm)
 }
 
-survFitPlotTKTDGG <- function(data, xlab, ylab, main, one.plot, spaghetti,
-                              dataCIm, adddata, addlegend) {
+survFitPlotTKTDGG <- function(data, xlab, ylab, main, concentration, one.plot,
+                              spaghetti, dataCIm, adddata, addlegend) {
   
   if (one.plot) {
     survFitPlotTKTDGGOnePlot(data, xlab, ylab, main, adddata, addlegend)
+  } else if (!one.plot && is.null(concentration)) {
+    survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
+                               dataCIm, adddata, concentration)
   } else {
     survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
                                dataCIm, adddata, concentration, addlegend)
