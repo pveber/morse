@@ -64,7 +64,7 @@ plotDoseResponse.survData <- function(x,
                                       ...) {
   if (is.null(target.time)) target.time <- max(x$time)
   
-  if (!target.time %in% x$time)
+  if (!target.time %in% x$time || target.time == 0)
     stop("[target.time] is not one of the possible time !")
   
   if (style == "generic" && remove.someLabels)
