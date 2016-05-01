@@ -14,8 +14,6 @@
 #' on the x-axis, this line is represented by steps.
 #'
 #' @param x An object of class \code{survFitTT}
-#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
-#' \code{'ggplot'} style to avoid the label overlap
 #' @param style Graphical package method: \code{generic} or \code{ggplot}
 #' @param \dots Further arguments to be passed to generic methods
 #'
@@ -41,25 +39,20 @@
 #' @importFrom graphics plot
 #' 
 #' @export
-ppc.survFitTT <- function(x, remove.someLabels = FALSE,
-                          style = "generic", ...) {
+ppc.survFitTT <- function(x, style = "generic", ...) {
   if (!is(x, "survFitTT"))
     stop("x is not of class 'survFitTT'!")
-  
-  if (style == "generic" && remove.someLabels)
-    warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
-            call. = FALSE)
   
   xlab <- "Observed Nbr. of survivor"
   ylab <- "Predicted Nbr. of survivor"
   
-  ppc_gen(EvalsurvPpc(x), style, xlab, ylab, remove.someLabels)
+  ppc_gen(EvalsurvPpc(x), style, xlab, ylab)
 }
 
-ppc_gen <- function(tab, style, xlab, ylab, remove.someLabels) {
+ppc_gen <- function(tab, style, xlab, ylab) {
   
   if (style == "generic") PpcGeneric(tab, xlab, ylab)
-  else if (style == "ggplot") PpcGG(tab, xlab, ylab, remove.someLabels)
+  else if (style == "ggplot") PpcGG(tab, xlab, ylab)
   else stop("Unknown style")
 }
 
@@ -109,8 +102,8 @@ PpcGeneric <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
-  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)$jitterObs
-  spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$jitterObs
+  spaceX <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$spaceX
   
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
@@ -159,34 +152,22 @@ PpcGeneric <- function(tab, xlab, ylab) {
 
 #' @import ggplot2
 #' @importFrom  grid arrow unit
-PpcGG <- function(tab, xlab, ylab, remove.someLabels) {
+PpcGG <- function(tab, xlab, ylab) {
   obs_val <- unique(tab[, "Obs"])
   sObs <- stepCalc(obs_val)$sObs
   stepX <- stepCalc(obs_val)$stepX
-  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val)$jitterObs
-  spaceX <- jitterObsGenerator(stepX, tab, obs_val)$spaceX
+  jittered_obs <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$jitterObs
+  spaceX <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$spaceX
   
   tab0 <- cbind(tab[order(tab$Obs),], jittered_obs)
   
   df <- data.frame(sObs, spaceX)
-  
+
   if (max(sObs) < 20) {
     gf1 <- ggplot(df) +
       geom_segment(aes(x = sObs - (spaceX * 1.25),
                        xend = sObs + (spaceX * 1.25),
-                       y = sObs, yend = sObs)) +
-      scale_x_continuous(breaks = unique(c(0, tab0[, "Obs"])),
-                         labels = if (remove.someLabels) {
-                           exclude_labels(unique(c(0, tab0[, "Obs"])))
-                         } else {
-                           unique(c(0, tab0[, "Obs"]))
-                         }) +
-      scale_y_continuous(breaks = unique(c(0, tab0[, "Obs"])),
-                         labels = if (remove.someLabels) {
-                           exclude_labels(unique(c(0, tab0[, "Obs"])))
-                         } else {
-                           unique(c(0, tab0[, "Obs"]))
-                         })
+                       y = sObs, yend = sObs))
   } else {
     gf1 <- ggplot(tab0) +
       geom_abline(intercept = 0, slope = 1)

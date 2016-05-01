@@ -5,13 +5,9 @@
 #' analysis.
 #' 
 #' The fitted curve represents the \strong{estimated reproduction rate} after
-#' the target time has passed as a function of the concentration of pollutant;
-#' When \code{adddata = TRUE} the black dots depict the \strong{observed reproduction
-#' rate} at each tested concentration.
-#' The function plots both 95 \% credible intervals for the estimated reproduction
-#' rate (by default the red area around the fitted curve) and 95 \% confidence
-#' intervals for the observed reproduction rate (as black error bars if
-#' \code{adddata = TRUE}).
+#' the target time has passed as a function of the concentration of pollutant.
+#' The function plots 95 \% credible intervals for the estimated reproduction
+#' rate (by default the red area around the fitted curve).
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two intervals.
 #' If spaghetti = TRUE, the credible intervals are represented by two dotted
@@ -65,11 +61,8 @@
 #' out <- reproFitTT(dat, stoc.part = "gammapoisson",
 #'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #'
-#' # (4) Plot the fitted curve with credible limits
-#' plot(out, log.scale = TRUE, adddata = TRUE,
-#'      main = "log-logistic gamma-poisson model")
 #'
-#' # (5) Plot the fitted curve with ggplot style
+#' # (4) Plot the fitted curve with ggplot style
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
 #'      fitcol = "blue", adddata = TRUE, cicol = "blue", style = "ggplot",
 #'      main = "Log-logistic response to concentration")
