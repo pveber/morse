@@ -39,7 +39,7 @@
 #' @importFrom graphics plot
 #' 
 #' @export
-ppc.survFitTKTD <- function(x, style = "generic", ...) {
+ppc.survFitTKTD <- function(x, meth = "for", style = "generic", ...) {
   if (!is(x, "survFitTKTD"))
     stop("x is not of class 'survFitTKTD'!")
   
@@ -67,20 +67,20 @@ EvalsurvTKTDPpc <- function(x) {
   Nprec <- x$jags.data$Nprec
   bigtime <- x$jags.data$bigtime
   NsurvPred <- matrix(NA, nrow = 5000, ncol = n)
-  
+  psurv = NULL
   for (i in 1:n) {
     for (j in 1:length(kd)) {
       xcor <- ifelse(xconc[i] > 0, xconc[i], 10)
       R <- ifelse(xconc[i] > nec[j], nec[j]/xcor, 0.1)
       tNEC <- ifelse(xconc[i] > nec[j], -1 / kd[j] * log(1 - R), bigtime)
       tref <- max(tprec[i], tNEC)
-      psurv <- exp(-m0 * (t[i] - tprec[i]) +
-                     if (t[i] > tNEC) {
-                       -ks * ((xconc[i] - nec[j]) * (t[i] - tref) +
-                                xconc[i]/kd[j] * (exp(-kd[j] * t[i]) - exp(-kd[j] * tref)))
-                     } else {
-                       0
-                     })
+      psurv[j] <- exp(-m0[j] * (t[i] - tprec[i]) +
+                        if (t[i] > tNEC) {
+                          -ks[j] * ((xconc[i] - nec[j]) * (t[i] - tref) +
+                                      xconc[i]/kd[j] * (exp(-kd[j] * t[i]) - exp(-kd[j] * tref)))
+                        } else {
+                          0
+                        })
     }
     NsurvPred[, i] <- rbinom(5000, Nprec[i], psurv)
   }
