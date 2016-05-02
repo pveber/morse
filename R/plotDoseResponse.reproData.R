@@ -100,7 +100,7 @@ plotDoseResponse.reproData <- function(x,
   conc_val <- unique(transf_data_conc)
   x$Obs <- x$conc
   stepX <- stepCalc(conc_val)$stepX
-  jittered_conc <- jitterObsGenerator(stepX, x, conc_val, log.scale)$jitterObs
+  jittered_conc <- jitterObsGenerator(stepX, x, conc_val)$jitterObs
   
   if (style == "generic")
     reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
@@ -133,13 +133,8 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
   }
   
   x0 <- x[order(x$conc),]
-  delta <- 0.01 * (max(conc_val) - min(conc_val))
   segments(jittered_conc, x0[, "reproRateInf"],
            jittered_conc, x0[, "reproRateSup"])
-  segments(jittered_conc - delta, x0[, "reproRateInf"],
-           jittered_conc + delta, x0[, "reproRateInf"])
-  segments(jittered_conc - delta, x0[, "reproRateSup"],
-           jittered_conc + delta, x0[, "reproRateSup"])
   
   points(jittered_conc, x0$resp, pch = 20)
   
@@ -176,8 +171,6 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
                                         y = reproRateInf, yend = reproRateSup,
                                         linetype = Conf.Int),
                                     data = dfCI,
-                                    arrow = arrow(length = unit(0.1, "cm"),
-                                                  angle = 90, ends = "both"),
                                     col = valCols$cols3) +
     geom_point(aes(x = jittered_conc, y = resp, fill = Points), df,
                col = valCols$cols1) +
