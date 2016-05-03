@@ -416,20 +416,16 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
   
   if (!is.null(concentration)) {
     gf <- gf + geom_line(data = curv_resp, aes(x = time, y = resp,
-                                               color = Line),
-                         linetype = 'dashed')  +
-      scale_color_hue("")
+                                               color = Line))  +
+      scale_color_hue("", value = "red")
   } else {
     gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
-                                                      color = data[["dtheoQ"]]$color,
-                         linetype = 'dashed')
+                                                      color = "red")
   }
   gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95,
-                                                    color = Cred.Lim),
-                       linetype = 'dashed') +
+                                                    color = Cred.Lim)) +
     geom_line(data = data[["dtheoQ"]], aes(x = time, y = qsup95,
-                                           color = Cred.Lim),
-              linetype = 'dashed') +
+                                           color = Cred.Lim)) +
     facet_wrap(~conc) +
     scale_linetype(name = "") +
     labs(x = xlab, y = ylab) + ggtitle(main) +
