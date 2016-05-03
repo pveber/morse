@@ -343,14 +343,14 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
              col = "black") # points
       segments(y[, "time"], y[, "qinf95"],
                y[, "time"], y[, "qsup95"],
-               col = "gray")
+               col = "black")
     }
     
     if (addlegend) {
       legend("bottomleft", pch = c(ifelse(adddata, 20, NA), NA, NA, NA),
              lty = c(NA, ifelse(adddata, 1, NA), 1, 2),
              col = c(ifelse(adddata, "black", NA),
-                     ifelse(adddata, "gray", NA),
+                     ifelse(adddata, "black", NA),
                      x[, "color"], x[, "color"]),
              legend = c(ifelse(adddata, "Observed values", NA),
                         ifelse(adddata, "Confidence interval", NA),
@@ -444,7 +444,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                  data = data[["dobs"]], col = "black") +
       geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95,
                        linetype = "Conf.Int"),
-                   data[["dobs"]], col = "gray",
+                   data[["dobs"]], col = "black",
                    size = 0.5) +
       scale_fill_hue("")
   } else {
