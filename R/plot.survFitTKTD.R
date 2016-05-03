@@ -314,8 +314,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
          ylab = ylab,
          type = "n",
          ylim = c(0, 1),
-         main = paste0("Concentration = ", unique(x[, "conc"])),
-         col = x[, "color"])
+         main = paste0("Concentration = ", unique(x[, "conc"])))
     
     if (spaghetti) {
       color <- "gray"
@@ -330,11 +329,11 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
     }
     
     lines(x[, "time"], x[, "q50"], # lines
-          col = x[, "color"])
+          col = "red")
     lines(x[, "time"], x[, "qinf95"],
-          col = x[, "color"], lty = 2)
+          col = "pink")
     lines(x[, "time"], x[, "qsup95"], 
-          col = x[, "color"], lty = 2)
+          col = "pink")
     
     if (adddata) {
       points(y[, "time"],
@@ -351,7 +350,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
              lty = c(NA, ifelse(adddata, 1, NA), 1, 2),
              col = c(ifelse(adddata, "black", NA),
                      ifelse(adddata, "black", NA),
-                     x[, "color"], x[, "color"]),
+                     "red", "pink"),
              legend = c(ifelse(adddata, "Observed values", NA),
                         ifelse(adddata, "Confidence interval", NA),
                         "Credible limits", "Mean curve"),
