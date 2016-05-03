@@ -109,6 +109,9 @@ plot.survFitTKTD <- function(x,
                                        Conf.Int = "Confidence interval",
                                        Points = "Observed values")
   
+  # remove time 0 in dobs
+  data.credInt[["dobs"]] <- filter(data.credInt[["dobs"]], time != 0)
+  
   data.credInt[["dtheoQ"]]$Cred.Lim <- "Credible limits"
   
   # vector color
@@ -252,8 +255,8 @@ survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, concentration,
 
 survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
                                           addlegend) {
-  plot(data[["dobs"]][["time"]],
-       data[["dobs"]][["psurv"]],
+  plot(c(0, data[["dobs"]][["time"]]),
+       c(data[["dobs"]][["psurv"]], 1),
        xlab = xlab,
        ylab = ylab,
        type = "n",
