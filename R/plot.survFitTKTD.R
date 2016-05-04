@@ -109,7 +109,11 @@ plot.survFitTKTD <- function(x,
                                        Conf.Int = "Confidence interval",
                                        Points = "Observed values")
   
+  # remove time 0 in dobs
+  data.credInt[["dobs"]] <- filter(data.credInt[["dobs"]], time != 0)
+  
   data.credInt[["dtheoQ"]]$Cred.Lim <- "Credible limits"
+  data.credInt[["dtheoQ"]]$Mean.C <- "Mean curve"
   
   # vector color
   data.credInt[["dobs"]]$color <-
@@ -252,8 +256,8 @@ survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, concentration,
 
 survFitPlotTKTDGenericOnePlot <- function(data, xlab, ylab, main, adddata,
                                           addlegend) {
-  plot(data[["dobs"]][["time"]],
-       data[["dobs"]][["psurv"]],
+  plot(c(0, data[["dobs"]][["time"]]),
+       c(data[["dobs"]][["psurv"]], 1),
        xlab = xlab,
        ylab = ylab,
        type = "n",
@@ -311,8 +315,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
          ylab = ylab,
          type = "n",
          ylim = c(0, 1),
-         main = paste0("Concentration = ", unique(x[, "conc"])),
-         col = x[, "color"])
+         main = paste0("Concentration = ", unique(x[, "conc"])))
     
     if (spaghetti) {
       color <- "gray"
@@ -327,11 +330,11 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
     }
     
     lines(x[, "time"], x[, "q50"], # lines
-          col = x[, "color"])
+          col = "red")
     lines(x[, "time"], x[, "qinf95"],
-          col = x[, "color"], lty = 2)
+          col = "pink")
     lines(x[, "time"], x[, "qsup95"], 
-          col = x[, "color"], lty = 2)
+          col = "pink")
     
     if (adddata) {
       points(y[, "time"],
@@ -340,15 +343,15 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, xlab, ylab, spaghetti,
              col = "black") # points
       segments(y[, "time"], y[, "qinf95"],
                y[, "time"], y[, "qsup95"],
-               col = "gray")
+               col = "black")
     }
     
     if (addlegend) {
       legend("bottomleft", pch = c(ifelse(adddata, 20, NA), NA, NA, NA),
              lty = c(NA, ifelse(adddata, 1, NA), 1, 2),
              col = c(ifelse(adddata, "black", NA),
-                     ifelse(adddata, "gray", NA),
-                     x[, "color"], x[, "color"]),
+                     ifelse(adddata, "black", NA),
+                     "red", "pink"),
              legend = c(ifelse(adddata, "Observed values", NA),
                         ifelse(adddata, "Confidence interval", NA),
                         "Credible limits", "Mean curve"),
@@ -392,6 +395,10 @@ survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend)
 survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                                        dataCIm, adddata, concentration,
                                        addlegend = FALSE) {
+  
+  # colors
+  valCols <- fCols(data, "red", "pink")
+  
   if (!is.null(concentration)) {
     data[["dobs"]] <- filter(data[["dobs"]], conc == concentration)
     data[["dtheoQ"]] <- filter(data[["dtheoQ"]], conc == concentration)
@@ -409,25 +416,21 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
     gf <- ggplot(data[["dobs"]]) +
       geom_ribbon(data = data[["dtheoQ"]], aes(x = time, ymin = qinf95,
                                                ymax = qsup95),
-                  fill = "pink", col = "pink", alpha = 0.4)
+                  fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
   }
   
   if (!is.null(concentration)) {
     gf <- gf + geom_line(data = curv_resp, aes(x = time, y = resp,
-                                               color = Line),
-                         linetype = 'dashed')  +
-      scale_color_hue("")
+                                               color = Line)) +
+      scale_colour_hue(name = "")
   } else {
     gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
-                                                      color = data[["dtheoQ"]]$color,
-                         linetype = 'dashed')
+                                                      color = valCols$cols5)
   }
   gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95,
-                                                    color = Cred.Lim),
-                       linetype = 'dashed') +
+                                                    color = Cred.Lim)) +
     geom_line(data = data[["dtheoQ"]], aes(x = time, y = qsup95,
-                                           color = Cred.Lim),
-              linetype = 'dashed') +
+                                           color = Cred.Lim)) +
     facet_wrap(~conc) +
     scale_linetype(name = "") +
     labs(x = xlab, y = ylab) + ggtitle(main) +
@@ -438,10 +441,10 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
     # dataframes points (data) and curve (curv)
     gf <- gf +
       geom_point(aes(x = time, y = psurv, fill = Points),
-                 data = data[["dobs"]], col = "black") +
+                 data = data[["dobs"]], col = valCols$cols1) +
       geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95,
-                       linetype = "Conf.Int"),
-                   data[["dobs"]], col = "gray",
+                       linetype = Conf.Int),
+                   data[["dobs"]], col = valCols$cols3,
                    size = 0.5) +
       scale_fill_hue("")
   } else {

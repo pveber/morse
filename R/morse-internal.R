@@ -171,11 +171,15 @@ fCols <- function(data, fitcol, cicol) {
   # Cred Int
   cols4 <- cicol
   names(cols4) <- "Credible limits"
+  # tktd mean curve
+  cols5 <- fitcol
+  names(cols5) <- "Mean curve"
   
   return(list(cols1 = cols1,
               cols2 = cols2,
               cols3 = cols3,
-              cols4 = cols4))
+              cols4 = cols4,
+              cols5 = cols5))
 }
 
 exclude_labels <- function(x) {

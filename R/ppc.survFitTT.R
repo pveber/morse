@@ -61,28 +61,29 @@ EvalsurvPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
   
   if (x$det.part == "loglogisticbinom_3") {
-    d <- sample(tot.mcmc[, "d"], 5000)
+    d <- tot.mcmc[, "d"]
   }
   
-  b <- 10^sample(tot.mcmc[, "log10b"], 5000)
-  e <- 10^sample(tot.mcmc[, "log10e"], 5000)
+  b <- 10^tot.mcmc[, "log10b"]
+  e <- 10^tot.mcmc[, "log10e"]
   
+  niter <- nrow(tot.mcmc)
   n <- x$jags.data$n
   xconc <- x$jags.data$xconc
   Ninit <- x$jags.data$Ninit
   NsurvObs <- x$jags.data$Nsurv
-  NsurvPred <- matrix(NA, nrow = 5000, ncol = n)
+  NsurvPred <- matrix(NA, nrow = niter, ncol = n)
   
   if (x$det.part == "loglogisticbinom_2") {
     for (i in 1:n) {
       p <- 1 / (1 + (xconc[i]/e)^b)
-      NsurvPred[, i] <- rbinom(5000, Ninit[i], p)
+      NsurvPred[, i] <- rbinom(niter, Ninit[i], p)
     }
   }
   if (x$det.part == "loglogisticbinom_3") {
     for (i in 1:n) {
       p <- d / (1 + (xconc[i]/e)^b)
-      NsurvPred[, i] <- rbinom(5000, Ninit[i], p)
+      NsurvPred[, i] <- rbinom(niter, Ninit[i], p)
     }
   }
   QNsurvPred <- t(apply(NsurvPred, 2, quantile,

@@ -53,20 +53,20 @@ ppc.survFitTKTD <- function(x, style = "generic", ...) {
 EvalsurvTKTDPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
 
-  kd <- 10^sample(tot.mcmc[, "log10kd"], 5000)
-  ks <- 10^sample(tot.mcmc[, "log10ks"], 5000)
-  nec <- 10^sample(tot.mcmc[, "log10NEC"], 5000)
-  m0 <- 10^sample(tot.mcmc[, "log10m0"], 5000)
+  kd <- 10^(tot.mcmc[, "log10kd"])
+  ks <- 10^(tot.mcmc[, "log10ks"])
+  nec <- 10^(tot.mcmc[, "log10NEC"])
+  m0 <- 10^(tot.mcmc[, "log10m0"])
   
+  niter <- nrow(tot.mcmc)
   n <- x$jags.data$ndat
   xconc <- x$jags.data$x
   t <- x$jags.data$t
   tprec <- x$jags.data$tprec
-  Nprec <- x$jags.data$Nprec
   NsurvObs <- x$jags.data$y
   Nprec <- x$jags.data$Nprec
   bigtime <- x$jags.data$bigtime
-  NsurvPred <- matrix(NA, nrow = 5000, ncol = n)
+  NsurvPred <- matrix(NA, nrow = niter, ncol = n)
   psurv = NULL
   for (i in 1:n) {
     for (j in 1:length(kd)) {
@@ -82,7 +82,7 @@ EvalsurvTKTDPpc <- function(x) {
                           0
                         })
     }
-    NsurvPred[, i] <- rbinom(5000, Nprec[i], psurv)
+    NsurvPred[, i] <- rbinom(niter, Nprec[i], psurv)
   }
 
   QNsurvPred <- t(apply(NsurvPred, 2, quantile,
