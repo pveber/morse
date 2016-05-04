@@ -421,7 +421,8 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
   
   if (!is.null(concentration)) {
     gf <- gf + geom_line(data = curv_resp, aes(x = time, y = resp,
-                                               color = Line))
+                                               color = Line)) +
+      scale_colour_hue(name = "")
   } else {
     gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
                                                       color = valCols$cols5)
