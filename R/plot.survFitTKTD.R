@@ -113,6 +113,7 @@ plot.survFitTKTD <- function(x,
   data.credInt[["dobs"]] <- filter(data.credInt[["dobs"]], time != 0)
   
   data.credInt[["dtheoQ"]]$Cred.Lim <- "Credible limits"
+  data.credInt[["dtheoQ"]]$Mean.C <- "Mean curve"
   
   # vector color
   data.credInt[["dobs"]]$color <-
@@ -394,6 +395,10 @@ survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend)
 survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
                                        dataCIm, adddata, concentration,
                                        addlegend = FALSE) {
+  
+  # colors
+  valCols <- fCols(data, "red", "pink")
+  
   if (!is.null(concentration)) {
     data[["dobs"]] <- filter(data[["dobs"]], conc == concentration)
     data[["dtheoQ"]] <- filter(data[["dtheoQ"]], conc == concentration)
@@ -411,16 +416,15 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
     gf <- ggplot(data[["dobs"]]) +
       geom_ribbon(data = data[["dtheoQ"]], aes(x = time, ymin = qinf95,
                                                ymax = qsup95),
-                  fill = "pink", col = "pink", alpha = 0.4)
+                  fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
   }
   
   if (!is.null(concentration)) {
     gf <- gf + geom_line(data = curv_resp, aes(x = time, y = resp,
-                                               color = Line))  +
-      scale_color_hue("", value = "red")
+                                               color = Line))
   } else {
     gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
-                                                      color = "red")
+                                                      color = valCols$cols5)
   }
   gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95,
                                                     color = Cred.Lim)) +
@@ -436,10 +440,10 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
     # dataframes points (data) and curve (curv)
     gf <- gf +
       geom_point(aes(x = time, y = psurv, fill = Points),
-                 data = data[["dobs"]], col = "black") +
+                 data = data[["dobs"]], col = valCols$cols1) +
       geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95,
                        linetype = "Conf.Int"),
-                   data[["dobs"]], col = "black",
+                   data[["dobs"]], col = valCols$cols3,
                    size = 0.5) +
       scale_fill_hue("")
   } else {
