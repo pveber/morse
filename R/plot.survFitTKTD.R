@@ -442,7 +442,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
       geom_point(aes(x = time, y = psurv, fill = Points),
                  data = data[["dobs"]], col = valCols$cols1) +
       geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95,
-                       linetype = "Conf.Int"),
+                       linetype = Conf.Int),
                    data[["dobs"]], col = valCols$cols3,
                    size = 0.5) +
       scale_fill_hue("")
