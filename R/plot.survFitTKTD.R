@@ -183,31 +183,52 @@ survFitPlotCITKTD <- function(x) {
   
   # prameters
   mctot <- do.call("rbind", x$mcmc)
-  sel <- sample(nrow(mctot))[1:ceiling(nrow(mctot) / 50)]
-  ks <- 10^mctot[, "log10ks"][sel]
-  kd <- 10^mctot[, "log10kd"][sel]
-  m0 <- 10^mctot[, "log10m0"][sel]
-  nec <- 10^mctot[, "log10NEC"][sel]
+  # sel <- sample(nrow(mctot))[1:ceiling(nrow(mctot) / 50)]
+  ks <- 10^mctot[, "log10ks"] #[sel]
+  kd <- 10^mctot[, "log10kd"] #[sel]
+  m0 <- 10^mctot[, "log10m0"] #[sel]
+  nec <- 10^mctot[, "log10NEC"] #[sel]
   
   # all theorical
-  dtheo = list()
-  for (k in 1:length(concobs)) {
-    dtheo[[k]] <- array(data = NA, dim = c(npoints, length(nec)))
-    for (i in 1:length(nec)) {
-      for (j in 1:npoints) {
-        dtheo[[k]][j, i] <- Surv(Cw = concobs[k], time = tfin[j],
-                                 ks = ks[i], kd = kd[i],
-                                 NEC = nec[i],
-                                 m0 = m0[i])
-      }
-    }
-  }
+  # dtheo = list()
+  # for (k in 1:length(concobs)) {
+  #   dtheo[[k]] <- array(data = NA, dim = c(npoints, length(nec)))
+  #   for (i in 1:length(nec)) {
+  #     for (j in 1:npoints) {
+  #       dtheo[[k]][j, i] <- Surv(Cw = concobs[k], time = tfin[j],
+  #                                ks = ks[i], kd = kd[i],
+  #                                NEC = nec[i],
+  #                                m0 = m0[i])
+  #     }
+  #   }
+  # }
   
-  dtheoSp <- do.call("rbind", dtheo)
-  dtheoSp <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
-                                rep(tfin, length(concobs)),
-                                dtheoSp))
-  names(dtheoSp) <- c("conc", "time", paste0("X", 1:length(sel)))
+  k <- 1:length(concobs)
+  i <- 1:length(nec)
+  j <- 1:npoints
+  dtheo <- sapply(k, function(x) { # concentration
+    sapply(i, function(y) { # mcmc
+      sapply(j, function(z) { # time
+        Surv(Cw = concobs[x], time = tfin[z],
+             ks = ks[y], kd = kd[y],
+             NEC = nec[y],
+             m0 = m0[y])
+      })
+    })
+  })
+  
+  # dtheoSp <- do.call("rbind", dtheo)
+  
+  # dtheoSp <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
+  #                               rep(tfin, length(concobs)),
+  #                               dtheoSp))
+  
+  dtheo <- as.data.frame(cbind(dtheo,
+                               rep(tfin, length(nec)),
+                               rep(1:length(nec), rep(length(tfin), length(nec)))))
+  
+  # names(dtheoSp) <- c("conc", "time", paste0("X", 1:length(sel)))
+  colnames(dtheo) <- c(paste0("conc_", concobs), "time", "mcmc")
   
   # quantile
   qinf95 = NULL
