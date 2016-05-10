@@ -569,7 +569,9 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
                                                color = Line)) +
       scale_colour_hue(name = "")
   } else {
-    gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
+    # gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
+    #                      color = valCols$cols5)
+    gf <- gf + geom_line(data = data, aes(x = time, y = q50),
                          color = valCols$cols5)
   }
   # gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95,
