@@ -142,8 +142,10 @@ plot.survFitTKTD <- function(x,
                            adddata, addlegend)
   }
   else if (style == "ggplot") {
-    survFitPlotTKTDGG(data.credInt, xlab, ylab, main, concentration, one.plot,
-                      spaghetti, dataCIm, adddata, addlegend)
+    # survFitPlotTKTDGG(data.credInt, xlab, ylab, main, concentration, one.plot,
+    #                   spaghetti, dataCIm, adddata, addlegend)
+    survFitPlotTKTDGG(data.credInt, dobs, xlab, ylab, main, concentration,
+                      one.plot, spaghetti, adddata, addlegend)
   }
   else stop("Unknown style")
 }
@@ -467,30 +469,44 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
   }, x = dtheoQ, y = dobs, z = dtheoQm)
 }
 
-survFitPlotTKTDGG <- function(data, xlab, ylab, main, concentration, one.plot,
-                              spaghetti, dataCIm, adddata, addlegend) {
+# survFitPlotTKTDGG <- function(data, xlab, ylab, main, concentration, one.plot,
+#                               spaghetti, dataCIm, adddata, addlegend) {
+survFitPlotTKTDGG <- function(data, dobs, xlab, ylab, main, concentration,
+                              one.plot, spaghetti, adddata, addlegend) {
   
   if (one.plot) {
-    survFitPlotTKTDGGOnePlot(data, xlab, ylab, main, adddata, addlegend)
+    # survFitPlotTKTDGGOnePlot(data, xlab, ylab, main, adddata, addlegend)
+    survFitPlotTKTDGGOnePlot(data, dobs, xlab, ylab, main, adddata, addlegend)
   } else if (!one.plot && is.null(concentration)) {
-    survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
-                               dataCIm, adddata, concentration)
+    # survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
+    #                            dataCIm, adddata, concentration)
+    survFitPlotTKTDGGNoOnePlot(data, dobs, xlab, ylab, main, spaghetti,
+                               adddata, concentration)
   } else {
-    survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
-                               dataCIm, adddata, concentration, addlegend)
+    # survFitPlotTKTDGGNoOnePlot(data, xlab, ylab, main, spaghetti,
+    #                            dataCIm, adddata, concentration, addlegend)
+    survFitPlotTKTDGGNoOnePlot(data, dobs, xlab, ylab, main, spaghetti,
+                               adddata, concentration, addlegend)
   }
 }
 
-survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend) {
-  gf <- ggplot(data[["dobs"]]) +
+# survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend) {
+survFitPlotTKTDGGOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
+                                     addlegend) {
+  # gf <- ggplot(data[["dobs"]]) +
+  gf <- ggplot(dobs) +
+    # geom_line(aes(x = time, y = q50, colour = factor(conc)),
+    #           data = data[["dtheoQ"]]) +
     geom_line(aes(x = time, y = q50, colour = factor(conc)),
-              data = data[["dtheoQ"]]) +
+              data = data) +
     labs(x = xlab, y = ylab) + ggtitle(main) +
     ylim(c(0, 1)) +
     theme_minimal()
   if (adddata) {
+    # gf <- gf + geom_point(aes(x = time, y = psurv, colour = factor(conc)),
+    #                       data = data[["dobs"]])
     gf <- gf + geom_point(aes(x = time, y = psurv, colour = factor(conc)),
-                          data = data[["dobs"]])
+                          data = dobs)
   }
   if (addlegend) {
     gf + scale_color_discrete("Concentrations")
@@ -499,30 +515,51 @@ survFitPlotTKTDGGOnePlot <- function(data, xlab, ylab, main, adddata, addlegend)
   }
 }
 
-survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
-                                       dataCIm, adddata, concentration,
+#' importFrom dplyr filter
+#' importFrom reshape2 melt
+# survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
+#                                        dataCIm, adddata, concentration,
+#                                        addlegend = FALSE) {
+survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
+                                       adddata, concentration,
                                        addlegend = FALSE) {
   
   # colors
   valCols <- fCols(data, "red", "pink")
   
+  dtheoQm <- melt(data,
+                  id.vars = c("conc", "time", "color"))
+  
   if (!is.null(concentration)) {
-    data[["dobs"]] <- filter(data[["dobs"]], conc == concentration)
-    data[["dtheoQ"]] <- filter(data[["dtheoQ"]], conc == concentration)
-    dataCIm <- filter(dataCIm, conc == concentration)
-    curv_resp <- data.frame(time = data[["dtheoQ"]]$time,
-                            resp = data[["dtheoQ"]]$q50,
+    # data[["dobs"]] <- filter(data[["dobs"]], conc == concentration)
+    # data[["dtheoQ"]] <- filter(data[["dtheoQ"]], conc == concentration)
+    # dataCIm <- filter(dataCIm, conc == concentration)
+    # curv_resp <- data.frame(time = data[["dtheoQ"]]$time,
+    #                         resp = data[["dtheoQ"]]$q50,
+    #                         Line = "Mean curve")
+    dobs <- filter(dobs, conc == concentration)
+    data <- filter(data, conc == concentration)
+    dtheoQm <- filter(dtheoQm, conc == concentration)
+    curv_resp <- data.frame(time = data$time,
+                            resp = data$q50,
                             Line = "Mean curve")
   }
   
   if (spaghetti) {
-    gf <- ggplot(data[["dobs"]]) +
-      geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
+    # gf <- ggplot(data[["dobs"]]) +
+    #   geom_line(data = dataCIm, aes(x = time, y = value, group = variable),
+    #             alpha = 0.05)
+    gf <- ggplot(dobs) +
+      geom_line(data = dtheoQm, aes(x = time, y = value, group = variable),
                 alpha = 0.05)
   } else {
-    gf <- ggplot(data[["dobs"]]) +
-      geom_ribbon(data = data[["dtheoQ"]], aes(x = time, ymin = qinf95,
-                                               ymax = qsup95),
+    # gf <- ggplot(data[["dobs"]]) +
+    #   geom_ribbon(data = data[["dtheoQ"]], aes(x = time, ymin = qinf95,
+    #                                            ymax = qsup95),
+    #               fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
+    gf <- ggplot(dobs) +
+      geom_ribbon(data = data, aes(x = time, ymin = qinf95,
+                                   ymax = qsup95),
                   fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
   }
   
@@ -534,10 +571,14 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
     gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = q50),
                          color = valCols$cols5)
   }
-  gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95,
-                                                    color = Cred.Lim)) +
-    geom_line(data = data[["dtheoQ"]], aes(x = time, y = qsup95,
-                                           color = Cred.Lim)) +
+  # gf <- gf + geom_line(data = data[["dtheoQ"]], aes(x = time, y = qinf95,
+  #                                                   color = Cred.Lim)) +
+  #   geom_line(data = data[["dtheoQ"]], aes(x = time, y = qsup95,
+  #                                          color = Cred.Lim)) +
+  gf <- gf + geom_line(data = data, aes(x = time, y = qinf95,
+                                        color = Cred.Lim)) +
+    geom_line(data = data, aes(x = time, y = qsup95,
+                               color = Cred.Lim)) +
     facet_wrap(~conc) +
     scale_linetype(name = "") +
     labs(x = xlab, y = ylab) + ggtitle(main) +
@@ -547,11 +588,17 @@ survFitPlotTKTDGGNoOnePlot <- function(data, xlab, ylab, main, spaghetti,
   if (adddata) {
     # dataframes points (data) and curve (curv)
     gf <- gf +
+      # geom_point(aes(x = time, y = psurv, fill = Points),
+      #            data = data[["dobs"]], col = valCols$cols1) +
+      # geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95,
+      #                  linetype = Conf.Int),
+      #              data[["dobs"]], col = valCols$cols3,
+      #              size = 0.5) +
       geom_point(aes(x = time, y = psurv, fill = Points),
-                 data = data[["dobs"]], col = valCols$cols1) +
+                 data = dobs, col = valCols$cols1) +
       geom_segment(aes(x = time, xend = time, y = qinf95, yend = qsup95,
                        linetype = Conf.Int),
-                   data[["dobs"]], col = valCols$cols3,
+                   dobs, col = valCols$cols3,
                    size = 0.5) +
       scale_fill_hue("")
   } else {
