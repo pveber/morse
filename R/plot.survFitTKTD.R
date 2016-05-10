@@ -101,25 +101,35 @@ plot.survFitTKTD <- function(x,
   
   conf.int <- survTKTDConfInt(x)
   
-  data.credInt <- survFitPlotCITKTD(x)
-  
-  data.credInt[["dobs"]] <- data.frame(data.credInt[["dobs"]],
-                                       qinf95 = conf.int["qinf95", ],
-                                       qsup95 = conf.int["qsup95",],
-                                       Conf.Int = "Confidence interval",
-                                       Points = "Observed values")
+  dobs <- data.frame(conc = x$transformed.data$conc,
+                     time = x$transformed.data$time, 
+                     psurv = x$transformed.data$N_alive / x$transformed.data$N_init,
+                     Conf.Int = "Confidence interval",
+                     Points = "Observed values",
+                     color = as.numeric(as.factor(x$transformed.data$conc)))
   
   # remove time 0 in dobs
-  data.credInt[["dobs"]] <- filter(data.credInt[["dobs"]], time != 0)
+  dobs <- filter(dobs, time != 0)
   
-  data.credInt[["dtheoQ"]]$Cred.Lim <- "Credible limits"
-  data.credInt[["dtheoQ"]]$Mean.C <- "Mean curve"
+  data.credInt <- survFitPlotCITKTD(x)
+  
+  # data.credInt[["dobs"]] <- data.frame(data.credInt[["dobs"]],
+  #                                      qinf95 = conf.int["qinf95", ],
+  #                                      qsup95 = conf.int["qsup95",],
+  #                                      Conf.Int = "Confidence interval",
+  #                                      Points = "Observed values")
+  
+  # # remove time 0 in dobs
+  # data.credInt[["dobs"]] <- filter(data.credInt[["dobs"]], time != 0)
+  
+  # data.credInt[["dtheoQ"]]$Cred.Lim <- "Credible limits"
+  # data.credInt[["dtheoQ"]]$Mean.C <- "Mean curve"
   
   # vector color
-  data.credInt[["dobs"]]$color <-
-    as.numeric(as.factor(data.credInt[["dobs"]][["conc"]]))
-  data.credInt[["dtheoQ"]]$color <-
-    as.numeric(as.factor(data.credInt[["dtheoQ"]][["conc"]]))
+  # data.credInt[["dobs"]]$color <-
+  #   as.numeric(as.factor(data.credInt[["dobs"]][["conc"]]))
+  # data.credInt[["dtheoQ"]]$color <-
+  #   as.numeric(as.factor(data.credInt[["dtheoQ"]][["conc"]]))
   
   dataCIm <- melt(data.credInt[["dtheoSp"]],
                   id.vars = c("conc", "time"))
@@ -164,8 +174,11 @@ survTKTDConfInt <- function(x) {
   ci <- apply(x$transformed.data, 1, function(x) {
     binom.test(x["N_alive"], x["N_init"])$conf.int
   })
-  rownames(ci) <- c("qinf95", "qsup95")
-  colnames(ci) <- x$transformed.data$conc
+  # rownames(ci) <- c("qinf95", "qsup95")
+  # colnames(ci) <- x$transformed.data$conc
+  ci <- as.data.frame(t(ci))
+  colnames(ci) <- c("qinf95", "qsup95")
+  ci$Conf.Int <- "Confidence interval"
   
   return(ci)
 }
@@ -191,7 +204,7 @@ survFitPlotCITKTD <- function(x) {
   
   # all theorical
   # dtheo = list()
-  # for (k in 1:length(concobs)) {
+  # system.time(for (k in 1:length(concobs)) {
   #   dtheo[[k]] <- array(data = NA, dim = c(npoints, length(nec)))
   #   for (i in 1:length(nec)) {
   #     for (j in 1:npoints) {
@@ -201,18 +214,18 @@ survFitPlotCITKTD <- function(x) {
   #                                m0 = m0[i])
   #     }
   #   }
-  # }
+  # })
   
   k <- 1:length(concobs)
   i <- 1:length(nec)
   j <- 1:npoints
-  dtheo <- sapply(k, function(x) { # concentration
-    sapply(i, function(y) { # mcmc
+  dtheo <- sapply(i, function(x) { # mcmc
+    sapply(k, function(y) { # conc
       sapply(j, function(z) { # time
-        Surv(Cw = concobs[x], time = tfin[z],
-             ks = ks[y], kd = kd[y],
-             NEC = nec[y],
-             m0 = m0[y])
+        Surv(Cw = concobs[y], time = tfin[z],
+             ks = ks[x], kd = kd[x],
+             NEC = nec[x],
+             m0 = m0[x])
       })
     })
   })
@@ -223,37 +236,56 @@ survFitPlotCITKTD <- function(x) {
   #                               rep(tfin, length(concobs)),
   #                               dtheoSp))
   
-  dtheo <- as.data.frame(cbind(dtheo,
-                               rep(tfin, length(nec)),
-                               rep(1:length(nec), rep(length(tfin), length(nec)))))
+  dtheo <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
+                               rep(tfin, length(concobs)),
+                               dtheo))
   
-  # names(dtheoSp) <- c("conc", "time", paste0("X", 1:length(sel)))
-  colnames(dtheo) <- c(paste0("conc_", concobs), "time", "mcmc")
+  # names(dtheoSp) <- c("conc", "time", paste0("X", 1:length(nec)))
+  
+  names(dtheo) <- c("conc", "time", paste0("X", 1:length(nec)))
   
   # quantile
-  qinf95 = NULL
-  qsup95 = NULL
-  q50 = NULL
+  # qinf95 = NULL
+  # qsup95 = NULL
+  # q50 = NULL
+  # 
+  # system.time(for (i in 1:nrow(dtheoSp)) {
+  #   qinf95[i] <- quantile(dtheoSp[i, 3:length(dtheoSp)],
+  #                         probs = 0.025, na.rm = TRUE)
+  #   qsup95[i] <- quantile(dtheoSp[i, 3:length(dtheoSp)],
+  #                         probs = 0.975, na.rm = TRUE)
+  #   q50[i] <- quantile(dtheoSp[i, 3:length(dtheoSp)],
+  #                      probs = 0.5, na.rm = TRUE)
+  # })
   
-  for (i in 1:dim(dtheoSp)[1]) {
-    qinf95[i] <- quantile(dtheoSp[i, 3:length(dtheoSp)],
-                          probs = 0.025, na.rm = TRUE)
-    qsup95[i] <- quantile(dtheoSp[i, 3:length(dtheoSp)],
-                          probs = 0.975, na.rm = TRUE)
-    q50[i] <- quantile(dtheoSp[i, 3:length(dtheoSp)],
-                       probs = 0.5, na.rm = TRUE)
-  }
+  dtheo$qinf95 <- apply(dtheo[,3:ncol(dtheo)], 1,
+                        quantile, probs = 0.025, na.rm = TRUE)
+  dtheo$qsup95 <- apply(dtheo[,3:ncol(dtheo)], 1,
+                        quantile, probs = 0.975, na.rm = TRUE)
+  dtheo$q50 <- apply(dtheo[,3:ncol(dtheo)], 1,
+                     quantile, probs = 0.5, na.rm = TRUE)
   
-  dtheoQ <- data.frame(conc = dtheoSp[, "conc"], time = dtheoSp[, "time"],
-                       qinf95 = qinf95, qsup95 = qsup95, q50 = q50)
+  # names for legend plots
+  dtheo$Cred.Lim <- "Credible limits"
+  dtheo$Mean.C <- "Mean curve"
+  # vector color
+  dtheo$color <- as.numeric(as.factor(dtheo$conc))
+    
+    data.credInt[["dtheoQ"]]$color <-
+    as.numeric(as.factor(data.credInt[["dtheoQ"]][["conc"]]))
   
-  dobs <- data.frame(conc = x$transformed.data$conc,
-                     time = x$transformed.data$time, 
-                     psurv = x$transformed.data$N_alive / x$transformed.data$N_init)
+  # dtheoQ <- data.frame(conc = dtheoSp[, "conc"], time = dtheoSp[, "time"],
+  #                      qinf95 = qinf95, qsup95 = qsup95, q50 = q50)
   
-  return(list(dtheoQ = dtheoQ,
-              dtheoSp = dtheoSp,
-              dobs = dobs))
+  # dobs <- data.frame(conc = x$transformed.data$conc,
+  #                    time = x$transformed.data$time, 
+  #                    psurv = x$transformed.data$N_alive / x$transformed.data$N_init)
+  
+  # return(list(dtheoQ = dtheoQ,
+  #             dtheoSp = dtheoSp,
+  #             dobs = dobs))
+  
+  return(dtheo)
 }
 
 survFitPlotTKTDGeneric <- function(data, xlab, ylab, main, concentration,
