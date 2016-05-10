@@ -103,9 +103,10 @@ plot.survFitTKTD <- function(x,
   dobs <- data.frame(conc = x$transformed.data$conc,
                      time = x$transformed.data$time, 
                      psurv = x$transformed.data$N_alive / x$transformed.data$N_init,
-                     Conf.Int = "Confidence interval",
                      Points = "Observed values",
-                     color = as.numeric(as.factor(x$transformed.data$conc)))
+                     color = as.numeric(as.factor(x$transformed.data$conc)),
+                     conf.int)
+  
   
   # remove time 0 in dobs
   dobs <- filter(dobs, time != 0)
