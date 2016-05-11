@@ -280,7 +280,8 @@ survFitPlotTKTDGenericOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
            bty = "n",
            cex = 1,
            ncol = 2,
-           col = unique(dobs$color),
+           col = c(ifelse(adddata, "black", NA),
+                   unique(dobs$color)),
            title = "Concentrations")
   }
 }
@@ -346,13 +347,13 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
     
     if (addlegend) {
       legend("bottomleft", pch = c(ifelse(adddata, 20, NA), NA, NA, NA),
-             lty = c(NA, ifelse(adddata, 1, NA), 1, 2),
+             lty = c(NA, ifelse(adddata, 1, NA), 1, 1),
              col = c(ifelse(adddata, "black", NA),
                      ifelse(adddata, "black", NA),
                      "red", "pink"),
              legend = c(ifelse(adddata, "Observed values", NA),
                         ifelse(adddata, "Confidence interval", NA),
-                        "Credible limits", "Mean curve"),
+                        "Mean curve", "Credible limits"),
              bty = "n")
     }
   }, x = dtheoQ, y = dobs, z = dtheoQm)
