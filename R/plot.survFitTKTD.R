@@ -126,19 +126,15 @@ plot.survFitTKTD <- function(x,
 }
 
 Surv <- function(Cw, time, ks, kd, NEC, m0)
-  # Fonction S ecrite en R pour la validation en simu ensuite
-  # Cw est la concentration dans le milieu
 {
-  S <- exp(-m0*time) # survie de base avec mortalite naturelle seule
-  if (Cw > NEC) {
-    tNEC <- -(1/kd)*log(1 - NEC/Cw)
-    if (time > tNEC) {
-      # ajoute de la mortalite due au toxique
-      S <- S * exp( ks/kd*Cw*(exp(-kd*tNEC) -exp(-kd*time))
-                    - ks*(Cw-NEC)*(time - tNEC) )
-    }
-  }
-  return(S)
+  S <- exp(-m0*time)
+  x <- ifelse(Cw > NEC, 1 - NEC/Cw, NA)
+  tNEC <- -(1/kd)*log(x)
+  y <- ifelse(time > tNEC,
+              exp( ks/kd*Cw*(exp(-kd*tNEC) -exp(-kd*time))
+                   - ks*(Cw-NEC)*(time - tNEC)),
+              NA)
+  return(ifelse(!is.na(x) & !is.na(y), S * y, S))
 }
 
 #' @importFrom stats aggregate binom.test
@@ -181,33 +177,31 @@ survFitPlotCITKTD <- function(x) {
   # all theorical
   
   k <- 1:length(concobs)
-  i <- 1:length(nec)
   j <- 1:npoints
-  dtheo <- sapply(i, function(x) { # mcmc
-    sapply(k, function(y) { # conc
-      sapply(j, function(z) { # time
-        Surv(Cw = concobs[y], time = tfin[z],
-             ks = ks[x], kd = kd[x],
-             NEC = nec[x],
-             m0 = m0[x])
-      })
+  
+  dtheo <- lapply(k, function(y) { # conc
+    sapply(j, function(z) { # time
+      Surv(Cw = concobs[y], time = tfin[z],
+           ks = ks, kd = kd,
+           NEC = nec,
+           m0 = m0)
     })
   })
+  
+  # transpose dtheo
+  dtheo <- do.call("rbind", lapply(dtheo, t))
+  
+  # quantile
+  qinf95 <- apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE)
+  qsup95 <- apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+  q50 <- apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE)
+  
   
   dtheo <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
                                rep(tfin, length(concobs)),
                                dtheo))
-  
 
   names(dtheo) <- c("conc", "time", paste0("X", 1:length(nec)))
-  
-  # quantile
-  qinf95 <- apply(dtheo[,3:ncol(dtheo)], 1,
-                  quantile, probs = 0.025, na.rm = TRUE)
-  qsup95 <- apply(dtheo[,3:ncol(dtheo)], 1,
-                  quantile, probs = 0.975, na.rm = TRUE)
-  q50 <- apply(dtheo[,3:ncol(dtheo)], 1,
-               quantile, probs = 0.5, na.rm = TRUE)
   
   # divide number of mcmc by 50
   sel <- sample(ncol(dtheo[3:ncol(dtheo)]))[1:ceiling(ncol(dtheo) / 50)]
