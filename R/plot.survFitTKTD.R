@@ -293,8 +293,12 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
   
   delta <- 0.01 * (max(dobs$time) - min(dobs$time))
   
-  dtheoQm <- melt(data,
+  #remove unused column before melt
+  dataTmp <- data
+  dataTmp[, c("Cred.Lim", "Mean.C")] <- list(NULL)
+  dtheoQm <- melt(dataTmp,
                   id.vars = c("conc", "time", "color"))
+  rm(dataTmp)
   
   if (is.null(concentration)) {
     dobs <- split(dobs, dobs$conc)
@@ -402,9 +406,11 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
   
   # colors
   valCols <- fCols(data, "red", "pink")
-  
-  dtheoQm <- melt(data,
+  dataTmp <- data
+  dataTmp[, c("Cred.Lim", "Mean.C")] <- list(NULL)
+  dtheoQm <- melt(dataTmp,
                   id.vars = c("conc", "time", "color"))
+  rm(dataTmp)
   
   if (!is.null(concentration)) {
     dobs <- filter(dobs, conc == concentration)
