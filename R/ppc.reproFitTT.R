@@ -56,23 +56,24 @@ EvalreproPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
 
   if (x$model.label == "GP") {
-    omega <- 10^sample(tot.mcmc[, "log10omega"], 5000)
+    omega <- 10^tot.mcmc[, "log10omega"]
   }
-  b <- 10^sample(tot.mcmc[, "log10b"], 5000)
-  d <- sample(tot.mcmc[, "d"], 5000)
-  e <- 10^sample(tot.mcmc[, "log10e"], 5000)
+  b <- 10^tot.mcmc[, "log10b"]
+  d <- tot.mcmc[, "d"]
+  e <- 10^tot.mcmc[, "log10e"]
 
+  niter <- nrow(tot.mcmc)
   n <- x$jags.data$n
   xconc <- x$jags.data$xconc
   Nindtime <- x$jags.data$Nindtime
   NcumulObs <- x$jags.data$Ncumul
-  NcumulPred <- matrix(NA, nrow = 5000, ncol = n)
+  NcumulPred <- matrix(NA, nrow = niter, ncol = n)
 
   if (x$model.label == "GP") {
     for (i in 1:n) {
       popmean <- d / (1 + (xconc[i]/e)^b)
-      indmean <- rgamma(n = 5000, shape = popmean / omega, rate = 1 / omega)
-      NcumulPred[, i] <- rpois(5000, indmean * Nindtime[i])
+      indmean <- rgamma(n = niter, shape = popmean / omega, rate = 1 / omega)
+      NcumulPred[, i] <- rpois(niter, indmean * Nindtime[i])
     }
 
   }
@@ -80,7 +81,7 @@ EvalreproPpc <- function(x) {
     for (i in 1:n) {
       ytheo <- d / (1 + (xconc[i]/e)^b)
       nbtheo <- ytheo * Nindtime[i]
-      NcumulPred[, i] <- rpois(5000, nbtheo)
+      NcumulPred[, i] <- rpois(niter, nbtheo)
     }
   }
   QNreproPred <- t(apply(NcumulPred, 2, quantile,
