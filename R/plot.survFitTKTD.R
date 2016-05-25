@@ -5,7 +5,7 @@
 #' survival analysis.
 #' 
 #' The fitted curves represent the \strong{estimated survival rate} as a function
-#' of time for each concentration;
+#' of time for each concentration
 #' When \code{adddata = TRUE} the black dots depict the \strong{observed survival
 #' rate} at each time point. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
@@ -17,7 +17,7 @@
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two intervals.
 #' If \code{spaghetti = TRUE}, the credible intervals are represented by two
-#' dotted ines limiting the credible band, and a spaghetti plot is added to this
+#' dotted lines limiting the credible band, and a spaghetti plot is added to this
 #' band.
 #' It consists of the representation of simulated curves using parameter values
 #' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
@@ -29,11 +29,12 @@
 #' @param main A main title for the plot.
 #' @param concentration A numeric value corresponding to some concentration in
 #' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration.
-#' @param spaghetti if \code{TRUE}, the credible interval is represented by 
-#' multiple curves
-#' @param one.plot if \code{TRUE}, draws all the estimeted curves in one plot.
-#' @param adddata if \code{TRUE}, adds the observed data with confidence interval
-#' to the plot
+#' @param spaghetti if \code{TRUE}, draws a set of survival curves using
+#' parameters drawn from the posterior distribution
+#' @param one.plot if \code{TRUE}, draws all the estimated curves in
+#' one plot instead of one per concentration.
+#' @param adddata if \code{TRUE}, adds the observed data to the plot
+#' with (frequentist) confidence intervals
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot.
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods.
