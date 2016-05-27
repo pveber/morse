@@ -147,7 +147,7 @@ survTKTDPARAMS <- function(mcmc) {
 
 #' Fits a Bayesian time-exposure-response model for survival analysis
 #' 
-#' This function estimates the parameters of an  time-exposure-response
+#' This function estimates the parameters of a time-exposure-response
 #' model for survival analysis using Bayesian inference. In this model,
 #' the survival rate of individuals is modeled as a function of the pollutant's
 #' concentration with a mechanistic description of toxic effects on survival over
@@ -159,8 +159,7 @@ survTKTDPARAMS <- function(mcmc) {
 #' @param data An object of class \code{survData}.
 #' @param n.chains Number of MCMC chains. The minimum required number of chains
 #' is 2.
-#' @param quiet If \code{TRUE}, make silent all prints and progress bars of
-#' JAGS compilation.
+#' @param quiet If \code{FALSE}, prints logs and progress bar from JAGS.
 #' 
 #' @return The function returns an object of class \code{survFitTKTD}, which is
 #' a list with the following fields:
@@ -176,7 +175,6 @@ survTKTDPARAMS <- function(mcmc) {
 #' monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #' \item{jags.data}{a list a the data passed to the jags model}
-#' \item{transformed.data}{the \code{survData} object passed to the function}
 #'
 #' @keywords estimation
 #
