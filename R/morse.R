@@ -8,7 +8,7 @@
 #' curves. The \eqn{LC_{x}}/\eqn{EC_{x}} and parameters of the curve are
 #' provided along with an indication of the uncertainty of the estimation.
 #' It can be used to perform an estimation of \eqn{NEC} (No Effect Concentration)
-#' value by fitting time-exposure-response curves (TKTD).
+#' value by fitting a toxico-kinetic toxico-dynamic model.
 #'
 #' Estimation procedures in MORSE can be used without a deep knowledge of
 #' their underlying probabilistic model or inference methods. Rather, they

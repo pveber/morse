@@ -145,16 +145,16 @@ survTKTDPARAMS <- function(mcmc) {
   return(res)
 }
 
-#' Fits a Bayesian time-exposure-response model for survival analysis
+#' Fits a TKTD for survival analysis using Bayesian inference
 #' 
-#' This function estimates the parameters of a time-exposure-response
+#' This function estimates the parameters of a TKTD
 #' model for survival analysis using Bayesian inference. In this model,
 #' the survival rate of individuals is modeled as a function of the pollutant's
 #' concentration with a mechanistic description of toxic effects on survival over
 #' time. Details of the model are presented in the vignette accompanying the package.
 #' 
 #' The function returns
-#' parameter estimates of the time-exposure-response model.
+#' parameter estimates of the TKTD model.
 #' 
 #' @param data An object of class \code{survData}.
 #' @param n.chains Number of MCMC chains. The minimum required number of chains

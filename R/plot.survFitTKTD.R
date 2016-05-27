@@ -1,8 +1,8 @@
 #' Plotting method for \code{survFitTKTD} objects
 #' 
-#' This is the generic \code{plot} S3 method for the \code{survFitTKTD}.
-#' It plots time-exposure-response fits for each concentration of
-#' survival analysis.
+#' This is the generic \code{plot} S3 method for the
+#' \code{survFitTKTD}.  It plots the fits obtained for each
+#' concentration of pollutant in the original dataset.
 #' 
 #' The fitted curves represent the \strong{estimated survival rate} as a function
 #' of time for each concentration
