@@ -1,20 +1,20 @@
 #' Posterior predictive check plot for \code{survFitTKTD} objects
 #'
 #' This is the generic \code{ppc} S3 method for the \code{survFitTKTD} class. It
-#' plots the predicted values with 95 \% credible intervals
+#' plots the predicted values along with 95\% credible intervals
 #' versus the observed values for \code{survFitTKTD} objects.
 #' 
-#' The coordinates of black points are the observed values of the number of survivor
-#' (poolled replicates) for a given concentration (x-scale) and the corresponding 
-#' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
-#' value, colored in green if this interval contains the observed value and in red
-#' in the other case.
-#' As replicates are shifted on the x-axis, the bisecting line (y = x), is
-#' represented by steps, and is added to the plot in order to see if each
-#' prediction interval contains each observed value. 
+#' The black points show the observed number of survivors (pooled
+#' replicates, on \eqn{X}-axis) against the corresponding predicted
+#' number (\eqn{Y}-axis). Predictions come along with 95\% prediction
+#' intervals, which are depicted in green when they contain the
+#' observed value and in red otherwise. Samples with equal observed
+#' value are shifted on the \eqn{X}-axis. For that reason, the
+#' bisecting line (y = x), is represented by steps when observed
+#' values are low. That way we ensure green intervals do intersect the
+#' bisecting line.
 #'
 #' @param x An object of class \code{survFitTKTD}
-#' \code{'ggplot'} style to avoid the label overlap
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods
 #'
