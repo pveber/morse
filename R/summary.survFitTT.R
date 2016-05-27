@@ -1,6 +1,6 @@
 #' Summary for \code{survFitTT} objects
 #'
-#' This is the gnenric \code{summary} S3 method for the \code{survFitTT} class.
+#' This is the generic \code{summary} S3 method for the \code{survFitTT} class.
 #' It shows the quantiles of priors and posteriors on parameters and the quantiles
 #' of the posterior on the LCx.
 #'
