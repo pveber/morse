@@ -29,7 +29,6 @@ vignettes/*.html
 vignettes/*.blg
 vignettes/*.bbl
 vignettes/*.aux
-vignettes/*.tex
 vignettes/*.R
 vignettes/*_cache
 vignettes/*_files
