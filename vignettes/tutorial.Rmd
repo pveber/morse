@@ -1,19 +1,21 @@
 ---
 title: "MORSE tutorial"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  html_vignette:
+    toc: true
 self_contained: no
 vignette: >
   %\VignetteIndexEntry{Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
-  
+
 ---
 
 ```{r,include=FALSE, echo=FALSE}
 
-knitr::opts_chunk$set(fig.width = 7, 
-                      fig.height = 4, 
+knitr::opts_chunk$set(fig.width = 7,
+                      fig.height = 4,
                       cache = TRUE)
 
 ```
@@ -30,7 +32,7 @@ compute estimations of risk assessment indicators. This document illustrates
 a typical use of MORSE on survival and reproduction data, which can be followed
 to analyze new datasets.
 
-# Survival data analysis
+# Survival data analysis at target time
 
 The following example shows all the stages to perform survival analysis on
 standard bioassay data and produce estimate values of the $LC_x$.
@@ -41,9 +43,9 @@ experiment, snails were exposed to six concentrations of a metal contaminant
 
 ## Step 1: check the structure and the dataset integrity
 
-The data from a survival assay should be gathered in a `data.frame` with a 
-specific layout. This is documented in the paragraph on `survData` in the 
-reference manual, and you can also inspect one of the datasets provided in 
+The data from a survival assay should be gathered in a `data.frame` with a
+specific layout. This is documented in the paragraph on `survData` in the
+reference manual, and you can also inspect one of the datasets provided in
 the package (like `cadmium2`). First, we load the dataset and use the function
 `survDataCheck` to verify that it has the expected layout:
 
@@ -54,7 +56,7 @@ survDataCheck(cadmium2)
 
 ## Step 2: create a `survData` object
 
-The class `survData` represents \emph{validated} survival data and is the 
+The class `survData` represents \emph{validated} survival data and is the
 basic representation used for the subsequent operations. Note that if the
 call to `survDataCheck` reports no error, it is guaranteed that `survData`
 will not fail.
@@ -65,7 +67,7 @@ head(dat)
 ```
 
 ## Step 3: visualize your dataset
-  
+
 The function `plot` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
 
@@ -79,7 +81,7 @@ is `TRUE` the datapoints for a given time and concentration are pooled
 and only the mean number of survivors is plotted. To observe the full
 dataset, we set this option to `FALSE`.
 
-By fixing the concentration to a (tested) value, we can visualize one subplot 
+By fixing the concentration to a (tested) value, we can visualize one subplot
 in particular:
 ```{r, cache=TRUE}
 plot(dat, concentration = 124, addlegend = TRUE,
@@ -89,7 +91,7 @@ plot(dat, concentration = 124, addlegend = TRUE,
 We can also plot the survival rate with the confidence intervale on the data
 at a given time point as a function of the concentration, by using the function
 `plot.DoseResponse` and by fixing `target.time`:
-  
+
 ```{r, cache=TRUE}
 plotDoseResponse(dat, target.time = 21, style = "ggplot", addlegend = TRUE)
 ```
@@ -116,7 +118,7 @@ fit <- survFitTT(dat,
                  lcx = c(10, 20, 30, 40, 50))
 ```
 
-The returned value is an object of class `survFitTT` and provides the estimated 
+The returned value is an object of class `survFitTT` and provides the estimated
 parameters as a posterior[^1] distribution, in order to model our uncertainty on
 their true value. For the parameters of the models, as well as the $LC_x$
 values, we report the median (as the estimated value) and the 2.5 \% and 97.5 \%
@@ -128,7 +130,7 @@ intervals). These can seen using the `summary` method:
 summary(fit)
 ```
 
-If the inference went well, it is expected that the difference between 
+If the inference went well, it is expected that the difference between
 quantiles in the posterior will be reduced compared to the prior, meaning
 that the data was helpful to reduce the uncertainty on the true value of
 the parameters. This simple check can be performed using the summary function.
@@ -141,7 +143,7 @@ plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
 This representation shows the estimated relation between concentration of
 pollutant and survival rate (red curve). It is computed by choosing for each
 parameter the median value of its posterior. To assess the uncertainty on this
-estimation, we compute many such curves this time by sampling the parameters 
+estimation, we compute many such curves this time by sampling the parameters
 in the posterior distribution. This gives rise to the pink band, showing for
 any given concentration an interval (called credible interval) containing the
 survival rate 95% of the time in the posterior distribution. The experimental
@@ -166,8 +168,8 @@ plot(wrong_fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
 ```
 
 In this example, the experimental design did not include sufficiently high
-concentrations, and we are missing measurements that would have a major 
-influence on the final estimation. For this reason this result should be 
+concentrations, and we are missing measurements that would have a major
+influence on the final estimation. For this reason this result should be
 considered unreliable.
 
 
@@ -197,13 +199,49 @@ intervals are represented in green if they overlap with the line $Y=X$,
 and in red otherwise.
 As replicates are shifted on the x-axis, the bisecting line (y = x), is
 represented by steps, and is added to the plot in order to see if each
-prediction interval contains each observed value. 
+prediction interval contains each observed value.
+
+# Survival analysis using a toxico-kinetic toxico-dynamic model
+
+The steps for TKTD data analysis are absolutely analogous to what we
+described for the analysis at target time. Here the goal is to estimate the relation
+between pollutant concentration, time and survival rate.
+
+Here is a typical session:
+```{r, cache=TRUE}
+# (1) load dataset
+data(propiconazole)
+
+# (2) check structure and integrity of the dataset
+survDataCheck(propiconazole)
+
+# (3) create a `survData` object
+dat <- survData(propiconazole)
+
+# (4) represent the number of survivor as a function time
+plot(dat, style = "ggplot", pool.replicate = FALSE)
+
+# (5) check information on the experimental design
+summary(dat)
+
+# (6) fit a TKTD model
+fit <- survFitTKTD(dat, quiet = TRUE)
+summary(fit)
+```
+
+```{r, cache=TRUE}
+plot(fit, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+```
+
+```{r, cache=TRUE}
+ppc(fit, style = "ggplot")
+```
 
 # Reproduction data analyses
-  
+
 The steps in reproduction data analysis are absolutely analogous to what we
-described for survival data. This time the goal is to estimate the relation 
-between pollutant concentration and reproduction rate per individual-day. 
+described for survival data. This time the goal is to estimate the relation
+between pollutant concentration and reproduction rate per individual-day.
 
 Here is a typical session:
 ```{r, cache=TRUE}
@@ -245,7 +283,7 @@ ppc(fit, style = "ggplot")
 ```
 As in survival analysis, we assume that the reproduction rate per individual-day
 is a log-logistic function of the concentration. More details and parameter
-signification can be found in the Modeling vignette. 
+signification can be found in the Modeling vignette.
 
 
 ## Model comparison
@@ -265,7 +303,7 @@ parameter called `omega`, which quantifies the inter-individual variability
 
 ## Reproduction data and survival functions
 
-In MORSE, reproduction datasets are a special case of survival datasets: a 
+In MORSE, reproduction datasets are a special case of survival datasets: a
 reproduction dataset includes the same information than a survival dataset plus
 the information on reproduction outputs. For that reason the S3 class `reproData`
 inherits from the class `survData`, which means that any operation on a `survData`
@@ -278,41 +316,6 @@ dat <- reproData(cadmium2)
 plot(as.survData(dat))
 ```
 
-# Toxico-kinetic toxico-dynamic data analyses
-  
-The steps in TKTD data analysis are absolutely analogous to what we
-described for survival data. This time the goal is to estimate the relation 
-between pollutant concentration, time and survival rate. 
-
-Here is a typical session:
-```{r, cache=TRUE}
-# (1) load dataset
-data(propiconazole)
-
-# (2) check structure and integrity of the dataset
-survDataCheck(propiconazole)
-
-# (3) create a `survData` object
-dat <- survData(propiconazole)
-
-# (4) represent the number of survivor as a function time
-plot(dat, style = "ggplot", pool.replicate = FALSE)
-
-# (5) check information on the experimental design
-summary(dat)
-
-# (6) fit an time-exposure-response model at
-fit <- survFitTKTD(dat, quiet = TRUE)
-summary(fit)
-```
-
-```{r, cache=TRUE}
-plot(fit, style = "ggplot", adddata = TRUE, one.plot = FALSE)
-```
-
-```{r, cache=TRUE}
-ppc(fit, style = "ggplot")
-```
 
 [^1]: In Bayesian inference, the parameters of a model are estimated
 from the data starting from a so-called *prior*, which is a probability
@@ -322,4 +325,3 @@ the parameters after seeing the data and combining it with the prior. To obtain
 a point estimate of the parameters, it is typical to compute the mean or median
 of the posterior and quantify the uncertainty by reporting the standard
 deviation or inter-quantile distance.
-
