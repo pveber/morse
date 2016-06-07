@@ -7,11 +7,11 @@ Companion R package for MOSAIC website
 
 ### CRAN release version
 
-[![CRAN version](http://www.r-pkg.org/badges/version/morse)](http://cran.rstudio.com/web/packages/morse/index.html) [![](http://cranlogs.r-pkg.org/badges/grand-total/morse)](http://cran.rstudio.com/web/packages/morse/index.html)
+[![CRAN version](http://www.r-pkg.org/badges/version/morse)](https://cran.r-project.org/package=morse) [![](http://cranlogs.r-pkg.org/badges/grand-total/morse)](https://cran.r-project.org/package=morse)
 
 ### Build status for development version
 
-[![Build Status](https://api.travis-ci.org/philipperuiz/morse.svg?branch=v2.3.0Comp)](https://api.travis-ci.org/philipperuiz/morse.svg)
+[![Build Status](https://api.travis-ci.org/pveber/morse.svg?branch=master)](https://api.travis-ci.org/pveber/morse.svg)
 
 ## Report a problem
 
