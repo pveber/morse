@@ -281,7 +281,7 @@ survFitPlotTKTDGenericOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
   }
 }
 
-#' importFrom reshape2 melt
+#' @importFrom reshape2 melt
 survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
                                             adddata, concentration,
                                             addlegend = FALSE) {
@@ -393,8 +393,8 @@ survFitPlotTKTDGGOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
   }
 }
 
-#' importFrom dplyr filter
-#' importFrom reshape2 melt
+#' @importFrom dplyr filter
+#' @importFrom reshape2 melt
 survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
                                        adddata, concentration,
                                        addlegend = FALSE) {
