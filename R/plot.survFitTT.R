@@ -33,6 +33,8 @@
 #' @param cicol color of the 95 \% credible interval limits
 #' @param cilty line type for the 95 \% credible interval limits
 #' @param cilwd width of the 95 \% credible interval limits
+#' @param ribcol color of the ribbon between the lower and upper credible limits.
+#' Transparent if \code{NULL}
 #' @param adddata if \code{TRUE}, adds the observed data with confidence interval
 #' to the plot
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
@@ -84,9 +86,10 @@ plot.survFitTT <- function(x,
                            fitlty = 1,
                            fitlwd = 1,
                            spaghetti = FALSE,
-                           cicol = "pink1",
-                           cilty = 1,
+                           cicol = "red",
+                           cilty = 2,
                            cilwd = 1,
+                           ribcol = "pink1",
                            adddata = FALSE,
                            addlegend = FALSE,
                            log.scale = FALSE,
@@ -145,7 +148,7 @@ plot.survFitTT <- function(x,
                               conf.int, cred.int, spaghetti.CI, dataCIm,
                               xlab, ylab, fitcol, fitlty, fitlwd,
                               main, addlegend, adddata,
-                              cicol, cilty, cilwd, log.scale)
+                              cicol, cilty, cilwd, ribcol, log.scale)
   }
   else if (style == "ggplot") {
     survFitPlotGG(x,
@@ -154,7 +157,7 @@ plot.survFitTT <- function(x,
                   conf.int, cred.int, spaghetti.CI, dataCIm,
                   xlab, ylab, fitcol, fitlty, fitlwd,
                   main, addlegend, adddata,
-                  cicol, cilty, cilwd / 2)
+                  cicol, cilty, cilwd / 2, ribcol)
   }
   else stop("Unknown style")
 }
@@ -270,7 +273,7 @@ survFitPlotGenericCredInt <- function(x,
                                       conf.int, cred.int, spaghetti.CI, dataCIm,
                                       xlab, ylab, fitcol, fitlty, fitlwd,
                                       main, addlegend, adddata,
-                                      cicol, cilty, cilwd, log.scale)
+                                      cicol, cilty, cilwd, ribcol, log.scale)
 {
   # plot the fitted curve estimated by survFitTT
   # with generic style with credible interval
@@ -298,10 +301,10 @@ survFitPlotGenericCredInt <- function(x,
     by(dataCIm, dataCIm$variable, function(x) {
       lines(x$curv_conc, x$value, col = color_transparent)
     })
-  } else {
+  } else if(!is.null(ribcol)) {
     polygon(c(curv_conc, rev(curv_conc)), c(cred.int[["qinf95"]],
                                             rev(cred.int[["qsup95"]])),
-            col = cicol, border = NA)
+            col = ribcol, border = NA)
   }
   
   lines(curv_conc, cred.int[["qsup95"]], type = "l", col = cicol, lty = cilty,
@@ -341,7 +344,7 @@ survFitPlotGenericCredInt <- function(x,
 #' @importFrom grid arrow unit
 survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
                                  spaghetti.CI, dataCIm, cilty, cilwd,
-                                 valCols, fitlty, fitlwd, xlab, ylab, main,
+                                 valCols, fitlty, fitlwd, ribcol, xlab, ylab, main,
                                  adddata) {
   # IC
   data.three <- data.frame(conc = data$transf_conc,
@@ -369,7 +372,7 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
   } else {
     ggplot(data) + geom_ribbon(data = data.four, aes(x = conc, ymin = qinf95,
                                                      ymax = qsup95),
-                               fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
+                               fill = ribcol, col = NA, alpha = 0.4)
   }
   
   plt_32 <- plt_302 +
@@ -390,8 +393,8 @@ survFitPlotGGCredInt <- function(x, data, curv_resp, conf.int, cred.int,
     plt_40 <- ggplot(data) + geom_ribbon(data = data.four, aes(x = conc,
                                                                ymin = qinf95,
                                                                ymax = qsup95),
-                                         fill = valCols$cols4,
-                                         col = valCols$cols4, alpha = 0.4)
+                                         fill = ribcol,
+                                         col = NA, alpha = 0.4)
   }
   
   plt_401 <- plt_40 +
@@ -425,7 +428,7 @@ survFitPlotGG <- function(x,
                           conf.int, cred.int, spaghetti.CI, dataCIm,
                           xlab, ylab, fitcol, fitlty, fitlwd,
                           main, addlegend, adddata,
-                          cicol, cilty, cilwd) {
+                          cicol, cilty, cilwd, ribcol) {
   
   
   if (Sys.getenv("RSTUDIO") == "") {
@@ -457,7 +460,7 @@ survFitPlotGG <- function(x,
   
   plt_4 <-
     survFitPlotGGCredInt(x, data, curv_resp, conf.int, cred.int, spaghetti.CI,
-                         dataCIm, cilty, cilwd, valCols, fitlty, fitlwd,
+                         dataCIm, cilty, cilwd, valCols, fitlty, fitlwd, ribcol,
                          xlab, ylab, main, adddata)$plt_4
   
   if (addlegend) { # legend yes
@@ -470,11 +473,11 @@ survFitPlotGG <- function(x,
     
     plt_3 <- survFitPlotGGCredInt(x, data, curv_resp, conf.int, cred.int, 
                                   spaghetti.CI, dataCIm, cilty, cilwd,
-                                  valCols, fitlty, fitlwd, xlab, ylab, main,
+                                  valCols, fitlty, fitlwd, ribcol, xlab, ylab, main,
                                   adddata)$plt_3
     plt_32 <- survFitPlotGGCredInt(x, data, curv_resp, conf.int, cred.int, 
                                    spaghetti.CI, dataCIm, cilty, cilwd,
-                                   valCols, fitlty, fitlwd, xlab, ylab, main,
+                                   valCols, fitlty, fitlwd, ribcol, xlab, ylab, main,
                                    adddata)$plt_32
     
     mylegend_3 <- if (adddata) { legendGgplotFit(plt_3) } else NULL
