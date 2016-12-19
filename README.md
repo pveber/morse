@@ -24,6 +24,7 @@ to report a problem.
 - `cd` to source directory
 - Build from sources (creates vignette and archive)
   `R CMD build .`
+- Build and install `R CMD INSTALL --build .`
 - Check the package
   `R CMD check --as-cran morse_X.X.X.tar.gz`
 - Update package description/NAMESPACE
@@ -65,7 +66,5 @@ R: ?morse
 - Test: `Build > More > Test package` (Ctrl + Shift + T). Note that you must activate the option "Use devtools package functions if available" in `Project Options > Build Tools`.
 - Generate the documentation: `Build & Reload or Build > More > Document` (Ctrl + Shift + D)
 - Check the package with the stable and the devel version of R:
-  - in `Build > More > Configure Build Tools`, add `--as-cran` in `Check Package -- R CMD check additional` options 
+  - in `Build > More > Configure Build Tools`, add `--as-cran` in `Check Package -- R CMD check additional` options
   - `Build > Check` (Ctrl + Shift + E)
-  
-
