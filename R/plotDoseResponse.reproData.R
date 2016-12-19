@@ -143,7 +143,7 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
            lty = c(NA, 1),
            lwd = c(NA, 1),
            col = c(1, 1),
-           legend = c("Observed values", "Confidence interval"),
+           legend = c("Observed values", "Confidence intervals"),
            bty = "n")
   }
 }
@@ -162,7 +162,7 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
   dfCI <- data.frame(x0,
                      transf_data_conc,
                      display.conc,
-                     Conf.Int = "Confidence interval")
+                     Conf.Int = "Confidence intervals")
   
   # colors
   valCols <- fCols(df, fitcol = NA, cicol = NA)

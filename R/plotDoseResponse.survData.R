@@ -128,7 +128,7 @@ plotDoseResponse.survData <- function(x,
              lty = c(NA, 1),
              lwd = c(NA, 1),
              col = c(1, 1),
-             legend = c("Observed values", "Confidence interval"),
+             legend = c("Observed values", "Confidence intervals"),
              bty = "n")
     }
   }
@@ -143,7 +143,7 @@ plotDoseResponse.survData <- function(x,
     dfCI <- data.frame(conc = transf_data_conc,
                        qinf95 = conf.int["qinf95",],
                        qsup95 = conf.int["qsup95",],
-                       Conf.Int = "Confidence interval")
+                       Conf.Int = "Confidence intervals")
     
     fd <- ggplot(df) +
       geom_point(aes(x = transf_data_conc, y = resp, fill = Points),
