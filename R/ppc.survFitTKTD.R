@@ -43,8 +43,8 @@ ppc.survFitTKTD <- function(x, style = "generic", ...) {
   if (!is(x, "survFitTKTD"))
     stop("x is not of class 'survFitTKTD'!")
   
-  xlab <- "Observed Nbr. of survivor"
-  ylab <- "Predicted Nbr. of survivor"
+  xlab <- "Observed nb of survivors"
+  ylab <- "Predicted nb of survivors"
   
   ppc_gen(EvalsurvTKTDPpc(x), style, xlab, ylab)
 }
