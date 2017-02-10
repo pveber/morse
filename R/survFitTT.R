@@ -74,8 +74,10 @@ survFitTT <- function(data,
   if(! is(data, "survData"))
     stop("survFitTT: object of class survData expected")
 
-  # select Data at target.time
+  # select Data at target.time and pool replicates
   dataTT <- selectDataTT(data, target.time)
+  dataTT <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, dataTT, sum), replicate = 1)
+
 
   # Choose model by testing mortality in the control
   control <- filter(dataTT, conc == 0)
