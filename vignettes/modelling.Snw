@@ -125,7 +125,7 @@ $S_i$ can be calculated by integrating the \emph{instantaneous mortality
 rate} $h_i$:
 \begin{equation}
   \label{eq:survivaldef}
-  S_i(t) = \int_0^t - h_i(u)\mbox{d}u
+  S_i(t) = \exp \left(\int_0^t - h_i(u)\mbox{d}u \right)
 \end{equation}
 In the model, the function $h_i$ is expressed using the internal
 concentration of contaminant (that is, the concentration inside an
