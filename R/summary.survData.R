@@ -33,9 +33,9 @@ summary.survData <- function(object, quiet = FALSE, ...) {
                                     as.factor(object$time)), sum)
   
   if (! quiet) {
-    cat("\nNumber of replicate per time and concentration: \n")
+    cat("\nNumber of replicates per time and concentration: \n")
     print(ans1)
-    cat("\nNumber of survival (sum of replicate) per time and concentration: \n")
+    cat("\nNumber of survivors (sum of replicate) per time and concentration: \n")
     print(ans2)
   }
   
