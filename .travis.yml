@@ -5,7 +5,7 @@ language: r
 sudo: required
 #bioc_required: false
 
-before_script:
+before_install:
   - sudo apt-get install -y jags
 
 # before_install:
