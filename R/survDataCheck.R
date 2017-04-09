@@ -53,7 +53,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 0. check we have a data.frame
   ##
-  if (class(data) != "data.frame") {
+  if ("data.frame" %in% class(data)) {
     return(errorTableSingleton("dataframeExpected",
                                 "A dataframe is expected."))
   }
