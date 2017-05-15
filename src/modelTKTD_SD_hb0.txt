@@ -1,0 +1,44 @@
+#
+# Here, it's exactly the JAGS model used in `MORSE` package in the function `survFitTKTD()`
+#
+model {
+  ######### priors 
+  log10.kk ~ dnorm(meanlog10.kk, taulog10.kk)
+  log10.z ~ dnorm(meanlog10.z, taulog10.z)
+  log10.ke ~ dnorm(meanlog10.ke, taulog10.ke)
+
+  ##### parameter transformation
+  kk <- 10**log10.kk
+  z <- 10**log10.z
+  ke <- 10**log10.ke
+  hb <- 10**-10 # to respect psurv < 1
+  #hb <- 0
+  
+  ########## Computation of the likelihood
+  
+  for (gr in 1:n.group){
+  
+      for (t in 1:n.time){
+   
+          x.pos[gr,t] <- ifelse(x[gr,t] > 0, x[gr,t], 10) # Ensure positivity of x[i] for division, also : 1e^-10=0
+          R[gr,t] <- ifelse(x[gr,t] > z, z/x.pos[gr,t], 0.1)
+          t.z[gr,t] <- ifelse(x[gr,t] > z, -1/ke * log( 1- R[gr,t]), bigtime) # if z=0, t.z -> + infty
+          #t.z[gr,t] <- ifelse(x[gr,t] > z, -1/ke * log( 1- z/x.pos[gr,t]), bigtime) # if z=0, t.z -> + infty
+
+          # Integration between t.z and max(t)
+          tref[gr,t] <- max(tprec[gr,t], t.z[gr,t])
+          
+          risk[gr,t] <- -hb * (time[gr,t] - tprec[gr,t]) +
+                ifelse(time[gr,t] > t.z[gr,t],
+                  -kk * ((x[gr,t] - z) * (time[gr,t] - tref[gr,t]) + x[gr,t]/ke * ( exp(-ke * time[gr,t]) - exp(-ke * tref[gr,t]))),
+                  0
+                )
+
+          psurv[gr,t] <- exp(risk[gr,t])
+
+          y[gr,t] ~ dbin(psurv[gr,t] , Nprec[gr,t])
+
+          
+      }
+  }
+}

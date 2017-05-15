@@ -14,6 +14,7 @@ Depends:
     R (>= 3.0.0)
 SystemRequirements: jags (>= 4.0.0) (see http://mcmc-jags.sourceforge.net)
 Imports:
+    broom,
     coda,
     dplyr,
     epitools,
@@ -26,7 +27,9 @@ Imports:
     reshape2,
     rjags (>= 4.0),
     stats,
-    stringr
+    stringr,
+    tidyr,
+    zoo
 License: GPL (>=2)
 Suggests:
     knitr,
