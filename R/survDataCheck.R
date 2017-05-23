@@ -46,14 +46,14 @@
 #' survDataCheck(zinc, diagnosis.plot = TRUE)
 #'
 #' @importFrom stringr str_c
-#' 
+#'
 #' @export
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
 
   ##
   ## 0. check we have a data.frame
   ##
-  if ("data.frame" %in% class(data)) {
+  if (!("data.frame" %in% class(data))) {
     return(errorTableSingleton("dataframeExpected",
                                 "A dataframe is expected."))
   }

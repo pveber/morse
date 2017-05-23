@@ -8,7 +8,7 @@
 #'
 
 
-gm_jagsPriors = function(gm_survData){
+gm_priors = function(gm_survData){
   
   data = filter(gm_survData, time != 0)
 
@@ -76,21 +76,32 @@ gm_jagsPriors = function(gm_survData){
   ## shape parameter of a log-logistic distribution
   ##
   
-  beta_log10min = -2 
-  beta_log10max = 2
+  beta_minlog10 = -2 
+  beta_maxlog10 = 2
   
   return(list(
+    ## kk
     kk_meanlog10 = kk_meanlog10,
+    kk_sdlog10 = kk_sdlog10,
     kk_taulog10 = kk_taulog10,
+    ## kd
     kd_meanlog10 = kd_meanlog10,
+    kd_sdlog10 = kd_sdlog10,
     kd_taulog10 = kd_taulog10,
+    ## hb
     hb_meanlog10 = hb_meanlog10,
+    hb_sdlog10 = hb_sdlog10,
     hb_taulog10 = hb_taulog10,
+    ## z
     z_meanlog10 = z_meanlog10,
+    z_sdlog10 = z_sdlog10,
     z_taulog10.z = z_taulog10,
+    ## alpha
     alpha_meanlog10 = alpha_meanlog10,
+    alpha_sdlog10 = alpha_sdlog10,
     alpha_taulog10 = alpha_taulog10,
-    beta_log10min = beta_log10min,
-    beta_log10max = beta_log10max 
+    ## beta
+    beta_minlog10 = beta_minlog10,
+    beta_maxlog10 = beta_maxlog10 
   ))
 }
