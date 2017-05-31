@@ -84,10 +84,15 @@ gm_survData = function(data_surv, data_conc){
     # From package zoo : 'na.locf()' carry the last observation forward to replace your NA values.
     # We create a variable 'conc.interpol' to test if variable is interpolated or extrapolated
     #mutate(conc.origin = conc)%>%
-    mutate(conc.interpol = zoo::na.approx(conc,time, na.rm = FALSE))%>%
+    dplyr::mutate(conc.interpol = zoo::na.approx(conc,time, na.rm = FALSE))%>%
     dplyr::mutate(conc = ifelse(is.na(conc.interpol), zoo::na.locf(conc, na.rm = FALSE), conc)) %>%
-    select(-conc.interpol) %>%
-    ungroup(profile, time)
+    dplyr::select(-conc.interpol) %>%
+    dplyr::ungroup() %>%
+    # Group by profile to profile an indice of profile:
+    dplyr::mutate(profile_ID = group_indices_(., .dots="profile")) %>%
+    dplyr::group_by(Profile) %>%
+    dplyr::mutate(time_ID = row_number()) %>%
+    dplyr::ungroup()
 
   class(df.survData) <- c("gm_survData", "data.frame")
 

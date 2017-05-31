@@ -16,9 +16,9 @@ model {
 
   ########## Computation of the likelihood
 
-  for (gr in 1:n.group){
+  for (gr in 1:n_group){
 
-      for (t in 1:n.time){
+      for (t in 1:n_time){
 
           x.pos[gr,t] <- ifelse(x[gr,t] > 0, x[gr,t], 10) # Ensure positivity of x[i] for division, also : 1e^-10=0
           R[gr,t] <- ifelse(x[gr,t] > z, z/x.pos[gr,t], 0.1)
@@ -40,19 +40,5 @@ model {
           y[gr,t] ~ dbin(psurv[gr,t] , Nprec[gr,t])
 
       }
-      
-      #ysim[gr,1] ~ dbin(psurv[gr,1] , Nprec[gr,1])
-      
-      #log_lik[gr,1] <- (Nprec[gr,1]-y[gr,1])*log(1-psurv[gr,1]*1)
-      #log_lik[gr,2] <- (Nprec[gr,2]-y[gr,2])*log(psurv[gr,1]*1-psurv[gr,2]*psurv[gr,1]) # psurv here is not the same as in IT, SD_Cext and IT_Cext model  
-      
-      #for( t in 2:n.time){
-      #  ysim[gr,t] ~ dbin(psurv[gr,1] , ysim[gr,t-1])
-      #}
-      #for( t in 3:n.time){ # Ce n'est pas l'idéal dans le cas où n.time < 3
-      #   log_lik[gr,t] <- (y[gr,t-1]-ysim[gr,t])*log(psurv[gr,t-1]*psurv[gr,t-2]-psurv[gr,t]*psurv[gr,t-1]) 
-      #}
-      #log_lik_gr[gr] <- sum(log_lik[gr,1:n.time])
-  }
-  #log_lik_Tot <- sum(log_lik_gr[1:n.group])
+   }
 }

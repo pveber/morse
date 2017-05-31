@@ -42,14 +42,14 @@ This data set is taken from the fathead minnow toxicity database[Geiger1988]. It
 toxicity study, and it includes a hypothetical exposure profile representing a typical FOCUS-SW ditch and a real exposure profile from chemical monitoring in a stream [Wittmer2010, Ashauer2011].
 
 
+## Step 1: check the structure and the dataset integrity and create a `survData` object
+
 ```{r diazinon data, include=FALSE, echo=FALSE}
 data(gm_diazinonPimephales_Nsurv)
 data(gm_diazinonPimephales_conc)
 ```
 
-
-
-```{r}
+```{r step 1, cache=TRUE}
 df_Nsurv = gm_diazinonPimephales_Nsurv %>%
   filter(varType == "var") %>%
   select(-varType)
@@ -62,16 +62,57 @@ gm_survDataCheck(data_surv = df_Nsurv,
                  data_conc = df_conc)
 
 # Check the structure and the dataset integrity 
-dat = gm_survData(data_surv = df_Nsurv,
+gm_dat = gm_survData(data_surv = df_Nsurv,
                   data_conc = df_conc)
 
-head(dat)
+head(gm_dat)
 ```
+
+
+## Step 2: visualize your dataset
+
+The function `plot` can be used to plot the number of surviving individuals
+as a function of time for all profiles.
+
+```{r step 2, cache=TRUE}
+plot(gm_dat)
+
+plot(gm_dat,
+     facetting = FALSE)
+
+plot(gm_dat,
+     facetting.level = c("varControl","varA","varB","varC"))
+
+table(gm_dat[, c("profile", "time")])
+
+```
+
+The function `summary` provides some descriptive statistics on the experimental design.
+
+```{r, cache=TRUE}
+summary(gm_dat)
+```
+
+
+## Step 3: fit an exposure-response model to the survival data at target time
 
 
 ```{r, cache=TRUE}
-plot(dat, style = "ggplot", pool.replicate = FALSE)
+priors <- gm_priors(gm_dat) 
+
+
+
+
+
+fit <- gm_survFit(gm_dat, GUTS_type = "SD")
+
+
+fit <- survFitTT(dat,
+                 target.time = 21,
+                 lcx = c(10, 20, 30, 40, 50))
+
 ```
+
 
 # References
 

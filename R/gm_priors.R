@@ -22,7 +22,7 @@ gm_priors = function(gm_survData){
   conc_unic = sort(unique(data$conc))
   conc_unicPrec = dplyr::lag(conc_unic)
   conc_minDelta = min(conc_unic - conc_unicPrec, na.rm=TRUE)   
- 
+
   ##
   ## killing rate parameter: kk
   ##

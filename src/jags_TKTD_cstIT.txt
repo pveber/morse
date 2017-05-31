@@ -2,55 +2,56 @@
 # IT model with log-normal function.
 #
 model {
-  #-------------------------------------------------------- priors
-  
-  log10.ke ~ dnorm(meanlog10.ke, taulog10.ke)
-  log10.hb ~ dnorm(meanlog10.hb, taulog10.hb)
-  
-  log10.alpha ~ dnorm(meanlog10.alpha, taulog10.alpha)
-  log10.beta ~ dunif(-2,2) # shape of the log-logistic // greater than 0
-  #------------------------------------------parameter transformation
-  
-  ke <- 10**log10.ke
-  hb <- 10**log10.hb
-  
-  alpha <- 10**log10.alpha
-  beta <- 10**log10.beta
-  ##------------------------------------ Computation of the likelihood
-  
-  for (gr in 1:n.group){
-      
-      for (t in 1:n.time){
-      
-          D[gr,t] <- x[gr,t] * ( 1 - exp( - ke * time[gr,t] ))
-          D.max[gr,t] <- max(D[gr,1:t])
 
-          F[gr,t]  <- D.max[gr,t]**beta/(D.max[gr,t]**beta+alpha**beta)
-          
+  #-------------------------------------------------------- priors
+
+  kd_log10 ~ dnorm(kd_meanlog10, kd_taulog10)
+  hb_log10 ~ dnorm(hb_meanlog10, hb_taulog10)
+
+  alpha_log10 ~ dnorm(alpha_meanlog10, alpha_taulog10)
+  beta_log10 ~ dunif(beta_min, beta_max)
+
+  #------------------------------------------parameter transformation
+
+  kd <- 10**kd_log10
+  hb <- 10**hb_log10
+
+  alpha <- 10**alpha_log10
+  beta <- 10**beta_log10
+
+  ##------------------------------------ model
+
+  for (gr in 1:n_group){
+
+      for (t in 1:n_time){
+
+          D[gr,t] <- conc[gr,t] * ( 1 - exp( - kd * time[gr,t] ))
+          D_max[gr,t] <- max(D[gr,1:t])
+
+          F[gr,t]  <- D_max[gr,t]**beta/(D_max[gr,t]**beta+alpha**beta)
+
           psurv[gr,t] <-  exp(-hb * time[gr,t]) * (1- F[gr,t])
-         
+
       }
-      
-      y[gr,1] ~ dbin(psurv[gr,1]/1 , Nprec[gr,1])
-      
-      #ysim[gr,1] ~ dbin(psurv[gr,1]/1 , Nprec[gr,1])
-      #log_lik[gr,1] <- (Nprec[gr,1]-y[gr,1])*log(1-psurv[gr,1])
-      
+
+      Nsurv[gr,1] ~ dbin(psurv[gr,1]/1 , Nprec[gr,1])
+
+      Nsurv_ppc[gr,1] ~ dbin(psurv[gr,1]/1 , Nprec[gr,1])
+      Nsurv_sim[gr,1] ~ dbin(psurv[gr,1]/1 , Nprec[gr,1])
+
       for (t in 2:n.time){
-      
-        y[gr,t] ~ dbin(psurv[gr,t]/psurv[gr,t-1] , Nprec[gr,t])
-        
-       # ysim[gr,t] ~ dbin(psurv[gr,t]/psurv[gr,t-1] , ysim[gr,t-1])
-       # log_lik[gr,t] <- (Nprec[gr,t]-y[gr,t])*log(psurv[gr,t-1]-psurv[gr,t])
-        
+
+        Nsurv[gr,t] ~ dbin(psurv[gr,t]/psurv[gr,t-1] , Nprec[gr,t])
+
+        Nsurv_ppc[gr,t] ~ dbin(psurv[gr,t]/psurv[gr,t-1]  , Nprec[gr,t])
+        Nsurv_sim[gr,t] ~ dbin(psurv[gr,t]/psurv[gr,t-1]  , Nsurv_sim[gr,t-1])
+
       }
-      
-      # log_lik_gr[gr] <- sum(log_lik[gr,1:n.time])
-  
+
   }
-  
+
   # log_lik_Tot <- sum(log_lik_gr[1:n.group])
-  
+
 }
 
 
