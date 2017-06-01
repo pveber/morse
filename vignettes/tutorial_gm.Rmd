@@ -29,6 +29,7 @@ library(dplyr)
 library(tidyr)
 library(rjags)
 library(coda)
+library(zoo)
 library(gridExtra)
 library(reshape2)
 library(epitools)
@@ -82,9 +83,6 @@ plot(gm_dat,
 
 plot(gm_dat,
      facetting.level = c("varControl","varA","varB","varC"))
-
-table(gm_dat[, c("profile", "time")])
-
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
@@ -96,15 +94,24 @@ summary(gm_dat)
 
 ## Step 3: fit an exposure-response model to the survival data at target time
 
-
 ```{r, cache=TRUE}
 priors <- gm_priors(gm_dat) 
 
+gm_datInterpol = gm_survData_interpolate(gm_dat, extend.time = 100)
+gm_datInterpol
 
+gm_datInterpol %>%
+      dplyr::filter(!is.na(Nsurv)) %>%
+      dplyr::rename(time_ID_red = time_ID_long) %>%
+      # Group by profile to profile an indice of profile:
+      dplyr::mutate(profile_ID = group_indices_(., .dots="profile")) %>%
+      dplyr::group_by(profile) %>%
+      dplyr::mutate(time_ID = row_number()) %>%
+      dplyr::ungroup()
 
+gm_modelData(gm_dat, model_type = "SD")
 
-
-fit <- gm_survFit(gm_dat, GUTS_type = "SD")
+fit <- gm_survFitTKTD(gm_dat, model_type = "SD")
 
 
 fit <- survFitTT(dat,

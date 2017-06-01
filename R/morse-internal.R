@@ -50,12 +50,11 @@ selectDataTT <- function(data, target.time) {
 
 #' @import rjags
 #' @importFrom coda raftery.diag
-modelSamplingParameters <- function(model, parameters, n.chains, quiet = quiet) {
+modelSamplingParameters <- function(model, n.chains, quiet = quiet) {
   # estimate the number of iteration required for the estimation
   # by using the raftery.diag
   # INPUTS:
   # - model: jags model from loading function
-  # - parameters: parameters from loading function
   # - nchains: Number of chains desired
   # - quiet: silent option
   # OUTPUTS:
@@ -63,12 +62,12 @@ modelSamplingParameters <- function(model, parameters, n.chains, quiet = quiet) 
   # - thin: thining rate parameter
   # - burnin: number of iteration burned
 
-  # number of iteration for the pilote run required by raftery.diag
-  # default value: 3746
-  niter.init <- 5000
-  prog.b <- ifelse(quiet == TRUE, "none", "text") # plot progress bar option
-  mcmc <- coda.samples(model, parameters, n.iter = niter.init, thin = 1,
-                       progress.bar = prog.b)
+  mcmc <- coda.samples(model,
+                       # nbr iterations for pilote run required by raftery.diag
+                       # default value: 3746
+                       n.iter = 5000,
+                       thin = 1,
+                       progress.bar = "none")
   RL <- raftery.diag(mcmc)
 
   # check raftery.diag result (number of sample for the diagnostic procedure)
@@ -158,7 +157,7 @@ legendGgplotFit <- function(a.gplot) {
 }
 
 fCols <- function(data, fitcol, cicol) {
-  
+
   # points
   cols1 <- "black"
   names(cols1) <- unique(data$Points)
@@ -174,7 +173,7 @@ fCols <- function(data, fitcol, cicol) {
   # tktd mean curve
   cols5 <- fitcol
   names(cols5) <- "Mean curve"
-  
+
   return(list(cols1 = cols1,
               cols2 = cols2,
               cols3 = cols3,
@@ -206,7 +205,7 @@ jitterObsGenerator <- function(stepX, tab, obs_val, ppc = FALSE) {
                         function(i) { obs_val[i] - obs_val[i-1] })
     spaceX <- min(allSpaceX[which(allSpaceX != 0)]) / 4
   }
-  
+
   lengthX <- table(tab[, "Obs"])
   jitterObs <- mapply(function(x, y) {
     if (y == 1) {

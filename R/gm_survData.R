@@ -38,12 +38,6 @@
 #'
 #' @examples
 #'
-#' # (1) Load the survival dataset
-#' data(zinc)
-#'
-#' # (2) Create an objet of class 'gm_survData'
-#' dat <- gm_survData(zinc)
-#' class(dat)
 #'
 #'
 #' @export
@@ -87,11 +81,6 @@ gm_survData = function(data_surv, data_conc){
     dplyr::mutate(conc.interpol = zoo::na.approx(conc,time, na.rm = FALSE))%>%
     dplyr::mutate(conc = ifelse(is.na(conc.interpol), zoo::na.locf(conc, na.rm = FALSE), conc)) %>%
     dplyr::select(-conc.interpol) %>%
-    dplyr::ungroup() %>%
-    # Group by profile to profile an indice of profile:
-    dplyr::mutate(profile_ID = group_indices_(., .dots="profile")) %>%
-    dplyr::group_by(Profile) %>%
-    dplyr::mutate(time_ID = row_number()) %>%
     dplyr::ungroup()
 
   class(df.survData) <- c("gm_survData", "data.frame")

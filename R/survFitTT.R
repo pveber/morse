@@ -12,7 +12,7 @@
 #' parameter estimates of the exposure-response model and estimates of the so-called
 #' LCx, that is the concentration of pollutant required to obtain an 1 - x survival
 #' rate.
-#' 
+#'
 #' @param data an object of class \code{survData}
 #' @param target.time the chosen endpoint to evaluate the effect of a given
 #' concentration of pollutant, by default the last time point available for
@@ -63,7 +63,7 @@
 #'
 #' @import rjags
 #' @importFrom dplyr filter
-#' 
+#'
 #' @export
 survFitTT <- function(data,
                       target.time = NULL,
@@ -278,7 +278,28 @@ survPARAMS <- function(mcmc, det.part) {
   return(res)
 }
 
-llbinom3.model.text <- "\nmodel # Loglogistic binomial model with 3 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- d/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nd ~ dunif(dmin, dmax)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
+llbinom3.model.text <- "# Loglogistic binomial model with 3 parameters
+model{
+  for (i in 1:n){
+    p[i] <- d/ (1 + (xconc[i]/e)^b)
+    Nsurv[i]~ dbin(p[i], Ninit[i])
+  }
+  # specification of priors (may be changed if needed)
+    d ~ dunif(dmin, dmax)\nlog10b ~ dunif(log10bmin, log10bmax)
+    log10e ~ dnorm(meanlog10e, taulog10e)
+    b <- pow(10, log10b)
+    e <- pow(10, log10e)
+}"
 
-llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- 1/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
+llbinom2.model.text <- "# Loglogistic binomial model with 2 parameters
+model{
+  for (i in 1:n){
+    p[i] <- 1/ (1 + (xconc[i]/e)^b)
+    Nsurv[i]~ dbin(p[i], Ninit[i])
+  }
+  # specification of priors (may be changed if needed)
+    log10b ~ dunif(log10bmin, log10bmax)
+    log10e ~ dnorm(meanlog10e, taulog10e)
+    b <- pow(10, log10b)\ne <- pow(10, log10e)
+}"
 

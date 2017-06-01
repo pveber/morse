@@ -1,0 +1,69 @@
+#
+# IT model with log-normal function.
+#
+model {
+ #-------------------------------------------------------- priors
+
+  kd_taulog10 <- 1 / kd_sdlog10^2
+  hb_taulog10 <- 1 / hb_sdlog10^2
+  alpha_taulog10 <- 1 / alpha_sdlog10^2
+
+  kd_log10 ~ dnorm(kd_meanlog10, kd_taulog10)
+  hb_log10 ~ dnorm(hb_meanlog10, hb_taulog10)
+
+  alpha_log10 ~ dnorm(alpha_meanlog10, alpha_taulog10)
+  beta_log10 ~ dunif(beta_minlog10, beta_maxlog10)
+
+  #------------------------------------------ parameter transformation
+
+  kd <- 10**kd_log10
+  hb <- 10**hb_log10
+
+  alpha <- 10**alpha_log10
+  beta <- 10**beta_log10
+
+  ##------------------------------------ model
+
+  for( i in 1:n_dataLong){
+
+    diff.int[profile_ID[i], 1] <- 0
+
+    for(time_ID[i] >1){
+
+      # methode des trapezes :
+      diff.int[profile_ID_long[i], time_ID_long[i]] <- (exp(ke * time[i]) * conc[i] + exp(ke * time[i-1]) * conc[i-1]) / 2 * (time[i] - time[i-1])
+    }
+
+    D_int[profile_ID_long[i], time_ID_long[i]] <- ke*exp(-ke * time[i])*sum(diff.int[profile_ID[i], 1:time_ID_long[i]])
+
+  }
+
+  for( i in 1:n_dataRed){
+
+    D[profile_ID[i], time_ID[i]]  <- D_int[profile_ID[i], time_ID_red[i]]
+
+    D_max[profile_ID[i], time_ID[i]] <- max(D[profile_ID[i],1:time_ID[i]])
+
+    F[i]  <- D_max[profile_ID[i], time_ID[i]]**beta / ( D_max[profile_ID[i], time_ID[i]]**beta + alpha**beta )
+
+    psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
+
+    ifelse(time[i] > 1,
+           Nsurv[i] ~ dbin(psurv[i]/psurv[i-1] , Nprec[i]),
+           Nsurv[i] ~ dbin(psurv[i]/1 , Nprec[i]) )
+
+    ## ---------------------- generated data
+
+    ifelse(time[i] > 1,
+           Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i-1] , Nprec[i]),
+           Nsurv_ppc[i] ~ dbin(psurv[i]/1 , Nprec[i]) )
+
+    ifelse(time[i] > 1,
+           Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i-1] , Nsurv_sim[i-1]),
+           Nsurv_sim[i] ~ dbin(psurv[i]/1 , Nprec[i])
+
+  }
+
+}
+
+
