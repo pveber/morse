@@ -187,7 +187,5 @@ gm_survDataCheck <- function(data_surv, data_conc) {
   if(length(unique(as.list(df_checkTimeSurv))) != 1) {
     stop( "In 'data_surv' all 'time' vector must be the same." )
   }
-
-
 }
 

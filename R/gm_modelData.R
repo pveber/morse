@@ -33,25 +33,28 @@ gm_survData_interpolate = function(gm_survData,
     dplyr::summarise(min_time = min(time, na.rm = TRUE),
               max_time = max(time, na.rm = TRUE)) %>%
     dplyr::group_by(profile) %>%
-    dplyr::do(data.frame(profile = .$profile, time = seq(.$min_time, .$max_time, length = extend.time)))
+    # dplyr::do(data.frame(profile = .$profile, time = seq(.$min_time, .$max_time, length = extend.time)))
+    dplyr::do(data_frame(profile = as.character(.$profile), time = seq(.$min_time, .$max_time, length = extend.time)))
 
   gm_survData.Interpolate = dplyr::full_join(df_MinMax,
                       gm_survData,
                       by = c("profile", "time")) %>%
     dplyr::group_by(profile) %>%
-    dplyr::arrange(time) %>%
+    dplyr::arrange(profile, time) %>% # organize in profile and time
     dplyr::mutate(conc.origin = conc) %>%
     dplyr::mutate(conc = na.approx(conc,time, na.rm=FALSE)) %>%
     dplyr::mutate(id_conc_interp = ifelse(is.na(Nsurv), NA, row_number()))%>%
     # from package zoo : 'na.locf()' carry the last observation forward to replace your NA values.
     dplyr::mutate(conc = ifelse(is.na(conc),zoo::na.locf(conc),conc)) %>%# FOR THE LAST VALUE
-    dplyr::arrange(profile, time) %>%
-    dplyr::ungroup() %>%
-    # Group by profile to profile an indice of profile:
-    dplyr::mutate(profile_ID_long = group_indices_(., .dots="profile")) %>%
+    # 'lag' function copy values lagged by 1 (see 'dplyr' package)
+    dplyr::mutate( tprec_long = ifelse( time == 0, time, dplyr::lag(time) ) ) %>%
+    dplyr::mutate( concprec_long = ifelse( time == 0, conc, dplyr::lag(conc) ) ) %>%
     dplyr::group_by(profile) %>%
     dplyr::mutate(time_ID_long = row_number()) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    # Group by profile to profile an indice of profile:
+    dplyr::mutate(profile_ID_long = group_indices_(., .dots="profile"))
+
 
   class(gm_survData.Interpolate) = c("gm_survData", "data.frame")
   return(gm_survData.Interpolate)
@@ -68,14 +71,15 @@ gm_survData_interpolate = function(gm_survData,
 
 
 gm_modelData = function(gm_survData,
-                        model_type = NULL){
+                        model_type = NULL,
+                        extend_time = 100){
 
-  test_cst_conc = test_cst_conc(gm_survData = gm_survData)
+  cst_conc = test_cst_conc(gm_survData)
 
-  if(test_cst_conc){
+  # return priors for model
+  priorsData = gm_priors(gm_survData = gm_survData, model_type = model_type)
 
-    # return priors for model.
-    priorsData = gm_priors(gm_survData = gm_survData, model_type = model_type)
+  if(cst_conc){
 
     gm_survData = gm_survData %>%
       # Group by profile to profile an indice of profile:
@@ -87,10 +91,10 @@ gm_modelData = function(gm_survData,
 
   } else{
 
-    gm_survData_interpolate = df.long_interpolate(gm_survData,
-                                   extend.time=extend_time)
+    gm_survData_interpolate = gm_survData_interpolate(gm_survData,
+                                                      extend.time = extend_time)
 
-    gm_survDataRed = gm_survData_interpolate %>%
+    gm_survData = gm_survData_interpolate %>%
       dplyr::filter(!is.na(Nsurv)) %>%
       dplyr::rename(time_ID_red = time_ID_long) %>%
       # Group by profile to profile an indice of profile:
@@ -104,12 +108,12 @@ gm_modelData = function(gm_survData,
   ## ============================= Construction of modelData
   ##
 
-  modelData = priorsData
+  modelData = priorsData$priorsList
 
   ##
   ##  observations
   ##
-  modelData$conc = gm_survData$conc
+
   modelData$Nsurv = gm_survData$Nsurv
 
   ##
@@ -121,36 +125,60 @@ gm_modelData = function(gm_survData,
   modelData$profile_ID = gm_survData$profile_ID
   modelData$time_ID = gm_survData$time_ID
 
-  modelData$n_data = nrow(gm_survData)
-
   ##
   ## other parameters specific to model SD vs. IT and cst vs. var
   ##
 
   if(model_type == "IT"){
-    if(test_cst_conc){ # return TRUE if conc are constant by replicat, FALSE otherwise
+    if(cst_conc){ # return TRUE if conc are constant by replicat, FALSE otherwise
+
+      modelData$n_data = nrow(gm_survData)
+
+      modelData$conc = gm_survData$conc
 
     } else{
 
-      # Nécessaire lorsque la concentration est variable en fonction du temps
-      modelData$intC = MYintCList$intC
-      modelData$intC.time = MYintCList$intC.time
-      modelData$id.intCtime = MYintCList$id.intCtime
-      modelData$N.intC = MYintCList$N.intC
+      modelData$n_dataRed = nrow(gm_survData)
+      modelData$n_dataLong = nrow(gm_survData_interpolate)
+
+      ### Integration
+      modelData$profile_ID_long  = gm_survData_interpolate$profile_ID_long
+      modelData$time_ID_long = gm_survData_interpolate$time_ID
+      modelData$conc_long  = gm_survData_interpolate$conc
+      modelData$time_long = gm_survData_interpolate$time
+
+      modelData$tprec_long = gm_survData_interpolate$tprec_long
+      modelData$concprec_long = gm_survData_interpolate$concprec_long
+
+      ### Interpolation
+      modelData$time_ID_red = gm_survData$time_ID_red
 
     }
   } else if (model_type == "SD"){
-    if(test_cst_conc){
+    if(cst_conc){
+
+      modelData$n_data = nrow(gm_survData)
+
+      modelData$conc = gm_survData$conc
 
       modelData$bigtime = max(gm_survData$time)+10
 
     } else{
 
-      # Nécessaire lorsque la concentration est variable en fonction du temps
-      modelData$intC = MYintCList$intC
-      modelData$intC.time = MYintCList$intC.time
-      modelData$id.intCtime = MYintCList$id.intCtime
-      modelData$N.intC = MYintCList$N.intC
+      modelData$n_dataRed = nrow(gm_survData)
+      modelData$n_dataLong = nrow(gm_survData_interpolate)
+
+      ### Integration
+      modelData$profile_ID_long  = gm_survData_interpolate$profile_ID_long
+      modelData$time_ID_long = gm_survData_interpolate$time_ID
+      modelData$conc_long  = gm_survData_interpolate$conc
+      modelData$time_long = gm_survData_interpolate$time
+
+      modelData$tprec_long = gm_survData_interpolate$tprec_long
+      modelData$concprec_long = gm_survData_interpolate$concprec_long
+
+      ### Interpolation
+      modelData$time_ID_red = gm_survData$time_ID_red
 
     }
   } else stop("Please provide 'model_type': 'SD' or 'IT'")
@@ -163,10 +191,18 @@ gm_modelData = function(gm_survData,
   ## Model data Null (without observations of Nsurv)
   ##
   modelData_NULL = modelData
-  modelData_NULL$Nsurv = NULL
+  modelData_NULL$Nsurv = NULL # remove Nsurv from mdelData
 
-  return(list(modelData = modelData,
-              modelData_Null = modelData_NULL,
-              priorsData = priorsData))
+  ### OUT ================
+  OUT_modelDATA = list(modelData = modelData,
+                       modelData_Null = modelData_NULL,
+                       priorsList = priorsData$priorsList,
+                       priorsMinMax = priorsData$priorsMinMax,
+                       cst_conc = cst_conc)
+
+
+  class(OUT_modelDATA) <- c("gm_modelData", "list")
+
+  return(OUT_modelDATA)
 
 }

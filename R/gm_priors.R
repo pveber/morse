@@ -52,7 +52,7 @@ gm_priors = function(gm_survData, model_type = NULL){
   beta_minlog10 = -2
   beta_maxlog10 = 2
 
-  priorMinMax= list(
+  priorsMinMax= list(
     conc_min = conc_min,
     conc_max = conc_max,
 
@@ -68,7 +68,7 @@ gm_priors = function(gm_survData, model_type = NULL){
   ## Construction of the list of priors
   ##
 
-  priorList =  list(
+  priorsList =  list(
     ##
     ## dominant rate constant: kd
     ##
@@ -83,39 +83,39 @@ gm_priors = function(gm_survData, model_type = NULL){
 
   if(model_type == "IT"){
 
-    ## priorMinMax
-    priorMinMax$beta_min = beta_minlog10
-    priorMinMax$beta_max = beta_maxlog10
+    ## priorsMinMax
+    priorsMinMax$beta_min = beta_minlog10
+    priorsMinMax$beta_max = beta_maxlog10
 
-    ## priorList
+    ## priorsList
     ### non effect threshold: scale parameter & median of a log-logistic distribution
-    priorList$alpha_meanlog10 = (log10(conc_max) + log10(conc_min)) / 2
-    priorList$alpha_sdlog10 = (log10(conc_max) - log10(conc_min)) / 4
+    priorsList$alpha_meanlog10 = (log10(conc_max) + log10(conc_min)) / 2
+    priorsList$alpha_sdlog10 = (log10(conc_max) - log10(conc_min)) / 4
 
     ### shape parameter of a log-logistic distribution
-    priorList$beta_minlog10 = beta_minlog10
-    priorList$beta_maxlog10 = beta_maxlog10
+    priorsList$beta_minlog10 = beta_minlog10
+    priorsList$beta_maxlog10 = beta_maxlog10
 
   } else if (model_type == "SD"){
 
-    ## priorMinMax
-    priorMinMax$kk_min = kk_min
-    priorMinMax$kk_max = kk_max
+    ## priorsMinMax
+    priorsMinMax$kk_min = kk_min
+    priorsMinMax$kk_max = kk_max
 
-    priorMinMax$z_min = z_min
-    priorMinMax$z_max = z_max
+    priorsMinMax$z_min = z_min
+    priorsMinMax$z_max = z_max
 
 
-    ## priorList
+    ## priorsList
     ### killing rate parameter: kk
-    priorList$kk_meanlog10 = (log10(kk_max) + log10(kk_min)) / 2
-    priorList$kk_sdlog10 = (log10(kk_max) - log10(kk_min)) / 4
+    priorsList$kk_meanlog10 = (log10(kk_max) + log10(kk_min)) / 2
+    priorsList$kk_sdlog10 = (log10(kk_max) - log10(kk_min)) / 4
     ### non effect threshold: z
-    priorList$z_meanlog10 = (log10(conc_max) + log10(conc_min)) / 2
-    priorList$z_sdlog10 = (log10(conc_max) - log10(conc_min)) / 4
+    priorsList$z_meanlog10 = (log10(conc_max) + log10(conc_min)) / 2
+    priorsList$z_sdlog10 = (log10(conc_max) - log10(conc_min)) / 4
   } else stop("please, provide the 'model_type': 'IT' or 'SD'")
 
 
-  return(list(priorList = priorList,
-              priorMinMax = priorMinMax))
+  return(list(priorsList = priorsList,
+              priorsMinMax = priorsMinMax))
 }

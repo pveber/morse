@@ -79,10 +79,11 @@ as a function of time for all profiles.
 plot(gm_dat)
 
 plot(gm_dat,
-     facetting = FALSE)
+     facetting.level = c("varControl","varA","varB","varC"))
 
 plot(gm_dat,
-     facetting.level = c("varControl","varA","varB","varC"))
+     facetting = FALSE)
+
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
@@ -95,29 +96,203 @@ summary(gm_dat)
 ## Step 3: fit an exposure-response model to the survival data at target time
 
 ```{r, cache=TRUE}
-priors <- gm_priors(gm_dat) 
-
-gm_datInterpol = gm_survData_interpolate(gm_dat, extend.time = 100)
-gm_datInterpol
-
-gm_datInterpol %>%
-      dplyr::filter(!is.na(Nsurv)) %>%
-      dplyr::rename(time_ID_red = time_ID_long) %>%
-      # Group by profile to profile an indice of profile:
-      dplyr::mutate(profile_ID = group_indices_(., .dots="profile")) %>%
-      dplyr::group_by(profile) %>%
-      dplyr::mutate(time_ID = row_number()) %>%
-      dplyr::ungroup()
-
-gm_modelData(gm_dat, model_type = "SD")
-
-fit <- gm_survFitTKTD(gm_dat, model_type = "SD")
+fit <- gm_survFitTKTD(gm_dat, model_type = "IT")
 
 
 fit <- survFitTT(dat,
                  target.time = 21,
                  lcx = c(10, 20, 30, 40, 50))
+``` 
 
+DEBUG 
+
+```{r}
+data = gm_dat
+model_type = "IT"
+nbr.chain = 3
+nbr.adapt = 1000
+
+#== 
+
+### time start
+  time_start <- Sys.time()
+
+  ### class of object
+  if(!is(data, "gm_survData")){
+    stop("gm_survFitTKTD: object of class 'gm_modelData' expected")
+  }
+
+  ### ensures model_type is one of "SD" and "IT"
+  if(is.null(model_type)) {
+    stop("You need to specify a 'model_type': 'SD' or 'IT'")
+  }
+  if(!model_type %in% c("SD","IT")) {
+    stop("'model_type' available for use are 'SD' or 'IT'")
+  }
+
+  ### check number of sample for the diagnostic procedure
+  if (nbr.chain < 2) {
+    stop('2 or more parallel chains required')
+  }
+
+  ##
+  ## Data and Priors for model
+  ##
+
+  globalData = gm_modelData(data,
+                            model_type = model_type)
+
+  modelData = globalData$modelData
+  modelData_Null = globalData$modelData_Null
+  priorsData = globalData$priorsMinMax
+
+  ##
+  ## Define model
+  ##
+
+  cst_conc <- globalData$cst_conc
+
+  if(model_type == "SD"){
+    ### Determine sampling parameters
+    parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
+
+    if(cst_conc){
+      file_to_use <- jags_TKTD_cstSD
+    } else{
+      file_to_use <- jags_TKTD_varSD
+    }
+  } else if(model_type == "IT"){
+    ### Determine sampling parameters
+    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10")
+
+    if(cst_conc){
+      file_to_use <- jags_TKTD_cstIT
+    } else{
+      file_to_use <- jags_TKTD_varIT
+    }
+  }
+  
+  model_Null <- survLoadModel(model.program = file_to_use,
+                              data = modelData_Null,
+                              n.chains = nbr.chain,
+                              Nadapt = nbr.adapt,
+                              quiet = TRUE)
+
+  # model_Null <- jags.model(file = file_to_use,
+  #                          data = modelData_Null,
+  #                          inits,
+  #                          n.chains = nbr.chain,
+  #                          n.adapt = nbr.adapt,
+  #                          quiet = TRUE)
+
+  file_to_use <- jags_TKTD_varIT
+  model <- survLoadModel(model.program = file_to_use,
+                         data = modelData,
+                         n.chains = nbr.chain,
+                         Nadapt = nbr.adapt,
+                         quiet = TRUE)
+
+  # model <- jags.model(file = file_to_use,
+  #                     data = modelData,
+  #                     inits,
+  #                     n.chains = nbr.chain,
+  #                     n.adapt = nbr.adapt,
+  #                     quiet = TRUE)
+
+
+
+  ##
+  ## estimate the number of iteration required for convergency of chains
+  ## by using the raftery.diag
+  ##
+
+  if(is.null(nbr.warmup) | is.null(nbr.thin) | is.null(nbr.iter)){
+
+    sampling.parameters <- modelSamplingParameters(model,
+                                                   parameters,
+                                                   n.chains)
+    if (sampling.parameters$niter > 200000)
+      stop("The model needs too many iterations to provide reliable parameter estimates !")
+
+    nbr.warmup = sampling.parameters$burnin
+    nbr.thin = sampling.parameters$thin
+    nbr.iter = sampling.parameters$niter
+
+  }
+
+  ### Null model to check priors with the model
+  update(model_Null, nbr.warmup)
+  mcmc_Null =  coda.samples(model_Null,
+                            variable.names = parameters,
+                            n.iter = nbr.iter,
+                            thin = nbr.thin,
+                            quiet = TRUE)
+
+  ### model to check priors with the model
+  update(model, nbr.warmup)
+  mcmc =  coda.samples(model,
+                       variable.names = parameters,
+                       n.iter = nbr.iter,
+                       thin = nbr.thin)
+
+  ##
+  ## Cheking posterior range with data from experimental design:
+  ##
+
+  estim.par <- gm_survTKTDPARAMS(mcmc, model_type = model_type)
+
+  if (estim.par["kk", "Q97.5"] > priorsData$kk_max)
+    warning("The estimation of the killing rate (model parameter k) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+            call. = FALSE)
+
+  if (estim.par["kd", "Q97.5"] > priorsData$kd_max)
+    warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+            call. = FALSE)
+
+  if (estim.par["hb", "Q2.5"] < priorsData$hb_min)
+    warning("The estimation of the natural instantaneous mortality rate (model parameter hb) lies outside the range used to define its prior distribution which indicates that this rate is very low and so difficult to estimate from this experiment !",
+            call. = FALSE)
+
+  if (estim.par["z", "Q2.5"] < priorsData$z_min ||
+      estim.par["z", "Q97.5"] > priorsData$z_max)
+    warning("The estimation of Non Effect Concentration threshold (NEC) (model parameter z) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
+            call. = FALSE)
+
+  ### time end
+  time_end = Sys.time() - time_start
+
+  ##
+  ## OUTPUT
+  ##
+
+  OUT <- list(mcmc = mcmc,
+              mcmc_Null = mcmc_Null,
+              data = gm_survData,
+              estim.par = estim.par)
+
+  class(OUT) <- "gm_survFitTKTD"
+
+```
+
+
+
+### Details on the step 3
+
+```{r, cache=TRUE}
+priors <- gm_priors(gm_dat, model_type = "IT") 
+priors$priorsList
+priors$priorsMinMax
+```
+
+
+```{r, cache=TRUE}
+gm_datInterpol = gm_survData_interpolate(gm_dat, extend.time = 100)
+gm_datInterpol
+
+test_cst_conc(gm_dat)
+
+modelData = gm_modelData(gm_dat, model_type = "IT")
+modelData$modelData
 ```
 
 
