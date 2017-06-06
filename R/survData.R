@@ -39,9 +39,9 @@
 #' # (2) Create an objet of class 'survData'
 #' dat <- survData(zinc)
 #' class(dat)
-#' 
+#'
 #' @importFrom dplyr left_join rename
-#' 
+#'
 #' @export
 survData <- function(data) {
   ### INPUT
@@ -63,15 +63,15 @@ survData <- function(data) {
   data.t0 <- rename(data.t0, Ninit = Nsurv)
   out <- left_join(data, data.t0, by = c("replicate", "conc"))
 
-  T <- sort(unique(data$time)) # observation times
+  Tab <- sort(unique(data$time)) # observation times
   Nindtime <- rep(0,dim(out)[1])
-  for (i in 2:length(T)) {
-    now <- out$time == T[i]
-    before <- out$time == T[i - 1]
+  for (i in 2:length(Tab)) {
+    now <- out$time == Tab[i]
+    before <- out$time == Tab[i - 1]
     Nindtime[now] <-
       Nindtime[before] +
-      (out$Nsurv[before] - out$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
-      out$Nsurv[now] * (T[i] - T[i - 1])
+      (out$Nsurv[before] - out$Nsurv[now]) * ((Tab[i] - Tab[i - 1]) / 2) +
+      out$Nsurv[now] * (Tab[i] - Tab[i - 1])
   }
 
   out <- cbind(out, Nindtime)

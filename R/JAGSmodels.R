@@ -38,10 +38,12 @@ jags_TKTD_cstSD <-
     ## ---------------------- generated data
 
     Nsurv_ppc[i] ~ dbin(psurv[i] , Nprec[i])
+  }
 
-    ifelse(time[i] > 1,
-           Nsurv_sim[i] ~ dbin(psurv[i] , Nsurv[i-1]),
-           Nsurv_sim[i] ~ dbin(psurv[i] , Nprec[i]))
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1], Nprec[1])
+  for( i in 2:n_data){
+    Nsurv_sim[i] ~ dbin(psurv[i], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 }"
 
@@ -85,21 +87,20 @@ model {
 
     psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
 
-    ifelse(time[i] > 1,
-           Nsurv[i] ~ dbin(psurv[i]/psurv[i-1] , Nprec[i]),
-           Nsurv[i] ~ dbin(psurv[i]/1 , Nprec[i]) )
+    Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
     ## ---------------------- generated data
 
-    ifelse(time[i] > 1,
-           Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i-1] , Nprec[i]),
-           Nsurv_ppc[i] ~ dbin(psurv[i]/1 , Nprec[i]) )
-
-    ifelse(time[i] > 1,
-           Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i-1] , Nsurv_sim[i-1]),
-           Nsurv_sim[i] ~ dbin(psurv[i]/1 , Nprec[i])
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
   }
+
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
+  for( i in 2:n_data){
+    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+  }
+
 }"
 
 
@@ -122,50 +123,47 @@ jags_TKTD_varSD <-
   kd <- 10**kd_log10
   hb <- 10**hb_log10
 
-  ########## Computation of the likdlihood
+  ########## Computation of the likelihood
 
-  for (gr in 1:n_data){
+  for( i in 1:n_dataLong){
 
-    #---- Integration for the internal concentration
-    diff.int[gr,1]=0
-    int.hazard[gr,1]=0
+    #### midpoint method:
+    conc_midpoint[profile_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
+    * concprec_long[i]) / 2 * (time_long[i] - tprec_long[i])
 
-    for(i in 2:N.intC[gr]){
+    D_int[profile_ID_long[i], time_ID_long[i]] <- kd * exp(-kd * time_long[i]) *
+    sum( conc_midpoint[profile_ID_long[i], 1:time_ID_long[i]] )
 
-      ### midpoint method:
-      conc_midPoint[gr,i] = ((exp(kd * time_interp[gr,i]) * conc_interp[gr,i] + exp(kd * time_interp[gr,i-1]) * conc_interp[gr,i-1]) / 2 ) * (time_interp[gr,i] - time_interp[gr,i-1])
+    h[profile_ID_long[i], time_ID_long[i]] = kk * max(0, D_int[profile_ID_long[i], time_ID_long[i]] - z) + hb
 
-    }
-    for(i in 1:N_int[gr]){
-      D[gr,i] = kd * exp(- kd * time_interp[gr,i]) * sum(conc_midPoint[gr,1:i])
+    h_midPoint[profile_ID_long[i], time_ID_long[i]] = ((h[profile_ID_long[i], time_ID_long[i]-1] +
+            h[profile_ID_long[i], time_ID_long[i]-1])/2) * (time_long[i] - tprec_long[i])
 
-      hazard[gr,i] = kk * max(0, D[gr,i] - z) + hb
-    }
-    for(i in 2:N.intC[gr]){
-
-      #### midpoint method:
-      hazard_midPoint[gr,i] = ((hazard[gr,i] + hazard[gr,i-1])/2) * (time_interp[gr,i] - time_interp[gr,i-1])
-
-    }
-    #---------------------------------------------
-
-    hazard_integr[gr,1] = -sum(hazard_midPoint[gr, 1:id_time_interp[gr,2]])
-
-    psurv[gr,1] = exp(hazard_integr[gr,1])
-
-    Nsurv[gr,1] ~ dbin(psurv[gr,1] , Nsurv_prec[gr,1])
-
-    for (t in 2:n.time[gr]){
-
-      hazard_integr[gr,t] = -sum( hazard_midPoint[ gr, 1:id.intCtime[gr,t+1] ] )
-
-      psurv[gr,t] = exp(hazard_integr[gr,t])
-
-      Nsurv[gr,t] ~ dbin(psurv[gr,t] / psurv[gr,t-1] , Nsurv_prec[gr,t])
-
-    }
+    H_int[profile_ID_long[i], time_ID_long[i]] = sum( h_midPoint[profile_ID_long[i], 1:time_ID_long[i]] )
 
   }
+  for( i in 1:n_dataRed){
+
+     H[profile_ID[i], time_ID[i]]  <- H_int[profile_ID[i], time_ID_red[i]]
+
+     H[i] = sum(h_midPoint[gr, 1:time_interp[gr,i+1]])
+
+     psurv[i] = exp( - H[i])
+
+     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+
+    ## ---------------------- generated data
+
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+
+  }
+
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
+  for( i in 2:n_dataRed){
+    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+  }
+
 }"
 
 
@@ -173,4 +171,63 @@ jags_TKTD_varSD <-
 # IT model with log-normal function.
 #
 
+jags_TKTD_varIT <-"model {
+  #------------------------------------------ parameter transformation
+  kd_taulog10 <- 1 / kd_sdlog10^2
+  hb_taulog10 <- 1 / hb_sdlog10^2
+  alpha_taulog10 <- 1 / alpha_sdlog10^2
+
+  #-------------------------------------------------------- priors
+  kd_log10 ~ dnorm(kd_meanlog10, kd_taulog10)
+  hb_log10 ~ dnorm(hb_meanlog10, hb_taulog10)
+
+  alpha_log10 ~ dnorm(alpha_meanlog10, alpha_taulog10)
+  beta_log10 ~ dunif(beta_minlog10, beta_maxlog10)
+
+  #------------------------------------------ parameter transformation
+
+  kd <- 10**kd_log10
+  hb <- 10**hb_log10
+
+  alpha <- 10**alpha_log10
+  beta <- 10**beta_log10
+
+  ##------------------------------------ model
+
+  for( i in 1:n_dataLong){
+
+    # trapezoid method :
+    diff.int[profile_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
+    * concprec_long[i]) / 2 * (time_long[i] - tprec_long[i])
+
+    D_int[profile_ID_long[i], time_ID_long[i]] <- kd * exp(-kd * time_long[i]) *
+    sum( diff.int[profile_ID_long[i], 1:time_ID_long[i]] )
+
+  }
+
+  for( i in 1:n_dataRed){
+
+    D[profile_ID[i], time_ID[i]]  <- D_int[profile_ID[i], time_ID_red[i]]
+
+    D_max[profile_ID[i], time_ID[i]] <- max(D[profile_ID[i],1:time_ID[i]])
+
+    F[i]  <- D_max[profile_ID[i], time_ID[i]]**beta / ( D_max[profile_ID[i], time_ID[i]]**beta + alpha**beta )
+
+    psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
+
+    Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+
+    ## ---------------------- generated data
+
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+
+  }
+
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
+  for( i in 2:n_dataRed){
+    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+  }
+
+}"
 

@@ -86,7 +86,9 @@ gm_modelData = function(gm_survData,
       dplyr::mutate(profile_ID = group_indices_(., .dots="profile")) %>%
       dplyr::group_by(profile) %>%
       dplyr::mutate(time_ID = row_number()) %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      dplyr::mutate(i_row = row_number()) %>%
+      dplyr::mutate(i_prec = ifelse(time_ID == 1, i_row, dplyr::lag(i_row)))
 
 
   } else{
@@ -101,7 +103,9 @@ gm_modelData = function(gm_survData,
       dplyr::mutate(profile_ID = group_indices_(., .dots="profile")) %>%
       dplyr::group_by(profile) %>%
       dplyr::mutate(time_ID = row_number()) %>%
-      dplyr::ungroup()
+      dplyr::ungroup()%>%
+      dplyr::mutate(i_row = row_number()) %>%
+      dplyr::mutate(i_prec = ifelse(time_ID == 1, i_row, dplyr::lag(i_row)))
   }
 
   ##
@@ -115,6 +119,7 @@ gm_modelData = function(gm_survData,
   ##
 
   modelData$Nsurv = gm_survData$Nsurv
+  modelData$profile = gm_survData$profile
 
   ##
   ##  parameters
@@ -135,6 +140,7 @@ gm_modelData = function(gm_survData,
       modelData$n_data = nrow(gm_survData)
 
       modelData$conc = gm_survData$conc
+      modelData$i_prec = gm_survData$i_prec
 
     } else{
 
@@ -152,6 +158,8 @@ gm_modelData = function(gm_survData,
 
       ### Interpolation
       modelData$time_ID_red = gm_survData$time_ID_red
+      # modelData$i_row = gm_survData$i_row
+      modelData$i_prec = gm_survData$i_prec
 
     }
   } else if (model_type == "SD"){
@@ -163,6 +171,9 @@ gm_modelData = function(gm_survData,
 
       modelData$bigtime = max(gm_survData$time)+10
 
+      modelData$i_prec = gm_survData$i_prec
+
+
     } else{
 
       modelData$n_dataRed = nrow(gm_survData)
@@ -179,6 +190,8 @@ gm_modelData = function(gm_survData,
 
       ### Interpolation
       modelData$time_ID_red = gm_survData$time_ID_red
+      # modelData$i_row = gm_survData$i_row
+      modelData$i_prec = gm_survData$i_prec
 
     }
   } else stop("Please provide 'model_type': 'SD' or 'IT'")

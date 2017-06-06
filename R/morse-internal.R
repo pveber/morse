@@ -50,7 +50,7 @@ selectDataTT <- function(data, target.time) {
 
 #' @import rjags
 #' @importFrom coda raftery.diag
-modelSamplingParameters <- function(model, n.chains, quiet = quiet) {
+modelSamplingParameters <- function(model, parameters, n.chains, quiet = quiet) {
   # estimate the number of iteration required for the estimation
   # by using the raftery.diag
   # INPUTS:
@@ -65,9 +65,11 @@ modelSamplingParameters <- function(model, n.chains, quiet = quiet) {
   mcmc <- coda.samples(model,
                        # nbr iterations for pilote run required by raftery.diag
                        # default value: 3746
+                       variable.names = parameters,
                        n.iter = 5000,
                        thin = 1,
                        progress.bar = "none")
+
   RL <- raftery.diag(mcmc)
 
   # check raftery.diag result (number of sample for the diagnostic procedure)
