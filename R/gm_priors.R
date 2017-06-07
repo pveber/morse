@@ -102,10 +102,6 @@ gm_priors = function(gm_survData, model_type = NULL){
     priorsMinMax$kk_min = kk_min
     priorsMinMax$kk_max = kk_max
 
-    priorsMinMax$z_min = z_min
-    priorsMinMax$z_max = z_max
-
-
     ## priorsList
     ### killing rate parameter: kk
     priorsList$kk_meanlog10 = (log10(kk_max) + log10(kk_min)) / 2

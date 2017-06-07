@@ -96,6 +96,9 @@ gm_survFitTKTD <- function(data,
     if(cst_conc){
       file_to_use <- jags_TKTD_cstSD
     } else{
+
+      modelData$time = NULL # remove modelData$time for varSD model
+
       file_to_use <- jags_TKTD_varSD
     }
   } else if(model_type == "IT"){
@@ -148,7 +151,7 @@ gm_survFitTKTD <- function(data,
     sampling.parameters <- modelSamplingParameters(model,
                                                    parameters_red,
                                                    n.chains = nbr.chain)
-    if (sampling.parameters$niter > 2e5)
+    if (sampling.parameters$niter > 5e5)
       stop("The model needs too many iterations to provide reliable parameter estimates !")
 
     nbr.warmup = sampling.parameters$burnin

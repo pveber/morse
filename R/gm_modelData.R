@@ -51,6 +51,7 @@ gm_survData_interpolate = function(gm_survData,
     dplyr::mutate( concprec_long = ifelse( time == 0, conc, dplyr::lag(conc) ) ) %>%
     dplyr::group_by(profile) %>%
     dplyr::mutate(time_ID_long = row_number()) %>%
+    dplyr::mutate(tprec_ID_long = ifelse(time_ID_long==1, time_ID_long,  dplyr::lag(time_ID_long))) %>%
     dplyr::ungroup() %>%
     # Group by profile to profile an indice of profile:
     dplyr::mutate(profile_ID_long = group_indices_(., .dots="profile"))
@@ -85,16 +86,21 @@ gm_modelData = function(gm_survData,
       # Group by profile to profile an indice of profile:
       dplyr::mutate(profile_ID = group_indices_(., .dots="profile")) %>%
       dplyr::group_by(profile) %>%
+      dplyr::arrange(profile, time) %>%
+      dplyr::mutate(tprec = ifelse(time == 0, time, lag(time))) %>%
       dplyr::mutate(time_ID = row_number()) %>%
       dplyr::ungroup() %>%
+      dplyr::arrange(profile, time) %>%
       dplyr::mutate(i_row = row_number()) %>%
       dplyr::mutate(i_prec = ifelse(time_ID == 1, i_row, dplyr::lag(i_row)))
+
 
 
   } else{
 
     gm_survData_interpolate = gm_survData_interpolate(gm_survData,
-                                                      extend.time = extend_time)
+                                                      extend.time = extend_time) %>%
+      dplyr::arrange(profile, time)
 
     gm_survData = gm_survData_interpolate %>%
       dplyr::filter(!is.na(Nsurv)) %>%
@@ -105,7 +111,8 @@ gm_modelData = function(gm_survData,
       dplyr::mutate(time_ID = row_number()) %>%
       dplyr::ungroup()%>%
       dplyr::mutate(i_row = row_number()) %>%
-      dplyr::mutate(i_prec = ifelse(time_ID == 1, i_row, dplyr::lag(i_row)))
+      dplyr::mutate(i_prec = ifelse(time_ID == 1, i_row, dplyr::lag(i_row))) %>%
+      dplyr::arrange(profile, time)
   }
 
   ##
@@ -149,7 +156,8 @@ gm_modelData = function(gm_survData,
 
       ### Integration
       modelData$profile_ID_long  = gm_survData_interpolate$profile_ID_long
-      modelData$time_ID_long = gm_survData_interpolate$time_ID
+      modelData$time_ID_long = gm_survData_interpolate$time_ID_long
+      #modelData$tprec_ID_long = gm_survData_interpolate$tprec_ID_long
       modelData$conc_long  = gm_survData_interpolate$conc
       modelData$time_long = gm_survData_interpolate$time
 
@@ -167,12 +175,15 @@ gm_modelData = function(gm_survData,
 
       modelData$n_data = nrow(gm_survData)
 
+      modelData$tprec = gm_survData$tprec
       modelData$conc = gm_survData$conc
 
       modelData$bigtime = max(gm_survData$time)+10
 
       modelData$i_prec = gm_survData$i_prec
 
+      modelData$profile_ID = NULL
+      modelData$time_ID = NULL
 
     } else{
 
@@ -182,6 +193,7 @@ gm_modelData = function(gm_survData,
       ### Integration
       modelData$profile_ID_long  = gm_survData_interpolate$profile_ID_long
       modelData$time_ID_long = gm_survData_interpolate$time_ID
+      modelData$tprec_ID_long = gm_survData_interpolate$tprec_ID_long
       modelData$conc_long  = gm_survData_interpolate$conc
       modelData$time_long = gm_survData_interpolate$time
 

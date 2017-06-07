@@ -49,7 +49,7 @@ ppc.gm_survFitTKTD <- function(x, ...) {
   ppc_plt = df_plt %>%
     ggplot() + theme_bw() +
     theme(legend.position="none") +
-    expand_limits(x = 0, y = 0) +
+    # expand_limits(x = 0, y = 0) +
     scale_colour_manual(values = c("green", "red")) +
     scale_x_continuous(name="Observed nb of survivors") +
     scale_y_continuous(name="Predicted nb of survivors") +
