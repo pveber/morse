@@ -1,5 +1,15 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 2.2.1
+=============
+
+NEW FEATURES
+- add the 'gm_survFitTKTD' function to analyse 'gm_survData' object with a time-exposure-
+  -response model with GUTS model SD, IT taking into account variation of exposure concentration.
+- add the S3 'plot', 'print', 'summary' and 'ppc' methods for the 'gm_survFitTKTD'
+  class.
+- add two survival datasets with variation of exposure concentration: gm_diazinonPimephales_conc.rad and gm_diazinonPimephales_Nsurv.rda.
+
 Version 2.2.0
 =============
 
@@ -15,7 +25,7 @@ NEW FEATURES
 - the calcul of the mean fitted curve of 'plot.reproFitTT' and 'plot.survFitTT'
   is the same of the 95 % Credible limits.
 - the ci arg in 'plot.reproFitTT' and 'plot.survFitTT' was suppressed and the
-  credible limites was allways plotted.
+  credible limites was always plotted.
 - added a new argument 'adddata' in 'plot.reproFitTT' and 'plot.survFitTT'
   to draw the datas with theyre confidence interval.
 - add a new argument 'spaghetti' in 'plot.reproFitTT' and 'plot.survFitTT'
