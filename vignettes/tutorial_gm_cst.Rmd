@@ -167,7 +167,6 @@ summary(fit_cstIT)
 ```
 
 
-
 # References
 
 Geiger, D. L.; Call, D. J.; Brooke, L. T. Acute toxicities of organic chemicals to fathead minnow

@@ -13,11 +13,9 @@ vignette: >
 ---
 
 ```{r,include=FALSE, echo=FALSE}
-
 knitr::opts_chunk$set(fig.width = 7,
                       fig.height = 4,
                       cache = TRUE)
-
 ```
 
 
@@ -56,7 +54,7 @@ reference manual, and you can also inspect one of the datasets provided in
 the package (like `cadmium2`). First, we load the dataset and use the function
 `survDataCheck` to verify that it has the expected layout:
 
-```{r, cache=TRUE}
+```{r step 1, cache=TRUE}
 data(cadmium2)
 survDataCheck(cadmium2)
 ```
@@ -68,7 +66,7 @@ basic representation used for the subsequent operations. Note that if the
 call to `survDataCheck` reports no error, it is guaranteed that `survData`
 will not fail.
 
-```{r, cache=TRUE}
+```{r step 2, cache=TRUE}
 dat <- survData(cadmium2)
 head(dat)
 ```
@@ -78,7 +76,7 @@ head(dat)
 The function `plot` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
 
-```{r, cache=TRUE}
+```{r step 3, cache=TRUE}
 plot(dat, style = "ggplot", pool.replicate = FALSE)
 ```
 
@@ -90,7 +88,7 @@ dataset, we set this option to `FALSE`.
 
 By fixing the concentration to a (tested) value, we can visualize one subplot
 in particular:
-```{r, cache=TRUE}
+```{r step 3b, cache=TRUE}
 plot(dat, concentration = 124, addlegend = TRUE,
      pool.replicate = FALSE, style = "ggplot")
 ```
@@ -99,13 +97,13 @@ We can also plot the survival rate with the confidence intervale on the data
 at a given time point as a function of the concentration, by using the function
 `plot.DoseResponse` and by fixing `target.time`:
 
-```{r, cache=TRUE}
+```{r step 3c, cache=TRUE}
 plotDoseResponse(dat, target.time = 21, style = "ggplot", addlegend = TRUE)
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
 
-```{r, cache=TRUE}
+```{r step 3d, cache=TRUE}
 summary(dat)
 ```
 
@@ -119,11 +117,17 @@ function. Once we have estimated the parameters, we can then calculate the $LC_x
 for any $x$. All this work is performed by the `survFitTT` function, which requires
 a `survData` object and the levels of $LC_x$ we need:
 
-```{r, results="hide", cache=TRUE}
-fit <- survFitTT(dat,
+```{r step 4, results="hide", cache=TRUE, eval =FALSE}
+fit_survTT <- survFitTT(dat,
                  target.time = 21,
                  lcx = c(10, 20, 30, 40, 50))
 ```
+
+
+```{r step 4a, cache=TRUE}
+# save(fit_survTT, file = "vignettes/fit_survTT.Rdata")
+load("fit_survTT.Rdata")
+``` 
 
 The returned value is an object of class `survFitTT` and provides the estimated
 parameters as a posterior[^1] distribution, in order to model our uncertainty on
@@ -133,8 +137,8 @@ quantiles of the posterior (as a measure of uncertainty, a.k.a. credible
 intervals). These can seen using the `summary` method:
 
 
-```{r, cache=TRUE}
-summary(fit)
+```{r step 4b, cache=TRUE}
+summary(fit_survTT)
 ```
 
 If the inference went well, it is expected that the difference between
@@ -143,8 +147,8 @@ that the data was helpful to reduce the uncertainty on the true value of
 the parameters. This simple check can be performed using the summary function.
 
 The fit can also be plotted:
-```{r, cache=TRUE}
-plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
+```{r step 4c, cache=TRUE}
+plot(fit_survTT, log.scale = TRUE, style = "ggplot", adddata = TRUE,
      addlegend = TRUE)
 ```
 This representation shows the estimated relation between concentration of
@@ -165,11 +169,19 @@ and the confidence interval around experimental points will largely overlap.
 Note that `survFitTT` will warn you if the estimated $LC_{50}$ lies outside the
 range of tested concentrations, as in the following example:
 
-```{r, results="hide", cache=TRUE}
+```{r step 4d, results="hide", cache=TRUE}
 data("cadmium1")
+```
+
+```{r step 4e, eval=FALSE}
 wrong_fit <- survFitTT(survData(cadmium1),
                        target.time = 21,
                        lcx = c(10, 20, 30, 40, 50))
+```
+
+```{r step 4f, results="hide", cache=TRUE}
+# save(wrong_fit, file = "vignettes/wrong_fit_survTT.Rdata")
+load("wrong_fit_survTT.Rdata")
 plot(wrong_fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
      addlegend = TRUE)
 ```
@@ -179,8 +191,6 @@ concentrations, and we are missing measurements that would have a major
 influence on the final estimation. For this reason this result should be
 considered unreliable.
 
-
-
 ## Step 5: validate the model with a posterior predictive check
 
 The estimation can be further validated using so-called posterior
@@ -189,8 +199,8 @@ corresponding estimated predictions, along with their 95% credible
 interval. If the fit is correct, we expect to see 95% of the data
 inside the intervals.
 
-```{r,cache=TRUE, results="hide"}
-ppc(fit, style = "ggplot")
+```{r step 5,cache=TRUE, results="hide"}
+ppc(fit_survTT, style = "ggplot")
 ```
 
 In this plot, each black dot represents an observation made at some
@@ -215,7 +225,7 @@ described for the analysis at target time. Here the goal is to estimate the rela
 between pollutant concentration, time and survival rate.
 
 Here is a typical session:
-```{r, cache=TRUE}
+```{r surv 1, cache=TRUE}
 # (1) load dataset
 data(propiconazole)
 
@@ -230,18 +240,26 @@ plot(dat, style = "ggplot", pool.replicate = FALSE)
 
 # (5) check information on the experimental design
 summary(dat)
+```
 
+
+```{r surv 2, cache=TRUE, eval=FALSE}
 # (6) fit a TKTD model
-fit <- survFitTKTD(dat, quiet = TRUE)
-summary(fit)
+fit_survTKTD <- survFitTKTD(dat, quiet = TRUE)
 ```
 
-```{r, cache=TRUE}
-plot(fit, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+
+```{r surv 3, cache=TRUE}
+# save(fit_survTKTD, file = "vignettes/fit_survTKTD.Rdata")
+load("fit_survTKTD.Rdata")
+
+summary(fit_survTKTD)
+
+plot(fit_survTKTD, style = "ggplot", adddata = TRUE, one.plot = FALSE)
 ```
 
-```{r, cache=TRUE}
-ppc(fit, style = "ggplot")
+```{r surv 4, cache=TRUE}
+ppc(fit_survTKTD, style = "ggplot")
 ```
 
 # Reproduction data analyses
@@ -251,7 +269,7 @@ described for survival data. This time the goal is to estimate the relation
 between pollutant concentration and reproduction rate per individual-day.
 
 Here is a typical session:
-```{r, cache=TRUE}
+```{r repro 1, cache=TRUE}
 # (1) load dataset
 data(cadmium2)
 
@@ -271,22 +289,28 @@ plotDoseResponse(dat, target.time = 56, style = "ggplot")
 
 # (6) check information on the experimental design
 summary(dat)
+```
 
+```{r repro 2, cache=TRUE , eval=FALSE}
 # (7) fit an exposure-response model at target-time
-fit <- reproFitTT(dat, stoc.part = "bestfit",
+fit_reproTT <- reproFitTT(dat, stoc.part = "bestfit",
                   target.time = 21,
                   ecx = c(10, 20, 30, 40, 50),
                   quiet = TRUE)
-summary(fit)
 ```
 
-```{r, cache=TRUE}
-plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
+
+```{r repro 3, cache=TRUE}
+# save(fit_reproTT, file = "vignettes/fit_reproTT.Rdata")
+load("fit_reproTT.Rdata")
+summary(fit_reproTT)
+
+plot(fit_reproTT, log.scale = TRUE, style = "ggplot", adddata = TRUE,
      addlegend = TRUE)
 ```
 
-```{r, cache=TRUE}
-ppc(fit, style = "ggplot")
+```{r repro 4, cache=TRUE}
+ppc(fit_reproTT, style = "ggplot")
 ```
 As in survival analysis, we assume that the reproduction rate per individual-day
 is a log-logistic function of the concentration. More details and parameter
@@ -300,8 +324,8 @@ variability (named "Poisson") and another one which takes it into account
 (named "gamma Poisson"). You can choose either one using the option `stoc.part`,
 but by setting it to `"bestfit"`, you let `reproFitTT` decide which models fits the
 data best. The choice can be seen by calling the `summary` function:
-```{r, cache=TRUE}
-summary(fit)
+```{r modelComp, cache=TRUE}
+summary(fit_reproTT)
 ```
 When the gamma Poisson model is selected, the summary shows an additional
 parameter called `omega`, which quantifies the inter-individual variability
