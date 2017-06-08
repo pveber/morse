@@ -22,6 +22,7 @@ jags_TKTD_cstSD <-
   kk <- 10**kk_log10
   z  <- 10**z_log10
 
+ bigtime <- max(time[1:n_data]) + 1
 
   ########## Computation of the likelihood
 
@@ -30,22 +31,23 @@ jags_TKTD_cstSD <-
     tz[i] <- ifelse(conc[i] > z, -1/kd * log( 1- R[i]), bigtime)
     R[i] <- ifelse(conc[i] > z, z/xcor[i], 0.1)
     xcor[i] <- ifelse(conc[i] > 0, conc[i], 10)
-    tref[i] <- max(tprec[i], tz[i])
 
-    psurv[i] <- exp(-hb * (time[i] - tprec[i]) + ifelse(time[i] > tz[i], -kk * ((conc[i] - z) * (time[i] - tref[i]) + conc[i]/kd * ( exp(-kd * time[i]) - exp(-kd * tref[i]))), 0))
+    psurv[i] <- exp(-hb * time[i] + ifelse(time[i] > tz[i], -kk * ((conc[i] - z) * (time[i] - tz[i]) + conc[i]/kd * ( exp(-kd * time[i]) - exp(-kd * tz[i]))), 0))
 
-    Nsurv[i] ~ dbin(psurv[i] , Nprec[i])
+    Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
     ## ---------------------- generated data
 
-    Nsurv_ppc[i] ~ dbin(psurv[i] , Nprec[i])
-  }
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
-  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
-  Nsurv_sim[1] ~ dbin(psurv[1], Nprec[1])
-  for( i in 2:n_data){
-    Nsurv_sim[i] ~ dbin(psurv[i], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
-  }
+    }
+
+    ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+    Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
+    for( i in 2:n_data){
+      Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+    }
+
 }"
 
 

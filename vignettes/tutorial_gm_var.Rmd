@@ -1,5 +1,5 @@
 ---
-title: "MORSE tutorial for 'gm' models"
+title: "MORSE tutorial for 'gm' models with time variable exposure concentration"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
@@ -60,12 +60,18 @@ df_conc = gm_diazinonPimephales_conc %>%
 gm_survDataCheck(data_surv = df_Nsurv,
                  data_conc = df_conc)
 
-# Check the structure and the dataset integrity 
+```
+
+
+Build the `gm_survData` object
+
+```{r step 1b, cache=TRUE}
 var_data = gm_survData(data_surv = df_Nsurv,
-                  data_conc = df_conc)
+                       data_conc = df_conc)
 
 head(var_data)
 ```
+
 
 
 ## Step 2: visualize your dataset
@@ -95,7 +101,7 @@ summary(var_data)
 ### SD model
 
 ```{r step3 , eval=FALSE}
-fit_varSD <- gm_survFitTKTD(var_data, model_type = "SD")
+fit_varSD <- survFit(var_data, model_type = "SD")
 ```
 
 
@@ -104,31 +110,10 @@ fit_varSD <- gm_survFitTKTD(var_data, model_type = "SD")
 load("fit_varSD.Rdata")
 ``` 
 
-
-#### Details of the step 3
-
-```{r, cache=TRUE}
-### Priors
-priors <- gm_priors(var_data, model_type = "SD") 
-priors$priorsList
-priors$priorsMinMax
-
-### Interpolation
-var_dataInterpol = gm_survData_interpolate(var_data, extend.time = 10)
-head(var_dataInterpol)
-
-### cst or var system
-test_cst_conc(var_data)
-
-### model data
-modelData = gm_modelData(var_data, model_type = "SD")
-modelData$modelData
-```
-
 ### IT model
 
 ```{r, eval=FALSE}
-fit_varIT <- gm_survFitTKTD(var_data, model_type = "IT")
+fit_varIT <- survFit(var_data, model_type = "IT")
 ```
 
 
@@ -137,24 +122,19 @@ fit_varIT <- gm_survFitTKTD(var_data, model_type = "IT")
 load("fit_varIT.Rdata")
 ``` 
 
-#### Details of the step 3
+
+## Step 4: print information on analysis (mcmc)
+
+### SD model
 
 ```{r, cache=TRUE}
-### Priors
-priors <- gm_priors(var_data, model_type = "IT") 
-priors$priorsList
-priors$priorsMinMax
+print(fit_varSD)
+```
 
-### Interpolation
-var_dataInterpol = gm_survData_interpolate(var_data, extend.time = 10)
-head(var_dataInterpol)
+### IT model
 
-### cst or var system
-test_cst_conc(var_data)
-
-### model data
-modelData = gm_modelData(var_data, model_type = "IT")
-modelData$modelData
+```{r, cache=TRUE}
+print(fit_varIT)
 ```
 
 ## Step 4: validate the model with a posterior predictive check

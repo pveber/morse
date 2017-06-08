@@ -1,5 +1,5 @@
 ---
-title: "MORSE tutorial for 'gm' models"
+title: "MORSE tutorial for 'gm' models with constant exposure concentration"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
@@ -56,11 +56,15 @@ df_conc = gm_diazinonPimephales_conc %>%
    filter(varType == "cst") %>%
    select(-varType)
 
-# Check the structure and the dataset integrity 
+# Check the structure and the dataset integrity
 gm_survDataCheck(data_surv = df_Nsurv,
                  data_conc = df_conc)
+```
 
-# Check the structure and the dataset integrity 
+
+Build the `gm_survData` object
+
+```{r step 1b, cache=TRUE}
 cst_data = gm_survData(data_surv = df_Nsurv,
                   data_conc = df_conc)
 
@@ -92,27 +96,27 @@ summary(cst_data)
 ### SD model
 
 ```{r step3 , eval=FALSE}
-fit_cstSD <- gm_survFitTKTD(cst_data, model_type = "SD")
+fit_cstSD <- survFit(cst_data, model_type = "SD")
 ```
 
 
 ```{r, cache=TRUE}
 # save(fit_cstSD, file = "vignettes/fit_cstSD.Rdata")
 load("fit_cstSD.Rdata")
-``` 
+```
 
 ### IT model
 
 
 ```{r, eval=FALSE}
-fit_cstIT <- gm_survFitTKTD(cst_data, model_type = "IT")
+fit_cstIT <- survFit(cst_data, model_type = "IT")
 ```
 
 
 ```{r, cache=TRUE}
 # save(fit_cstIT, file = "vignettes/fit_cstIT.Rdata")
 load("fit_cstIT.Rdata")
-``` 
+```
 
 ## Step 4: validate the model with a posterior predictive check
 
