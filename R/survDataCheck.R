@@ -2,10 +2,44 @@
 #'
 #' The \code{survDataCheck} function can be used to check if an object
 #' containing survival data is formatted according to the expectations of the
+#' \code{survDataCstC} function or the \code{survDataVarC} .
+#'
+#'
+#' @param \dots \code{data.frame} used to select a class
+
+#' @export
+survDataCheck <- function(... , diagnosis.plot = TRUE){
+  
+  ls_data <- list(...)
+  
+  ##
+  ## 0. check we have 1 or 2 objects in '...'
+  ##
+  if (length(ls_data) > 2 ) {
+    return(errorTableSingleton("objectNumberExpected",
+                               "A maximal of 2 objects is expected."))
+  }
+  
+  if(length(ls_data) == 1){
+    
+    survDataCheckCstC(..., diagnosis.plot)
+    
+  } else if(length(ls_data) == 2){
+    
+    survDataCheckVarC(..., diagnosis.plot)
+    
+  }
+}
+
+
+#' Checks if an object can be used to perform survival analysis
+#'
+#' The \code{survDataCheck} function can be used to check if an object
+#' containing survival data is formatted according to the expectations of the
 #' \code{survData} function.
 #'
 #'
-#' @aliases survDataCheck
+#' @aliases survDataCheckCstC
 #'
 #' @param data any object
 #' @param diagnosis.plot if \code{TRUE}, the function may produce diagnosis plots
@@ -48,8 +82,13 @@
 #' @importFrom stringr str_c
 #' 
 #' @export
-survDataCheck <- function(data, diagnosis.plot = TRUE) {
+survDataCheckCstC <- function(..., diagnosis.plot) {
 
+  ls_data <- list(...)
+  
+  data <- ls_data[[1]]
+  
+  
   ##
   ## 0. check we have a data.frame
   ##
@@ -133,6 +172,8 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                  " is duplicated.", sep = "")
     errors <- errorTableAdd(errors, "duplicatedID", msg)
   }
+  
+  
   consistency <- function(subdata) {
     # Function to be used on a subdataset corresponding to one replicate at one
     # concentration.
@@ -169,8 +210,197 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   consistency.errors <- do.call("errorTableAppend", res)
   errors <- errorTableAppend(errors, consistency.errors)
 
+  
+  ### Plot if necessary
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
-    survDataPlotFull(data, ylab = "Number of surviving individuals")
+    survDataPlotFull(data, ylab = "Number of survivors")
   }
   return(errors)
 }
+
+#' Checks if an object can be used to perform survival analysis
+#'
+#' The \code{gm_survDataCheck} function can be used to check if an object
+#' containing survival data is formatted according to the expectations of the
+#' \code{gm_survData} function.
+#'
+#'
+#' @aliases survDataCheckVarC
+#'
+#' @param data any object
+#' @param diagnosis.plot if \code{TRUE}, the function may produce diagnosis plots
+#'
+#' @return
+#' @seealso \code{\link{survData}}
+#'
+#' @export
+#' 
+survDataCheckVarC <- function(..., diagnosis.plot) {
+  
+  ls_data <- list(...)
+  
+  ##
+  ## 0. check if data.frame
+  ##
+  
+  if(!("data.frame" %in% class(ls_data[[1]]) & "data.frame" %in% class(ls_data[[2]]))) {
+    
+    return(errorTableSingleton("dataframeExpected",
+                               "dataframes are expected."))
+  }
+  
+  
+  ##
+  ## 1.1 check column number
+  ##
+  
+  if ( ncol(ls_data[[1]]) != 3  | ncol(ls_data[[2]]) != 3  ) {
+    msg <- paste("Object must have 3 columns: 'replicate','time' and 'Nsurv' and 'replicate','time' and 'conc'")
+    return(errorTableSingleton("missingColumn",msg))
+  }
+  
+  ##
+  ## 1.2 assert column names are correct and assign data_surv or data_conc to corresponding data.frame
+  ##
+  ref.names_surv <- c("replicate","time","Nsurv")
+  ref.names_conc <- c("replicate","time","conc")
+  
+  ### data_surv
+  if(all(colnames(ls_data[[1]]) %in% ref.names_surv) & all(colnames(ls_data[[2]]) %in% ref.names_conc)){
+    
+    data_surv <- ls_data[[1]]
+    data_conc <- ls_data[[2]]
+    
+  } else if(all(colnames(ls_data[[1]]) %in% ref.names_conc) & all(colnames(ls_data[[2]]) %in% ref.names_surv)){
+    
+    data_conc <- ls_data[[1]]
+    data_surv <- ls_data[[2]]
+    
+  } else{
+    
+    msg <- paste("Object must have 3 columns: 'replicate','time' and 'Nsurv' and 'replicate','time' and 'conc'")
+    return(errorTableSingleton("missingColumn",msg))
+    
+  }
+
+  # Next errors do not prevent from checking others
+  errors <- errorTableCreate()
+  
+  ##
+  ## 2. assert the first time point is zero for each (replicate, concentration)
+  ##
+  
+  df_check0Surv <- data_surv %>%
+    group_by(replicate) %>%
+    summarize(check_0 = 0 %in% time)
+  
+  df_check0Conc <- data_conc %>%
+    group_by(replicate) %>%
+    summarize(check_0 = 0 %in% time)
+  
+  if(all(df_check0Surv$check_0) != TRUE ){
+    msg <- "Data (Nsurv) are required at time 0 for each replicate."
+    errors <- errorTableAdd(errors, "firstTime0surv", msg)
+  }
+  
+  if(all(df_check0Conc$check_0) !=TRUE ){
+    msg <- "Data (conc) are required at time 0 for replicate."
+    errors <- errorTableAdd(errors, "firstTime0conc", msg)
+  }
+  
+  
+  ##
+  ## 3. assert time are numeric, Nsurv are interger, concentrations are numeric AND all are positive
+  ##
+  ### 3.1 data_surv
+  if (!is.integer(data_surv$Nsurv) | any(data_surv$Nsurv < 0)
+      | !is.numeric(data_surv$time) | any(data_surv$time < 0)      ) {
+    msg <- "In survival data, column 'time' must contain only positive numeric values and column 'Nsurv' must contain only positive integer values."
+    errors <- errorTableAdd(errors, "survDataType", msg)
+  }
+  ### 3.2 data_conc
+  if (!is.numeric(data_conc$conc) | any(data_conc$conc < 0)
+      | !is.numeric(data_conc$time) | any(data_conc$time < 0)      ) {
+    msg <- "In concentration data, column 'time' must contain only positive numeric values and column 'conc' must contain only positive integer values."
+    errors <- errorTableAdd(errors, "concDataType", msg)
+  }
+  
+  ##
+  ## 4. assert Nsurv != 0 at time 0
+  ##
+  datatime0 <- data_surv[data_surv$time == 0, ]  # select data for initial time points
+  if (any(datatime0$Nsurv == 0)) { # test if Nsurv != 0 at time 0
+    msg <- "Nsurv should be different to 0 at time 0 for each replicate."
+    errors <- errorTableAdd(errors, "Nsurv0T0", msg)
+  }
+
+  ##
+  ## 5. assert there is the same name and/or number of replicate between tables
+  ##
+  
+  df_checkReplicate_surv <- data_surv %>%
+    summarize( check_Profile = length(unique(replicate)))
+  
+  df_checkReplicate_conc <- data_conc %>%
+    summarize( check_Profile = length(unique(replicate)))
+  
+  if( all( df_checkProfile_surv$check_Profile == df_checkProfile_conc$check_Profile ) != TRUE){
+    msg <- "At least one 'replicate' is missing or different between tables."
+    errors <- errorTableAdd(errors, "missingReplicate", msg)
+  }
+  
+  ##
+  ## 6. assert each (replicate, concentration, time) triplet is unique
+  ##
+  ID_conc <- idCreate(data_conc) # ID vector
+  if (any(duplicated(ID_conc))) {
+    msg <- paste("The (replicate, conc, time) triplet ",
+                 ID_conc[duplicated(ID_conc)],
+                 " is duplicated.", sep = "")
+    errors <- errorTableAdd(errors, "duplicatedIDconc", msg)
+  }
+  
+  ##
+  ## 7. assert Nsurv never increases with time
+  ##
+  
+  df_checkSurvIncrease <- data_surv %>%
+    group_by(replicate) %>%
+    arrange(time) %>%
+    mutate(Nprec = ifelse(time == 0, Nsurv, lag(Nsurv))) %>%
+    mutate( check_SurvIncrease = Nsurv <= Nprec)
+  
+  if(all(df_checkSurvIncrease$check_SurvIncrease) != TRUE){
+    msg <-  "'Nsurv' increases at some time points."
+    errors <- errorTableAdd(errors, "NsurvIncrease", msg)
+  }
+  
+  
+  ##
+  ## 9. WARNING - assert max(time in data_conc) >= max(time in data_surv)
+  ##
+  
+  df_checkMaxTimeSurv <- data_surv %>%
+    group_by(replicate) %>%
+    filter(time == max(time))
+  
+  df_checkMaxTimeConc <- data_conc %>%
+    group_by(replicate) %>%
+    filter(time == max(time))
+  
+  if(!all(df_checkMaxTimeConc$time >= df_checkMaxTimeSurv$time) ){
+    warning( "In each 'replicate', maximum time for concentration record should be greater or equal to maximum time in survival data observation.
+             Otherwise, last concentration is taken to fill concentration replicate until the maximum time in survival data." )
+  }
+  
+  ##
+  ## PLOT IF diagnosis.plot == TRUE
+  ##
+  # if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
+  #   survDataPlotFull(data, ylab = "Number of survivors")
+  # }
+  
+  return(errors)
+}
+  
+
