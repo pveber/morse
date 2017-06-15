@@ -77,33 +77,6 @@ survTKTDCreateJagsData <- function(data, comp) {
   }
 }
 
-modelTKTDNorm <- "model {
-#########priors 
-log10ks ~ dnorm(meanlog10ks, taulog10ks)
-log10NEC ~ dnorm(meanlog10nec, taulog10nec)
-log10kd ~ dnorm(meanlog10kd, taulog10kd)
-log10m0 ~ dnorm(meanlog10m0, taulog10m0)
-
-#####parameter transformation
-ks <- 10**log10ks
-NEC <- 10**log10NEC
-kd <- 10**log10kd
-m0 <- 10**log10m0
-
-##########Computation of the likelihood
-for (i in 1:ndat)
-{
-  tNEC[i] <- ifelse(x[i] > NEC, -1/kd * log( 1- R[i]), bigtime)
-  R[i] <- ifelse(x[i] > NEC, NEC/xcor[i], 0.1)
-  xcor[i] <- ifelse(x[i] > 0, x[i], 10)
-  tref[i] <- max(tprec[i], tNEC[i])
-  
-  psurv[i] <- exp(-m0 * (t[i] - tprec[i]) + ifelse(t[i] > tNEC[i], -ks * ((x[i] - NEC) * (t[i] - tref[i]) + x[i]/kd * ( exp(-kd * t[i]) - exp(-kd * tref[i]))), 0))
-  
-  y[i] ~ dbin(psurv[i] , Nprec[i]) 
-}
-}"
-
 survTKTDPARAMS <- function(mcmc) {
   # create the table of posterior estimated parameters
   # for the survival analyses
@@ -239,7 +212,7 @@ survFitTKTD <- function(data,
   
   # Define model
   
-  model <- survLoadModel(model.program = modelTKTDNorm,
+  model <- survLoadModel(model.program = jags_TKTD_cstSD,
                          data = jags.data, n.chains,
                          Nadapt = 3000, quiet)
   
