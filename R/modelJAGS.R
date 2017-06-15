@@ -82,11 +82,11 @@ model {
   
   for( i in 1:n_data){
   
-    D[profile_ID[i], time_ID[i]] <- conc[i] * ( 1 - exp( - kd * time[i] ))
+    D[replicate_ID[i], time_ID[i]] <- conc[i] * ( 1 - exp( - kd * time[i] ))
     
-    D_max[profile_ID[i], time_ID[i]] <- max(D[profile_ID[i],1:time_ID[i]])
+    D_max[replicate_ID[i], time_ID[i]] <- max(D[replicate_ID[i],1:time_ID[i]])
     
-    F[i]  <- D_max[profile_ID[i], time_ID[i]]**beta / ( D_max[profile_ID[i], time_ID[i]]**beta + alpha**beta )
+    F[i]  <- D_max[replicate_ID[i], time_ID[i]]**beta / ( D_max[replicate_ID[i], time_ID[i]]**beta + alpha**beta )
     
     psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
     
@@ -139,25 +139,25 @@ jags_TKTD_varSD <-
   
     ###-------------- midpoint method
 
-    conc_midpoint[profile_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
+    conc_midpoint[replicate_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
     * concprec_long[i]) / 2 * (time_long[i] - tprec_long[i])
     
-    D_int[profile_ID_long[i], time_ID_long[i]] <- kd * exp(-kd * time_long[i]) *
-    sum( conc_midpoint[profile_ID_long[i], 1:time_ID_long[i]] )
+    D_int[replicate_ID_long[i], time_ID_long[i]] <- kd * exp(-kd * time_long[i]) *
+    sum( conc_midpoint[replicate_ID_long[i], 1:time_ID_long[i]] )
     
-    h[profile_ID_long[i], time_ID_long[i]] <- kk * max(0, D_int[profile_ID_long[i], time_ID_long[i]] - z) + hb
+    h[replicate_ID_long[i], time_ID_long[i]] <- kk * max(0, D_int[replicate_ID_long[i], time_ID_long[i]] - z) + hb
     
-    h_midPoint[profile_ID_long[i], time_ID_long[i]] <- (h[profile_ID_long[i], time_ID_long[i]] +
-    h[profile_ID_long[i], tprec_ID_long[i]])/2 * (time_long[i] - tprec_long[i])
+    h_midPoint[replicate_ID_long[i], time_ID_long[i]] <- (h[replicate_ID_long[i], time_ID_long[i]] +
+    h[replicate_ID_long[i], tprec_ID_long[i]])/2 * (time_long[i] - tprec_long[i])
     
-    H_int[profile_ID_long[i], time_ID_long[i]] <- sum( h_midPoint[profile_ID_long[i], 1:time_ID_long[i]] )
+    H_int[replicate_ID_long[i], time_ID_long[i]] <- sum( h_midPoint[replicate_ID_long[i], 1:time_ID_long[i]] )
   
   }
   for( i in 1:n_dataRed){
   
-    H[profile_ID[i], time_ID[i]]  <- H_int[profile_ID[i], time_ID_red[i]]
+    H[replicate_ID[i], time_ID[i]]  <- H_int[replicate_ID[i], time_ID_red[i]]
     
-    psurv[i] = exp( - H[profile_ID[i], time_ID[i]])
+    psurv[i] = exp( - H[replicate_ID[i], time_ID[i]])
     
     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
     
@@ -207,21 +207,21 @@ jags_TKTD_varIT <-"model {
   
     ###------------ midpoint method
 
-    diff.int[profile_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
+    diff.int[replicate_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
     * concprec_long[i]) / 2 * (time_long[i] - tprec_long[i])
     
-    D_int[profile_ID_long[i], time_ID_long[i]] <- kd * exp(-kd * time_long[i]) *
-    sum( diff.int[profile_ID_long[i], 1:time_ID_long[i]] )
+    D_int[replicate_ID_long[i], time_ID_long[i]] <- kd * exp(-kd * time_long[i]) *
+    sum( diff.int[replicate_ID_long[i], 1:time_ID_long[i]] )
   
   }
   
   for( i in 1:n_dataRed){
   
-    D[profile_ID[i], time_ID[i]]  <- D_int[profile_ID[i], time_ID_red[i]]
+    D[replicate_ID[i], time_ID[i]]  <- D_int[replicate_ID[i], time_ID_red[i]]
     
-    D_max[profile_ID[i], time_ID[i]] <- max(D[profile_ID[i],1:time_ID[i]])
+    D_max[replicate_ID[i], time_ID[i]] <- max(D[replicate_ID[i],1:time_ID[i]])
     
-    F[i]  <- D_max[profile_ID[i], time_ID[i]]**beta / ( D_max[profile_ID[i], time_ID[i]]**beta + alpha**beta )
+    F[i]  <- D_max[replicate_ID[i], time_ID[i]]**beta / ( D_max[replicate_ID[i], time_ID[i]]**beta + alpha**beta )
     
     psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
     
