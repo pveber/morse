@@ -1,0 +1,207 @@
+---
+title: "MORSE tutorial for 'gm' models with time variable exposure concentration"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: true
+self_contained: no
+vignette: >
+  %\VignetteIndexEntry{Tutorial_var}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+```{r options,include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(fig.width = 7,
+                      fig.height = 4,
+                      cache = TRUE)
+```
+
+
+
+```{r, echo=FALSE, cache=TRUE, results='hide'}
+library(morse)
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(rjags)
+library(coda)
+library(zoo)
+library(gridExtra)
+library(reshape2)
+library(epitools)
+library(ggplot2)
+```
+
+# Survival data analysis using TKTD model GUTS with time exposure variable concentration
+
+Data set : Diazinon and *Pimephales promelas*.
+This data set is taken from the fathead minnow toxicity database[Geiger1988]. It represents a typical fish acute
+toxicity study, and it includes a hypothetical exposure profile representing a typical FOCUS-SW ditch and a real exposure profile from chemical monitoring in a stream [Wittmer2010, Ashauer2011].
+
+
+## Step 1: check the structure and the dataset integrity and create a `survData` object
+
+```{r diazinon data, include=FALSE, echo=FALSE}
+data(gm_diazinonPimephales_Nsurv)
+data(gm_diazinonPimephales_conc)
+```
+
+```{r step 1, cache=TRUE}
+df_Nsurv = gm_diazinonPimephales_Nsurv %>%
+  filter(varType == "var") %>%
+  select(-varType)
+df_conc = gm_diazinonPimephales_conc %>%
+   filter(varType == "var") %>%
+   select(-varType)
+
+# Check the structure and the dataset integrity 
+gm_survDataCheck(data_surv = df_Nsurv,
+                 data_conc = df_conc)
+
+```
+
+
+Build the `gm_survData` object
+
+```{r step 1b, cache=TRUE}
+var_data = gm_survData(data_surv = df_Nsurv,
+                       data_conc = df_conc)
+
+head(var_data)
+```
+
+
+
+## Step 2: visualize your dataset
+
+The function `plot` can be used to plot the number of surviving individuals
+as a function of time for all profiles.
+
+```{r step 2, cache=TRUE}
+plot(var_data)
+
+plot(var_data,
+     facetting.level = c("varControl","varA","varB","varC"))
+
+plot(var_data,
+     facetting = FALSE)
+```
+
+The function `summary` provides some descriptive statistics on the experimental design.
+
+```{r , cache=TRUE}
+summary(var_data)
+```
+
+
+## Step 3: fit an exposure-response model to the survival data at target time
+
+### SD model
+
+```{r step3 , eval=FALSE}
+fit_varSD <- survFit(var_data, model_type = "SD")
+```
+
+
+```{r, cache=TRUE}
+# save(fit_varSD, file = "vignettes/fit_varSD.Rdata")
+load("fit_varSD.Rdata")
+``` 
+
+### IT model
+
+```{r, eval=FALSE}
+fit_varIT <- survFit(var_data, model_type = "IT")
+```
+
+
+```{r, cache=TRUE}
+# save(fit_varIT, file = "vignettes/fit_varIT.Rdata")
+load("fit_varIT.Rdata")
+``` 
+
+
+## Step 4: print information on analysis (mcmc)
+
+### SD model
+
+```{r, cache=TRUE}
+print(fit_varSD)
+```
+
+### IT model
+
+```{r, cache=TRUE}
+print(fit_varIT)
+```
+
+## Step 4: validate the model with a posterior predictive check
+
+### SD model
+
+```{r, cache=TRUE}
+ppc(fit_varSD)
+```
+
+
+### IT model
+
+```{r, cache=TRUE}
+ppc(fit_varIT)
+```
+
+## Step 5: plot the model prediction
+
+### SD model
+
+```{r, cache=TRUE}
+plot(fit_varSD, data_type = "probability")
+```
+
+
+```{r, cache=TRUE}
+plot(fit_varSD, data_type = "number")
+```
+
+### IT model
+
+```{r, cache=TRUE}
+plot(fit_varIT, data_type = "probability")
+```
+
+
+```{r, cache=TRUE}
+plot(fit_varIT, data_type = "number")
+```
+
+## Step 6: summary of priors and posteriors
+
+### SD model
+
+```{r, cache=TRUE}
+summary(fit_varSD)
+```
+
+### IT model
+
+```{r, cache=TRUE}
+summary(fit_varIT)
+```
+
+
+
+# References
+
+Geiger, D. L.; Call, D. J.; Brooke, L. T. Acute toxicities of organic chemicals to fathead minnow
+(Pimephales promelas). Volume IV.; University of Wisconsin-Superior: Superior, Wisconsin, USA,
+1988.
+
+Wittmer, I. K.; Bader, H. P.; Scheidegger, R.; Singer, H.; Lück, A.; Hanke, I.; Carlsson, C.;
+Stamm, C., Significance of urban and agricultural land use for biocide and pesticide dynamics in
+surface waters. Water Res. 2010, 44, (9), 2850-2862.
+
+Ashauer, R.; Wittmer, I.; Stamm, C.; Escher, B. I., Environmental Risk Assessment of
+Fluctuating Diazinon Concentrations in an Urban and Agricultural Catchment Using Toxicokinetic-
+Toxicodynamic Modeling. Environ. Sci. Technol. 2011, 45, (22), 9783-9792.
