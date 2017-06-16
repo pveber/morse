@@ -77,11 +77,8 @@ survFitTT <- function(data,
   # Create a new column named profile
   data$profile = as.character(data$conc)
   
-  # select Data at target.time and pool profiles
-  dataTT <- selectDataTT(data, target.time)
-
   # agregate by sum of profile
-  x <- x %>%
+  data <- data %>%
     dplyr::group_by(profile, conc, time) %>%
     dplyr::summarise(Nsurv = sum(Nsurv))
   
@@ -91,6 +88,9 @@ survFitTT <- function(data,
     # survDataCheck checked that Nsurv was decreasing in each replicate and the presen of time == 0
     dplyr::mutate(Ninit = max(Nsurv))
 
+  # select Data at target.time and pool profiles
+  dataTT <- selectDataTT(data, target.time)
+  
   # Choose model by testing mortality in the control
   control <- filter(dataTT, conc == 0)
   det.part <-
