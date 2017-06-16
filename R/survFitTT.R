@@ -74,10 +74,16 @@ survFitTT <- function(data,
   if(! is(data, "survData"))
     stop("survFitTT: object of class survData expected")
 
-  # select Data at target.time and pool replicates
+  # Create a new column named profile
+  data$profile = as.character(data$conc)
+  
+  # select Data at target.time and pool profiles
   dataTT <- selectDataTT(data, target.time)
-  dataTT <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, dataTT, sum), replicate = 1)
 
+  # agregate by sum of profile
+  x <- x %>%
+    dplyr::group_by(profile, conc, time) %>%
+    dplyr::summarise(Nsurv = sum(Nsurv))
 
   # Choose model by testing mortality in the control
   control <- filter(dataTT, conc == 0)

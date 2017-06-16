@@ -52,7 +52,7 @@
 #' @importFrom stats aggregate
 #'
 #' @export
-plotDoseResponse.survData <- function(x,
+plotDoseResponse.survDataCstC <- function(x,
                                       xlab = "Concentration",
                                       ylab = "Survival rate",
                                       main = NULL,
@@ -70,10 +70,15 @@ plotDoseResponse.survData <- function(x,
   if (style == "generic" && remove.someLabels)
     warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
             call. = FALSE)
-
-  # agregate by sum of replicate
-  x <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, x, sum),
-             replicate = 1)
+  
+  # Create a new column named profile
+  x$profile = as.character(x$conc)
+  
+  # agregate by sum of profile
+  x <- x %>%
+    dplyr::group_by(profile,conc, time) %>%
+    dplyr::summarise(Nsurv = sum(Nsurv)) %>%
+    ungroup()
   
   x$resp <- x$Nsurv / x$Ninit
   # select the target.time
@@ -93,7 +98,7 @@ plotDoseResponse.survData <- function(x,
   })()
   
   # vector color
-  x$color <- as.numeric(as.factor(x$replicate))
+  # x$color <- as.numeric(as.factor(x$profile))
   
   if (style == "generic") {
     plot(transf_data_conc, seq(0, max(conf.int["qsup95",]),
