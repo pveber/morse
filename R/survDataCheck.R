@@ -393,12 +393,12 @@ survDataCheckVarC <- function(..., diagnosis.plot) {
              Otherwise, last concentration is taken to fill concentration replicate until the maximum time in survival data." )
   }
   
-  ##
-  ## PLOT IF diagnosis.plot == TRUE
-  ##
-  # if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
-  #   survDataPlotFull(data, ylab = "Number of survivors")
-  # }
+  #
+  # PLOT IF diagnosis.plot == TRUE
+  #
+  if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
+    survDataPlotFull_VarC(data, ylab = "Number of survivors")
+  }
   
   return(errors)
 }
