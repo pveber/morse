@@ -70,13 +70,26 @@ survFitTKTD <- function(data,
   if(!is(data, "survData"))
     stop("survFitTKTD: object of class survData expected")
   
-  jags.data <- priors(data, model_type)$priorsList
+  
+  ##
+  ## Data and Priors for model
+  ##
+  
+  globalData <- modelData(data,
+                         model_type = model_type)
+  
+  modelData_ <- globalData$modelData
+  jags.data  <- modelData_ ; jags.data$replicate = NULL
+
+  priorsData = globalData$priorsMinMax
   
   # Define model
   
   model <- survLoadModel(model.program = jags_TKTD_cstSD,
-                         data = jags.data, n.chains,
-                         Nadapt = 3000, quiet)
+                         data = jags.data,
+                         n.chains,
+                         Nadapt = 3000,
+                         quiet)
   
   # Determine sampling parameters
   parameters <- c("kd_log10", "z_log10","kk_log10", "hb_log10")
@@ -96,13 +109,13 @@ survFitTKTD <- function(data,
                        progress.bar = prog.b)
   
   # check the posterior range
-  priorsData <- priors(data, model_type)$priorsMinMax
+  priorsData <- priors_survData(data, model_type)$priorsMinMax
   
   ##
   ## Cheking posterior range with data from experimental design:
   ##
   
-  estim.par <- survTKTDPARAMS(mcmc, model_type = model_type)
+  estim.par <- survTKTDPARAMS(mcmc, model_type)
   
   if (filter(estim.par, parameters == "kd")$Q97.5 > priorsData$kd_max){
     warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
@@ -113,47 +126,15 @@ survFitTKTD <- function(data,
             call. = FALSE)
   }
   
-  ### for SD model
-  if(model_type == "SD"){
-    if (filter(estim.par, parameters == "kk")$Q97.5 > priorsData$kk_max)
-      warning("The estimation of the killing rate (model parameter k) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
-              call. = FALSE)
-    
-    if (filter(estim.par, parameters == "z")$Q2.5 < priorsData$conc_min ||
-        filter(estim.par, parameters == "z")$Q97.5 > priorsData$conc_max)
-      warning("The estimation of Non Effect Concentration threshold (NEC) (model parameter z) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
-              call. = FALSE)
-    
-  }
-  
-  ### for IT model
-  if(model_type == "IT"){
-    
-    if (filter(estim.par, parameters == "alpha")$Q2.5 < priorsData$conc_min ||
-        filter(estim.par, parameters == "alpha")$Q97.5 > priorsData$conc_max)
-      warning("The estimation of log-logistic median (model parameter alpha) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
-              call. = FALSE)
-    
-  }
-  
-  
-  if (log10(estim.par["ks", "Q97.5"]) > priorBonds$log10ksmax)
-    warning("The estimation of the killing rate (model parameter ks) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+  if (filter(estim.par, parameters == "kk")$Q97.5 > priorsData$kk_max)
+    warning("The estimation of the killing rate (model parameter k) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
             call. = FALSE)
   
-  if (log10(estim.par["kd", "Q97.5"]) > priorBonds$log10kdmax)
-    warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+  if (filter(estim.par, parameters == "z")$Q2.5 < priorsData$conc_min ||
+      filter(estim.par, parameters == "z")$Q97.5 > priorsData$conc_max)
+    warning("The estimation of Non Effect Concentration threshold (NEC) (model parameter z) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
             call. = FALSE)
-  
-  if (log10(estim.par["m0", "Q2.5"]) < priorBonds$log10m0min)
-    warning("The estimation of the natural instantaneous mortality rate (model parameter m0) lies outside the range used to define its prior distribution which indicates that this rate is very low and so difficult to estimate from this experiment !",
-            call. = FALSE)
-  
-  if (log10(estim.par["nec", "Q2.5"]) < priorBonds$log10necmin ||
-      log10(estim.par["nec", "Q97.5"]) > priorBonds$log10necmax)
-    warning("The NEC estimation (model parameter nec) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
-            call. = FALSE)
-  
+
   #OUTPUT
   OUT <- list(estim.par = estim.par,
               mcmc = mcmc,
