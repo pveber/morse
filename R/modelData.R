@@ -117,8 +117,8 @@ modelData.survDataVarC <- function(x_survData,
   ## - i_row: identification of row number (for every group)
   ## - i_row: identification of previous row number (for every group) exeptc when time_ID (in group) is 1
   
-  x_survData_interpolate = x_survData_interpolate(x_survData,
-                                                  extend.time = extend_time) %>%
+  x_survData_interpolate = survData_interpolate(x_survData,
+                                                extend.time = extend_time) %>%
     dplyr::arrange(replicate, time)
   
   x_survData = x_survData_interpolate %>%
@@ -231,7 +231,7 @@ modelData.survDataVarC <- function(x_survData,
 #'
 #'
 
-x_survData_interpolate = function(x_survData,
+survData_interpolate = function(x_survData,
                                   extend.time = 100){
   
   ## data.frame with time
@@ -255,10 +255,10 @@ x_survData_interpolate = function(x_survData,
     # identification of time point index for Nsurv
     dplyr::mutate(id_conc_interp = ifelse(is.na(Nsurv), NA, row_number()))%>%
     # 'lag' function copy values lagged by 1 (see 'dplyr' package)
-    dplyr::mutate( tprec_long = ifelse( time == 0, time, dplyr::lag(time) )
+    dplyr::mutate( tprec_long = ifelse( time == 0, time, dplyr::lag(time) ),
                    concprec_long = ifelse( time == 0, conc, dplyr::lag(conc) ) ) %>%
     dplyr::group_by(replicate) %>%
-    dplyr::mutate(time_ID_long = row_number()
+    dplyr::mutate(time_ID_long = row_number(),
                   tprec_ID_long = ifelse(time_ID_long==1, time_ID_long,  dplyr::lag(time_ID_long))) %>%
     dplyr::ungroup() %>%
     # Group by replicate to replicate an indice of replicate:
