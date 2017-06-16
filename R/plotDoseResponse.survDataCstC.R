@@ -89,7 +89,7 @@ plotDoseResponse.survDataCstC <- function(x,
   
   x$resp <- x$Nsurv / x$Ninit
   # select the target.time
-  xf <- filter(x, x$time == target.time)
+  xf <- filter(x, time == target.time)
   
   conf.int <- survConfInt(xf, log.scale)
   
@@ -127,7 +127,6 @@ plotDoseResponse.survDataCstC <- function(x,
            pch = 20)
     
     # segment CI
-    
     segments(transf_data_conc, x$resp,
              transf_data_conc, conf.int["qsup95", ])
     
