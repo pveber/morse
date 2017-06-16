@@ -1,150 +1,3 @@
-#' @importFrom dplyr filter
-survTKTDCreateJagsData <- function(data, comp) {
-  # Creates the parameters to define the prior of the TKTD model
-  # INPUTS
-  # data : object of class survData
-  # comp : if true return only min and max of prior
-  # OUTPUT
-  # jags.data : list of data required for the jags.model function
-  
-  data <- data[data$time != 0, ]
-  
-  # Parameter calculation of concentration min and max
-  concmin <- min(data$conc[data$conc != 0])
-  concmax <- max(data$conc)
-  
-  tmin <- min(data$time)
-  tmax <- max(data$time)
-  conc <- sort(unique(data$conc))
-  
-  deltaCmin = NULL
-  for (i in 2:length(conc)) {
-    deltaCmin[i - 1] <- conc[i] - conc[i - 1]
-  }
-  deltaCmin <- min(deltaCmin)
-  
-  # ks parameters
-  ksmax <- -log(0.001) / (tmin * deltaCmin)
-  ksmin <- -log(0.999) / (tmax * (concmax - concmin))
-  
-  meanlog10ks <- (log10(ksmax) + log10(ksmin)) / 2
-  sdlog10ks <- (log10(ksmax) - log10(ksmin)) / 4
-  taulog10ks <- 1 / sdlog10ks^2
-  
-  # kd parameters
-  kdmax <- -log(0.001) / tmin
-  kdmin <- -log(0.999) / tmax
-  
-  meanlog10kd <- (log10(kdmax) + log10(kdmin)) / 2
-  
-  sdlog10kd <- (log10(kdmax) - log10(kdmin)) / 4
-  taulog10kd <- 1 / sdlog10kd^2
-  
-  # m0 parameters
-  m0max <- -log(0.5) / tmin
-  m0min <- -log(0.999) / tmax
-  
-  meanlog10m0 <- (log10(m0max) + log10(m0min)) / 2
-  sdlog10m0 <- (log10(m0max) - log10(m0min)) / 4
-  taulog10m0 <- 1/ sdlog10m0^2
-  
-  # nec parameters
-  meanlog10nec <- (log10(concmax) + log10(concmin))/2
-  sdlog10nec <- (log10(concmax) - log10(concmin)) / 4 
-  taulog10nec <- 1/ sdlog10nec^2
-  
-  if (!comp) {
-    return(list( x = data$conc, y = data$N_alive,
-                 t = data$time, tprec = data$tprec,
-                 Nprec = data$Nprec,
-                 meanlog10ks = meanlog10ks, taulog10ks = taulog10ks,
-                 meanlog10kd = meanlog10kd,
-                 taulog10kd = taulog10kd,
-                 meanlog10m0 = meanlog10m0,
-                 taulog10m0 = taulog10m0,
-                 meanlog10nec = meanlog10nec, taulog10nec = taulog10nec,
-                 ndat = length(data$conc),
-                 bigtime = max(data$time) + 10))
-  } else {
-    return(list(log10necmin = log10(concmin),
-                log10necmax = log10(concmax),
-                log10ksmin = log10(ksmin),
-                log10ksmax = log10(ksmax),
-                log10kdmin = log10(kdmin),
-                log10kdmax = log10(kdmax),
-                log10m0min = log10(m0min),
-                log10m0max = log10(m0max)))
-  }
-}
-
-modelTKTDNorm <- "model {
-#########priors 
-log10ks ~ dnorm(meanlog10ks, taulog10ks)
-log10NEC ~ dnorm(meanlog10nec, taulog10nec)
-log10kd ~ dnorm(meanlog10kd, taulog10kd)
-log10m0 ~ dnorm(meanlog10m0, taulog10m0)
-
-#####parameter transformation
-ks <- 10**log10ks
-NEC <- 10**log10NEC
-kd <- 10**log10kd
-m0 <- 10**log10m0
-
-##########Computation of the likelihood
-for (i in 1:ndat)
-{
-  tNEC[i] <- ifelse(x[i] > NEC, -1/kd * log( 1- R[i]), bigtime)
-  R[i] <- ifelse(x[i] > NEC, NEC/xcor[i], 0.1)
-  xcor[i] <- ifelse(x[i] > 0, x[i], 10)
-  tref[i] <- max(tprec[i], tNEC[i])
-  
-  psurv[i] <- exp(-m0 * (t[i] - tprec[i]) + ifelse(t[i] > tNEC[i], -ks * ((x[i] - NEC) * (t[i] - tref[i]) + x[i]/kd * ( exp(-kd * t[i]) - exp(-kd * tref[i]))), 0))
-  
-  y[i] ~ dbin(psurv[i] , Nprec[i]) 
-}
-}"
-
-survTKTDPARAMS <- function(mcmc) {
-  # create the table of posterior estimated parameters
-  # for the survival analyses
-  # INPUT:
-  # - mcmc:  list of estimated parameters for the model with each item representing
-  # a chain
-  # OUTPUT:
-  # - data frame with 3 columns (values, CIinf, CIsup) and 3-4rows (the estimated
-  # parameters)
-  
-  # Retrieving parameters of the model
-  res.M <- summary(mcmc)
-  
-  kd <- 10^res.M$quantiles["log10kd", "50%"]
-  kdinf <- 10^res.M$quantiles["log10kd", "2.5%"]
-  kdsup <- 10^res.M$quantiles["log10kd", "97.5%"]
-  
-  ks <- 10^res.M$quantiles["log10ks", "50%"]
-  ksinf <- 10^res.M$quantiles["log10ks", "2.5%"]
-  kssup <- 10^res.M$quantiles["log10ks", "97.5%"]
-  nec <- 10^res.M$quantiles["log10NEC", "50%"]
-  necinf <- 10^res.M$quantiles["log10NEC", "2.5%"]
-  necsup <- 10^res.M$quantiles["log10NEC", "97.5%"]
-  
-  m0 <- 10^res.M$quantiles["log10m0", "50%"]
-  m0inf <- 10^res.M$quantiles["log10m0", "2.5%"]
-  m0sup <- 10^res.M$quantiles["log10m0", "97.5%"]
-  
-  # Definition of the parameter storage and storage data
-  
-  rownames <- c("kd", "ks", "nec", "m0")
-  params <- c(kd, ks, nec, m0)
-  CIinf <- c(kdinf, ksinf, necinf, m0inf)
-  CIsup <- c(kdsup, kssup, necsup, m0sup)
-  
-  res <- data.frame(median = params, Q2.5 = CIinf, Q97.5 = CIsup,
-                    row.names = rownames)
-  
-  return(res)
-}
-
 #' Fits a TKTD for survival analysis using Bayesian inference
 #' 
 #' This function estimates the parameters of a TKTD
@@ -207,44 +60,26 @@ survTKTDPARAMS <- function(mcmc) {
 survFitTKTD <- function(data,
                         n.chains = 3,
                         quiet = FALSE) {
+  
+  
+  warning("'survFitTKTD' is deprecated with morse version >= 3.0.0, please use the function 'survFit'")
+  
+  model_type = "SD"
+  
   # test class object
   if(!is(data, "survData"))
     stop("survFitTKTD: object of class survData expected")
   
-  # data transformation
-  data <- summarise(group_by(data, conc, time), N_alive = sum(Nsurv))
-  
-  n <- nrow(data)
-  data$tprec <- NA
-  data$Nprec <- NA
-  data$N_init <- NA
-  for (i in 1:n)
-  {
-    if (data$time[i] != 0)
-    {
-      data$tprec[i] <- data$time[i - 1]
-      data$Nprec[i] <- data$N_alive[i - 1]
-      data$N_init[i] <- data$N_alive[data$conc == data$conc[i] & data$time == 0]
-    }
-  }
-  
-  # control
-  datasurv0 <- subset(data, time == min(data$time[data$time != 0]))
-  datasurv0$time <- 0
-  datasurv0$N_alive <- datasurv0$N_init
-  data[is.na(data$tprec),
-       c("tprec", "Nprec", "N_init")] <- datasurv0[, c("tprec", "Nprec", "N_init")]
-  
-  jags.data <- survTKTDCreateJagsData(data, FALSE)
+  jags.data <- priors(data, model_type)$priorsList
   
   # Define model
   
-  model <- survLoadModel(model.program = modelTKTDNorm,
+  model <- survLoadModel(model.program = jags_TKTD_cstSD,
                          data = jags.data, n.chains,
                          Nadapt = 3000, quiet)
   
   # Determine sampling parameters
-  parameters <- c("log10kd", "log10NEC","log10ks", "log10m0")
+  parameters <- c("kd_log10", "z_log10","kk_log10", "hb_log10")
   
   sampling.parameters <- modelSamplingParameters(model,
                                                  parameters, n.chains, quiet)
@@ -260,12 +95,47 @@ survFitTKTD <- function(data,
                        thin = sampling.parameters$thin,
                        progress.bar = prog.b)
   
-  # summarize estime.par et CIs
-  # calculate from the estimated parameters
-  estim.par <- survTKTDPARAMS(mcmc)
-  
   # check the posterior range
-  priorBonds <- survTKTDCreateJagsData(data, TRUE)
+  priorsData <- priors(data, model_type)$priorsMinMax
+  
+  ##
+  ## Cheking posterior range with data from experimental design:
+  ##
+  
+  estim.par <- survTKTDPARAMS(mcmc, model_type = model_type)
+  
+  if (filter(estim.par, parameters == "kd")$Q97.5 > priorsData$kd_max){
+    warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+            call. = FALSE)
+  }
+  if (filter(estim.par, parameters == "hb")$Q2.5 < priorsData$hb_min){
+    warning("The estimation of the natural instantaneous mortality rate (model parameter hb) lies outside the range used to define its prior distribution which indicates that this rate is very low and so difficult to estimate from this experiment !",
+            call. = FALSE)
+  }
+  
+  ### for SD model
+  if(model_type == "SD"){
+    if (filter(estim.par, parameters == "kk")$Q97.5 > priorsData$kk_max)
+      warning("The estimation of the killing rate (model parameter k) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
+              call. = FALSE)
+    
+    if (filter(estim.par, parameters == "z")$Q2.5 < priorsData$conc_min ||
+        filter(estim.par, parameters == "z")$Q97.5 > priorsData$conc_max)
+      warning("The estimation of Non Effect Concentration threshold (NEC) (model parameter z) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
+              call. = FALSE)
+    
+  }
+  
+  ### for IT model
+  if(model_type == "IT"){
+    
+    if (filter(estim.par, parameters == "alpha")$Q2.5 < priorsData$conc_min ||
+        filter(estim.par, parameters == "alpha")$Q97.5 > priorsData$conc_max)
+      warning("The estimation of log-logistic median (model parameter alpha) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
+              call. = FALSE)
+    
+  }
+  
   
   if (log10(estim.par["ks", "Q97.5"]) > priorBonds$log10ksmax)
     warning("The estimation of the killing rate (model parameter ks) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
