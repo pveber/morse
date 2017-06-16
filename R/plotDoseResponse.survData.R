@@ -80,6 +80,13 @@ plotDoseResponse.survDataCstC <- function(x,
     dplyr::summarise(Nsurv = sum(Nsurv)) %>%
     ungroup()
   
+  # create column Ninit
+  x <- x %>%
+    dplyr::group_by(profile) %>%
+    # survDataCheck checked that Nsurv was decreasing in each profile and the present of time == 0
+    dplyr::mutate(Ninit = max(Nsurv))
+  
+  
   x$resp <- x$Nsurv / x$Ninit
   # select the target.time
   xf <- filter(x, x$time == target.time)
