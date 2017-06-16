@@ -74,11 +74,6 @@ survFit.survDataCstC <- function(data,
   ### time start
   time_start <- Sys.time()
   
-  ### class of object
-  if(!is(data, "gm_survData")){
-    stop("gm_survFitTKTD: object of class 'gm_survData' expected")
-  }
-  
   ### ensures model_type is one of "SD" and "IT"
   if(is.null(model_type)) {
     stop("You need to specify a 'model_type': 'SD' or 'IT'")
@@ -96,14 +91,14 @@ survFit.survDataCstC <- function(data,
   ## Data and Priors for model
   ##
   
-  globalData = gm_modelData(data,
-                            model_type = model_type)
+  globalData = modelData(data,
+                         model_type = model_type)
   
   modelData_ = globalData$modelData
-  modelData = modelData_ ; modelData$profile = NULL
+  modelData = modelData_ ; modelData$replicate = NULL
   
   modelData_Null_ = globalData$modelData_Null
-  modelData_Null = modelData_Null_ ; modelData_Null$profile = NULL
+  modelData_Null = modelData_Null_ ; modelData_Null$replicate = NULL
   
   priorsData = globalData$priorsMinMax
   
@@ -137,19 +132,20 @@ survFit.survDataCstC <- function(data,
                          data = modelData,
                          n.chains = nbr.chain,
                          Nadapt = nbr.adapt,
-                         quiet = TRUE)
+                         quiet = quiet)
   
   
   ##
   ## estimate the number of iteration required for convergency of chains
   ## by using the raftery.diag
   ##
-  
+
   if(is.null(nbr.warmup) | is.null(nbr.thin) | is.null(nbr.iter)){
+  
     
     sampling.parameters <- modelSamplingParameters(model,
                                                    parameters_red,
-                                                   n.chains = nbr.chain)
+                                                   n.chains = nbr.chain, quiet)
     if (sampling.parameters$niter > 5e5)
       stop("The model needs too many iterations to provide reliable parameter estimates !")
     
@@ -165,8 +161,7 @@ survFit.survDataCstC <- function(data,
   mcmc_Null =  coda.samples(model_Null,
                             variable.names = parameters_red,
                             n.iter = nbr.iter,
-                            thin = nbr.thin,
-                            quiet = TRUE)
+                            thin = nbr.thin)
   
   ### model to check priors with the model
   update(model, nbr.warmup)
@@ -179,7 +174,7 @@ survFit.survDataCstC <- function(data,
   ## Cheking posterior range with data from experimental design:
   ##
   
-  estim.par <- gm_survTKTDPARAMS(mcmc, model_type = model_type)
+  estim.par <- survTKTDPARAMS(mcmc, model_type = model_type)
   
   if (filter(estim.par, parameters == "kd")$Q97.5 > priorsData$kd_max){
     warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
@@ -235,7 +230,6 @@ survFit.survDataCstC <- function(data,
               mcmcInfo = mcmcInfo,
               modelData = modelData_,
               model_type = model_type,
-              cst_conc = cst_conc,
               estim.par = estim.par)
 
   class(OUT) <- "survFitCstC"
