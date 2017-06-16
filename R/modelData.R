@@ -31,7 +31,7 @@ modelData.survDataCstC <- function(x_survData, model_type = NULL){
     dplyr::mutate(replicate_ID = group_indices_(., .dots="replicate")) %>%
     dplyr::group_by(replicate) %>%
     dplyr::arrange(replicate, time) %>%
-    dplyr::mutate(tprec = ifelse(time == 0, time, dply::lag(time)),
+    dplyr::mutate(tprec = ifelse(time == 0, time, dplyr::lag(time)),
                   Nprec = ifelse( time == 0, Nsurv, dplyr::lag(Nsurv) ),
                   time_ID = row_number()) %>%
     dplyr::ungroup() %>%
@@ -45,7 +45,7 @@ modelData.survDataCstC <- function(x_survData, model_type = NULL){
   ##
   
   # return priors for model
-  priorsData = priors(x_survData, model_type)
+  priorsData = priors_survData(x_survData, model_type)
   
   modelData = priorsData$priorsList
   
@@ -145,7 +145,7 @@ modelData.survDataVarC <- function(x_survData,
   ##
   
   # return priors for model
-  priorsData = gm_priors(x_survData = x_survData, model_type = model_type)
+  priorsData = priors_survData(x_survData = x_survData, model_type = model_type)
   
   modelData = priorsData$priorsList
   

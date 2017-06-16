@@ -27,12 +27,12 @@ survFit <- function(x, ...){
 #' @export
 
 
-priors <- function(x, ...){
-  UseMethod("priors")
-}
+# priors <- function(x, ...){
+#   UseMethod("priors")
+# }
 
 
-priors.survData <- function(x, model_type = NULL){
+priors_survData <- function(x, model_type = NULL){
   
   data <- filter(x, time != 0)
   
@@ -77,14 +77,14 @@ priors.survData <- function(x, model_type = NULL){
   beta_maxlog10 <- 2
   
   priorsMinMax<- list(
-    conc_min <- conc_min,
-    conc_max <- conc_max,
+    conc_min = conc_min,
+    conc_max = conc_max,
     
-    kd_min <- kd_min,
-    kd_max <- kd_max,
+    kd_min = kd_min,
+    kd_max = kd_max,
     
-    hb_min <- hb_min,
-    hb_max <- hb_max
+    hb_min = hb_min,
+    hb_max = hb_max
     
   )
   
