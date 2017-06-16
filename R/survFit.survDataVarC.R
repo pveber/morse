@@ -122,7 +122,7 @@ survFit.survDataVarC <- function(data,
     
     sampling.parameters <- modelSamplingParameters(model,
                                                    parameters_red,
-                                                   n.chains = nbr.chain)
+                                                   n.chains = nbr.chain, quiet)
     if (sampling.parameters$niter > 5e5)
       stop("The model needs too many iterations to provide reliable parameter estimates !")
     
@@ -208,7 +208,6 @@ survFit.survDataVarC <- function(data,
               mcmcInfo = mcmcInfo,
               modelData = modelData_,
               model_type = model_type,
-              cst_conc = cst_conc,
               estim.par = estim.par)
   
   class(OUT) <- "survFitVarC"
