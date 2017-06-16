@@ -285,3 +285,54 @@ survDataPlotFixedConc <- function(x,
   dataPlotFixedConc(x, xlab, ylab, main, "Nsurv", concentration,
                     style, addlegend, remove.someLabels)
 }
+
+
+# general full plot (ggplot variant): one subplot for each replicate,
+#' @import ggplot2
+
+survDataPlotFull_VarC <- function(data, x.lab, y.lab) {
+
+
+    data_plt = filter( data , !is.na(Nsurv))
+    
+    if(!is.null(facetting.level)){
+      data_plt$replicate = factor(data_plt$replicate, levels = facetting.level)
+    }
+    
+    
+    plt_g = ggplot(data_plt, aes(x = time, y = Nsurv, group = replicate, color = conc)) +
+      theme_minimal() +
+      theme(
+        ## facet elements
+        # strip.background = element_rect(fill="orange", colour = "orange"),
+        # strip.text = element_text(colour = "grey30"),
+        ## legend
+        legend.title = element_text(size = 9),
+        legend.text=element_text(size = 7),
+        legend.key.width = unit(0.3, "in"),
+        legend.key.height = unit(0.15, "in"),
+        legend.position = "top"
+      ) +
+      labs(title = lab.main,
+           x = x.lab,
+           y = y.lab,
+           colour = "Concentration" # legend title
+      ) +
+      scale_colour_gradient(
+        name="Concentration",
+        low="grey40", high="red"
+      ) +
+      scale_fill_gradient(
+        name="Concentration",
+        low="grey40", high="red"
+      ) +
+      expand_limits(x = 0, y = 0) +
+      geom_point() +
+      geom_line() +
+      facet_wrap(~ replicate, ncol = 2)
+
+    plt <- plt_g + theme(legend.position = "none") # remove legend
+    
+    return(plt)
+}
+
