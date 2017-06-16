@@ -82,7 +82,7 @@ survDataCheck <- function(... , diagnosis.plot = TRUE){
 #' @importFrom stringr str_c
 #' 
 #' @export
-survDataCheckCstC <- function(..., diagnosis.plot) {
+survDataCheckCstC <- function(..., diagnosis.plot = TRUE) {
 
   ls_data <- list(...)
   
@@ -235,7 +235,7 @@ survDataCheckCstC <- function(..., diagnosis.plot) {
 #'
 #' @export
 #' 
-survDataCheckVarC <- function(..., diagnosis.plot) {
+survDataCheckVarC <- function(..., diagnosis.plot = TRUE) {
   
   ls_data <- list(...)
   
