@@ -89,9 +89,10 @@ plotDoseResponse.survDataCstC <- function(x,
   
   x$resp <- x$Nsurv / x$Ninit
   # select the target.time
-  xf <- filter(x, time == target.time)
+  xf <- x %>% dplyr::filter(time == target.time)
   
-  conf.int <- survConfInt(xf, log.scale)
+  # Binomial confidence interval
+  xf <- binom_test(xf)
   
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) xf$conc > 0 else TRUE
@@ -108,7 +109,7 @@ plotDoseResponse.survDataCstC <- function(x,
   # x$color <- as.numeric(as.factor(x$profile))
   
   if (style == "generic") {
-    plot(transf_data_conc, seq(0, max(conf.int["qsup95",]),
+    plot(transf_data_conc, seq(0, max(x$conf.high),
                                length.out = length(transf_data_conc)),
          type = "n",
          xaxt = "n",
@@ -128,10 +129,11 @@ plotDoseResponse.survDataCstC <- function(x,
     
     # segment CI
     segments(transf_data_conc, x$resp,
-             transf_data_conc, conf.int["qsup95", ])
+             transf_data_conc, x$conf.high)
+            
     
     segments(transf_data_conc, x$resp,
-             transf_data_conc, conf.int["qinf95", ])
+             transf_data_conc, x$conf.low)
     
     # add legend
     if (addlegend) {
@@ -152,15 +154,14 @@ plotDoseResponse.survDataCstC <- function(x,
                      display.conc,
                      Points = "Observed values")
     dfCI <- data.frame(conc = transf_data_conc,
-                       qinf95 = conf.int["qinf95",],
-                       qsup95 = conf.int["qsup95",],
+                       qinf95 = x$conf.low, 
+                       qsup95 = x$conf.high,
                        Conf.Int = "Confidence intervals")
     
     fd <- ggplot(df) +
       geom_point(aes(x = transf_data_conc, y = resp, fill = Points),
                  data = df, col = valCols$cols1) +
-      geom_segment(aes(x = conc, xend = conc, y = qinf95,
-                       yend = qsup95,
+      geom_segment(aes(x = conc, xend = conc, y = qinf95, yend = qsup95,
                        linetype = Conf.Int),
                    dfCI, col = valCols$cols3) +
       scale_fill_hue("") +
@@ -189,22 +190,21 @@ if (addlegend) {
 }
 
 #' @importFrom stats aggregate binom.test
-survConfInt <- function(x, log.scale) {
+#' @importFrom broom package
+#' 
+binom_test <- function(x){
   # compute confidente interval on observed data
   # binomial model by a binomial test
   # INPUT:
   # - x : object of class survFitTT
-  # - log.scale : boolean
   # OUTPUT:
   
-  # - ci : confidente interval
-  ci <- apply(x, 1, function(x) {
-    binom.test(x["Nsurv"], x["Ninit"])$conf.int
-  })
-  rownames(ci) <- c("qinf95", "qsup95")
-  colnames(ci) <- x$conc
+  df_binom_test <- x %>%
+    dplyr::group_by(profile, time) %>%
+    do(broom::tidy(binom.test(.$Nsurv,.$Ninit)))
   
-  if (log.scale) ci <- ci[ ,colnames(ci) != 0]
+  df_with_binom_test <- full_join(x, df_binom_test,
+                                  by = c("profile", "time"))
   
-  return(ci)
+  return(df_with_binom_test)
 }
