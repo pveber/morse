@@ -11,7 +11,7 @@
 #' @param data An object of class \code{survModelData}.
 #' @param n.chains Number of MCMC chains. The minimum required number of chains
 #' is 2.
-#' @return The function returns an object of class \code{gm_survFitTKTD}, which is
+#' @return The function returns an object of class \code{survFitVarC}, which is
 #' a list with the following fields:
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
 #' distributions}
