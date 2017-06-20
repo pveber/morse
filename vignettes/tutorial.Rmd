@@ -50,7 +50,8 @@ the package (like `cadmium2`). First, we load the dataset and use the function
 
 ```{r, cache=TRUE}
 data(cadmium2)
-survDataCheck(cadmium2)
+cadmium2 <- select(cadmium2, - replicate_ID)
+survDataCheck(cadmium2) 
 ```
 
 ## Step 2: create a `survData` object
@@ -92,7 +93,7 @@ at a given time point as a function of the concentration, by using the function
 `plot.DoseResponse` and by fixing `target.time`:
 
 ```{r, cache=TRUE}
-# plotDoseResponse(dat, target.time = 21, style = "ggplot", addlegend = TRUE)
+plotDoseResponse(dat, target.time = 21, style = "ggplot", addlegend = TRUE)
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
@@ -165,9 +166,19 @@ range of tested concentrations, as in the following example:
 
 ```{r, results="hide", cache=TRUE}
 data("cadmium1")
+```
+
+```{r, cache=TRUE, eval=FALSE}
 wrong_fit <- survFitTT(survData(cadmium1),
                        target.time = 21,
                        lcx = c(10, 20, 30, 40, 50))
+```
+
+
+```{r, results="hide", cache=TRUE}
+# save(wrong_fit , file = "vignettes/wrong_fit .Rdata")
+load("wrong_fit .Rdata")
+
 plot(wrong_fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
      addlegend = TRUE)
 ```
@@ -205,16 +216,20 @@ As replicates are shifted on the x-axis, the bisecting line (y = x), is
 represented by steps, and is added to the plot in order to see if each
 prediction interval contains each observed value.
 
-# Survival analysis using a toxico-kinetic toxico-dynamic model
+# Survival analysis using a toxico-kinetic toxico-dynamic (TKTD) model
 
 The steps for TKTD data analysis are absolutely analogous to what we
 described for the analysis at target time. Here the goal is to estimate the relation
 between pollutant concentration, time and survival rate.
 
+## TKTD model with constant exposure concentration
+
+### Survival Analysis of Stochastic Death (SD) model
+
 Here is a typical session:
 ```{r TKTD 1, cache=TRUE}
 # (1) load dataset
-data(propiconazole)
+data(propiconazole) ; propiconazole <- select(propiconazole, - replicate_ID)
 
 # (2) check structure and integrity of the dataset
 survDataCheck(propiconazole)
@@ -245,7 +260,6 @@ load("fit_cstSD.Rdata")
 summary(fit_cstSD)
 ```
 
-
 ```{r, cache=TRUE}
 # plot(fit_cstSD, style = "ggplot", adddata = TRUE, one.plot = FALSE)
 ```
@@ -258,7 +272,7 @@ summary(fit_cstSD)
 # summary(fit_cstSD)
 ```
 
-## Survival Analysis of IT model
+### Survival Analysis of Individual Tolerance (IT) model
 
 Only change `model_type` to `IT`:
 
@@ -284,6 +298,12 @@ load("fit_cstIT.Rdata")
 # summary(fit_cstIT)
 ```
 
+
+## TKTD model with time-variable exposure concentration
+
+### Survival Analysis of Stochastic Death (SD) model
+
+### Survival Analysis of Individual Tolerance (IT) model
 
 # Reproduction data analyses
 
