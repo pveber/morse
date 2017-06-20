@@ -232,6 +232,6 @@ survFit.survDataCstC <- function(data,
               model_type = model_type,
               estim.par = estim.par)
 
-  class(OUT) <- "survFitCstC"
+  class(OUT) <- c("survFitCstC","survFit")
   return(OUT)
 }

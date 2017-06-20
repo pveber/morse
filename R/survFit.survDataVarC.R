@@ -210,6 +210,6 @@ survFit.survDataVarC <- function(data,
               model_type = model_type,
               estim.par = estim.par)
   
-  class(OUT) <- "survFitVarC"
+  class(OUT) <- c("survFitVarC","survFit")
   return(OUT)
 }
