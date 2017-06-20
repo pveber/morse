@@ -25,12 +25,11 @@
 #' @export
 
 plot.survDataVarC <- function(data,
-                             lab.x = "Time",
-                             lab.y = "Number of surviving individuals",
-                             lab.main = NULL,
+                             xlab = "Time",
+                             ylab = "Number of survivors",
+                             mainlab = NULL,
                              facetting = TRUE,
                              facetting.level = NULL){
-  
   
   data_plt = filter( data , !is.na(Nsurv))
   
@@ -42,8 +41,8 @@ plot.survDataVarC <- function(data,
     theme_minimal() +
     theme(
       ## facet elements
-      strip.background = element_rect(fill="orange", colour = "orange"),
-      strip.text = element_text(colour = "grey30"),
+      strip.background = element_rect(fill="white", colour = "white"),
+      strip.text = element_text(colour = "black"),
       ## legend
       legend.title = element_text(size = 9),
       legend.text=element_text(size = 7),
@@ -51,9 +50,9 @@ plot.survDataVarC <- function(data,
       legend.key.height = unit(0.15, "in"),
       legend.position = "top"
     ) +
-    labs(title = lab.main,
-         x = lab.x,
-         y = lab.y,
+    labs(title = mainlab,
+         x = xlab,
+         y = ylab,
          colour = "Concentration" # legend title
     ) +
     scale_colour_gradient(
