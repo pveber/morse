@@ -51,21 +51,29 @@ plot.survFit <- function(x,
                          xlab = "Time",
                          ylab = NULL,
                          mainlab = NULL,
-                         data_type = "probability") {
-  
- 
+                         data_type = "probability",
+                         facetting = TRUE,
+                         facet.label = "replicate") {
+
+
   ### compute posteriors median and 95 CI
   modelData = x$modelData
-  
+
   postData = posteriorData(x$mcmc, model_type = x$model_type)
-  
+
   if(data_type == "probability"){
-    
+
     ylab = "Survival rate"
     
     df_plt = data_frame(Nsurv = modelData$Nsurv,
                         time = modelData$time,
-                        replicate = modelData$replicate) %>%
+                        replicate = modelData$replicate)
+
+    if(!is.null(modelData$conc)){
+      df_plt$conc = modelData$conc
+    }
+    
+    df_plt = df_plt %>%
       group_by(replicate) %>%
       mutate(Ninit = max(Nsurv)) %>%
       ungroup() %>%
@@ -73,12 +81,12 @@ plot.survFit <- function(x,
              Y_q50 = apply(postData$df_psurv, 2, quantile, probs = 0.5, na.rm = TRUE),
              Y_qinf95 = apply(postData$df_psurv, 2, quantile, probs = 0.025, na.rm = TRUE),
              Y_qsup95 = apply(postData$df_psurv, 2, quantile, probs = 0.975, na.rm = TRUE))
-    
-    
+
+
   } else if(data_type == "number"){
-    
+
     ylab = "Number of survivors"
-    
+
     df_plt = data_frame(Y = modelData$Nsurv,
                         time = modelData$time,
                         replicate = modelData$replicate,
@@ -86,10 +94,14 @@ plot.survFit <- function(x,
                         Y_qinf95 = apply(postData$df_sim, 2, quantile, probs = 0.025, na.rm = TRUE),
                         Y_qsup95 = apply(postData$df_sim, 2, quantile, probs = 0.975, na.rm = TRUE))
     
+    if(!is.null(modelData$conc)){
+      df_plt$conc = modelData$conc
+    }
+
   } else stop("type must be 'probability' (i.e., probability of survival) or 'number' (i.e., number of survivors)")
-  
-  
-  plt_fit = df_plt %>%
+
+
+  plt_fit <- df_plt %>%
     ggplot() + theme_bw() +
     theme(legend.position="none") +
     expand_limits(x = 0, y = 0) +
@@ -110,14 +122,23 @@ plot.survFit <- function(x,
                     ymin = Y_qinf95,
                     ymax = Y_qsup95 ,
                     group = replicate), fill = "orange", alpha = 0.4, color = "grey90") +
-    geom_line(aes(x = time,
+    geom_step(aes(x = time,
                   y = Y_q50,
                   group = replicate )) +
     geom_point(aes(x = time,
                    y = Y,
-                   group = replicate )) +
-    facet_wrap(~ replicate)
+                   group = replicate ))
   
-  return(plt_fit)
+  ##
+  ## facetting
+  ##
+  if(facetting == TRUE){
+    if(facet.label == "replicate"){
+      OUT_fit <- plt_fit + facet_wrap(~ replicate)
+    } else if (facet.label == "conc"){
+      OUT_fit <- plt_fit + facet_wrap(~ conc)
+    } else stop("'facet.label' is either 'replicate' (default) or 'conc'.")
+  }
+  
+  return(OUT_fit)
 }
-
