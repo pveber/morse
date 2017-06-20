@@ -140,7 +140,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   
   df_checkSurvIncrease <- data %>%
-    filter(Nsurv != NA) %>%
+    filter(!is.na(Nsurv)) %>%
     group_by(replicate) %>%
     arrange(time) %>%
     mutate(Nprec = ifelse(time == 0, Nsurv, lag(Nsurv))) %>%
@@ -156,18 +156,18 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   
   df_checkMaxTimeSurv <- data %>%
-    filter(Nsurv != NA) %>%
+    filter(!is.na(Nsurv)) %>%
     group_by(replicate) %>%
     filter(time == max(time))
   
   df_checkMaxTimeConc <- data %>%
-    filter(conc != NA) %>%
+    filter(!is.na(conc)) %>%
     group_by(replicate) %>%
     filter(time == max(time))
   
   if(!all(df_checkMaxTimeConc$time >= df_checkMaxTimeSurv$time) ){
     msg <- "In each 'replicate', maximum time for concentration record should
-    be greater or equal to maximum time in survival data observation".
+    be greater or equal to maximum time in survival data observation."
     errors <- errorTableAdd(errors, "maxTimeDiffer", msg)
   }
   
@@ -177,7 +177,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     if(tst_cst){
       survDataPlotFull(data, ylab = "Number of survivors")
     } else{
-      survDataPlotFull_Var(data, ylab = "Number of survivors")
+      survDataPlotFull_VarC(data, ylab = "Number of survivors")
     }
   }
   
