@@ -87,7 +87,8 @@ test_cst_conc = function(x){
 
 #' Join two datasets and creates a survData object for survival analysis
 #'
-#' This function join two datasets and creates a \code{survData} object from experimental data
+#' This function joins two datasets and creates a \code{survData} object from
+#' experimental data
 #' provided by two \code{data.frame}. The resulting object
 #' can then be used for plotting and model fitting.
 #'
@@ -128,18 +129,10 @@ test_cst_conc = function(x){
 #' 
 #' @export
 #' 
-survData_join(data_x, data_y){
+survData_join <- function(data_x, data_y){
   
   ##
-  ## 1 check column number
-  ##
-  
-  if ( ncol(data_x) != 3  | ncol(data_y) != 3  ) {
-    stop("Object must have 3 columns: 'replicate','time' and 'Nsurv' and 'replicate','time' and 'conc'")
-  }
-  
-  ##
-  ## 2 assert column names are correct and assign join data_x or data_y to corresponding data.frame
+  ## 1 assert column names are correct and assign join data_x or data_y to corresponding data.frame
   ##
   ref.names_surv <- c("replicate","time","Nsurv")
   ref.names_conc <- c("replicate","time","conc")
@@ -161,8 +154,8 @@ survData_join(data_x, data_y){
     
   }
   
-  OUT_df <- survData(join_df) 
+  # OUT_df <- survData(join_df) 
   
-  return(OUT_df)
+  return(join_df)
   
 }
