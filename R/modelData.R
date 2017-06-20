@@ -45,7 +45,7 @@ modelData.survDataCstC <- function(x_survData, model_type = NULL){
   ##
   
   # return priors for model
-  priorsData = priors_survData(x_survData, model_type)
+  priorsData = priors_survData(x = x_survData, model_type)
   
   modelData = priorsData$priorsList
   
@@ -145,7 +145,7 @@ modelData.survDataVarC <- function(x_survData,
   ##
   
   # return priors for model
-  priorsData = priors_survData(x_survData = x_survData, model_type = model_type)
+  priorsData = priors_survData(x = x_survData, model_type = model_type)
   
   modelData = priorsData$priorsList
   
