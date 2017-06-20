@@ -47,7 +47,6 @@ priors_survData <- function(x, model_type = NULL){
   conc_unicPrec <- dplyr::lag(conc_unic)
   conc_minDelta <- min(conc_unic - conc_unicPrec, na.rm = TRUE)
   
-  
   ##
   ## dominant rate constant: kd
   ##
@@ -236,4 +235,40 @@ survTKTDPARAMS <- function(mcmc, model_type) {
     }
     
     return(res)
+}
+
+###############################################################################
+#
+#      posteriorData
+#
+###############################################################################
+
+
+# To retrive posterior object from a gm_survFitTKTD object
+#
+
+posteriorData = function(mcmc, model_type){
+  mctot <- do.call("rbind", mcmc)
+  
+  df_mctot = as_data_frame(mctot)
+  
+  df_psurv = select(df_mctot, contains("psurv"))
+  df_ppc = select(df_mctot, contains("Nsurv_ppc"))
+  df_sim = select(df_mctot, contains("Nsurv_sim"))
+  
+  if(model_type == "SD"){
+    
+    df_param = select(df_mctot, c(kd_log10, hb_log10, kk_log10, z_log10))
+    
+  } else if(model_type == "IT"){
+    
+    df_param = select(df_mctot, c(kd_log10, hb_log10, alpha_log10, beta_log10))
+  }
+  
+  ls_posteriorData = list( df_psurv = df_psurv,
+                           df_ppc = df_ppc,
+                           df_sim = df_sim,
+                           df_param = df_param)
+  
+  return(ls_posteriorData)
 }
