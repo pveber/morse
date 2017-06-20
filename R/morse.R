@@ -308,30 +308,24 @@ NULL
 NULL
 
 #' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
-#' during 4 days with constant exposure concentration and 10 days with time variable
+#' during 10 days with time variable
 #' exposure concentration (non-standard pulsed toxicity experiment)
 #'
 #' Survival datasets of laboratory bioassays with \emph{Gammarus pulex} 
 #' freshwater invertebrate exposed to several profiles of concentrations
-#' of one fungicide (propiconazole) (constant & pulsed). 
+#' of one fungicide (propiconazole). 
 #'
 #'
-#' @name propiconazole_varC_conc
+#' @name propiconazole_pulse_exposure_conc
 #' @docType data
-#' @usage data(propiconazole_varC_conc)
-#' @format A data frame with 102 observations on the following four variables:
+#' @usage data(propiconazole_pulse_exposure_conc)
+#' @format A data frame with 65 observations on the following three variables:
 #' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
 #' replicate code.}
 #' \item{\code{conc}}{A vector of class \code{numeric} with propiconazole
 #' concentrations in \eqn{mg.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
-#' (in days from the beginning of the experiment \eqn{t = 0}).}
-#' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
-#' alive individuals at each time point for each concentration and each
-#' replicate.}
-#' \item{\code{concType}}{A vector of class \code{factor} with the type of
-#'  experiment, \code{cst} for four day acute toxicity study with constant 
-#'  concentration and \code{var} for 10 days non-standard pulsed toxicity experiment.}}
+#' (in days from the beginning of the experiment \eqn{t = 0}).}}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
 #' propiconazole: model assumptions, calibration data requirements and predictive 
@@ -341,28 +335,54 @@ NULL
 NULL
 
 #' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
-#' during 4 days with constant exposure concentration and 10 days with time variable
+#' during 10 days with time variable
 #' exposure concentration (non-standard pulsed toxicity experiment)
 #'
 #' Survival datasets of laboratory bioassays with \emph{Gammarus pulex} 
 #' freshwater invertebrate exposed to several profiles of concentrations
-#' of one fungicide (propiconazole) (constant & pulsed). 
+#' of one fungicide (propiconazole). 
 #'
 #'
-#' @name propiconazole_varC_Nsurv
+#' @name propiconazole_pulse_exposure_Nsurv
 #' @docType data
-#' @usage data(propiconazole_varC_Nsurv)
-#' @format A data frame with 84 observations on the following four variables:
+#' @usage data(propiconazole_pulse_exposure_Nsurv)
+#' @format A data frame with 44 observations on the following three variables:
 #' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
 #' replicate code.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
 #' (in days from the beginning of the experiment \eqn{t = 0}).}
 #' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
 #' alive individuals at each time point for each concentration and each
-#' replicate.}
-#' ' \item{\code{concType}}{A vector of class \code{factor} with the type of
-#'  experiment, \code{cst} for four day acute toxicity study with constant 
-#'  concentration and \code{var} for 10 days non-standard pulsed toxicity experiment.}}
+#' replicate.}}
+#' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
+#' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
+#' propiconazole: model assumptions, calibration data requirements and predictive 
+#' power, \emph{Ecotoxicology}, (21), 1828-1840.
+#' 
+#' @keywords datasets
+NULL
+
+#' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
+#' during 10 days with time variable
+#' exposure concentration (non-standard pulsed toxicity experiment)
+#'
+#' Survival datasets of laboratory bioassays with \emph{Gammarus pulex} 
+#' freshwater invertebrate exposed to several profiles of concentrations
+#' of one fungicide (propiconazole). 
+#'
+#' @name propiconazole_pulse_exposure
+#' @docType data
+#' @usage data(propiconazole_pulse_exposure)
+#' @format A data frame with 74 observations on the following four variables:
+#' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
+#' replicate code.}
+#' \item{\code{conc}}{A vector of class \code{numeric} with propiconazole
+#' concentrations in \eqn{mg.L^{-1}}.}
+#' \item{\code{time}}{A vector of class \code{integer} with the time points
+#' (in days from the beginning of the experiment \eqn{t = 0}).}
+#' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
+#' alive individuals at each time point for each concentration and each
+#' replicate.}}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
 #' propiconazole: model assumptions, calibration data requirements and predictive 
