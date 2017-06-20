@@ -190,7 +190,7 @@ if (addlegend) {
 }
 
 #' @importFrom stats aggregate binom.test
-#' @importFrom broom package
+#' @importFrom broom tidy
 #' 
 binom_test <- function(x){
   # compute confidente interval on observed data
