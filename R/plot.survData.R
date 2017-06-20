@@ -43,9 +43,9 @@
 #' @importFrom stats aggregate
 #'
 #' @export
-plot.survData <- function(x,
+plot.survDataCstC <- function(x,
                           xlab,
-                          ylab = "Number of surviving individuals",
+                          ylab = "Number of survivors",
                           main = NULL,
                           concentration = NULL,
                           style = "generic",
@@ -290,10 +290,15 @@ survDataPlotFixedConc <- function(x,
 # general full plot (ggplot variant): one subplot for each replicate,
 #' @import ggplot2
 
-survDataPlotFull_VarC <- function(data, x.lab, y.lab) {
+survDataPlotFull_VarC <- function(data, xlab, ylab, mainlab = NULL, facetting.level=NULL) {
 
 
     data_plt = filter( data , !is.na(Nsurv))
+    
+    if (missing(xlab)) xlab <- "Time"
+    
+    if (missing(ylab)) ylab <- "Number of survivors"
+    
     
     if(!is.null(facetting.level)){
       data_plt$replicate = factor(data_plt$replicate, levels = facetting.level)
@@ -313,9 +318,9 @@ survDataPlotFull_VarC <- function(data, x.lab, y.lab) {
         legend.key.height = unit(0.15, "in"),
         legend.position = "top"
       ) +
-      labs(title = lab.main,
-           x = x.lab,
-           y = y.lab,
+      labs(title = mainlab,
+           x = xlab,
+           y = ylab,
            colour = "Concentration" # legend title
       ) +
       scale_colour_gradient(
