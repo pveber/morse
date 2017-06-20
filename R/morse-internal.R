@@ -17,7 +17,7 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c(
 #'
 idCreate <- function(data) {
   str_c(data[, "replicate"],
-        data[, "conc"],
+        # data[, "conc"],
         data[, "time"],
         sep = "_")
 }
