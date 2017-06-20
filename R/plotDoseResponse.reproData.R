@@ -81,7 +81,7 @@ plotDoseResponse.reproData <- function(x,
   x$resp <- x$Nreprocumul / x$Nindtime
   
   # select the target.time
-  xf <- filter(x, x$time == target.time)
+  xf <- filter(x, time == target.time)
   
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) xf$conc > 0 else TRUE
