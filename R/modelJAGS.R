@@ -1,5 +1,5 @@
 #
-# jags_TKTD_cstSD is the JAGS model used in `MORSE` 2.Y.Z packages in the function `survFitTKTD()`
+# jags_TKTD_cstSD is the JAGS model used in `MORSE` 2.Y.Z packages in the function `survFit()`
 #
 jags_TKTD_cstSD <-
   "model {

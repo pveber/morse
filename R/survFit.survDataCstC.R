@@ -13,7 +13,7 @@
 #' is 2.
 #' @param quiet If \code{FALSE}, prints logs and progress bar from JAGS.
 #' 
-#' @return The function returns an object of class \code{survFitTKTD}, which is
+#' @return The function returns an object of class \code{survFitCstC}, which is
 #' a list with the following fields:
 #' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
 #' credible intervals}
@@ -39,8 +39,8 @@
 #' dat <- survData(propiconazole)
 #' 
 #' \dontrun{
-#' # (3) Run the survFitTKTD function
-#' out <- survFitTKTD(dat)
+#' # (3) Run the survFit function
+#' out <- survFit(dat)
 #' 
 #' # (4) Summary look the estimated values (parameters)
 #' summary(out)
