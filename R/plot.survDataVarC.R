@@ -14,9 +14,6 @@
 #'
 #' @keywords plot
 #'
-#' @examples
-#'
-#'
 #' @import ggplot2
 #' @importFrom graphics plot axis legend lines par points title
 #' @importFrom methods is

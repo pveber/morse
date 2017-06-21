@@ -46,6 +46,7 @@
 #' survDataCheck(zinc, diagnosis.plot = TRUE)
 #'
 #' @importFrom stringr str_c
+#' @importFrom magrittr '%>%'
 #' 
 #' @export
 survDataCheck <- function(data, diagnosis.plot = TRUE) {

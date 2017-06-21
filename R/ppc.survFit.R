@@ -18,9 +18,6 @@
 #' @param style graphical backend
 #' @param \dots Further arguments to be passed to generic methods
 #'
-#' @examples
-#'
-#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot

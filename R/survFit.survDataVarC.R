@@ -25,9 +25,6 @@
 #'
 #' @keywords estimation
 #
-#' @examples
-#'
-#'
 #' @export
 #' @import rjags
 #'
