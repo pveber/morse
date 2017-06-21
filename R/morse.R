@@ -301,9 +301,9 @@ NULL
 #' replicate.}}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
-#' propiconazole: model assumptions, calibration data requirements and predictive 
+#' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
-#' 
+#'
 #' @keywords datasets
 NULL
 
@@ -312,9 +312,9 @@ NULL
 #' during 10 days with time variable
 #' exposure concentration (non-standard pulsed toxicity experiment)
 #'
-#' Survival datasets of laboratory bioassays with \emph{Gammarus pulex} 
+#' Survival datasets of laboratory bioassays with \emph{Gammarus pulex}
 #' freshwater invertebrate exposed to several profiles of concentrations
-#' of one fungicide (propiconazole). 
+#' of one fungicide (propiconazole).
 #'
 #' @name propiconazole_pulse_exposure
 #' @docType data
@@ -331,15 +331,15 @@ NULL
 #' replicate.}}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
-#' propiconazole: model assumptions, calibration data requirements and predictive 
+#' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
-#' 
+#'
 #' @keywords datasets
 NULL
 
-#' Survival datasets extract fomr \code{propiconazole_pulse_exposure}
-#'  without column \code{Nsurv} 
-#' 
+#' Subset of \code{propiconazole_pulse_exposure}
+#' excluding \code{Nsurv} observations
+#'
 #' @name propiconazole_pulse_exposure_conc
 #' @docType data
 #' @usage data(propiconazole_pulse_exposure_conc)
@@ -348,15 +348,15 @@ NULL
 #'  \code{propiconazole_pulse_exposure}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
-#' propiconazole: model assumptions, calibration data requirements and predictive 
+#' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
-#' 
+#'
 #' @keywords datasets
 NULL
 
-#' Survival datasets extract from \code{propiconazole_pulse_exposure}
-#'  without column \code{conc} 
-#' 
+#' Subset of \code{propiconazole_pulse_exposure}
+#' excluding \code{conc} observations
+#'
 #' @name propiconazole_pulse_exposure_Nsurv
 #' @docType data
 #' @usage data(propiconazole_pulse_exposure_Nsurv)
@@ -365,8 +365,8 @@ NULL
 #'  \code{propiconazole_pulse_exposure}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
-#' propiconazole: model assumptions, calibration data requirements and predictive 
+#' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
-#' 
+#'
 #' @keywords datasets
 NULL
