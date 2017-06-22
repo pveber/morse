@@ -46,6 +46,9 @@
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom dplyr filter
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr do
+#' @importFrom dplyr full_join
 #' @importFrom grid arrow unit
 #' @importFrom graphics plot axis lines points segments title
 #' @importFrom methods is

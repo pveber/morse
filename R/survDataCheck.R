@@ -47,6 +47,9 @@
 #'
 #' @importFrom stringr str_c
 #' @importFrom magrittr '%>%'
+#' @importFrom dplyr arrange
+#' @importFrom dplyr mutate 
+#' 
 #' 
 #' @export
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
