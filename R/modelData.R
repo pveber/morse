@@ -18,7 +18,7 @@ modelData <- function(x, ...){
 #' 
 #' 
 modelData.survDataCstC <- function(x_survData, model_type = NULL){
-  x_survData = data
+  
   ## 1. Gather replicate with same concentration
   ### Check the same number of (time, replicate) for a common concentration
   df_checkTimeReplicate <- x_survData %>%
