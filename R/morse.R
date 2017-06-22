@@ -344,7 +344,7 @@ NULL
 #' @docType data
 #' @usage data(propiconazole_pulse_exposure_conc)
 #' @format A data frame with 65 observations on the following three variables
-#'  \code{replicate}, \code{time} and \code{conc} extract from dataset
+#'  \code{replicate}, \code{time} and \code{conc} extracted from dataset
 #'  \code{propiconazole_pulse_exposure}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to
@@ -361,7 +361,7 @@ NULL
 #' @docType data
 #' @usage data(propiconazole_pulse_exposure_Nsurv)
 #' @format A data frame with 44 observations on the following three variables
-#'  \code{replicate}, \code{time} and \code{Nsurv} extract from dataset
+#'  \code{replicate}, \code{time} and \code{Nsurv} extracted from dataset
 #'  \code{propiconazole_pulse_exposure}
 #' @references Nyman, A.-M., Schirmer, K., Ashauer, R., (2012) Toxicokinetic-toxicodynamic
 #' modelling of survival of \emph{Gammarus pulex} in multiple pulse exposures to

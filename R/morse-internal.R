@@ -161,7 +161,7 @@ fCols <- function(data, fitcol, cicol) {
   
   # points
   cols1 <- "black"
-  names(cols1) <- unique(data$Points)
+  # names(cols1) <- unique(data$Points)
   # curve
   cols2 <- fitcol
   names(cols2) <- "loglogistic"
