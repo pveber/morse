@@ -34,13 +34,14 @@
 #' class(dat)
 #'
 #' @export
+#' 
 reproData <- function(data) {
 
   # test the integrity of the data with reproDataCheck
-  if (dim(reproDataCheck(dat, diagnosis.plot = FALSE))[1] > 0)
+  if (dim(reproDataCheck(data, diagnosis.plot = FALSE))[1] > 0)
     stop("The [x] argument is not well-formed, please use [reproDataCheck] for details.")
 
-  #x <- survData(x)
+  data <- survData(data)
   data <- data[order(data$replicate, data$conc, data$time), ]
   
   data.t0 <- data[data$time == 0, c("replicate", "conc", "Nsurv")]
@@ -61,19 +62,17 @@ reproData <- function(data) {
   x <- cbind(out, Nindtime)
   # force concentration as type double
   x$conc <- as.double(out$conc)
-  
-  
-  T <- sort(unique(x$time)) # observation times
+  Tab_2 <- sort(unique(x$time)) # observaTab_2ion Tab_2imes
   Nreprocumul <- x$Nrepro
-  for (i in 2:length(T)) {
-    now <- x$time == T[i]
-    before <- x$time == T[i - 1]
+  for (i in 2:length(Tab_2)) {
+    now <- x$time == Tab_2[i]
+    before <- x$time == Tab_2[i - 1]
     Nreprocumul[now] <- Nreprocumul[before] + x$Nrepro[now]
   }
 
   x <- cbind(x,Nreprocumul)
   # force concentration as type double
   x$conc <- as.double(x$conc)
-  class(x) <- c("reproData", "data.frame")
+  class(x) <- c("reproData", "survData", "data.frame")
   return(x)
 }

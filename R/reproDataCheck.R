@@ -87,14 +87,22 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
   consistency <- function(subdata) {
     # Function to be used on a subdataset corresponding to one replicate at one
     # concentration.
-    # This function checks:
-    #   - if at each time T for which Nsurv = 0, Nrepro = 0 at time T+1
-
+    
     # errors consitency dataframe
     errors <- errorTableCreate()
+    
+    ##
+    ## 4.1' assert there is the same number of replicates for each conc and time
+    ##
+    if (length(subdata$replicate) != length(unique(data$time))) {
+      msg <- paste("Replicate ", unique(subdata$replicate),
+                   " is missing for at least one time points at concentration ",
+                   unique(subdata$conc), ".", sep = "")
+      errors <- errorTableAdd(errors, "missingReplicate", msg)
+    }
 
     ##
-    ## 4' test Nsurv = 0 at time t => Nrepro > 0 at time t-1
+    ## 4.2' test Nsurv = 0 at time t => Nrepro > 0 at time t-1
     ##
     NsurvT <- subdata$Nsurv[-length(subdata$Nsurv)]
     NreproTplus1 <- subdata$Nrepro[-1]
@@ -108,6 +116,7 @@ reproDataCheck <- function(data, diagnosis.plot = TRUE) {
     }
     return(errors)
   }
+  
   res <- by(data, list(data$replicate, data$conc), consistency)
   consistency.errors <- do.call("errorTableAppend", res)
   errors <- errorTableAppend(errors, consistency.errors)
