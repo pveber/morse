@@ -4,6 +4,8 @@
 #'
 #' @return A list of scalar for parameterization of priors for Bayesian modeling
 #'
+#' @importFrom dplyr group_indices_
+#'
 #' @export
 #'
 
@@ -11,24 +13,42 @@ modelData <- function(x, ...){
   UseMethod("modelData")
 }
 
-
 #' survDataCstC
 #' 
 #' 
 #' 
 modelData.survDataCstC <- function(x_survData, model_type = NULL){
+  x_survData = data
+  ## 1. Gather replicate with same concentration
+  ### Check the same number of (time, replicate) for a common concentration
+  df_checkTimeReplicate <- x_survData %>%
+    dplyr::group_by(conc, time) %>%
+    dplyr::summarise(result_start = n_distinct(replicate)) %>%
+    dplyr::group_by(conc) %>%
+    dplyr::summarise(result_final = length(unique(result_start))) 
   
+  if( all(df_checkTimeReplicate$result_final == 1) ){
+    ### Sum Nsurv data for each (conc, time) couple
+    x_survData <- x_survData %>%
+      dplyr::group_by(conc, time) %>%
+      dplyr::summarise(Nsurv = sum(Nsurv)) %>%
+      # concate replicate in the same replicate using factor (conc)
+      dplyr::mutate(replicate = as.character(conc))%>%
+      as.data.frame()
+  }
+
   ##
-  ## 0. Creation of additional variable
+  ## 2. Creation of additional variable
   ## - tprec: previous time
   ## - Nprec: previous number of survivors
   ## - time_ID: identification of row number inside a group
   ## - i_row: identification of row number (for every group)
   ## - i_row: identification of previous row number (for every group) exeptc when time_ID (in group) is 1
+  #x_survData$replicate <- as.factor(x_survData$replicate)
   
-  x_survData = x_survData %>%
+  x_survData <- x_survData %>%
     # Add an indice of replicate:
-    dplyr::mutate(replicate_ID = group_indices_(., .dots="replicate")) %>%
+    dplyr::mutate(replicate_ID = group_indices_(., .dots = "replicate")) %>%
     dplyr::group_by(replicate) %>%
     dplyr::arrange(replicate, time) %>%
     dplyr::mutate(tprec = ifelse(time == 0, time, dplyr::lag(time)),
@@ -45,27 +65,27 @@ modelData.survDataCstC <- function(x_survData, model_type = NULL){
   ##
   
   # return priors for model
-  priorsData = priors_survData(x = x_survData, model_type)
+  priorsData <- priors_survData(x = x_survData, model_type)
   
-  modelData = priorsData$priorsList
+  modelData <- priorsData$priorsList
   
   ##
   ##  observations
   ##
   
-  modelData$Nsurv = x_survData$Nsurv
-  modelData$replicate = x_survData$replicate
-  modelData$conc = x_survData$conc
+  modelData$Nsurv <- x_survData$Nsurv
+  modelData$replicate <- x_survData$replicate
+  modelData$conc <- x_survData$conc
   
-  modelData$n_data = nrow(x_survData)
+  modelData$n_data <- nrow(x_survData)
   
   ##
   ##  parameters
   ##
-  modelData$Nprec = x_survData$Nprec
-  modelData$time = x_survData$time
+  modelData$Nprec <- x_survData$Nprec
+  modelData$time <- x_survData$time
   
-  modelData$i_prec = x_survData$i_prec
+  modelData$i_prec <- x_survData$i_prec
   
   ##
   ## other parameters specific to model SD vs. IT and cst vs. var
@@ -87,7 +107,7 @@ modelData.survDataCstC <- function(x_survData, model_type = NULL){
   modelData_NULL$Nsurv = NULL # remove Nsurv from modelData
   
   ### OUT ================
-  OUT_modelDATA = list(modelData = modelData,
+  OUT_modelDATA <- list(modelData = modelData,
                        modelData_Null = modelData_NULL,
                        priorsList = priorsData$priorsList,
                        priorsMinMax = priorsData$priorsMinMax)
@@ -117,11 +137,11 @@ modelData.survDataVarC <- function(x_survData,
   ## - i_row: identification of row number (for every group)
   ## - i_row: identification of previous row number (for every group) exeptc when time_ID (in group) is 1
   
-  x_survData_interpolate = survData_interpolate(x_survData,
+  x_survData_interpolate <- survData_interpolate(x_survData,
                                                 extend.time = extend_time) %>%
     dplyr::arrange(replicate, time)
   
-  x_survData = x_survData_interpolate %>%
+  x_survData <- x_survData_interpolate %>%
     dplyr::filter(!is.na(Nsurv)) %>%
     dplyr::rename(time_ID_red = time_ID_long) %>%
     # Group by replicate to replicate an indice of replicate:
@@ -145,43 +165,42 @@ modelData.survDataVarC <- function(x_survData,
   ##
   
   # return priors for model
-  priorsData = priors_survData(x = x_survData, model_type = model_type)
+  priorsData <- priors_survData(x = x_survData, model_type = model_type)
   
-  modelData = priorsData$priorsList
+  modelData <- priorsData$priorsList
   
   ##
   ##  observations
   ##
   
-  modelData$Nsurv = x_survData$Nsurv
-  modelData$replicate = x_survData$replicate
+  modelData$Nsurv <- x_survData$Nsurv
+  modelData$replicate <- x_survData$replicate
   
   ##
   ##  parameters
   ##
-  modelData$Nprec = x_survData$Nprec
+  modelData$Nprec <- x_survData$Nprec
   
-  modelData$replicate_ID = x_survData$replicate_ID
-  modelData$time_ID = x_survData$time_ID
+  modelData$replicate_ID <- x_survData$replicate_ID
+  modelData$time_ID <- x_survData$time_ID
   
   
-  modelData$n_dataRed = nrow(x_survData)
-  modelData$n_dataLong = nrow(x_survData_interpolate)
+  modelData$n_dataRed <- nrow(x_survData)
+  modelData$n_dataLong <- nrow(x_survData_interpolate)
   
   ### Integration
-  modelData$replicate_ID_long  = x_survData_interpolate$replicate_ID_long
-  modelData$time_ID_long = x_survData_interpolate$time_ID
+  modelData$replicate_ID_long  <- x_survData_interpolate$replicate_ID_long
+  modelData$time_ID_long <- x_survData_interpolate$time_ID
   
-  modelData$conc_long  = x_survData_interpolate$conc
-  modelData$time_long = x_survData_interpolate$time
+  modelData$conc_long <- x_survData_interpolate$conc
+  modelData$time_long <- x_survData_interpolate$time
   
-  modelData$tprec_long = x_survData_interpolate$tprec_long
-  modelData$concprec_long = x_survData_interpolate$concprec_long
+  modelData$tprec_long <- x_survData_interpolate$tprec_long
+  modelData$concprec_long <- x_survData_interpolate$concprec_long
   
   ### Interpolation
-  modelData$time_ID_red = x_survData$time_ID_red
-  # modelData$i_row = x_survData$i_row
-  modelData$i_prec = x_survData$i_prec
+  modelData$time_ID_red <- x_survData$time_ID_red
+  modelData$i_prec <- x_survData$i_prec
   
   ##
   ## other parameters specific to model SD vs. IT
@@ -205,11 +224,11 @@ modelData.survDataVarC <- function(x_survData,
   ##
   ## Model data Null (without observations of Nsurv)
   ##
-  modelData_NULL = modelData
-  modelData_NULL$Nsurv = NULL # remove Nsurv from mdelData
+  modelData_NULL <- modelData
+  modelData_NULL$Nsurv <- NULL # remove Nsurv from mdelData
   
   ### OUT ================
-  OUT_modelDATA = list(modelData = modelData,
+  OUT_modelDATA <- list(modelData = modelData,
                        modelData_Null = modelData_NULL,
                        priorsList = priorsData$priorsList,
                        priorsMinMax = priorsData$priorsMinMax)
@@ -231,12 +250,12 @@ modelData.survDataVarC <- function(x_survData,
 #'
 #'
 
-survData_interpolate = function(x_survData,
+survData_interpolate <- function(x_survData,
                                   extend.time = 100){
   
   ## data.frame with time
   
-  df_MinMax = x_survData %>%
+  df_MinMax <- x_survData %>%
     dplyr::group_by(replicate) %>%
     dplyr::summarise(min_time = min(time, na.rm = TRUE),
                      max_time = max(time, na.rm = TRUE)) %>%
@@ -244,19 +263,19 @@ survData_interpolate = function(x_survData,
     # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend.time)))
     dplyr::do(data_frame(replicate = as.character(.$replicate), time = seq(.$min_time, .$max_time, length = extend.time)))
   
-  x_survData.Interpolate = dplyr::full_join(df_MinMax,
+  x_survData.Interpolate <- dplyr::full_join(df_MinMax,
                                             x_survData,
                                             by = c("replicate", "time")) %>%
     dplyr::group_by(replicate) %>%
     dplyr::arrange(replicate, time) %>% # organize in replicate and time
     dplyr::mutate(conc = zoo::na.approx(conc, time, na.rm=FALSE)) %>%
     # from package zoo : 'na.locf()' carry the last observation forward to replace your NA values.
-    dplyr::mutate(conc = ifelse(is.na(conc),zoo::na.locf(conc),conc)) %>%# FOR THE LAST VALUE
-    # identification of time point index for Nsurv
-    dplyr::mutate(id_conc_interp = ifelse(is.na(Nsurv), NA, row_number()))%>%
-    # 'lag' function copy values lagged by 1 (see 'dplyr' package)
-    dplyr::mutate( tprec_long = ifelse( time == 0, time, dplyr::lag(time) ),
-                   concprec_long = ifelse( time == 0, conc, dplyr::lag(conc) ) ) %>%
+    dplyr::mutate(conc = ifelse(is.na(conc),zoo::na.locf(conc),conc),
+                  # identification of time point index for Nsurv
+                  id_conc_interp = ifelse(is.na(Nsurv), NA, row_number()),
+                  # 'lag' function copy values lagged by 1 (see 'dplyr' package)
+                  tprec_long = ifelse( time == 0, time, dplyr::lag(time) ),
+                  concprec_long = ifelse( time == 0, conc, dplyr::lag(conc) ) ) %>%
     dplyr::group_by(replicate) %>%
     dplyr::mutate(time_ID_long = row_number(),
                   tprec_ID_long = ifelse(time_ID_long==1, time_ID_long,  dplyr::lag(time_ID_long))) %>%
@@ -265,7 +284,7 @@ survData_interpolate = function(x_survData,
     dplyr::mutate(replicate_ID_long = group_indices_(., .dots="replicate"))
   
   
-  class(x_survData.Interpolate) = c("x_survData", "data.frame")
+  class(x_survData.Interpolate) <- c("x_survData", "data.frame")
   return(x_survData.Interpolate)
 }
 
