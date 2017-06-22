@@ -50,7 +50,7 @@ the package (like `cadmium2`). First, we load the dataset and use the function
 
 ```{r step1TT, cache=TRUE}
 data(cadmium2)
-cadmium2 <- select(cadmium2, - replicate_ID)
+cadmium2
 survDataCheck(cadmium2) 
 ```
 
@@ -227,7 +227,7 @@ between pollutant concentration, time and survival rate.
 Here is a typical session:
 ```{r TKTDcst, cache=TRUE}
 # (1) load dataset
-data(propiconazole) ; propiconazole <- select(propiconazole, - replicate_ID)
+data(propiconazole)
 
 # (2) check structure and integrity of the dataset
 survDataCheck(propiconazole)
@@ -298,6 +298,12 @@ ppc(fit_cstIT)
 summary(fit_cstIT)
 ```
 
+To have a summary of the estimation of parameters
+
+```{r, cache=TRUE}
+fit_cstIT$estim.par
+```
+
 
 ## TKTD model with time-variable exposure concentration
 
@@ -306,12 +312,6 @@ summary(fit_cstIT)
 # (1) load dataset
 data("propiconazole_pulse_exposure_Nsurv")
 data("propiconazole_pulse_exposure_conc")
-
-propiconazole_pulse_exposure %>%
-  filter(!is.na(Nsurv)) %>% 
-  filter(!is.na(conc)) %>%
-  nrow()
-
 
 # (2) merge data set into a `survData` object
 propiconazole_varC <- survData_join(propiconazole_pulse_exposure_conc, propiconazole_pulse_exposure_Nsurv)
@@ -330,7 +330,7 @@ dat_var <- survData(propiconazole_pulse_exposure)
 plot(dat_var)
 
 # (6) check information on the experimental design
-summary(dat_var)
+# summary(dat_var)
 ```
 
 ### Survival Analysis of Stochastic Death (SD) model
@@ -356,10 +356,6 @@ plot(fit_varSD, data_type = "number")
 
 ```{r, cache=TRUE}
 ppc(fit_varSD)
-```
-
-```{r, cache=TRUE}
-summary(fit_varSD)
 ```
 
 ### Survival Analysis of Individual Tolerance (IT) model
@@ -389,10 +385,6 @@ plot(fit_varIT)
 ppc(fit_varIT)
 ```
 
-```{r, cache=TRUE}
-summary(fit_varIT)
-```
-
 # Reproduction data analyses
 
 The steps in reproduction data analysis are absolutely analogous to what we
@@ -401,27 +393,26 @@ between pollutant concentration and reproduction rate per individual-day.
 
 Here is a typical session:
 ```{r repro, cache=TRUE}
-# # (1) load dataset
-# data(cadmium2)
-# cadmium2 <- select(cadmium2, - replicate_ID)
-# 
-# # (2) check structure and integrity of the dataset
-# reproDataCheck(cadmium2)
-# 
-# # (3) create a `reproData` object
-# dat <- reproData(cadmium2)
-# 
-# # (4) represent the cumulated number of offspring as a function time
-# # plot(dat, style = "ggplot", pool.replicate = FALSE)
-# plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
-#      pool.replicate = FALSE)
-# # 
-# # # (5) represent the reproduction rate as a function of concentration
-# plotDoseResponse(dat, target.time = 56, style = "ggplot")
-# 
-# # 
-# # # (6) check information on the experimental design
-# summary(dat)
+# (1) load dataset
+data(cadmium2)
+
+# (2) check structure and integrity of the dataset
+reproDataCheck(cadmium2)
+
+# (3) create a `reproData` object
+dat <- reproData(cadmium2)
+
+# (4) represent the cumulated number of offspring as a function time
+# plot(dat, style = "ggplot", pool.replicate = FALSE)
+plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
+     pool.replicate = FALSE)
+#
+# # (5) represent the reproduction rate as a function of concentration
+plotDoseResponse(dat, target.time = 56, style = "ggplot")
+
+#
+# # (6) check information on the experimental design
+summary(dat)
 ```
 
 
