@@ -54,21 +54,21 @@ plot.survFit <- function(x,
                          data_type = "probability",
                          facetting = TRUE,
                          facet.label = "replicate") {
-
-
+  
+  
   ### compute posteriors median and 95 CI
   modelData = x$modelData
-
+  
   postData = posteriorData(x$mcmc, model_type = x$model_type)
-
+  
   if(data_type == "probability"){
-
+    
     ylab = "Survival rate"
     
     df_plt = data_frame(Nsurv = modelData$Nsurv,
                         time = modelData$time,
                         replicate = modelData$replicate)
-
+    
     if(!is.null(modelData$conc)){
       df_plt$conc = modelData$conc
     }
@@ -78,31 +78,33 @@ plot.survFit <- function(x,
       mutate(Ninit = max(Nsurv)) %>%
       ungroup() %>%
       mutate(Y = Nsurv / Ninit,
+             timelag = ifelse(time == 0, time, lag(time)),
              Y_q50 = apply(postData$df_psurv, 2, quantile, probs = 0.5, na.rm = TRUE),
              Y_qinf95 = apply(postData$df_psurv, 2, quantile, probs = 0.025, na.rm = TRUE),
              Y_qsup95 = apply(postData$df_psurv, 2, quantile, probs = 0.975, na.rm = TRUE))
-
-
+    
+    
   } else if(data_type == "number"){
-
+    
     ylab = "Number of survivors"
-
+    
     df_plt = data_frame(Y = modelData$Nsurv,
                         time = modelData$time,
                         replicate = modelData$replicate,
                         Y_q50 = apply(postData$df_sim, 2, quantile, probs = 0.5, na.rm = TRUE),
                         Y_qinf95 = apply(postData$df_sim, 2, quantile, probs = 0.025, na.rm = TRUE),
-                        Y_qsup95 = apply(postData$df_sim, 2, quantile, probs = 0.975, na.rm = TRUE))
+                        Y_qsup95 = apply(postData$df_sim, 2, quantile, probs = 0.975, na.rm = TRUE)) %>%
+      mutate(timelag = ifelse(time == 0, time, lag(time)))
     
     if(!is.null(modelData$conc)){
       df_plt$conc = modelData$conc
     }
-
+    
   } else stop("type must be 'probability' (i.e., probability of survival) or 'number' (i.e., number of survivors)")
-
-
+  
+  
   plt_fit <- df_plt %>%
-    ggplot() + theme_bw() +
+    ggplot() + theme_minimal() +
     theme(legend.position="none") +
     expand_limits(x = 0, y = 0) +
     labs(title = mainlab,
@@ -118,13 +120,16 @@ plot.survFit <- function(x,
       name="Concentration",
       low="grey20", high="orange"
     ) +
-    geom_ribbon(aes(x = time,
-                    ymin = Y_qinf95,
-                    ymax = Y_qsup95 ,
-                    group = replicate), fill = "orange", alpha = 0.4, color = "grey90") +
+    # geom_ribbon(aes(x = time,
+    #                 ymin = Y_qinf95,
+    #                 ymax = Y_qsup95 ,
+    #                 group = replicate), fill = "orange", alpha = 0.4, color = "grey90") +
+    geom_rect(aes(xmin = timelag, xmax = time,
+                  ymin = Y_qinf95,  ymax = Y_qsup95 ,
+                  group = replicate), fill = "pink", alpha = 0.4) +
     geom_step(aes(x = time,
                   y = Y_q50,
-                  group = replicate )) +
+                  group = replicate ), direction = "vh", color="red") +
     geom_point(aes(x = time,
                    y = Y,
                    group = replicate ))
