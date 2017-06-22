@@ -31,7 +31,7 @@ compute estimations of risk assessment indicators. This document illustrates
 a typical use of MORSE on survival and reproduction data, which can be followed
 to analyze new datasets.
 
-# Survival data analysis at target time
+# Survival data analysis at target time (TT)
 
 The following example shows all the stages to perform survival analysis on
 standard bioassay data and produce estimate values of the $LC_x$.
@@ -48,9 +48,9 @@ reference manual, and you can also inspect one of the datasets provided in
 the package (like `cadmium2`). First, we load the dataset and use the function
 `survDataCheck` to verify that it has the expected layout:
 
-```{r, cache=TRUE}
+```{r step1TT, cache=TRUE}
 data(cadmium2)
-cadmium2 <- select(cadmium2, - replicate_ID)
+cadmium2
 survDataCheck(cadmium2) 
 ```
 
@@ -61,7 +61,7 @@ basic representation used for the subsequent operations. Note that if the
 call to `survDataCheck` reports no error, it is guaranteed that `survData`
 will not fail.
 
-```{r, cache=TRUE}
+```{r step2TT, cache=TRUE}
 dat <- survData(cadmium2)
 head(dat)
 ```
@@ -71,7 +71,7 @@ head(dat)
 The function `plot` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
 
-```{r, cache=TRUE}
+```{r step3TT, cache=TRUE}
 plot(dat, style = "ggplot", pool.replicate = FALSE)
 ```
 
@@ -112,7 +112,7 @@ function. Once we have estimated the parameters, we can then calculate the $LC_x
 for any $x$. All this work is performed by the `survFitTT` function, which requires
 a `survData` object and the levels of $LC_x$ we need:
 
-```{r, results="hide", cache=TRUE, eval=FALSE}
+```{r step4TT, results="hide", cache=TRUE, eval=FALSE}
 fit_TT <- survFitTT(dat,
                     target.time = 21,
                     lcx = c(10, 20, 30, 40, 50))
@@ -197,7 +197,7 @@ corresponding estimated predictions, along with their 95% credible
 interval. If the fit is correct, we expect to see 95% of the data
 inside the intervals.
 
-```{r,cache=TRUE, results="hide"}
+```{r step5TT,cache=TRUE, results="hide"}
 ppc(fit_TT, style = "ggplot")
 ```
 
@@ -224,12 +224,10 @@ between pollutant concentration, time and survival rate.
 
 ## TKTD model with constant exposure concentration
 
-### Survival Analysis of Stochastic Death (SD) model
-
 Here is a typical session:
-```{r TKTD 1, cache=TRUE}
+```{r TKTDcst, cache=TRUE}
 # (1) load dataset
-data(propiconazole) ; propiconazole <- select(propiconazole, - replicate_ID)
+data(propiconazole)
 
 # (2) check structure and integrity of the dataset
 survDataCheck(propiconazole)
@@ -244,11 +242,13 @@ plot(dat, style = "ggplot", pool.replicate = FALSE)
 summary(dat)
 ```
 
-```{r, eval=FALSE}
+
+### Survival Analysis of Stochastic Death (SD) model
+
+```{r TKTDsctSD, eval=FALSE}
 # (6) fit a TKTD model version >3.0.0
 fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
 ```
-
 
 ```{r, cache=TRUE}
 # save(fit_cstSD, file = "vignettes/fit_cstSD.Rdata")
@@ -261,22 +261,22 @@ summary(fit_cstSD)
 ```
 
 ```{r, cache=TRUE}
-# plot(fit_cstSD, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+plot(x = fit_cstSD, facet.label = "conc")
 ```
 
 ```{r, cache=TRUE}
-# ppc(fit_cstSD, style = "ggplot")
+ppc(fit_cstSD)
 ```
 
 ```{r, cache=TRUE}
-# summary(fit_cstSD)
+summary(fit_cstSD)
 ```
 
 ### Survival Analysis of Individual Tolerance (IT) model
 
 Only change `model_type` to `IT`:
 
-```{r, cache=TRUE, eval=FALSE}
+```{r TKTDcstIT, cache=TRUE, eval=FALSE}
 # From step 6.2
 fit_cstIT <- survFit(dat, quiet = FALSE, model_type = "IT")
 ```
@@ -287,80 +287,103 @@ load("fit_cstIT.Rdata")
 ```
 
 ```{r, cache=TRUE}
-# plot(fit_cstIT, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+plot(fit_cstIT, facet.label = "conc")
 ```
 
 ```{r, cache=TRUE}
-# ppc(fit_cstIT, style = "ggplot")
+ppc(fit_cstIT)
 ```
 
 ```{r, cache=TRUE}
-# summary(fit_cstIT)
+summary(fit_cstIT)
+```
+
+To have a summary of the estimation of parameters
+
+```{r, cache=TRUE}
+fit_cstIT$estim.par
 ```
 
 
 ## TKTD model with time-variable exposure concentration
 
-```{r TKTD 1, cache=TRUE}
-# (1) load dataset
-data(propiconazole_varC_conc)
-propiconazole_varC_conc <- propiconazole_varC_conc %>%
-  filter(concType == "var") %>%
-  select(- concType)
 
-data(propiconazole_varC_Nsurv)
-propiconazole_varC_Nsurv <- propiconazole_varC_Nsurv %>%
-  filter(concType == "var") %>%
-  select(- concType)
+```{r TKTDvar, cache=TRUE}
+# (1) load dataset
+data("propiconazole_pulse_exposure_Nsurv")
+data("propiconazole_pulse_exposure_conc")
 
 # (2) merge data set into a `survData` object
-propiconazole_varC <- survData_join(propiconazole_varC_conc, propiconazole_varC_Nsurv)
+propiconazole_varC <- survData_join(propiconazole_pulse_exposure_conc, propiconazole_pulse_exposure_Nsurv)
+
+# (2.1) note that 'propiconazole_varC' is exactly the object 'propiconazole_pulse_exposure'
+data("propiconazole_pulse_exposure")
+all.equal(propiconazole_varC, propiconazole_pulse_exposure)
 
 # (3) check structure and integrity of the dataset
-survDataCheck(propiconazole_varC)
+survDataCheck(propiconazole_pulse_exposure)
 
 # (4) create a `survData` object
-dat_var <- survData(propiconazole_varC)
+dat_var <- survData(propiconazole_pulse_exposure)
 
 # (5) represent the number of survivor as a function time
 plot(dat_var)
 
 # (6) check information on the experimental design
-summary(dat_var)
+# summary(dat_var)
 ```
 
-```{r, eval=FALSE}
+### Survival Analysis of Stochastic Death (SD) model
+
+```{r TKTDvarSD, eval=FALSE}
 # (6) fit a TKTD model
 fit_varSD <- survFit(dat_var, quiet = FALSE, model_type = "SD")
 ```
 
-
 ```{r, cache=TRUE}
-# save(fit_cstSD, file = "vignettes/fit_cstSD.Rdata")
-load("fit_cstSD.Rdata")
+# save(fit_varSD, file = "fit_varSD.Rdata")
+load("fit_varSD.Rdata")
 ```
 
 ```{r, cache=TRUE}
 # (7) summary of the fit object
-summary(fit_cstSD)
+summary(fit_varSD)
 ```
 
 ```{r, cache=TRUE}
-# plot(fit_cstSD, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+plot(fit_varSD, data_type = "number")
 ```
 
 ```{r, cache=TRUE}
-# ppc(fit_cstSD, style = "ggplot")
+ppc(fit_varSD)
 ```
-
-```{r, cache=TRUE}
-# summary(fit_cstSD)
-```
-
-
-### Survival Analysis of Stochastic Death (SD) model
 
 ### Survival Analysis of Individual Tolerance (IT) model
+
+
+```{r TKTDvarIT, eval=FALSE}
+# (6) fit a TKTD model
+fit_varIT <- survFit(dat_var, quiet = FALSE, model_type = "IT")
+```
+
+
+```{r, cache=TRUE}
+# save(fit_varIT, file = "fit_varIT.Rdata")
+load("fit_varIT.Rdata")
+```
+
+```{r, cache=TRUE}
+# (7) summary of the fit object
+summary(fit_varIT)
+```
+
+```{r, cache=TRUE}
+plot(fit_varIT)
+```
+
+```{r, cache=TRUE}
+ppc(fit_varIT)
+```
 
 # Reproduction data analyses
 
@@ -369,7 +392,7 @@ described for survival data. This time the goal is to estimate the relation
 between pollutant concentration and reproduction rate per individual-day.
 
 Here is a typical session:
-```{r, cache=TRUE}
+```{r repro, cache=TRUE}
 # (1) load dataset
 data(cadmium2)
 
@@ -383,10 +406,11 @@ dat <- reproData(cadmium2)
 # plot(dat, style = "ggplot", pool.replicate = FALSE)
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
-# 
+#
 # # (5) represent the reproduction rate as a function of concentration
-# plotDoseResponse(dat, target.time = 56, style = "ggplot")
-# 
+plotDoseResponse(dat, target.time = 56, style = "ggplot")
+
+#
 # # (6) check information on the experimental design
 summary(dat)
 ```
@@ -450,7 +474,7 @@ related to survival analysis on `reproData` object, we can use the `as.survData`
 conversion function:
 
 ```{r, cache=TRUE}
-dat <- reproData(cadmium2)
+# dat <- reproData(cadmium2)
 # plot(as.survData(dat))
 ```
 
