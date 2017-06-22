@@ -408,7 +408,8 @@ reproDataCheck(cadmium2)
 dat <- reproData(cadmium2)
 
 # (4) represent the cumulated number of offspring as a function time
-# plot(dat, style = "ggplot", pool.replicate = FALSE)
+plot(dat, style = "ggplot", pool.replicate = FALSE)
+
 plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
      pool.replicate = FALSE)
 #
@@ -430,7 +431,7 @@ fit_reproTT <- reproFitTT(dat, stoc.part = "bestfit",
 ```
 
 ```{r, cache=TRUE}
-# save(fit_reproTT, file = "vignettes/fit_reproTT.Rdata")
+# save(fit_reproTT, file = "fit_reproTT.Rdata")
 load("fit_reproTT.Rdata")
 ```
 
@@ -479,8 +480,8 @@ related to survival analysis on `reproData` object, we can use the `as.survData`
 conversion function:
 
 ```{r, cache=TRUE}
-# dat <- reproData(cadmium2)
-# plot(as.survData(dat))
+dat <- reproData(cadmium2)
+plot(as.survData(dat))
 ```
 
 
