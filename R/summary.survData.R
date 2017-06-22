@@ -24,7 +24,7 @@
 #' @keywords summary
 #' 
 #' @export
-summary.survDataCstC <- function(object, quiet = FALSE, ...) {
+summary.survData <- function(object, quiet = FALSE, ...) {
   # matrix of number of replicate by time / conc
   ans1 <- table(object[, c("conc", "time")])
   
