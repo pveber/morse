@@ -22,7 +22,6 @@ knitr::opts_chunk$set(fig.width = 7,
 ```{r, echo=FALSE, cache=TRUE, results='hide'}
 library(morse)
 library(ggplot2)
-library(dplyr)
 ```
 
 The package MORSE is devoted to the analysis of data from standard toxicity
@@ -251,7 +250,7 @@ fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
 ```
 
 ```{r, cache=TRUE}
-# save(fit_cstSD, file = "vignettes/fit_cstSD.Rdata")
+# save(fit_cstSD, file = "fit_cstSD.Rdata")
 load("fit_cstSD.Rdata")
 ```
 
@@ -261,7 +260,7 @@ summary(fit_cstSD)
 ```
 
 ```{r, cache=TRUE}
-plot(x = fit_cstSD, facet.label = "conc")
+plot(fit_cstSD, facet.label = "conc")
 ```
 
 ```{r, cache=TRUE}
@@ -270,6 +269,12 @@ ppc(fit_cstSD)
 
 ```{r, cache=TRUE}
 summary(fit_cstSD)
+```
+
+To have a summary of the estimation of parameters
+
+```{r, cache=TRUE}
+fit_cstSD$estim.par
 ```
 
 ### Survival Analysis of Individual Tolerance (IT) model
@@ -282,7 +287,7 @@ fit_cstIT <- survFit(dat, quiet = FALSE, model_type = "IT")
 ```
 
 ```{r, cache=TRUE}
-# save(fit_cstIT, file = "vignettes/fit_cstIT.Rdata")
+# save(fit_cstIT, file = "fit_cstIT.Rdata")
 load("fit_cstIT.Rdata")
 ```
 
@@ -330,7 +335,7 @@ dat_var <- survData(propiconazole_pulse_exposure)
 plot(dat_var)
 
 # (6) check information on the experimental design
-# summary(dat_var)
+summary(dat_var)
 ```
 
 ### Survival Analysis of Stochastic Death (SD) model
