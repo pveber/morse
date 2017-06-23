@@ -22,6 +22,8 @@ knitr::opts_chunk$set(fig.width = 7,
 ```{r, echo=FALSE, cache=TRUE, results='hide'}
 library(morse)
 library(ggplot2)
+library(tidyr)
+library(dplyr)
 ```
 
 The package MORSE is devoted to the analysis of data from standard toxicity
@@ -49,7 +51,6 @@ the package (like `cadmium2`). First, we load the dataset and use the function
 
 ```{r step1TT, cache=TRUE}
 data(cadmium2)
-cadmium2
 survDataCheck(cadmium2) 
 ```
 
