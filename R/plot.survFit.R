@@ -5,29 +5,18 @@
 #' concentration of pollutant in the original dataset.
 #'
 #' The fitted curves represent the \strong{estimated survival rate} as a function
-#' of time for each concentration.
+#' of time for each concentration (if \code{ data_type = "rate"}), or th
+#' \strong{estimated number of survivros} as a function
+#' of time for each concentration (if \code{ data_type = "number"})
 #' The black dots depict the \strong{observed survival
-#' rate} at each time point. Note that since our model does not take
+#' rate} at each time point (if \code{adddata = TRUE}). Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
-#' The function plots both 95 \% credible intervals for the estimated survival
-#' rate (by default the red area around the fitted curve) and 95 \% confidence
-#' intervals for the observed survival rate (as black error bars if
-#' \code{adddata = TRUE}).
-#' Both types of intervals are taken at the same level. Typically
-#' a good fit is expected to display a large overlap between the two intervals.
-#' It consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
-#' taken for this sample).
 #'
-#' @param x An object of class \code{gm_urvFitTKTD}.
+#' @param x An object of class \code{survFit}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param mainlab A mainlab title for the plot.
-#' @param concentration A numeric value corresponding to some concentration in
-#' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration.
-#' @param spaghetti if \code{TRUE}, draws a set of survival curves using
-#' parameters drawn from the posterior distribution
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
 #' one plot instead of one per concentration.
 #' @param adddata if \code{TRUE}, adds the observed data to the plot
@@ -55,7 +44,9 @@ plot.survFit <- function(x,
                          xlab = "Time",
                          ylab = NULL,
                          mainlab = NULL,
-                         data_type = "probability",
+                         one.plot = FALSE,
+                         adddata = TRUE,
+                         data_type = "rate",
                          facetting = TRUE,
                          facet.label = "replicate") {
   
@@ -65,7 +56,7 @@ plot.survFit <- function(x,
   
   postData <- posteriorData(x$mcmc, model_type = x$model_type)
   
-  if(data_type == "probability"){
+  if(data_type == "rate"){
     
     ylab = "Survival rate"
     
@@ -104,7 +95,7 @@ plot.survFit <- function(x,
       df_plt$conc <- modelData$conc
     }
     
-  } else stop("type must be 'probability' (i.e., probability of survival) or 'number' (i.e., number of survivors)")
+  } else stop("type must be 'rate' (i.e., rate of survival) or 'number' (i.e., number of survivors)")
   
   
   plt_fit <- df_plt %>%
@@ -124,25 +115,41 @@ plot.survFit <- function(x,
       name = "Concentration",
       low = "grey20",
       high = "orange"
-    ) +
-    # geom_ribbon(aes(x = time,
-    #                 ymin = Y_qinf95,
-    #                 ymax = Y_qsup95 ,
-    #                 group = replicate), fill = "orange", alpha = 0.4, color = "grey90") +
-    geom_rect(aes(xmin = timelag, xmax = time,
-                  ymin = Y_qinf95,  ymax = Y_qsup95 ,
-                  group = replicate), fill = "pink", alpha = 0.4) +
-    geom_step(aes(x = time,
+    )
+  
+  
+  if(data_type == "rate"){
+   plt_fit <- plt_fit +
+     geom_ribbon(aes(x = time,
+                     ymin = Y_qinf95,
+                     ymax = Y_qsup95 ,
+                     group = replicate), fill = "orange", alpha = 0.4, color = "grey90") +
+    geom_line(aes(x = time,
                   y = Y_q50,
-                  group = replicate ), direction = "vh", color="red") +
-    geom_point(aes(x = time,
-                   y = Y,
-                   group = replicate ))
+                  group = replicate ), direction = "vh", color="red")
+  } else if(data_type == "number"){
+    plt_fit <- plt_fit +
+      geom_rect(aes(xmin = timelag, xmax = time,
+                    ymin = Y_qinf95,  ymax = Y_qsup95 ,
+                    group = replicate), fill = "pink", alpha = 0.4) +
+      geom_step(aes(x = time,
+                    y = Y_q50,
+                    group = replicate ), direction = "vh", color="red")
+  
+  } else stop("type must be 'rate' (i.e., rate of survival) or 'number' (i.e., number of survivors)")
+    
+  if(adddata == TRUE){
+    plt_fit <- plt_fit +
+      geom_point(aes(x = time,
+                     y = Y,
+                     group = replicate ))
+    
+  }
   
   ##
   ## facetting
   ##
-  if(facetting == TRUE){
+  if(one.plot != TRUE){
     if(facet.label == "replicate"){
       OUT_fit <- plt_fit + facet_wrap(~ replicate)
     } else if (facet.label == "conc"){
