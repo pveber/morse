@@ -278,6 +278,17 @@ To have a summary of the estimation of parameters
 fit_cstSD$estim.par
 ```
 
+It is also possible to predict:
+
+```{r, cache=TRUE}
+# create a prediction
+predict_fit_cstSD <- predict(fit_cstSD)
+
+#plot the prediction
+plot(predict_fit_cstSD)
+```
+
+
 ### Survival Analysis of Individual Tolerance (IT) model
 
 Only change `model_type` to `IT`:
@@ -310,6 +321,15 @@ To have a summary of the estimation of parameters
 fit_cstIT$estim.par
 ```
 
+It is also possible to predict:
+
+```{r, cache=TRUE}
+# create a prediction
+predict_fit_cstIT <- predict(fit_cstIT)
+
+#plot the prediction
+plot(predict_fit_cstIT)
+```
 
 ## TKTD model with time-variable exposure concentration
 
@@ -362,6 +382,16 @@ plot(fit_varSD, data_type = "number")
 
 ```{r, cache=TRUE}
 ppc(fit_varSD)
+```
+
+It is also possible to predict:
+
+```{r, cache=TRUE}
+# create a prediction
+predict_fit_varSD <- predict(fit_varSD)
+
+#plot the prediction
+plot(predict_fit_varSD)
 ```
 
 ### Survival Analysis of Individual Tolerance (IT) model
