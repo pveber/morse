@@ -44,19 +44,28 @@
 #'
 plot.predictFit <- function(x){
  
-  data_plt <- x$predict
+  # df <- data.frame(time = x$modelData$time,
+  #                  Nsurv = x$modelData$Nsurv,
+  #                  conc = x$modelData$conc,
+  #                  replicate = x$modelData$replicate) %>%
+  #   group_by(replicate) %>%
+  #   mutate(Ninit = max(Nsurv)) %>%
+  #   ungroup() %>%
+  #   mutate(Y = Nsurv / Ninit)
   
-    plt <- ggplot(data = data_plt) +
-      theme_minimal() +
-      # theme(legend.position ="top",
-      #       strip.background = element_rect(fill="grey10"),
-      #       strip.text = element_text(colour = "orange", face= "bold")) +
-      scale_x_continuous(name = "time")+
-      scale_y_continuous(name = "survival rate",
-                         limits = c(0,1)) +
-      theme(legend.position = "top") +
-      geom_ribbon(aes(x = time, ymin = qinf95, ymax = qsup95), fill = "pink", alpha = 0.4) +
-      geom_line(aes(x = time, y = q50), col = "red", size = 1)
-    
+  plt <- x %>%
+    ggplot()+theme_minimal()+
+    # theme(legend.position ="top",
+    #       strip.background = element_rect(fill="grey10"),
+    #       strip.text = element_text(colour = "orange", face= "bold")) +
+    scale_x_continuous(name = "time")+
+    scale_y_continuous(name = "survival rate",
+                       limits = c(0,1)) +
+    theme(legend.position = "top") +
+    geom_ribbon(aes(x = time, ymin = qinf95, ymax= qsup95), fill="pink")+
+    geom_line(aes(x = time, y = q50), color= "red")+
+    # geom_point(data = df, aes(x = time, y = Y))+
+    facet_wrap(~ replicate)
+  
     return(plt)
   }
