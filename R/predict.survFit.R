@@ -1,12 +1,12 @@
-#' Return prediction from the results of model fitting with \code{survFit}
-#' function.
+#' \code{predict} is a generic function for predictions from \code{survFiT} model. 
+#' The function invokes particular methods which depend on the class of the first argument.
 #'
 #' This function creates a \code{predictFit} object from a \code{survFit}
 #' object.
 #'
-#' @aliases reproData
-#'
-#' @param object a dataframe of class \code{survFit}
+#' @param object An object of class \code{survFit}
+#' @param newdata An optional data frame in which to look for variables with which to predict.
+#' If omitted, the fitted values are used.
 #'
 #' @return An object of class \code{reproData}.
 #'
@@ -15,12 +15,14 @@
 #' @export
 #' 
 #' @importFrom deSolve ode
+#' @importFrom dplyr rbind_rows
+#' 
 #' 
 predict.survFit <- function(object,
-                            time_predict,
-                            conc_predict,
-                            n_size,
-                            interpolate_length = NULL,
+                            newdata = NULL,
+                            only.newdata = FALSE,
+                            n_size = 100, # number of iteration selected
+                            interpolate_length = 100,
                             interpolate_method = "linear"){
   
   ##
@@ -42,42 +44,86 @@ predict.survFit <- function(object,
     parms$kk <- 10^mctot_samples[, "kk_log10"]
   } 
   
-  
   ##
   ## 2. ODE solver 
   ##
   
-  ### external signal with several rectangle impulses
-  signal <- data.frame(times = time_predict, 
-                       import = conc_predict)
+  ### 1. select object and newdata
+  
+  x <- data.frame(time = object$modelData$time,
+                  replicate = object$modelData$replicate)
+  
+  if(!is.null(newdata)){
+    if(only.newdata == TRUE){
+      x <- newdata
+    } else{
+      x <- dplyr::rbind_rows(x, newdata)
+    }
+  } 
+  
+  ### 2. Check number of replicate
+  
+  replicate_unique <- unique(x$replicate)
+  replicate_uniqueLength <- length(replicate_unique)
+  
+  ls_return <- lapply(1:replicate_uniqueLength,
+                      function(replic) ode_predict(x, parms, replicate_unique, replic, n_size,
+                                                   interpolate_method, interpolate_length, model_type = object$model_type))
+  
+  ### 3. produce the output data.frame
+  
+  OUT_df <- dplyr::bind_rows(ls_return) %>%
+    as_data_frame()
+  
+  OUT_df$replicate <- rep(replicate_unique, rep(interpolate_length, replicate_uniqueLength))
+  
+  class(OUT_df) <- c("predictFit", "data.frame")
+  return(OUT_df)
+  
+}
+
+
+#' ode_predict
+#' 
+ode_predict <- function(x, parms, replicate_unique, replic, n_size, interpolate_method, interpolate_length, model_type){
+  
+  x <- filter(x, replicate == replicate_unique[replic])
+  
+  if(is.null(x$conc)){
+    signal <- data.frame(times = x$time_long, 
+                         import = x$conc_long)
+  } else{
+    signal <- data.frame(times = x$time, 
+                         import = x$conc)
+  }
   
   sigimp <- approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
   
   ### time vector if interpolate_length is specified
   if(!is.null(interpolate_length)){
-    times = seq(min(time_predict),max(time_predict),length = interpolate_length)
+    ode_times = seq(min(x$time),max(x$time),length = interpolate_length)
   } else{
-    times = signal$times
+    ode_times = signal$times
   }
   
   ### parameterization of initial condition + ODE model to use SD or IT
-
-  if(object$model_type == "IT"){
+  
+  if(model_type == "IT"){
     ## Start values for steady state
     xstart <- c(D = rep(0,n_size))
     ## model
     model_TKTD <- model_TKTD_IT
   }
-  if (object$model_type == "SD"){
+  if (model_type == "SD"){
     xstart <- c(D = rep(0,n_size),
                 H = rep(0,n_size))
     ## model
     model_TKTD <- model_TKTD_SD
-  } 
+  }
   
   ### Solve  ODE system
   out <- ode(y = xstart,
-             times = times,
+             times = ode_times,
              func = model_TKTD,
              parms,
              input = sigimp)
@@ -86,10 +132,10 @@ predict.survFit <- function(object,
   ## 3. Construction of the object to return 
   ##
   
-  if(object$model_type == "IT"){
-    mat_predict <- out%>%
-      as.data.frame()%>%
-      select(-c(time,signal))%>%
+  if(model_type == "IT"){
+    mat_predict <- out %>%
+      as.data.frame() %>%
+      select(-c(time,signal)) %>%
       as.matrix()
     D <- t(mat_predict)
     D.max <- t(apply(D, 1, cummax))
@@ -98,11 +144,11 @@ predict.survFit <- function(object,
     dtheo <- t(S)
     
   } 
-  if(object$model_type == "SD"){
+  if(model_type == "SD"){
     
-    mat_predict_H <- out%>%
-      as.data.frame()%>%
-      select(contains("H"),-c(time,signal))%>%
+    mat_predict_H <- out %>%
+      as.data.frame() %>%
+      select(contains("H"),-c(time,signal)) %>%
       as.matrix()
     S <- exp(-t(mat_predict_H))
     dtheo <- t(S)
@@ -111,24 +157,14 @@ predict.survFit <- function(object,
   
   # -------- df.theo
   
-  OUT_df <- data_frame( time = signal$times,
-                        conc = signal$import,
+  OUT_df <- data_frame( time = ode_times,
                         q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
                         qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
                         qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE))
   
-  
-  OUT_ls <- list(predict = OUT_df,
-                n_size = parms$n_size)
-  
-  class(OUT_ls) <- c("predictFit")
-  
-  return(OUT_ls)
+  return(OUT_df)
   
 }
-
-
-#' Forecasting ith ODE solver
 
 
 # ----------------------------
