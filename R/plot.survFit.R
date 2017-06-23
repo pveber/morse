@@ -43,9 +43,13 @@
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom dplyr filter
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
+#' @importFrom tibble data_frame
+#' @importFrom tibble as_data_frame
 #'
 plot.survFit <- function(x,
                          xlab = "Time",
@@ -57,9 +61,9 @@ plot.survFit <- function(x,
   
   
   ### compute posteriors median and 95 CI
-  modelData = x$modelData
+  modelData <- x$modelData
   
-  postData = posteriorData(x$mcmc, model_type = x$model_type)
+  postData <- posteriorData(x$mcmc, model_type = x$model_type)
   
   if(data_type == "probability"){
     
@@ -70,10 +74,10 @@ plot.survFit <- function(x,
                         replicate = modelData$replicate)
     
     if(!is.null(modelData$conc)){
-      df_plt$conc = modelData$conc
+      df_plt$conc <- modelData$conc
     }
     
-    df_plt = df_plt %>%
+    df_plt <- df_plt %>%
       group_by(replicate) %>%
       mutate(Ninit = max(Nsurv)) %>%
       ungroup() %>%
@@ -86,9 +90,9 @@ plot.survFit <- function(x,
     
   } else if(data_type == "number"){
     
-    ylab = "Number of survivors"
+    ylab <- "Number of survivors"
     
-    df_plt = data_frame(Y = modelData$Nsurv,
+    df_plt <- data_frame(Y = modelData$Nsurv,
                         time = modelData$time,
                         replicate = modelData$replicate,
                         Y_q50 = apply(postData$df_sim, 2, quantile, probs = 0.5, na.rm = TRUE),
@@ -97,7 +101,7 @@ plot.survFit <- function(x,
       mutate(timelag = ifelse(time == 0, time, lag(time)))
     
     if(!is.null(modelData$conc)){
-      df_plt$conc = modelData$conc
+      df_plt$conc <- modelData$conc
     }
     
   } else stop("type must be 'probability' (i.e., probability of survival) or 'number' (i.e., number of survivors)")
@@ -113,12 +117,13 @@ plot.survFit <- function(x,
          colour = "Concentration" # legend title
     ) +
     scale_colour_gradient(
-      name="Concentration",
-      low="grey20", high="orange"
+      name = "Concentration",
+      low = "grey20", high="orange"
     ) +
     scale_fill_gradient(
-      name="Concentration",
-      low="grey20", high="orange"
+      name = "Concentration",
+      low = "grey20",
+      high = "orange"
     ) +
     # geom_ribbon(aes(x = time,
     #                 ymin = Y_qinf95,
