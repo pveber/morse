@@ -17,6 +17,7 @@ Imports:
     coda,
     broom,
     dplyr,
+    deSolve,
     epitools,
     graphics,
     grDevices,
