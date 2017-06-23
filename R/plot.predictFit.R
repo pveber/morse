@@ -20,7 +20,7 @@
 #' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
 #' taken for this sample).
 #'
-#' @param x An object of class \code{gm_urvFitTKTD}.
+#' @param x An object of class \code{survFit}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param mainlab A mainlab title for the plot.
