@@ -29,14 +29,6 @@
 #' @export
 #'
 #'
-x = predict_fit_cstSD
-xlab = "Time"
-ylab = "Survival rate"
-mainlab = NULL
-one.plot = FALSE
-adddata = FALSE
-addlegend = FALSE
-
 plot.predictFit <- function(x,
                             xlab = "Time",
                             ylab = "Survival rate",
@@ -115,5 +107,4 @@ plot.predictFit <- function(x,
 
   return(plt_fit)
 }
-
 
