@@ -261,35 +261,68 @@ summary(fit_cstSD)
 ```
 
 ```{r, cache=TRUE}
-plot(fit_cstSD, facet.label = "conc")
-```
-
-```{r, cache=TRUE}
+# (8) the posterior predictive check
 ppc(fit_cstSD)
 ```
 
-```{r, cache=TRUE}
-summary(fit_cstSD)
-```
-
-To have a summary of the estimation of parameters
+We can plot the survival rate with the option `data_type = 'rate'`
 
 ```{r, cache=TRUE}
-fit_cstSD$estim.par
+plot(fit_cstSD, data_type = 'rate')
 ```
 
-It is also possible to predict:
+or the number of survivors with the option `data_type = 'number'`
+
+```{r, cache=TRUE}
+plot(fit_cstSD, data_type = 'number')
+```
+
+and various other options can be used
+
+```{r, cache=TRUE}
+# (i) adddata
+plot(fit_cstSD, adddata = FALSE)
+# (ii) addlegend
+plot(fit_cstSD, addlegend = TRUE)
+# (ii) one.plot
+plot(fit_cstSD, one.plot = TRUE)
+```
+
+It is also possible to predict in the inter-interval:
 
 ```{r, cache=TRUE}
 # create a prediction
 predict_fit_cstSD <- predict(fit_cstSD)
 
 #plot the prediction
-plot(predict_fit_cstSD)
+plot(predict_fit_cstSD, adddata = TRUE)
+```
+
+The option `levels_vector` allow to reorder the plot (when `one.plot = FALSE`)
+
+```{r}
+plot(predict_fit_cstSD, levels_vector = c("0", "8", "12", "14", "18", "24", "29", "36"))
+```
+
+The user can add a `newdata`
+
+```{r}
+# The new dataset
+data_4casting <- data.frame(time = c(0:4, 0:4),
+                            conc = c(rep(16,5),rep(25,5)),
+                            replicate = c(rep("16_newdata",5),rep("25_newdata",5)))
+
+# create a prediction
+predict_fit_cstSD <- predict(object = fit_cstSD, newdata = data_4casting)
+
+#plot the prediction
+plot(predict_fit_cstSD, adddata = TRUE, 
+     levels_vector = c("0", "8", "12", "14", "16_newdata", "18", "24", "25_newdata", "29", "36"))
 ```
 
 
 ### Survival Analysis of Individual Tolerance (IT) model
+
 
 Only change `model_type` to `IT`:
 
@@ -304,7 +337,7 @@ load("fit_cstIT.Rdata")
 ```
 
 ```{r, cache=TRUE}
-plot(fit_cstIT, facet.label = "conc")
+plot(fit_cstIT)
 ```
 
 ```{r, cache=TRUE}
@@ -315,11 +348,6 @@ ppc(fit_cstIT)
 summary(fit_cstIT)
 ```
 
-To have a summary of the estimation of parameters
-
-```{r, cache=TRUE}
-fit_cstIT$estim.par
-```
 
 It is also possible to predict:
 
@@ -328,7 +356,9 @@ It is also possible to predict:
 predict_fit_cstIT <- predict(fit_cstIT)
 
 #plot the prediction
-plot(predict_fit_cstIT)
+plot(predict_fit_cstIT,
+     levels_vector = c("0", "8", "12", "14", "18", "24", "29", "36"),
+     adddata = TRUE)
 ```
 
 ## TKTD model with time-variable exposure concentration
@@ -376,26 +406,25 @@ load("fit_varSD.Rdata")
 summary(fit_varSD)
 ```
 
+We can plot the survival rate with the option `data_type = 'rate'`
+
+```{r, cache=TRUE}
+plot(fit_varSD, data_type = "rate")
+```
+
+Or the number of survivors with the option `data_type = 'number'`
+
 ```{r, cache=TRUE}
 plot(fit_varSD, data_type = "number")
 ```
+
+As previously, the posterior predictive check is given with the funcion `ppc`
 
 ```{r, cache=TRUE}
 ppc(fit_varSD)
 ```
 
-It is also possible to predict:
-
-```{r, cache=TRUE}
-# create a prediction
-predict_fit_varSD <- predict(fit_varSD)
-
-#plot the prediction
-plot(predict_fit_varSD)
-```
-
 ### Survival Analysis of Individual Tolerance (IT) model
-
 
 ```{r TKTDvarIT, eval=FALSE}
 # (6) fit a TKTD model
@@ -419,6 +448,15 @@ plot(fit_varIT)
 
 ```{r, cache=TRUE}
 ppc(fit_varIT)
+```
+
+
+```{r, cache=TRUE}
+# create a prediction
+predict_fit_varIT <- predict(fit_varIT)
+
+#plot the prediction
+plot(predict_fit_varIT, adddata = TRUE)
 ```
 
 # Reproduction data analyses
