@@ -15,7 +15,8 @@
 #' @export
 #' 
 #' @importFrom deSolve ode
-#' @importFrom dplyr rbind_rows
+#' @importFrom dplyr bind_rows
+#' 
 #' 
 #' 
 predict.survFit <- function(object,
@@ -49,15 +50,21 @@ predict.survFit <- function(object,
   ##
   
   ### 1. select object and newdata
-  
-  x <- data.frame(time = object$modelData$time,
-                  replicate = object$modelData$replicate)
+  if(!is.null(object$modelData$conc)){
+    x <- data.frame(time = object$modelData$time,
+                    conc = object$modelData$conc,
+                    replicate = object$modelData$replicate)
+  } else{
+    x <- data.frame(time = object$modelData$time_long,
+                    conc = object$modelData$conc_long,
+                    replicate = object$modelData$replicate_ID_long)
+  }
   
   if(!is.null(newdata)){
     if(only.newdata == TRUE){
       x <- newdata
     } else{
-      x <- dplyr::rbind_rows(x, newdata)
+      x <- rbind(x, newdata)
     }
   } 
   
@@ -66,19 +73,43 @@ predict.survFit <- function(object,
   replicate_unique <- unique(x$replicate)
   replicate_uniqueLength <- length(replicate_unique)
   
+  ### 3. run the ode
+  
   ls_return <- lapply(1:replicate_uniqueLength,
                       function(replic) ode_predict(x, parms, replicate_unique, replic, n_size,
                                                    interpolate_method, interpolate_length, model_type = object$model_type))
   
   ### 3. produce the output data.frame
   
-  OUT_df <- dplyr::bind_rows(ls_return) %>%
+  #---- Predict
+  
+  predict_df <- dplyr::bind_rows(ls_return) %>%
     as_data_frame()
   
-  OUT_df$replicate <- rep(replicate_unique, rep(interpolate_length, replicate_uniqueLength))
+  predict_df$replicate <- rep(replicate_unique, rep(interpolate_length, replicate_uniqueLength))
   
-  class(OUT_df) <- c("predictFit", "data.frame")
-  return(OUT_df)
+  #---- Observation
+  
+  if(!is.null(object$modelData$conc)){
+    observ_df <-  data.frame(time = object$modelData$time,
+                              conc = object$modelData$conc,
+                              Nsurv = object$modelData$Nsurv,
+                              replicate = object$modelData$replicate)
+  } else{
+    observ_df <-  data.frame(time = object$modelData$time,
+                             Nsurv = object$modelData$Nsurv,
+                             replicate_name = object$modelData$replicate,
+                             replicate = object$modelData$replicate_ID)
+  }
+  
+    
+    OUT_ls <- list(predict_data = predict_df,
+                   observ_data = observ_df)
+  
+
+  class(OUT_ls) <- "predictFit"
+
+  return(OUT_ls)
   
 }
 
@@ -87,21 +118,21 @@ predict.survFit <- function(object,
 #' 
 ode_predict <- function(x, parms, replicate_unique, replic, n_size, interpolate_method, interpolate_length, model_type){
   
-  x <- filter(x, replicate == replicate_unique[replic])
+  filter_x <- filter(x, replicate == replicate_unique[replic])
   
-  if(is.null(x$conc)){
-    signal <- data.frame(times = x$time_long, 
-                         import = x$conc_long)
+  if(is.null(filter_x$conc)){
+    signal <- data.frame(times = filter_x$time_long, 
+                         import = filter_x$conc_long)
   } else{
-    signal <- data.frame(times = x$time, 
-                         import = x$conc)
+    signal <- data.frame(times = filter_x$time, 
+                         import = filter_x$conc)
   }
   
   sigimp <- approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
   
   ### time vector if interpolate_length is specified
   if(!is.null(interpolate_length)){
-    ode_times = seq(min(x$time),max(x$time),length = interpolate_length)
+    ode_times = seq(min(filter_x$time),max(filter_x$time),length = interpolate_length)
   } else{
     ode_times = signal$times
   }
@@ -128,26 +159,26 @@ ode_predict <- function(x, parms, replicate_unique, replic, n_size, interpolate_
              parms,
              input = sigimp)
   
+  out_df = as.data.frame(out)
+  
   ##
   ## 3. Construction of the object to return 
   ##
   
   if(model_type == "IT"){
-    mat_predict <- out %>%
-      as.data.frame() %>%
+    mat_predict <- out_df %>%
       select(-c(time,signal)) %>%
       as.matrix()
     D <- t(mat_predict)
     D.max <- t(apply(D, 1, cummax))
     
-    S <- 1 - plogis(log(D.max), location = log(parms$alpha), scale = 1 / parms$beta)
+    S <- exp(-parms$hb %*% t(out_df$time))*(1 - plogis(log(D.max), location = log(parms$alpha), scale = 1 / parms$beta))
     dtheo <- t(S)
     
   } 
   if(model_type == "SD"){
     
-    mat_predict_H <- out %>%
-      as.data.frame() %>%
+    mat_predict_H <- out_df %>%
       select(contains("H"),-c(time,signal)) %>%
       as.matrix()
     S <- exp(-t(mat_predict_H))
@@ -155,14 +186,14 @@ ode_predict <- function(x, parms, replicate_unique, replic, n_size, interpolate_
     
   }
   
-  # -------- df.theo
-  
-  OUT_df <- data_frame( time = ode_times,
+  OUT_ode <- data_frame( time = out_df$time,
+                        conc = out_df$signal,
                         q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
                         qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
                         qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE))
   
-  return(OUT_df)
+  
+  return(OUT_ode)
   
 }
 
@@ -179,7 +210,7 @@ model_TKTD_SD <- function(t, State, parms, input)  {
     H = State[(n_size+1):(2*n_size)] 
     
     dD <- kd*(C - D)        # internal concentration
-    dH <- kk*max(D-z,0)     # risk function
+    dH <- kk*max(D-z,0) + hb    # risk function
     
     res <- c(dD, dH)
     list(res, signal = import)
@@ -201,3 +232,4 @@ model_TKTD_IT <- function(t, State, parms, input) {
     
   })
 }
+
