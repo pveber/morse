@@ -1,71 +1,119 @@
-#' Plotting method for \code{predictFit} objects
+#' Plotting method for \code{survFit} objects
 #'
 #' This is the generic \code{plot} S3 method for the
 #' \code{survFit}.  It plots the fits obtained for each
 #' concentration of pollutant in the original dataset.
 #'
 #' The fitted curves represent the \strong{estimated survival rate} as a function
-#' of time for each concentration.
+#' of time for each concentration (if \code{ data_type = "rate"}), or th
+#' \strong{estimated number of survivors} as a function
+#' of time for each concentration (if \code{ data_type = "number"})
 #' The black dots depict the \strong{observed survival
-#' rate} at each time point. Note that since our model does not take
+#' rate} at each time point (if \code{adddata = TRUE}). Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
-#' The function plots both 95 \% credible intervals for the estimated survival
-#' rate (by default the red area around the fitted curve) and 95 \% confidence
-#' intervals for the observed survival rate (as black error bars if
-#' \code{adddata = TRUE}).
-#' Both types of intervals are taken at the same level. Typically
-#' a good fit is expected to display a large overlap between the two intervals.
-#' It consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
-#' taken for this sample).
 #'
 #' @param x An object of class \code{survFit}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param mainlab A mainlab title for the plot.
-#' @param concentration A numeric value corresponding to some concentration in
-#' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration.
-#' @param spaghetti if \code{TRUE}, draws a set of survival curves using
-#' parameters drawn from the posterior distribution
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
 #' one plot instead of one per concentration.
 #' @param adddata if \code{TRUE}, adds the observed data to the plot
-#' with (frequentist) confidence intervals
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot.
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' 
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
 #'
 #' @export
 #'
-#' @importFrom deSolve 
 #'
-plot.predictFit <- function(x){
+x = predict_fit_cstSD
+xlab = "Time"
+ylab = "Survival rate"
+mainlab = NULL
+one.plot = FALSE
+adddata = FALSE
+addlegend = FALSE
+
+plot.predictFit <- function(x,
+                            xlab = "Time",
+                            ylab = "Survival rate",
+                            mainlab = NULL,
+                            one.plot = FALSE,
+                            levels_vector = NULL,
+                            adddata = FALSE,
+                            addlegend = FALSE){
  
-  # df <- data.frame(time = x$modelData$time,
-  #                  Nsurv = x$modelData$Nsurv,
-  #                  conc = x$modelData$conc,
-  #                  replicate = x$modelData$replicate) %>%
-  #   group_by(replicate) %>%
-  #   mutate(Ninit = max(Nsurv)) %>%
-  #   ungroup() %>%
-  #   mutate(Y = Nsurv / Ninit)
   
-  plt <- x %>%
-    ggplot()+theme_minimal()+
-    # theme(legend.position ="top",
-    #       strip.background = element_rect(fill="grey10"),
-    #       strip.text = element_text(colour = "orange", face= "bold")) +
-    scale_x_continuous(name = "time")+
-    scale_y_continuous(name = "survival rate",
-                       limits = c(0,1)) +
-    theme(legend.position = "top") +
-    geom_ribbon(aes(x = time, ymin = qinf95, ymax= qsup95), fill="pink")+
-    geom_line(aes(x = time, y = q50), color= "red")+
-    # geom_point(data = df, aes(x = time, y = Y))+
-    facet_wrap(~ replicate)
+  predict_df <- x$predict_data
   
-    return(plt)
+  if(!is.null(levels_vector)){
+    predict_df$replicate = factor(predict_df$replicate, levels = levels_vector)
   }
+  
+  plt_fit <- predict_df %>%
+    ggplot() + theme_minimal() +
+    expand_limits(x = 0, y = 0) +
+    labs(title = mainlab,
+         x = xlab,
+         y = ylab,
+         colour = "Concentration" # legend title
+    ) +
+    scale_colour_gradient(
+      name = "Concentration",
+      low = "grey20", high="orange"
+    ) +
+    scale_fill_gradient(
+      name = "Concentration",
+      low = "grey20",
+      high = "orange"
+    ) +
+    geom_ribbon(aes(x = time, ymin = qinf95, ymax = qsup95), fill="pink")+
+    geom_line(aes(x = time, y = q50), color= "red")
+  
+  ##
+  ## adddata
+  ##
+  
+  observ_df <- x$observ_data %>%
+    group_by(replicate) %>%
+    mutate(Ninit = max(Nsurv)) %>%
+    ungroup() %>%
+    mutate(psurv_obs = Nsurv / Ninit)
+  
+  if(!is.logical(adddata)) stop ("'adddata' must be a logical.")  
+  if(adddata == TRUE){
+    plt_fit <- plt_fit +
+      geom_point(data = observ_df,
+                 aes(x = time,
+                     y = psurv_obs,
+                     group = replicate ))
+    
+  }
+  
+  ##
+  ## addlegend
+  ##
+  if(!is.logical(addlegend)) stop ("'addlegend' must be a logical.")
+  if(addlegend == TRUE){
+    plt_fit <- plt_fit +
+      theme(legend.position="top")
+  } else {
+    plt_fit <- plt_fit +
+      theme(legend.position="none")
+  }
+  
+  ##
+  ## facetting
+  ##
+  if(!is.logical(one.plot)) stop ("'one.plot' must be a logical.")  
+  if(one.plot != TRUE){
+      plt_fit <- plt_fit + facet_wrap(~ replicate)
+  }
+
+  return(plt_fit)
+}
+
+
