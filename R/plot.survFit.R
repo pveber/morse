@@ -127,10 +127,10 @@ plot.survFit <- function(x,
      geom_ribbon(aes(x = time,
                      ymin = Y_qinf95,
                      ymax = Y_qsup95 ,
-                     group = replicate), fill = "orange", alpha = 0.4, color = "grey90") +
+                     group = replicate), fill = "pink", alpha = 0.4) +
     geom_line(aes(x = time,
                   y = Y_q50,
-                  group = replicate ), direction = "vh", color="red")
+                  group = replicate ), color="red")
   } else if(data_type == "number"){
     plt_fit <- plt_fit +
       geom_rect(aes(xmin = timelag, xmax = time,
