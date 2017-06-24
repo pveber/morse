@@ -6,7 +6,7 @@
 #'
 #' The fitted curves represent the \strong{estimated survival rate} as a function
 #' of time for each concentration (if \code{ data_type = "rate"}), or th
-#' \strong{estimated number of survivros} as a function
+#' \strong{estimated number of survivors} as a function
 #' of time for each concentration (if \code{ data_type = "number"})
 #' The black dots depict the \strong{observed survival
 #' rate} at each time point (if \code{adddata = TRUE}). Note that since our model does not take
@@ -20,9 +20,12 @@
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
 #' one plot instead of one per concentration.
 #' @param adddata if \code{TRUE}, adds the observed data to the plot
-#' with (frequentist) confidence intervals
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot.
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param data_type A label \code{'rate'} or \code{'number'}. If \code{'rate'},
+#' the fitted curves represent the \strong{estimated survival rate}, if \code{'number'}
+#' thef itted curves represent the \strong{estimated number of survivors} as a function
+#' of time for each concentration.
+#' 
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
@@ -46,9 +49,11 @@ plot.survFit <- function(x,
                          mainlab = NULL,
                          one.plot = FALSE,
                          adddata = TRUE,
+                         addlegend = FALSE,
                          data_type = "rate",
-                         facetting = TRUE,
-                         facet.label = "replicate") {
+                         # facetting = TRUE,
+                         #facet.label = "replicate",
+                         ...) {
   
   
   ### compute posteriors median and 95 CI
@@ -100,7 +105,6 @@ plot.survFit <- function(x,
   
   plt_fit <- df_plt %>%
     ggplot() + theme_minimal() +
-    theme(legend.position="none") +
     expand_limits(x = 0, y = 0) +
     labs(title = mainlab,
          x = xlab,
@@ -137,7 +141,11 @@ plot.survFit <- function(x,
                     group = replicate ), direction = "vh", color="red")
   
   } else stop("type must be 'rate' (i.e., rate of survival) or 'number' (i.e., number of survivors)")
-    
+  
+  ##
+  ## adddata
+  ##
+  if(!is.logical(adddata)) stop ("'adddata' must be a logical.")  
   if(adddata == TRUE){
     plt_fit <- plt_fit +
       geom_point(aes(x = time,
@@ -145,17 +153,34 @@ plot.survFit <- function(x,
                      group = replicate ))
     
   }
+  ##
+  ## addlegend
+  ##
+  if(!is.logical(addlegend)) stop ("'addlegend' must be a logical.")
+  if(addlegend == TRUE){
+    plt_fit <- plt_fit +
+      theme(legend.position="top")
+  } else {
+    plt_fit <- plt_fit +
+      theme(legend.position="none")
+  }
   
   ##
   ## facetting
   ##
+  if(!is.logical(one.plot)) stop ("'one.plot' must be a logical.")  
   if(one.plot != TRUE){
-    if(facet.label == "replicate"){
-      OUT_fit <- plt_fit + facet_wrap(~ replicate)
-    } else if (facet.label == "conc"){
-      OUT_fit <- plt_fit + facet_wrap(~ conc)
-    } else stop("'facet.label' is either 'replicate' (default) or 'conc'.")
+    if(is.null(modelData$conc)){
+      plt_fit <- plt_fit + facet_wrap(~ replicate)
+    } else{
+      plt_fit <- plt_fit + facet_wrap(~ conc)
+    }
+    # if(facet.label == "replicate"){
+    #   plt_fit <- plt_fit + facet_wrap(~ replicate)
+    # } else if (facet.label == "conc"){
+    #   plt_fit <- plt_fit + facet_wrap(~ conc)
+    # } else stop("'facet.label' is either 'replicate' (default) or 'conc'.")
   }
   
-  return(OUT_fit)
+  return(plt_fit)
 }
