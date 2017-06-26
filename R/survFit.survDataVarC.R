@@ -76,7 +76,10 @@ survFit.survDataVarC <- function(data,
   ### Remove the information of replicate since this is not used in JAGS, and so a warning message would be show
 
   modelData_ = globalData$modelData
-  modelData = modelData_ ; modelData$replicate = NULL
+  modelData = modelData_ 
+  modelData$replicate = NULL
+  modelData$time = NULL
+  modelData$conc = NULL
 
   modelData_Null_ = globalData$modelData_Null
   modelData_Null = modelData_Null_ ; modelData_Null$replicate = NULL
