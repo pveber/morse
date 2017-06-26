@@ -1,27 +1,16 @@
-## data
-# homogeneous always work
-
-data(cadmium1)
-data(cadmium2)
-data(copper)
-data(chlordan)
-data(zinc)
-
-# always work dataset
-d <- list(cadmium1 = cadmium1,
-          cadmium2 = cadmium2,
-          copper = copper,
-          chlordan = chlordan,
-          zinc = zinc)
-
-## tests
+datasets <- c("cadmium1",
+              "cadmium2",
+              "copper",
+              "chlordan",
+              "zinc")
+data(list=datasets)
 
 test_that("reproDataCheck", {
   skip_on_cran()
   empty_error_table <- errorTableCreate()
 
-  lapply(d, function(x) {
-    errors <- reproDataCheck(x)
+  lapply(datasets, function(x) {
+    errors <- reproDataCheck(get(x))
     expect_equal(errors, empty_error_table, info = paste(errors$msg, collapse = "\n"))
     expect_is(errors, c("errorTable",
                         "data.frame"))
@@ -69,7 +58,7 @@ test_that("reproDataCheck", {
 test_that("reproData", {
   skip_on_cran()
   
-  lapply(d, function(x) {
+  lapply(datasets, function(x) {
     dat <- reproData(x)
     expect_is(dat, c("reproData", "survData", "data.frame"))
     expect_true(!is.null(dat))

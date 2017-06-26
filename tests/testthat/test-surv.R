@@ -1,30 +1,20 @@
-## data
-data(cadmium1)
-data(cadmium2)
-data(copper)
-data(chlordan)
-data(dichromate)
-data(propiconazole)
-data(zinc)
+datasets <- c("cadmium1",
+              "cadmium2",
+              "copper",
+              "chlordan",
+              "dichromate",
+              "propiconazole",
+              "zinc")
+data(list=datasets)
 
-# no error dataset
-d <- list(cadmium1 = cadmium1,
-          cadmium2 = cadmium2,
-          copper = copper,
-          chlordan = chlordan,
-          dichromate = dichromate,
-          zinc = zinc,
-          propiconazole = propiconazole)
-
-## tests
 
 test_that("survDataCheck", {
   skip_on_cran()
   empty_error_table <- errorTableCreate()
 
   # no error dataset
-  lapply(d, function(x) {
-    errors <- survDataCheck(x)
+  lapply(datasets, function(x) {
+    errors <- survDataCheck(get(x))
     expect_equal(errors, empty_error_table, info = paste(errors$msg, collapse = "\n"))
     expect_is(errors, c("errorTable",
                         "data.frame"))
