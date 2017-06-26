@@ -196,6 +196,7 @@ modelData.survDataVarC <- function(x_survData,
   
   modelData$conc_long <- x_survData_interpolate$conc
   modelData$time_long <- x_survData_interpolate$time
+  modelData$replicate_long <- x_survData_interpolate$replicate
   
   modelData$tprec_long <- x_survData_interpolate$tprec_long
   modelData$concprec_long <- x_survData_interpolate$concprec_long
