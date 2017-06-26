@@ -18,14 +18,14 @@ d <- list(cadmium1 = cadmium1,
 
 test_that("reproDataCheck", {
   skip_on_cran()
-  
+  empty_error_table <- errorTableCreate()
+
   lapply(d, function(x) {
-    dat <- reproDataCheck(x)
-    expect_equal(dim(dat)[1], 0)
-    expect_equal(dim(dat)[2], 2)
-    expect_is(dat, c("errorTable",
-                     "data.frame"))
-    expect_true(morse:::errorTableIsEmpty(dat))
+    errors <- reproDataCheck(x)
+    expect_equal(errors, empty_error_table, info = paste(errors$msg, collapse = "\n"))
+    expect_is(errors, c("errorTable",
+                        "data.frame"))
+    expect_true(morse:::errorTableIsEmpty(errors))
   })
   
   # error dataset
