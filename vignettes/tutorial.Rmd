@@ -242,7 +242,6 @@ plot(dat, style = "ggplot", pool.replicate = FALSE)
 summary(dat)
 ```
 
-
 ### Survival Analysis of Stochastic Death (SD) model
 
 ```{r TKTDsctSD, eval=FALSE}
@@ -290,34 +289,49 @@ plot(fit_cstSD, one.plot = TRUE)
 
 It is also possible to predict in the inter-interval:
 
-```{r, cache=TRUE}
-# create a prediction
-predict_fit_cstSD <- predict(fit_cstSD)
 
+```{r, cache = TRUE, eval=FALSE}
+# create a prediction
+predict_survFitCstC <- predict(fit_cstSD)
+# save(predict_survFitCstC, file = "predict_survFitCstC.Rdata")
+```
+
+
+```{r, cache=TRUE}
+load(file = "predict_survFitCstC.Rdata")
 #plot the prediction
-plot(predict_fit_cstSD, adddata = TRUE)
+plot(predict_survFitCstC, adddata = TRUE)
 ```
 
 The option `levels_vector` allow to reorder the plot (when `one.plot = FALSE`)
 
 ```{r}
-plot(predict_fit_cstSD, levels_vector = c("0", "8", "12", "14", "18", "24", "29", "36"))
+plot(predict_survFitCstC, adddata = TRUE
+     , levels_vector = c("0", "8", "12", "14", "18", "24", "29", "36"))
 ```
 
 The user can add a `newdata`
 
 ```{r}
 # The new dataset
-data_4casting <- data.frame(time = c(0:4, 0:4),
-                            conc = c(rep(16,5),rep(25,5)),
-                            replicate = c(rep("16_newdata",5),rep("25_newdata",5)))
+data_4casting <- data.frame(time = rep(0:4,3),
+                            conc = rep(c(16,25,40), rep(5,3)),
+                            replicate = c(rep("16_newdata",5),rep("25_newdata",5),rep("40_newdata",5)))
+```
 
+
+```{r, cache=TRUE, eval=FALSE}
 # create a prediction
-predict_fit_cstSD <- predict(object = fit_cstSD, newdata = data_4casting)
+predict_survFitCstC_Newdata <- predict(object = fit_cstSD, newdata = data_4casting)
+# save(predict_survFitCstC_Newdata, file = "predict_survFitCstC_Newdata.Rdata")                             
+```
 
+
+```{r, cache=TRUE}
+load(file = "predict_survFitCstC_Newdata.Rdata")
 #plot the prediction
-plot(predict_fit_cstSD, adddata = TRUE, 
-     levels_vector = c("0", "8", "12", "14", "16_newdata", "18", "24", "25_newdata", "29", "36"))
+plot(predict_survFitCstC_Newdata, adddata = TRUE, 
+     levels_vector = c("0", "8", "12", "14", "16_newdata", "18", "24", "25_newdata", "29", "36", "40_newdata"))
 ```
 
 
@@ -348,15 +362,19 @@ ppc(fit_cstIT)
 summary(fit_cstIT)
 ```
 
-
 It is also possible to predict:
 
-```{r, cache=TRUE}
+```{r}
 # create a prediction
-predict_fit_cstIT <- predict(fit_cstIT)
+predict_survFitCstIT <- predict(fit_cstIT)
+# save(predict_survFitCstIT, file = "predict_survFitCstIT.Rdata")
+```
 
+
+```{r, cache=TRUE}
+load(file = "predict_survFitCstIT.Rdata")
 #plot the prediction
-plot(predict_fit_cstIT,
+plot(predict_survFitCstIT,
      levels_vector = c("0", "8", "12", "14", "18", "24", "29", "36"),
      adddata = TRUE)
 ```
@@ -424,6 +442,43 @@ As previously, the posterior predictive check is given with the funcion `ppc`
 ppc(fit_varSD)
 ```
 
+And a prediction of the intermediate data
+
+```{r, cache=TRUE, eval = FALSE}
+predict_survFitVarC <- predict(fit_varSD)
+# save(predict_survFitVarC, file = "predict_survFitVarC.Rdata")
+```
+
+```{r, cache=TRUE}
+load(file = "predict_survFitVarC.Rdata")
+plot(predict_survFitVarC, adddata = TRUE)
+```
+
+And we can forcast on totally different profile
+
+```{r, cache=TRUE}
+# newdata_varC = data.frame(time = seq(0,10,length = 100),
+#                           conc = 2 + abs(rnorm(100,0,15)),
+#                           replicate = rep("newdata", 100))
+# save(newdata_varC, file = "newdata_varC.Rdata")
+load(file ="newdata_varC.Rdata")
+
+qplot(data = newdata_varC, x = time, y = conc, geom = "line", color = "orange") +
+  theme_minimal() + theme(legend.position = "none")
+```
+
+
+```{r, cache=TRUE, eval = FALSE}
+predict_survFitVarC_newdata <- predict(fit_varSD, newdata = newdata_varC )
+# save(predict_survFitVarC_newdata, file ="predict_survFitVarC_newdata.Rdata")
+```
+
+
+```{r}
+load(file ="predict_survFitVarC_newdata.Rdata")
+plot(predict_survFitVarC_newdata , adddata = TRUE, keep_level = TRUE)
+```
+
 ### Survival Analysis of Individual Tolerance (IT) model
 
 ```{r TKTDvarIT, eval=FALSE}
@@ -450,13 +505,14 @@ plot(fit_varIT)
 ppc(fit_varIT)
 ```
 
+```{r, cache=TRUE, eval = FALSE}
+predict_survFitVarC_IT <- predict(fit_varIT)
+# save(predict_survFitVarC_IT, file = "predict_survFitVarC_IT.Rdata")
+```
 
 ```{r, cache=TRUE}
-# create a prediction
-predict_fit_varIT <- predict(fit_varIT)
-
-#plot the prediction
-plot(predict_fit_varIT, adddata = TRUE)
+load(file = "predict_survFitVarC_IT.Rdata")
+plot(predict_survFitVarC_IT, adddata = TRUE)
 ```
 
 # Reproduction data analyses
