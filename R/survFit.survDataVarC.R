@@ -80,9 +80,16 @@ survFit.survDataVarC <- function(data,
   modelData$replicate = NULL
   modelData$time = NULL
   modelData$conc = NULL
+  modelData$replicate_long = NULL
+  
 
   modelData_Null_ = globalData$modelData_Null
-  modelData_Null = modelData_Null_ ; modelData_Null$replicate = NULL
+  modelData_Null = modelData_Null_ 
+  modelData_Null$replicate = NULL
+  modelData_Null$replicate = NULL
+  modelData_Null$time = NULL
+  modelData_Null$conc = NULL
+  modelData_Null$replicate_long = NULL
 
   priorsData = globalData$priorsMinMax
 
