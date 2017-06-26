@@ -38,34 +38,34 @@
 #' @import grDevices
 #' @importFrom methods is
 #' @importFrom stats aggregate
-#' 
+#'
 #' @export
 plot.reproData <- function(x,
                            xlab,
                            ylab = "Cumulated Number of offspring",
                            main = NULL,
                            concentration = NULL,
-                           style = "generic",
+                           style = "ggplot",
                            pool.replicate = FALSE,
                            addlegend = FALSE,
                            remove.someLabels = FALSE, ...) {
   if (!is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
-  
+
   if (style == "generic" && remove.someLabels)
     warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
             call. = FALSE)
-  
+
   if (is.null(concentration) && addlegend)
     warning("'addlegend' argument is valid only when 'concentration' is not null.",
             call. = FALSE)
-  
+
   if (pool.replicate) {
     # agregate by sum of replicate
     x <- cbind(aggregate(cbind(Nreprocumul, Nsurv, Ninit) ~ time + conc, x, sum),
                replicate = 1)
   }
-  
+
   if (is.null(concentration)) {
     reproDataPlotFull(x, xlab, ylab, style, remove.someLabels)
   }
@@ -93,4 +93,3 @@ reproDataPlotFixedConc <- function(x,
   dataPlotFixedConc(x, xlab, ylab, main, "Nreprocumul",
                     concentration, style, addlegend, remove.someLabels)
 }
-

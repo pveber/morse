@@ -3,7 +3,7 @@
 #' This is the generic \code{plotDoseResponse} S3 method for the \code{survData}
 #' class. It plots the survival rate as a function of concentration (for a given
 #' target time).
-#' 
+#'
 #' The function plots the observed values of the survival rate for a given time
 #' as a function of concentration. The 95 \% binomial confidence interval is added
 #' to each survival rate. It is calculated using function
@@ -21,10 +21,10 @@
 #' \code{'ggplot'} style to avoid the label overlap
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods
-#' 
+#'
 #' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
-#' 
+#'
 #' @seealso \code{\link[stats]{binom.test}}
 #'
 #' @keywords plot
@@ -60,57 +60,56 @@ plotDoseResponse.survDataCstC <- function(x,
                                       ylab = "Survival rate",
                                       main = NULL,
                                       target.time = NULL,
-                                      style = "generic",
+                                      style = "ggplot",
                                       log.scale = FALSE,
                                       remove.someLabels = FALSE,
                                       addlegend = TRUE,
                                       ...) {
   if (is.null(target.time)) target.time <- max(x$time)
-  
+
   if (!target.time %in% x$time || target.time == 0)
     stop("[target.time] is not one of the possible time !")
-  
+
   if (style == "generic" && remove.someLabels)
     warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
             call. = FALSE)
-  
+
   # Create a new column named profile
   x$profile = as.character(x$conc)
-  
+
   # agregate by sum of profile
   x <- x %>%
     dplyr::group_by(profile,conc, time) %>%
     dplyr::summarise(Nsurv = sum(Nsurv)) %>%
     ungroup()
-  
+
   # create column Ninit
   x <- x %>%
     dplyr::group_by(profile) %>%
     # survDataCheck checked that Nsurv was decreasing in each profile and the present of time == 0
     dplyr::mutate(Ninit = max(Nsurv))
-  
-  
+
   x$resp <- x$Nsurv / x$Ninit
   # select the target.time
   xf <- x %>% dplyr::filter(time == target.time)
-  
+
   # Binomial confidence interval
   xf <- binom_test(xf)
-  
+
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) xf$conc > 0 else TRUE
   x <- xf[sel, ]
   transf_data_conc <- optLogTransform(log.scale, x$conc)
-  
+
   # Concentration values used for display in linear scale
   display.conc <- (function() {
     x <- optLogTransform(log.scale, x$conc)
     if(log.scale) exp(x) else x
   })()
-  
+
   # vector color
   # x$color <- as.numeric(as.factor(x$profile))
-  
+
   if (style == "generic") {
     plot(transf_data_conc, seq(0, max(x$conf.high),
                                length.out = length(transf_data_conc)),
@@ -120,24 +119,24 @@ plotDoseResponse.survDataCstC <- function(x,
          main = main,
          xlab = xlab,
          ylab = ylab)
-    
+
     axis(side = 1, at = transf_data_conc,
          labels = display.conc)
     axis(side = 2, at = unique(round(pretty(c(0, max(x$resp))))),
          labels = unique(round(pretty(c(0, max(x$resp))))))
-    
+
     # points
     points(transf_data_conc, x$resp,
            pch = 20)
-    
+
     # segment CI
     segments(transf_data_conc, x$resp,
              transf_data_conc, x$conf.high)
-            
-    
+
+
     segments(transf_data_conc, x$resp,
              transf_data_conc, x$conf.low)
-    
+
     # add legend
     if (addlegend) {
       legend("bottomleft", pch = c(20, NA),
@@ -151,16 +150,16 @@ plotDoseResponse.survDataCstC <- function(x,
   else if (style == "ggplot") {
     # colors
     valCols <- fCols(x, fitcol = NA, cicol = NA)
-    
+
     df <- data.frame(x,
                      transf_data_conc,
                      display.conc,
                      Points = "Observed values")
     dfCI <- data.frame(conc = transf_data_conc,
-                       qinf95 = x$conf.low, 
+                       qinf95 = x$conf.low,
                        qsup95 = x$conf.high,
                        Conf.Int = "Confidence intervals")
-    
+
     fd <- ggplot(df) +
       geom_point(aes(x = transf_data_conc, y = resp, fill = Points),
                  data = df, col = valCols$cols1) +
@@ -182,7 +181,7 @@ plotDoseResponse.survDataCstC <- function(x,
       ) +
       scale_y_continuous(breaks = unique(round(pretty(c(0, max(df$resp)))))) +
       expand_limits(x = 0, y = 0)
-    
+
 if (addlegend) {
   fd
 } else {
@@ -194,20 +193,20 @@ if (addlegend) {
 
 #' @importFrom stats aggregate binom.test
 #' @importFrom broom tidy
-#' 
+#'
 binom_test <- function(x){
   # compute confidente interval on observed data
   # binomial model by a binomial test
   # INPUT:
   # - x : object of class survFitTT
   # OUTPUT:
-  
+
   df_binom_test <- x %>%
     dplyr::group_by(profile, time) %>%
     do(broom::tidy(binom.test(.$Nsurv,.$Ninit)))
-  
+
   df_with_binom_test <- full_join(x, df_binom_test,
                                   by = c("profile", "time"))
-  
+
   return(df_with_binom_test)
 }

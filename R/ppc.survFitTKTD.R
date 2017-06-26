@@ -3,7 +3,7 @@
 #' This is the generic \code{ppc} S3 method for the \code{survFitTKTD} class. It
 #' plots the predicted values along with 95\% credible intervals
 #' versus the observed values for \code{survFitTKTD} objects.
-#' 
+#'
 #' The black points show the observed number of survivors (pooled
 #' replicates, on \eqn{X}-axis) against the corresponding predicted
 #' number (\eqn{Y}-axis). Predictions come along with 95\% prediction
@@ -37,15 +37,15 @@
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot
-#' 
+#'
 #' @export
-ppc.survFitTKTD <- function(x, style = "generic", ...) {
+ppc.survFitTKTD <- function(x, style = "ggplot", ...) {
   if (!is(x, "survFitTKTD"))
     stop("x is not of class 'survFitTKTD'!")
-  
+
   xlab <- "Observed nb of survivors"
   ylab <- "Predicted nb of survivors"
-  
+
   ppc_gen(EvalsurvTKTDPpc(x), style, xlab, ylab)
 }
 
@@ -57,7 +57,7 @@ EvalsurvTKTDPpc <- function(x) {
   ks <- 10^(tot.mcmc[, "log10ks"])
   nec <- 10^(tot.mcmc[, "log10NEC"])
   m0 <- 10^(tot.mcmc[, "log10m0"])
-  
+
   niter <- nrow(tot.mcmc)
   n <- x$jags.data$ndat
   xconc <- x$jags.data$x
@@ -93,7 +93,6 @@ EvalsurvTKTDPpc <- function(x) {
                                    QNsurvPred[,"97.5%"] < NsurvObs,
                                  "red", "green"))
   colnames(tab) <- c("P2.5", "P50", "P97.5", "Nprec", "Obs", "col")
-  
+
   return(tab)
 }
-

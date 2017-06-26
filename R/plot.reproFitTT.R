@@ -1,9 +1,9 @@
 #' Plotting method for \code{reproFitTT} objects
-#' 
+#'
 #' This is the generic \code{plot} S3 method for the \code{reproFitTT} class.
 #' It plots exposure-response fits for target time reproduction
 #' analysis.
-#' 
+#'
 #' The fitted curve represents the \strong{estimated reproduction rate} after
 #' the target time has passed as a function of the concentration of pollutant.
 #' The function plots 95 \% credible intervals for the estimated reproduction
@@ -23,7 +23,7 @@
 #' @param fitcol color used for the fitted curve
 #' @param fitlty line type for the fitted curve
 #' @param fitlwd width of the fitted curve
-#' @param spaghetti if \code{TRUE}, the credible interval is represented by 
+#' @param spaghetti if \code{TRUE}, the credible interval is represented by
 #' multiple curves
 #' @param cicol color for the 95 \% credible limits of the fitted curve
 #' @param cilty line type for the 95 \% credible limits of the fitted curve
@@ -34,10 +34,10 @@
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods
-#' 
+#'
 #' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
-#' 
+#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom gridExtra grid.arrange arrangeGrob
@@ -47,7 +47,7 @@
 #' @importFrom reshape2 melt
 #'
 #' @keywords plot
-#' 
+#'
 #' @examples
 #'
 #' # (1) Load the data
@@ -67,7 +67,7 @@
 #'      fitcol = "blue", cicol = "blue", style = "ggplot",
 #'      main = "Log-logistic response to concentration")
 #' }
-#' 
+#'
 #' @export
 plot.reproFitTT <- function(x,
                             xlab = "Concentration",
@@ -83,7 +83,7 @@ plot.reproFitTT <- function(x,
                             ribcol = "lightgrey",
                             addlegend = FALSE,
                             log.scale = FALSE,
-                            style = "generic", ...) {
+                            style = "ggplot", ...) {
   # plot the fitted curve estimated by reproFitTT
   # INPUTS
   # - x:  reproFitTT object
@@ -101,33 +101,33 @@ plot.reproFitTT <- function(x,
   # - style : generic ou ggplot
   # OUTPUT:
   # - plot of fitted regression
-  
+
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if (log.scale) x$dataTT$conc > 0 else TRUE
-  
+
   dataTT <- x$dataTT[sel, ]
   dataTT$resp <- dataTT$Nreprocumul / dataTT$Nindtime
   transf_data_conc <- optLogTransform(log.scale, dataTT$conc)
-  
+
   # Concentration values used for display in linear scale
   display.conc <- (function() {
     x <- optLogTransform(log.scale, dataTT$conc)
     s <- seq(min(x),max(x), length = 100)
     if(log.scale) exp(s) else s
   })()
-  
+
   # Possibly log transformed concentration values for display
   curv_conc <- optLogTransform(log.scale, display.conc)
-  
+
   cred.int <- reproMeanCredInt(x, display.conc)
-  
+
   spaghetti.CI <- if (spaghetti) { reproSpaghetti(x, display.conc) } else NULL
   dataCIm <- if (spaghetti) { melt(cbind(curv_conc, spaghetti.CI),
                                    id.vars = c("curv_conc", "conc"))} else NULL
-  
+
   curv_resp <- data.frame(conc = curv_conc, resp = cred.int[["q50"]],
                           Line = "loglogistic")
-  
+
   # ylim
   ylim_CI <- if (spaghetti) { max(dataCIm$value, cred.int$qsup95)
   } else {
@@ -161,7 +161,7 @@ reproMeanCredInt <- function(fit, x) {
   # - x : vector of concentrations values (x axis)
   # OUTPUT:
   # - ci : credible limit
-  
+
   mctot <- do.call("rbind", fit$mcmc)
   k <- nrow(mctot)
   # parameters
@@ -170,12 +170,12 @@ reproMeanCredInt <- function(fit, x) {
   b2 <- 10^log10b2
   log10e2 <- mctot[, "log10e"]
   e2 <- 10^log10e2
-  
+
   # quantiles
   qinf95 = NULL
   q50 = NULL
   qsup95 = NULL
-  
+
   # poisson
   if (fit$model.label == "P") {
     for (i in 1:length(x)) {
@@ -186,13 +186,13 @@ reproMeanCredInt <- function(fit, x) {
       q50[i] <- quantile(theomean, probs = 0.5, na.rm = TRUE)
     }
   }
-  
+
   # gamma poisson
   else if (fit$model.label == "GP") {
     # parameters
     log10omega2 <- mctot[, "log10omega"]
     omega2 <- 10^(log10omega2)
-    
+
     for (i in 1:length(x)) {
       theomean <- d2 / (1 + (x[i] / e2)^(b2)) # mean curve
       theo <- rgamma(n = k, shape = theomean / omega2, rate = 1 / omega2)
@@ -206,7 +206,7 @@ reproMeanCredInt <- function(fit, x) {
   ci <- data.frame(qinf95 = qinf95,
                    q50 = q50,
                    qsup95 = qsup95)
-  
+
   return(ci)
 }
 
@@ -224,7 +224,7 @@ reproSpaghetti <- function(fit, x) {
     log10omega2 <- mctot[, "log10omega"][sel]
     omega2 <- 10^(log10omega2)
   }
-  
+
   # all theorical
   dtheo <- array(data = NA, dim = c(length(x), length(e2)))
   if (fit$model.label == "GP") dtheotemp <- dtheo
@@ -240,7 +240,7 @@ reproSpaghetti <- function(fit, x) {
   }
   dtheof <- as.data.frame(cbind(x, dtheo))
   names(dtheof) <- c("conc", paste0("X", 1:length(sel)))
-  
+
   return(dtheof)
 }
 
@@ -254,7 +254,7 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
 
   # plot the fitted curve estimated by reproFitTT
   # with generic style with credible interval
-  
+
   plot(transf_data_conc, data_resp,
        xlab = xlab,
        ylab = ylab,
@@ -263,13 +263,13 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
        yaxt = "n",
        ylim = c(0, ylim_CI + 0.01),
        type = "n")
-  
+
   # axis
   axis(side = 2, at = pretty(c(0, ylim_CI)))
   axis(side = 1,
        at = transf_data_conc,
        labels = data_conc)
-  
+
   # Plotting the theoretical curve
   # cred.int ribbon + lines
   if (!is.null(spaghetti.CI)) {
@@ -283,16 +283,16 @@ reproFitPlotGenericCredInt <- function(x, data_conc, transf_data_conc, data_resp
                                             rev(cred.int[["qsup95"]])),
             col = ribcol, border = NA)
   }
-  
+
   lines(curv_conc, cred.int[["qsup95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
   lines(curv_conc, cred.int[["qinf95"]], type = "l", col = cicol, lty = cilty,
         lwd = cilwd)
-  
+
   # fitted curve
   lines(curv_conc, curv_resp[, "resp"], col = fitcol,
         lty = fitlty, lwd = fitlwd, type = "l")
-  
+
   # legend
   if(addlegend)  {
     legend("bottomleft",
@@ -312,7 +312,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
                            qinf95 = cred.int[["qinf95"]],
                            qsup95 = cred.int[["qsup95"]],
                            Cred.Lim = "Credible limits")
-  
+
   plt_31 <- if (!is.null(spaghetti.CI)) {
     ggplot(data.three) + geom_line(data = dataCIm, aes(x = curv_conc, y = value,
                                                        group = variable),
@@ -324,7 +324,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
                                      fill = ribcol, col = NA,
                                      alpha = 0.4)
   }
-  
+
   plt_3 <- plt_31 +
     geom_line(data = data.three, aes(conc, qinf95, color = Cred.Lim),
               linetype = cilty, size = cilwd) +
@@ -332,10 +332,10 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
               linetype = cilty, size = cilwd) +
     scale_color_manual("", values = valCols$cols4) +
     theme_minimal()
-  
+
   # plot IC
   # final plot
-  
+
   if (!is.null(spaghetti.CI)) {
     plt_40 <- ggplot(data.three) +
       geom_line(data = dataCIm, aes(x = curv_conc, y = value, group = variable),
@@ -348,7 +348,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
                                                fill = ribcol,
                                                col = NA, alpha = 0.4)
   }
-  
+
   plt_4 <- plt_40 +
     geom_line(data = data.three, aes(conc, qinf95),
               linetype = cilty, size = cilwd, color = valCols$cols4) +
@@ -359,7 +359,7 @@ reproFitPlotGGCredInt <- function(curv_resp, cred.int, spaghetti.CI, dataCIm,
     ylim(0, ylim_CI + 0.2) +
     labs(x = xlab, y = ylab) +
     ggtitle(main) + theme_minimal()
-  
+
   return(list(plt_3 = plt_3,
               plt_4 = plt_4))
 }
@@ -370,12 +370,12 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
                            xlab, ylab, fitcol, fitlty, fitlwd,
                            main, addlegend,
                            cicol, cilty, cilwd, ribcol, log.scale, ylim_CI) {
-  
+
   if (Sys.getenv("RSTUDIO") == "") {
     dev.new() # create a new page plot
     # when not use RStudio
   }
-  
+
   # dataframes points (data) and curve (curv)
   # colors
   valCols <- fCols(curv_resp, fitcol, cicol)
@@ -384,29 +384,29 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
     reproFitPlotGGCredInt(curv_resp, cred.int, spaghetti.CI, dataCIm,
                           cicol, cilty, cilwd, valCols, fitlty, fitlwd, ribcol, xlab,
                           ylab, main, ylim_CI)$plt_4
-  
+
   if (addlegend) {
-    
+
     # create legends
-    
+
     # curve (to create the legend)
     plt_2 <- ggplot(curv_resp) +
       geom_line(data = curv_resp, aes(conc, resp, colour = Line),
                 linetype = fitlty, size = fitlwd) +
       scale_color_manual("", values = valCols$cols2) +
       theme_minimal()
-    
+
     mylegend_2 <- legendGgplotFit(plt_2) # mean line legend
-    
+
     plt_5 <- plt_4 + scale_x_continuous(breaks = transf_data_conc,
                                         labels = data_conc)
-    
+
     plt_3 <- reproFitPlotGGCredInt(curv_resp, cred.int, spaghetti.CI, dataCIm,
                                    cicol, cilty, cilwd, valCols, fitlty,
                                    fitlwd, ribcol, xlab, ylab, main, ylim_CI)$plt_3
-    
+
     mylegend_3 <- legendGgplotFit(plt_3)
-    
+
     grid.arrange(plt_5, arrangeGrob(mylegend_2, mylegend_3,
                                     nrow = 6), ncol = 2,
                  widths = c(6, 2))
@@ -417,4 +417,3 @@ reproFitPlotGG <- function(x, data_conc, transf_data_conc, data_resp,
     return(plt_5)
   }
 }
-

@@ -25,7 +25,7 @@
 #' the fitted curves represent the \strong{estimated survival rate}, if \code{'number'}
 #' thef itted curves represent the \strong{estimated number of survivors} as a function
 #' of time for each concentration.
-#' 
+#'
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
@@ -52,27 +52,24 @@ plot.survFit <- function(x,
                          addlegend = FALSE,
                          data_type = "rate",
                          # facetting = TRUE,
-                         #facet.label = "replicate",
+                         # facet.label = "replicate",
                          ...) {
-  
-  
+
+
   ### compute posteriors median and 95 CI
   modelData <- x$modelData
-  
+
   postData <- posteriorData(x$mcmc, model_type = x$model_type)
-  
+
   if(data_type == "rate"){
-    
+
     ylab = "Survival rate"
-    
+
     df_plt = data_frame(Nsurv = modelData$Nsurv,
                         time = modelData$time,
+                        conc = modelData$conc,
                         replicate = modelData$replicate)
-    
-    if(!is.null(modelData$conc)){
-      df_plt$conc <- modelData$conc
-    }
-    
+
     df_plt <- df_plt %>%
       group_by(replicate) %>%
       mutate(Ninit = max(Nsurv)) %>%
@@ -82,27 +79,25 @@ plot.survFit <- function(x,
              Y_q50 = apply(postData$df_psurv, 2, quantile, probs = 0.5, na.rm = TRUE),
              Y_qinf95 = apply(postData$df_psurv, 2, quantile, probs = 0.025, na.rm = TRUE),
              Y_qsup95 = apply(postData$df_psurv, 2, quantile, probs = 0.975, na.rm = TRUE))
-    
-    
+
+
   } else if(data_type == "number"){
-    
+
     ylab <- "Number of survivors"
-    
+
     df_plt <- data_frame(Y = modelData$Nsurv,
                         time = modelData$time,
+                        conc = modelData$conc,
                         replicate = modelData$replicate,
                         Y_q50 = apply(postData$df_sim, 2, quantile, probs = 0.5, na.rm = TRUE),
                         Y_qinf95 = apply(postData$df_sim, 2, quantile, probs = 0.025, na.rm = TRUE),
                         Y_qsup95 = apply(postData$df_sim, 2, quantile, probs = 0.975, na.rm = TRUE)) %>%
       mutate(timelag = ifelse(time == 0, time, lag(time)))
-    
-    if(!is.null(modelData$conc)){
-      df_plt$conc <- modelData$conc
-    }
-    
+
+
   } else stop("type must be 'rate' (i.e., rate of survival) or 'number' (i.e., number of survivors)")
-  
-  
+
+
   plt_fit <- df_plt %>%
     ggplot() + theme_minimal() +
     expand_limits(x = 0, y = 0) +
@@ -120,38 +115,54 @@ plot.survFit <- function(x,
       low = "grey20",
       high = "orange"
     )
-  
-  
+
+
   if(data_type == "rate"){
    plt_fit <- plt_fit +
-     geom_ribbon(aes(x = time,
-                     ymin = Y_qinf95,
-                     ymax = Y_qsup95 ,
-                     group = replicate), fill = "lightgrey") +
-    geom_line(aes(x = time,
-                  y = Y_q50,
-                  group = replicate ), color="orange")
+    #  geom_ribbon(aes(x = time,
+    #                  ymin = Y_qinf95,
+    #                  ymax = Y_qsup95 ,
+    #                  group = replicate), fill = "lightgrey") +
+     # geom_line(aes(x = time,
+     #               y = Y_q50,
+     #               group = replicate ), linetype = 2, color="orange") +
+     geom_errorbar(aes( x = time,
+                       ymin = Y_qinf95,
+                       ymax = Y_qsup95 ,
+                       group = replicate), color = "orange", width = 0.2) +
+     geom_point(aes(x = time,
+                   y = Y_q50,
+                   group = replicate ), color="orange")
+
+
   } else if(data_type == "number"){
     plt_fit <- plt_fit +
-      geom_rect(aes(xmin = timelag, xmax = time,
-                    ymin = Y_qinf95,  ymax = Y_qsup95 ,
-                    group = replicate), fill = "lightgrey") +
-      geom_step(aes(x = time,
-                    y = Y_q50,
-                    group = replicate ), direction = "vh", color="orange")
-  
+      # geom_rect(aes(xmin = timelag, xmax = time,
+      #               ymin = Y_qinf95,  ymax = Y_qsup95 ,
+      #               group = replicate), fill = "lightgrey") +
+      # geom_step(aes(x = time,
+      #               y = Y_q50,
+      #               group = replicate ), direction = "vh", color="orange")
+      geom_errorbar(aes( x = time,
+                        ymin = Y_qinf95,
+                        ymax = Y_qsup95 ,
+                        group = replicate), color = "orange", width = 0.2) +
+      geom_point(aes(x = time,
+                     y = Y_q50,
+                     group = replicate ), color="orange")
+
   } else stop("type must be 'rate' (i.e., rate of survival) or 'number' (i.e., number of survivors)")
-  
+
   ##
   ## adddata
   ##
-  if(!is.logical(adddata)) stop ("'adddata' must be a logical.")  
+  if(!is.logical(adddata)) stop ("'adddata' must be a logical.")
   if(adddata == TRUE){
     plt_fit <- plt_fit +
       geom_point(aes(x = time,
                      y = Y,
                      group = replicate ))
-    
+
   }
   ##
   ## addlegend
@@ -164,23 +175,23 @@ plot.survFit <- function(x,
     plt_fit <- plt_fit +
       theme(legend.position="none")
   }
-  
+
   ##
   ## facetting
   ##
-  if(!is.logical(one.plot)) stop ("'one.plot' must be a logical.")  
+  if(!is.logical(one.plot)) stop ("'one.plot' must be a logical.")
   if(one.plot != TRUE){
-    if(is.null(modelData$conc)){
-      plt_fit <- plt_fit + facet_wrap(~ replicate)
-    } else{
-      plt_fit <- plt_fit + facet_wrap(~ conc)
-    }
-    # if(facet.label == "replicate"){
+    #if(is.null(modelData$conc)){
     #   plt_fit <- plt_fit + facet_wrap(~ replicate)
-    # } else if (facet.label == "conc"){
+    # } else{
     #   plt_fit <- plt_fit + facet_wrap(~ conc)
-    # } else stop("'facet.label' is either 'replicate' (default) or 'conc'.")
+    # }
+    if("survFitVarC" %in% class(x)){
+      plt_fit <- plt_fit + facet_wrap(~ replicate)
+    } else {
+      plt_fit <- plt_fit + facet_wrap(~ conc)
+    } 
   }
-  
+
   return(plt_fit)
 }

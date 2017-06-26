@@ -3,9 +3,9 @@
 #' This is the generic \code{ppc} S3 method for the \code{survFitTT} class. It
 #' plots the predicted values with 95 \% credible intervals versus the observed
 #' values for \code{survFitTT} objects.
-#' 
+#'
 #' The coordinates of black points are the observed values of the number of survivor
-#' (poolled replicates) for a given concentration (x-scale) and the corresponding 
+#' (poolled replicates) for a given concentration (x-scale) and the corresponding
 #' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
 #' value, colored in green if this interval contains the observed value and in red
 #' in the other case.
@@ -37,20 +37,20 @@
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom graphics plot
-#' 
+#'
 #' @export
-ppc.survFitTT <- function(x, style = "generic", ...) {
+ppc.survFitTT <- function(x, style = "ggplot", ...) {
   if (!is(x, "survFitTT"))
     stop("x is not of class 'survFitTT'!")
-  
+
   xlab <- "Observed nb of survivors"
   ylab <- "Predicted nb of survivors"
-  
+
   ppc_gen(EvalsurvPpc(x), style, xlab, ylab)
 }
 
 ppc_gen <- function(tab, style, xlab, ylab) {
-  
+
   if (style == "generic") PpcGeneric(tab, xlab, ylab)
   else if (style == "ggplot") PpcGG(tab, xlab, ylab)
   else stop("Unknown style")
@@ -59,21 +59,21 @@ ppc_gen <- function(tab, style, xlab, ylab) {
 #' @importFrom stats rbinom quantile
 EvalsurvPpc <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
-  
+
   if (x$det.part == "loglogisticbinom_3") {
     d <- tot.mcmc[, "d"]
   }
-  
+
   b <- 10^tot.mcmc[, "log10b"]
   e <- 10^tot.mcmc[, "log10e"]
-  
+
   niter <- nrow(tot.mcmc)
   n <- x$jags.data$n
   xconc <- x$jags.data$xconc
   Ninit <- x$jags.data$Ninit
   NsurvObs <- x$jags.data$Nsurv
   NsurvPred <- matrix(NA, nrow = niter, ncol = n)
-  
+
   if (x$det.part == "loglogisticbinom_2") {
     for (i in 1:n) {
       p <- 1 / (1 + (xconc[i]/e)^b)
@@ -94,7 +94,7 @@ EvalsurvPpc <- function(x) {
                                    QNsurvPred[,"97.5%"] < NsurvObs,
                                  "red", "green"))
   colnames(tab) <- c("P2.5", "P50", "P97.5", "Ninit", "Obs", "col")
-  
+
   return(tab)
 }
 
@@ -105,7 +105,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
   stepX <- stepCalc(obs_val)$stepX
   jittered_obs <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$jitterObs
   spaceX <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$spaceX
-  
+
   plot(c(0, max(tab[, "P97.5"])),
        c(0, max(tab[, "P97.5"])),
        type = "n",
@@ -113,7 +113,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
        ylab = ylab,
        xaxt = "n",
        yaxt = "n")
-  
+
   # axis
   axis(side = 2, at = if (max(tab[, "Obs"]) == 1) {
     c(0, 1)
@@ -125,7 +125,7 @@ PpcGeneric <- function(tab, xlab, ylab) {
   } else {
     pretty(c(0, max(tab[, "P97.5"])))
   })
-  
+
   if (max(sObs) < 20) {
     sapply(1:length(sObs), function(i) {
       segments(sObs[i] - (spaceX * 1.25), sObs[i],
@@ -134,12 +134,12 @@ PpcGeneric <- function(tab, xlab, ylab) {
   } else {
     abline(0, 1)
   }
-  
+
   tab0 <- tab[order(tab$Obs),]
   segments(jittered_obs, tab0[, "P2.5"],
            jittered_obs, tab0[, "P97.5"],
            col = as.character(tab0[, "col"]))
-  
+
   points(jittered_obs, tab0[, "P50"],
          pch = 20)
 }
@@ -152,9 +152,9 @@ PpcGG <- function(tab, xlab, ylab) {
   stepX <- stepCalc(obs_val)$stepX
   jittered_obs <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$jitterObs
   spaceX <- jitterObsGenerator(stepX, tab, obs_val, ppc = TRUE)$spaceX
-  
+
   tab0 <- cbind(tab[order(tab$Obs),], jittered_obs)
-  
+
   df <- data.frame(sObs, spaceX)
 
   if (max(sObs) < 20) {
@@ -166,7 +166,7 @@ PpcGG <- function(tab, xlab, ylab) {
     gf1 <- ggplot(tab0) +
       geom_abline(intercept = 0, slope = 1)
   }
-  
+
   gf2 <- gf1 +
     geom_segment(aes(x = jittered_obs, xend = jittered_obs,
                      y = P2.5, yend = P97.5), data = tab0,
@@ -176,6 +176,6 @@ PpcGG <- function(tab, xlab, ylab) {
     expand_limits(x = 0) +
     labs(x = xlab, y = ylab) +
     theme_minimal()
-  
+
   return(gf2)
 }

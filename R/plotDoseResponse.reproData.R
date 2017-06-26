@@ -3,7 +3,7 @@
 #' This is the generic \code{plotDoseResponse} S3 method for the \code{reproData}
 #' class. It plots the number of offspring per individual-days as a function of
 #' concentration (for a given target time).
-#' 
+#'
 #' The function plots the observed values of the reproduction rate (number of
 #' reproduction outputs per individual-day) for a given time as a function of
 #' concentration. The 95 \% Poisson confidence interval is added to each reproduction
@@ -25,10 +25,10 @@
 #' @param axis if \code{TRUE} displays ticks and label axis
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods
-#' 
+#'
 #' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
-#' 
+#'
 #' @seealso \code{\link[epitools]{pois.exact}}
 #'
 #' @keywords plot
@@ -63,37 +63,37 @@ plotDoseResponse.reproData <- function(x,
                                        main = NULL,
                                        ylim = NULL,
                                        target.time = NULL,
-                                       style = "generic",
+                                       style = "ggplot",
                                        log.scale = FALSE,
                                        remove.someLabels = FALSE,
                                        axis = TRUE,
                                        addlegend = TRUE,
                                        ...) {
   if (is.null(target.time)) target.time <- max(x$time)
-  
+
   if (!target.time %in% x$time || target.time == 0)
     stop("[target.time] is not one of the possible time !")
-  
+
   if (style == "generic" && remove.someLabels)
     warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
             call. = FALSE)
-  
+
   x$resp <- x$Nreprocumul / x$Nindtime
-  
+
   # select the target.time
   xf <- filter(x, time == target.time)
-  
+
   # Selection of datapoints that can be displayed given the type of scale
   sel <- if(log.scale) xf$conc > 0 else TRUE
   x <- xf[sel, ]
   transf_data_conc <- optLogTransform(log.scale, x$conc)
-  
+
   # Concentration values used for display in linear scale
   display.conc <- (function() {
     x <- optLogTransform(log.scale, x$conc)
     if(log.scale) exp(x) else x
   })()
-  
+
   ICpois <- pois.exact(x$Nreprocumul, x$Nindtime)
   x$reproRateInf <- ICpois$lower
   x$reproRateSup <- ICpois$upper
@@ -101,7 +101,7 @@ plotDoseResponse.reproData <- function(x,
   x$Obs <- x$conc
   stepX <- stepCalc(conc_val)$stepX
   jittered_conc <- jitterObsGenerator(stepX, x, conc_val)$jitterObs
-  
+
   if (style == "generic")
     reproDoseResponseCIGeneric(x, conc_val, jittered_conc, transf_data_conc,
                                display.conc, ylim, axis, main, addlegend)
@@ -114,7 +114,7 @@ plotDoseResponse.reproData <- function(x,
 reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
                                        transf_data_conc, display.conc, ylim,
                                        axis, main, addlegend) {
-  
+
   if (is.null(ylim)) ylim <- c(0, max(x$reproRateSup))
   plot(jittered_conc, x$resp,
        ylim = ylim,
@@ -124,20 +124,20 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
        main = main,
        xlab = if (axis) { "Concentration" } else "",
        ylab = if (axis) { "Reproduction rate"} else "")
-  
+
   # axis
   if (axis) {
     axis(side = 2, at = pretty(c(0, max(x$resp))))
     axis(side = 1, at = transf_data_conc,
          labels = display.conc)
   }
-  
+
   x0 <- x[order(x$conc),]
   segments(jittered_conc, x0[, "reproRateInf"],
            jittered_conc, x0[, "reproRateSup"])
-  
+
   points(jittered_conc, x0$resp, pch = 20)
-  
+
   if (addlegend) {
     legend("bottomleft", pch = c(20, NA),
            lty = c(NA, 1),
@@ -151,22 +151,22 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
 reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
                                   display.conc, main, addlegend,
                                   remove.someLabels) {
-  
+
   x0 <- cbind(x[order(x$conc),], jittered_conc = as.vector(jittered_conc))
-  
+
   df <- data.frame(x0,
                    transf_data_conc,
                    display.conc,
                    Points = "Observed values")
-  
+
   dfCI <- data.frame(x0,
                      transf_data_conc,
                      display.conc,
                      Conf.Int = "Confidence intervals")
-  
+
   # colors
   valCols <- fCols(df, fitcol = NA, cicol = NA)
-  
+
   gf <- ggplot(dfCI) + geom_segment(aes(x = jittered_conc, xend = jittered_conc,
                                         y = reproRateInf, yend = reproRateSup,
                                         linetype = Conf.Int),
@@ -187,7 +187,7 @@ reproDoseResponseCIGG <- function(x, conc_val, jittered_conc, transf_data_conc,
                        }
     ) +
     theme_minimal()
-  
+
   if (addlegend) {
     gf
   } else {

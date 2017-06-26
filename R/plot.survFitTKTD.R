@@ -1,9 +1,9 @@
 #' Plotting method for \code{survFitTKTD} objects
-#' 
+#'
 #' This is the generic \code{plot} S3 method for the
 #' \code{survFitTKTD}.  It plots the fits obtained for each
 #' concentration of pollutant in the original dataset.
-#' 
+#'
 #' The fitted curves represent the \strong{estimated survival rate} as a function
 #' of time for each concentration
 #' When \code{adddata = TRUE} the black dots depict the \strong{observed survival
@@ -22,7 +22,7 @@
 #' It consists of the representation of simulated curves using parameter values
 #' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
 #' taken for this sample).
-#' 
+#'
 #' @param x An object of class \code{survFitTKTD}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
@@ -38,22 +38,22 @@
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot.
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods.
-#' 
-#' @keywords plot 
-#' 
+#'
+#' @keywords plot
+#'
 #' @examples
-#' 
+#'
 #' # (1) Load the survival data
 #' data(propiconazole)
-#' 
+#'
 #' # (2) Create an object of class "survData"
 #' dat <- survData(propiconazole)
-#' 
+#'
 #' \dontrun{
 #' # (3) Run the survFitTKTD function
 #' out <- survFitTKTD(dat)
 #'
-#' # (4) Plot the fitted curves in one plot 
+#' # (4) Plot the fitted curves in one plot
 #' plot(out)
 #'
 #' # (5) Plot one fitted curve by concentration with credible limits as
@@ -65,16 +65,16 @@
 #' # (6) Plt fitted curve for one specific concentration
 #' plot(out, concentration = 36, style = "ggplot")
 #' }
-#' 
+#'
 #' @export
-#' 
+#'
 #' @import ggplot2
 #' @import grDevices
 #' @importFrom dplyr filter
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
-#' 
+#'
 plot.survFitTKTD <- function(x,
                              xlab = "Time",
                              ylab = "Survival rate",
@@ -84,36 +84,36 @@ plot.survFitTKTD <- function(x,
                              one.plot = FALSE,
                              adddata = FALSE,
                              addlegend = FALSE,
-                             style = "generic", ...) {
-  
+                             style = "ggplot", ...) {
+
   if (one.plot && !is.null(concentration))
     one.plot <- FALSE
-  
+
   if ((addlegend && is.null(concentration)) ||
       (addlegend && !one.plot))
     warning("The legend is available only if [one.plot] is TRUE or if [concentration] is not NULL !", call. = FALSE)
-  
+
   if (!is.null(concentration) && !any(x$transformed.data$conc == concentration))
     stop("The [concentration] argument is not one of the possible concentration !")
-  
+
   if (one.plot)
     warning("The credible limits and confidence intervals are not drawn when 'one.plot' = TRUE.", call. = FALSE)
-  
+
   conf.int <- survTKTDConfInt(x)
-  
+
   dobs <- data.frame(conc = x$transformed.data$conc,
-                     time = x$transformed.data$time, 
+                     time = x$transformed.data$time,
                      psurv = x$transformed.data$N_alive / x$transformed.data$N_init,
                      Points = "Observed values",
                      color = as.numeric(as.factor(x$transformed.data$conc)),
                      conf.int)
-  
-  
+
+
   # remove time 0 in dobs
   dobs <- filter(dobs, time != 0)
-  
+
   data.credInt <- survFitPlotCITKTD(x)
-  
+
   if (style == "generic") {
     survFitPlotTKTDGeneric(data.credInt, dobs, xlab, ylab, main, concentration,
                            one.plot, spaghetti,
@@ -146,14 +146,14 @@ survTKTDConfInt <- function(x) {
   # - x : object of class survFitTT
   # OUTPUT:
   # - ci : confidente interval
-  
+
   ci <- apply(x$transformed.data, 1, function(x) {
     binom.test(x["N_alive"], x["N_init"])$conf.int
   })
   ci <- as.data.frame(t(ci))
   colnames(ci) <- c("qinf95", "qsup95")
   ci$Conf.Int <- "Confidence interval"
-  
+
   return(ci)
 }
 
@@ -164,22 +164,22 @@ survFitPlotCITKTD <- function(x) {
   # A list of - dobs : observed values
   #           - dtheo : estimated values
   npoints <- 100
-  
+
   concobs <- unique(x$transformed.data$conc)
   tfin <- seq(0, max(x$jags.data$t), length.out = npoints)
-  
+
   # prameters
   mctot <- do.call("rbind", x$mcmc)
   ks <- 10^mctot[, "log10ks"]
   kd <- 10^mctot[, "log10kd"]
   m0 <- 10^mctot[, "log10m0"]
   nec <- 10^mctot[, "log10NEC"]
-  
+
   # all theorical
-  
+
   k <- 1:length(concobs)
   j <- 1:npoints
-  
+
   dtheo <- lapply(k, function(y) { # conc
     sapply(j, function(z) { # time
       Surv(Cw = concobs[y], time = tfin[z],
@@ -188,53 +188,53 @@ survFitPlotCITKTD <- function(x) {
            m0 = m0)
     })
   })
-  
+
   # transpose dtheo
   dtheo <- do.call("rbind", lapply(dtheo, t))
-  
+
   # quantile
   qinf95 <- apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE)
   qsup95 <- apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
   q50 <- apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE)
-  
-  
+
+
   dtheo <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
                                rep(tfin, length(concobs)),
                                dtheo))
 
   names(dtheo) <- c("conc", "time", paste0("X", 1:length(nec)))
-  
+
   # divide number of mcmc by 50
   sel <- sample(ncol(dtheo[3:ncol(dtheo)]))[1:ceiling(ncol(dtheo) / 50)]
   dtheo <- cbind(dtheo[, 1:2], dtheo[, sel])
-  
+
   # add credible limits
   dtheo$qinf95 <- qinf95
   dtheo$qsup95 <- qsup95
   dtheo$q50 <- q50
-  
+
   # names for legend plots
   dtheo$Cred.Lim <- "Credible limits"
   dtheo$Mean.C <- "Mean curve"
   # vector color
   dtheo$color <- as.numeric(as.factor(dtheo$conc))
-  
+
   return(dtheo)
 }
 
 survFitPlotTKTDGeneric <- function(data, dobs, xlab, ylab, main, concentration,
                                    one.plot, spaghetti, adddata,
                                    addlegend) {
-  
+
   if (one.plot) {
     survFitPlotTKTDGenericOnePlot(data, dobs, xlab, ylab, main, adddata,
                                   addlegend)
   } else if (!one.plot && is.null(concentration)) {
     par(mfrow = plotMatrixGeometry(length(unique(dobs$conc))))
-    
+
     survFitPlotTKTDGenericNoOnePlot(data, dobs, xlab, ylab, spaghetti,
                                     adddata, concentration)
-    
+
     par(mfrow = c(1, 1))
   } else {
     survFitPlotTKTDGenericNoOnePlot(data, dobs, xlab, ylab, spaghetti,
@@ -251,13 +251,13 @@ survFitPlotTKTDGenericOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
        ylab = ylab,
        type = "n",
        main = main)
-  
+
   by(data, list(data$conc),
      function(x) {
        lines(x$time, x$q50, # lines
              col = x$color)
      })
-  
+
   # points
   if (adddata) {
     points(dobs$time,
@@ -285,27 +285,27 @@ survFitPlotTKTDGenericOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
 survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
                                             adddata, concentration,
                                             addlegend = FALSE) {
-  
+
   delta <- 0.01 * (max(dobs$time) - min(dobs$time))
-  
+
   #remove unused column before melt
   dataTmp <- data
   dataTmp[, c("Cred.Lim", "Mean.C")] <- list(NULL)
   dtheoQm <- melt(dataTmp,
                   id.vars = c("conc", "time", "color"))
   rm(dataTmp)
-  
+
   if (is.null(concentration)) {
     dobs <- split(dobs, dobs$conc)
     dtheoQ <- split(data, data$conc)
     dtheoQm <- split(dtheoQm, dtheoQm$conc)
-    
+
   } else {
     dobs <- list(filter(dobs, conc == concentration))
     dtheoQ <- list(filter(data, conc == concentration))
     dtheoQm <- list(filter(dtheoQm, conc == concentration))
   }
-  
+
   mapply(function(x, y, z) {
     plot(x[, "time"],
          x[, "q50"],
@@ -314,7 +314,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
          type = "n",
          ylim = c(0, 1),
          main = paste0("Concentration = ", unique(x[, "conc"])))
-    
+
     if (spaghetti) {
       color <- "gray"
       color_transparent <- adjustcolor(color, alpha.f = 0.05)
@@ -326,14 +326,14 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
                                                   rev(x[, "qsup95"])),
               col = "lightgrey", border = NA)
     }
-    
+
     lines(x[, "time"], x[, "q50"], # lines
           col = "orange")
     lines(x[, "time"], x[, "qinf95"],
           col = "lightgrey")
-    lines(x[, "time"], x[, "qsup95"], 
+    lines(x[, "time"], x[, "qsup95"],
           col = "lightgrey")
-    
+
     if (adddata) {
       points(y[, "time"],
              y[, "psurv"],
@@ -343,7 +343,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
                y[, "time"], y[, "qsup95"],
                col = "black")
     }
-    
+
     if (addlegend) {
       legend("bottomleft", pch = c(ifelse(adddata, 20, NA), NA, NA, NA),
              lty = c(NA, ifelse(adddata, 1, NA), 1, 1),
@@ -360,7 +360,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
 
 survFitPlotTKTDGG <- function(data, dobs, xlab, ylab, main, concentration,
                               one.plot, spaghetti, adddata, addlegend) {
-  
+
   if (one.plot) {
     survFitPlotTKTDGGOnePlot(data, dobs, xlab, ylab, main, adddata, addlegend)
   } else if (!one.plot && is.null(concentration)) {
@@ -380,12 +380,12 @@ survFitPlotTKTDGGOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
     labs(x = xlab, y = ylab) + ggtitle(main) +
     ylim(c(0, 1)) +
     theme_minimal()
-  
+
   if (adddata) {
     gf <- gf + geom_point(aes(x = time, y = psurv, colour = factor(conc)),
                           data = dobs)
   }
-  
+
   if (addlegend) {
     gf + scale_color_discrete("Concentrations")
   } else {
@@ -398,7 +398,7 @@ survFitPlotTKTDGGOnePlot <- function(data, dobs, xlab, ylab, main, adddata,
 survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
                                        adddata, concentration,
                                        addlegend = FALSE) {
-  
+
   # colors
   valCols <- fCols(data, "orange", "lightgrey")
   dataTmp <- data
@@ -406,7 +406,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
   dtheoQm <- melt(dataTmp,
                   id.vars = c("conc", "time", "color"))
   rm(dataTmp)
-  
+
   if (!is.null(concentration)) {
     dobs <- filter(dobs, conc == concentration)
     data <- filter(data, conc == concentration)
@@ -415,7 +415,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
                             resp = data$q50,
                             Line = "Mean curve")
   }
-  
+
   if (spaghetti) {
     gf <- ggplot(dobs) +
       geom_line(data = dtheoQm, aes(x = time, y = value, group = variable),
@@ -426,7 +426,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
                                    ymax = qsup95),
                   fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
   }
-  
+
   if (!is.null(concentration)) {
     gf <- gf + geom_line(data = curv_resp, aes(x = time, y = resp,
                                                color = Line)) +
@@ -444,7 +444,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
     labs(x = xlab, y = ylab) + ggtitle(main) +
     ylim(c(0, 1)) +
     theme_minimal()
-  
+
   if (adddata) {
     # dataframes points (data) and curve (curv)
     gf <- gf +
@@ -458,11 +458,11 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
   } else {
     gf <- gf
   }
-  
+
   if (addlegend) {
     gf
   } else {
     gf + theme(legend.position = "none")
   }
-  
+
 }

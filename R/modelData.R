@@ -108,9 +108,9 @@ modelData.survDataCstC <- function(x_survData, model_type = NULL){
   
   ### OUT ================
   OUT_modelDATA <- list(modelData = modelData,
-                       modelData_Null = modelData_NULL,
-                       priorsList = priorsData$priorsList,
-                       priorsMinMax = priorsData$priorsMinMax)
+                        modelData_Null = modelData_NULL,
+                        priorsList = priorsData$priorsList,
+                        priorsMinMax = priorsData$priorsMinMax)
   
   
   class(OUT_modelDATA) <- c("modelDataCstC", "list")
@@ -175,6 +175,8 @@ modelData.survDataVarC <- function(x_survData,
   
   modelData$Nsurv <- x_survData$Nsurv
   modelData$replicate <- x_survData$replicate
+  modelData$conc <- x_survData$conc
+  modelData$time <- x_survData$time
   
   ##
   ##  parameters
