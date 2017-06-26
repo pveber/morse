@@ -5,53 +5,44 @@ datasets <- c("cadmium1",
               "zinc")
 data(list=datasets)
 
+failswith_id <- function(dataset, id) {
+    gen_failswith_id(reproDataCheck, dataset, id)
+}
+
+failswith_ids <- function(dataset, id) {
+    gen_failswith_ids(reproDataCheck, dataset, id)
+}
+
 test_that("reproDataCheck", {
   skip_on_cran()
-  empty_error_table <- errorTableCreate()
 
-  lapply(datasets, function(x) {
-    errors <- reproDataCheck(get(x))
-    expect_equal(errors, empty_error_table, info = paste(c(x,errors$msg), collapse = "\n"))
-    expect_is(errors, c("errorTable",
-                        "data.frame"))
-    expect_true(morse:::errorTableIsEmpty(errors))
-  })
+  check_all_datasets(datasets, reproDataCheck)
   
-  # error dataset
   zinc0 <- as.list(zinc)
   expect_named(reproDataCheck(zinc0,
                               diagnosis.plot = FALSE), c("id", "msg"))
-  expect_equal(reproDataCheck(zinc0,
-                              diagnosis.plot = FALSE)$id,
-               "dataframeExpected")
+  failswith_id(zinc0, "dataframeExpected")
   
   zinc1 <- zinc
   colnames(zinc1) <- c("replica","con","time","Nsur","Nrepro")
-  expect_equal(reproDataCheck(zinc1,
-                              diagnosis.plot = FALSE)$id,
-               rep("missingColumn", 3))
+  failswith_ids(zinc1, rep("missingColumn", 3))
   
   zinc2 <- zinc[,c("replicate", "conc", "time", "Nsurv")]
-  expect_equal(reproDataCheck(zinc2,
-                              diagnosis.plot = FALSE)$id,
-               "missingColumn")
+  failswith_id(zinc2, "missingColumn")
   
   zinc3 <- zinc
   zinc3$Nrepro <- as.numeric(zinc3$Nrepro)
-  expect_equal(reproDataCheck(zinc3, diagnosis.plot = FALSE)$id,
-               "NreproInteger")
+  failswith_id(zinc3, "NreproInteger")
   
   zinc4 <- zinc
   zinc4[91, "Nrepro"] <- 1
   zinc4$Nrepro <- as.integer(zinc4$Nrepro)
-  expect_equal(reproDataCheck(zinc4, diagnosis.plot = FALSE)$id,
-               "Nrepro0T0")
+  failswith_id(zinc4, "Nrepro0T0")
   
   zinc5 <- zinc
   zinc5[107, "Nsurv"] <- 0
   zinc5Nsurv <- as.integer(zinc5$Nsurv)
-  expect_equal(reproDataCheck(zinc5, diagnosis.plot = FALSE)$id[3],
-               "Nsurvt0Nreprotp1P")
+  failswith_id(zinc5, "Nsurvt0Nreprotp1P")
   
 })
 
@@ -59,7 +50,7 @@ test_that("reproData", {
   skip_on_cran()
   
   lapply(datasets, function(x) {
-    dat <- reproData(x)
+    dat <- reproData(get(x))
     expect_is(dat, c("reproData", "survData", "data.frame"))
     expect_true(!is.null(dat))
     expect_true(any(!is.na(dat)))
