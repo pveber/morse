@@ -22,8 +22,6 @@ knitr::opts_chunk$set(fig.width = 7,
 ```{r, echo=FALSE, cache=TRUE, results='hide'}
 library(morse)
 library(ggplot2)
-library(tidyr)
-library(dplyr)
 ```
 
 The package MORSE is devoted to the analysis of data from standard toxicity
@@ -334,9 +332,7 @@ plot(predict_survFitCstC_Newdata, adddata = TRUE,
      levels_vector = c("0", "8", "12", "14", "16_newdata", "18", "24", "25_newdata", "29", "36", "40_newdata"))
 ```
 
-
 ### Survival Analysis of Individual Tolerance (IT) model
-
 
 Only change `model_type` to `IT`:
 
@@ -411,41 +407,41 @@ summary(dat_var)
 
 ```{r TKTDvarSD, eval=FALSE}
 # (6) fit a TKTD model
-fit_varSD <- survFit(dat_var, quiet = FALSE, model_type = "SD")
-# save(fit_varSD, file = "fit_varSD_2.Rdata")
+fit.varSD <- survFit(dat_var, quiet = FALSE, model_type = "SD")
+# save(fit.varSD, file = "fit.varSD.Rdata")
 ```
 
 ```{r, cache=TRUE}
-load("fit_varSD_2.Rdata")
+load("fit.varSD.Rdata")
 ```
 
 ```{r, cache=TRUE}
 # (7) summary of the fit object
-summary(fit_varSD)
+summary(fit.varSD)
 ```
 
 We can plot the survival rate with the option `data_type = 'rate'`
 
 ```{r, cache=TRUE}
-plot(fit_varSD, data_type = "rate")
+plot(fit.varSD, data_type = "rate")
 ```
 
 Or the number of survivors with the option `data_type = 'number'`
 
 ```{r, cache=TRUE}
-plot(fit_varSD, data_type = "number")
+plot(fit.varSD, data_type = "number")
 ```
 
 As previously, the posterior predictive check is given with the funcion `ppc`
 
 ```{r, cache=TRUE}
-ppc(fit_varSD)
+ppc(fit.varSD)
 ```
 
 And a prediction of the intermediate data
 
 ```{r, cache=TRUE, eval = FALSE}
-predict_survFitVarC <- predict(fit_varSD)
+predict_survFitVarC <- predict(fit.varSD)
 # save(predict_survFitVarC, file = "predict_survFitVarC.Rdata")
 ```
 
@@ -457,11 +453,9 @@ plot(predict_survFitVarC, adddata = TRUE)
 And we can forcast on totally different profile
 
 ```{r, cache=TRUE}
-# newdata_varC = data.frame(time = seq(0,10,length = 100),
-#                           conc = 2 + abs(rnorm(100,0,15)),
-#                           replicate = rep("newdata", 100))
-# save(newdata_varC, file = "newdata_varC.Rdata")
-load(file ="newdata_varC.Rdata")
+newdata_varC = data.frame(time = seq(0,10,length = 100),
+                          conc = c(rep(30,20), rep(0,80)),
+                          replicate = rep("new", 100))
 
 qplot(data = newdata_varC, x = time, y = conc, geom = "line", color = "orange") +
   theme_minimal() + theme(legend.position = "none")
@@ -469,14 +463,14 @@ qplot(data = newdata_varC, x = time, y = conc, geom = "line", color = "orange") 
 
 
 ```{r, cache=TRUE, eval = FALSE}
-predict_survFitVarC_newdata <- predict(fit_varSD, newdata = newdata_varC )
+predict_survFitVarC_newdata <- predict(fit.varSD, newdata = newdata_varC, only.newdata = FALSE)
 # save(predict_survFitVarC_newdata, file ="predict_survFitVarC_newdata.Rdata")
 ```
 
 
 ```{r}
 load(file ="predict_survFitVarC_newdata.Rdata")
-plot(predict_survFitVarC_newdata , adddata = TRUE, keep_level = TRUE)
+plot(predict_survFitVarC_newdata , adddata = TRUE)
 ```
 
 ### Survival Analysis of Individual Tolerance (IT) model
