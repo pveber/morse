@@ -15,7 +15,7 @@ test_that("survDataCheck", {
   # no error dataset
   lapply(datasets, function(x) {
     errors <- survDataCheck(get(x))
-    expect_equal(errors, empty_error_table, info = paste(errors$msg, collapse = "\n"))
+    expect_equal(errors, empty_error_table, info = paste(c(x,errors$msg), collapse = "\n"))
     expect_is(errors, c("errorTable",
                         "data.frame"))
     expect_true(morse:::errorTableIsEmpty(errors))
