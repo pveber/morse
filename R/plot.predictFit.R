@@ -67,15 +67,15 @@ plot.predictFit <- function(x,
     ) +
     scale_colour_gradient(
       name = "Concentration",
-      low = "grey20", high="orange"
+      low = "lightgrey", high="orange"
     ) +
     scale_fill_gradient(
       name = "Concentration",
-      low = "grey20",
+      low = "lightgrey",
       high = "orange"
     ) +
-    geom_ribbon(aes(x = time, ymin = qinf95, ymax = qsup95), fill="pink")+
-    geom_line(aes(x = time, y = q50), color= "red")
+    geom_ribbon(aes(x = time, ymin = qinf95, ymax = qsup95), fill="lightgrey")+
+    geom_line(aes(x = time, y = q50), color= "orange")
   
   ##
   ## adddata

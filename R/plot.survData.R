@@ -325,11 +325,11 @@ survDataPlotFull_VarC <- function(data, xlab, ylab, mainlab = NULL, facetting.le
       ) +
       scale_colour_gradient(
         name="Concentration",
-        low="grey40", high="red"
+        low="lightgrey", high="orange"
       ) +
       scale_fill_gradient(
         name="Concentration",
-        low="grey40", high="red"
+        low="lightgrey", high="orange"
       ) +
       expand_limits(x = 0, y = 0) +
       geom_point() +
