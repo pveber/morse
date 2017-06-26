@@ -27,13 +27,13 @@ plot.survDataVarC <- function(data,
                              mainlab = NULL,
                              facetting = TRUE,
                              facetting.level = NULL){
-  
+
   data_plt = filter( data , !is.na(Nsurv))
-  
+
   if(!is.null(facetting.level)){
     data_plt$replicate = factor(data_plt$replicate, levels = facetting.level)
   }
-  
+
   plt = ggplot(data_plt, aes(x = time, y = Nsurv, group = replicate, color = conc)) +
     theme_minimal() +
     theme(
@@ -54,22 +54,21 @@ plot.survDataVarC <- function(data,
     ) +
     scale_colour_gradient(
       name="Concentration",
-      low="lightgrey", high="orange"
+      low="black", high="orange"
     ) +
     scale_fill_gradient(
       name="Concentration",
-      low="lightgrey", high="orange"
+      low="black", high="orange"
     ) +
     expand_limits(x = 0, y = 0) +
     geom_point() +
     geom_line()
-  
+
   if(facetting == TRUE){
     plt = plt + facet_wrap(~ replicate, ncol = 2)
   } else if(facetting != TRUE){
     plt
   } else stop("'facetting' is a logical 'TRUE' or 'FALSE'.")
-  
+
   return(plt)
 }
-

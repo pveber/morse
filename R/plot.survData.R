@@ -16,7 +16,7 @@
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods
-#' 
+#'
 #' @note When \code{style = "ggplot"}, the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #'
@@ -48,18 +48,18 @@ plot.survDataCstC <- function(x,
                           ylab = "Number of survivors",
                           main = NULL,
                           concentration = NULL,
-                          style = "generic",
+                          style = "ggplot",
                           pool.replicate = FALSE,
                           addlegend = FALSE,
                           remove.someLabels = FALSE, ...) {
 
   if (!is(x,"survData"))
     stop("plot.survData: object of class survData expected")
-  
+
   if (style == "generic" && remove.someLabels)
     warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
             call. = FALSE)
-  
+
   if (is.null(concentration) && addlegend)
     warning("'addlegend' argument is valid only when 'concentration' is not null.",
             call. = FALSE)
@@ -131,7 +131,7 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
     # title
     title(paste("Conc: ", unique(x$conc), sep = ""))
   })
-  
+
   par(mfrow = c(1, 1))
 }
 
@@ -139,12 +139,12 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
 # and one color for each replicate
 #' @import ggplot2
 dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
-  
+
   time = NULL
   Nsurv = NULL
-  
+
   data$response <- data[,resp]
-  
+
   # create ggplot object Nsurv / time / replicate / conc
   fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
     geom_point() +
@@ -161,9 +161,9 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
     scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
     expand_limits(x = 0, y = 0) +
     theme_minimal()
-  
+
   fd <- fg + theme(legend.position = "none") # remove legend
-  
+
   return(fd)
 }
 
@@ -294,17 +294,17 @@ survDataPlotFull_VarC <- function(data, xlab, ylab, mainlab = NULL, facetting.le
 
 
     data_plt = filter( data , !is.na(Nsurv))
-    
+
     if (missing(xlab)) xlab <- "Time"
-    
+
     if (missing(ylab)) ylab <- "Number of survivors"
-    
-    
+
+
     if(!is.null(facetting.level)){
       data_plt$replicate = factor(data_plt$replicate, levels = facetting.level)
     }
-    
-    
+
+
     plt_g = ggplot(data_plt, aes(x = time, y = Nsurv, group = replicate, color = conc)) +
       theme_minimal() +
       theme(
@@ -337,7 +337,6 @@ survDataPlotFull_VarC <- function(data, xlab, ylab, mainlab = NULL, facetting.le
       facet_wrap(~ replicate, ncol = 2)
 
     plt <- plt_g + theme(legend.position = "none") # remove legend
-    
+
     return(plt)
 }
-

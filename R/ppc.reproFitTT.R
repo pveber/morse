@@ -3,9 +3,9 @@
 #' This is the generic \code{ppc} S3 method for the \code{reproFitTT} class.
 #' It Plots the predicted values with 95 \% credible intervals versus the observed
 #' values.
-#' 
+#'
 #' The coordinates of black points are the observed values of the cumulated number
-#' of reproduction outputs for a given concentration (x-scale) and the corresponding 
+#' of reproduction outputs for a given concentration (x-scale) and the corresponding
 #' predicted values (y-scale). 95 \% prediction intervals are added to each predicted
 #' value, colored in green if this interval contains the observed value and in red
 #' in the other case. As replicates are not pooled in this plot, overlapped points
@@ -40,10 +40,10 @@
 #' @importFrom graphics plot
 #'
 #' @export
-ppc.reproFitTT <- function(x, style = "generic", ...) {
+ppc.reproFitTT <- function(x, style = "ggplot", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
-  
+
   xlab <- "Observed Cumul. Nbr. of offspring"
   ylab <- "Predicted Cumul. Nbr. of offspring"
 
