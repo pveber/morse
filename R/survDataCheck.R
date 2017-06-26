@@ -181,7 +181,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     filter(!is.na(Nsurv)) %>%
     group_by(replicate) %>%
     arrange(time) %>%
-    mutate(Nprec = ifelse(time == 0, Nsurv, lag(Nsurv))) %>%
+    mutate(Nprec = ifelse(time == min(time), Nsurv, lag(Nsurv))) %>%
     mutate( check_SurvIncrease = Nsurv <= Nprec)
 
   if(all(df_checkSurvIncrease$check_SurvIncrease) != TRUE){
