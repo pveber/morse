@@ -127,18 +127,18 @@ plot.survFit <- function(x,
      geom_ribbon(aes(x = time,
                      ymin = Y_qinf95,
                      ymax = Y_qsup95 ,
-                     group = replicate), fill = "pink", alpha = 0.4) +
+                     group = replicate), fill = "lightgrey") +
     geom_line(aes(x = time,
                   y = Y_q50,
-                  group = replicate ), color="red")
+                  group = replicate ), color="orange")
   } else if(data_type == "number"){
     plt_fit <- plt_fit +
       geom_rect(aes(xmin = timelag, xmax = time,
                     ymin = Y_qinf95,  ymax = Y_qsup95 ,
-                    group = replicate), fill = "pink", alpha = 0.4) +
+                    group = replicate), fill = "lightgrey") +
       geom_step(aes(x = time,
                     y = Y_q50,
-                    group = replicate ), direction = "vh", color="red")
+                    group = replicate ), direction = "vh", color="orange")
   
   } else stop("type must be 'rate' (i.e., rate of survival) or 'number' (i.e., number of survivors)")
   

@@ -324,15 +324,15 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
     } else {
       polygon(c(x[, "time"], rev(x[, "time"])), c(x[, "qinf95"],
                                                   rev(x[, "qsup95"])),
-              col = "pink", border = NA)
+              col = "lightgrey", border = NA)
     }
     
     lines(x[, "time"], x[, "q50"], # lines
-          col = "red")
+          col = "orange")
     lines(x[, "time"], x[, "qinf95"],
-          col = "pink")
+          col = "lightgrey")
     lines(x[, "time"], x[, "qsup95"], 
-          col = "pink")
+          col = "lightgrey")
     
     if (adddata) {
       points(y[, "time"],
@@ -349,7 +349,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
              lty = c(NA, ifelse(adddata, 1, NA), 1, 1),
              col = c(ifelse(adddata, "black", NA),
                      ifelse(adddata, "black", NA),
-                     "red", "pink"),
+                     "orange", "lightgrey"),
              legend = c(ifelse(adddata, "Observed values", NA),
                         ifelse(adddata, "Confidence interval", NA),
                         "Mean curve", "Credible limits"),
@@ -400,7 +400,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
                                        addlegend = FALSE) {
   
   # colors
-  valCols <- fCols(data, "red", "pink")
+  valCols <- fCols(data, "orange", "lightgrey")
   dataTmp <- data
   dataTmp[, c("Cred.Lim", "Mean.C")] <- list(NULL)
   dtheoQm <- melt(dataTmp,

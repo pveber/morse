@@ -54,11 +54,11 @@ plot.survDataVarC <- function(data,
     ) +
     scale_colour_gradient(
       name="Concentration",
-      low="grey20", high="orange"
+      low="lightgrey", high="orange"
     ) +
     scale_fill_gradient(
       name="Concentration",
-      low="grey20", high="orange"
+      low="lightgrey", high="orange"
     ) +
     expand_limits(x = 0, y = 0) +
     geom_point() +
