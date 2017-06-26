@@ -28,7 +28,7 @@ predict.survFitVarC <- function(object,
   
   x <-  data.frame(time = object$modelData$time_long,
                    conc = object$modelData$conc_long,
-                   replicate = object$modelData$replicate_ID_long)
+                   replicate = object$modelData$replicate_long)
   
   if(!is.null(newdata)){
     if(only.newdata == TRUE){
@@ -137,8 +137,8 @@ predict.survFitVarC <- function(object,
   #---- Observation
   observ_df <-  data.frame(time = object$modelData$time,
                            Nsurv = object$modelData$Nsurv,
-                           replicate_name = object$modelData$replicate,
-                           replicate = object$modelData$replicate_ID)
+                           conc = object$modelData$conc,
+                           replicate = object$modelData$replicate)
   
   
   OUT_ls <- list(predict_data = predict_df,

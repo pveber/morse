@@ -35,7 +35,6 @@ plot.predictFit <- function(x,
                             mainlab = NULL,
                             one.plot = FALSE,
                             levels_vector = NULL,
-                            keep_level = FALSE, # this opption and the way replicate are used must be clearer !!!
                             adddata = FALSE,
                             addlegend = FALSE){
  
@@ -44,19 +43,7 @@ plot.predictFit <- function(x,
   
   observ_df <- x$observ_data
   
-  if(!is.null(x$observ_data$replicate_name) & keep_level == FALSE){
-    predict_df$replicate <- as.factor(predict_df$replicate)
-    observ_df$replicate <- as.factor(observ_df$replicate)
-    levels(predict_df$replicate) <- levels(observ_df$replicate_name)
-    levels(observ_df$replicate) <- levels(observ_df$replicate_name)
-  }
-  
-  
-  
-  if(!is.null(levels_vector)){
-    predict_df$replicate = factor(predict_df$replicate, levels = levels_vector)
-  }
-  
+
   plt_fit <- predict_df %>%
     ggplot() + theme_minimal() +
     expand_limits(x = 0, y = 0) +
