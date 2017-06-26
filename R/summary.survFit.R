@@ -29,6 +29,7 @@
 #' @keywords summary
 #'
 #' @importFrom stats qnorm qunif
+#' @importFrom tidyr spread
 #' 
 #' @export
 #' 
