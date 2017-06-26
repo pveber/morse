@@ -124,21 +124,37 @@ plot.survFit <- function(x,
   
   if(data_type == "rate"){
    plt_fit <- plt_fit +
-     geom_ribbon(aes(x = time,
-                     ymin = Y_qinf95,
-                     ymax = Y_qsup95 ,
-                     group = replicate), fill = "lightgrey") +
-    geom_line(aes(x = time,
-                  y = Y_q50,
-                  group = replicate ), color="orange")
+    #  geom_ribbon(aes(x = time,
+    #                  ymin = Y_qinf95,
+    #                  ymax = Y_qsup95 ,
+    #                  group = replicate), fill = "lightgrey") +
+     # geom_line(aes(x = time,
+     #               y = Y_q50,
+     #               group = replicate ), linetype = 2, color="orange") +
+     geom_errorbar(aes( x = time,
+                       ymin = Y_qinf95,
+                       ymax = Y_qsup95 ,
+                       group = replicate), color = "orange", width = 0.4) +
+     geom_point(aes(x = time,
+                   y = Y_q50,
+                   group = replicate ), color="orange")
+     
+   
   } else if(data_type == "number"){
     plt_fit <- plt_fit +
-      geom_rect(aes(xmin = timelag, xmax = time,
-                    ymin = Y_qinf95,  ymax = Y_qsup95 ,
-                    group = replicate), fill = "lightgrey") +
-      geom_step(aes(x = time,
-                    y = Y_q50,
-                    group = replicate ), direction = "vh", color="orange")
+      # geom_rect(aes(xmin = timelag, xmax = time,
+      #               ymin = Y_qinf95,  ymax = Y_qsup95 ,
+      #               group = replicate), fill = "lightgrey") +
+      # geom_step(aes(x = time,
+      #               y = Y_q50,
+      #               group = replicate ), direction = "vh", color="orange")
+      geom_errorbar(aes( x = time,
+                        ymin = Y_qinf95,
+                        ymax = Y_qsup95 ,
+                        group = replicate), color = "orange", width = 0.4) +
+      geom_point(aes(x = time,
+                     y = Y_q50,
+                     group = replicate ), color="orange")
   
   } else stop("type must be 'rate' (i.e., rate of survival) or 'number' (i.e., number of survivors)")
   
