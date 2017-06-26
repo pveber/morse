@@ -12,10 +12,8 @@
 #'
 #' @export
 #' 
-#' @importFrom deSolve ode
 #' @importFrom dplyr bind_rows
-#' 
-#' 
+#' @importFrom dplyr count
 #' 
 #' 
 predict.survFitVarC <- function(object,
