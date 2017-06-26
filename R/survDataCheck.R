@@ -46,9 +46,13 @@
 #' survDataCheck(zinc, diagnosis.plot = TRUE)
 #'
 #' @importFrom stringr str_c
-#' 
+#' @importFrom magrittr '%>%'
+#' @importFrom dplyr arrange
+#' @importFrom dplyr mutate
+#'
 #' @export
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
+
 
   ##
   ## 0. check we have a data.frame
@@ -75,9 +79,9 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 2. assert the first time point is zero for each (replicate, concentration)
   ##
-  subdata <- split(data, list(data$replicate, data$conc), drop = TRUE)
+  subdata <- split(data, list(data$replicate), drop = TRUE)
   if (any(unlist(lapply(subdata, function(x) x$time[1] != 0)))) {
-    msg <- "Data are required at time 0 for each concentration and each replicate."
+    msg <- "Data are required at time 0 for each replicate."
     errors <- errorTableAdd(errors, "firstTime0", msg)
   }
 
@@ -124,11 +128,11 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 8 assert each (replicate, concentration, time) triplet is unique
+  ## 8. assert each (replicate, time) pair is unique
   ##
   ID <- idCreate(data) # ID vector
   if (any(duplicated(ID))) {
-    msg <- paste("The (replicate, conc, time) triplet ",
+    msg <- paste("The (replicate, time) pair ",
                  ID[duplicated(ID)],
                  " is duplicated.", sep = "")
     errors <- errorTableAdd(errors, "duplicatedID", msg)
