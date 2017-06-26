@@ -412,11 +412,11 @@ summary(dat_var)
 ```{r TKTDvarSD, eval=FALSE}
 # (6) fit a TKTD model
 fit_varSD <- survFit(dat_var, quiet = FALSE, model_type = "SD")
+# save(fit_varSD, file = "fit_varSD_2.Rdata")
 ```
 
 ```{r, cache=TRUE}
-# save(fit_varSD, file = "fit_varSD.Rdata")
-load("fit_varSD.Rdata")
+load("fit_varSD_2.Rdata")
 ```
 
 ```{r, cache=TRUE}
