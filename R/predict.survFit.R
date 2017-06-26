@@ -8,7 +8,7 @@
 #' @param newdata An optional data frame in which to look for variables with which to predict.
 #' If omitted, the fitted values are used.
 #'
-#' @return An object of class \code{reproData}.
+#' @return An object of class \code{predictFit}.
 #'
 #' @keywords transformation
 #'
