@@ -176,16 +176,21 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 9. assert Nsurv never increases with time
   ##
-
-  df_checkSurvIncrease <- data %>%
+  df_variation <- data %>%
     filter(!is.na(Nsurv)) %>%
     group_by(replicate) %>%
     arrange(time) %>%
     mutate(Nprec = ifelse(time == min(time), Nsurv, lag(Nsurv))) %>%
-    mutate( check_SurvIncrease = Nsurv <= Nprec)
+    mutate(decrease = Nsurv <= Nprec) %>%
+    summarise(decreasing = all(decrease))
 
-  if(all(df_checkSurvIncrease$check_SurvIncrease) != TRUE){
-    msg <-  "'Nsurv' increases at some time points."
+  if (! all(df_variation$decreasing)) {
+    replicates <- df_variation$replicate[! df_variation$decreasing]
+    msg <- paste(
+        "'Nsurv' increases at some time points in replicate(s) ",
+        paste(replicates, sep=", "),
+        ".",
+        sep = "")
     errors <- errorTableAdd(errors, "NsurvIncrease", msg)
   }
 
