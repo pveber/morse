@@ -173,6 +173,22 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   consistency.errors <- do.call("errorTableAppend", res)
   errors <- errorTableAppend(errors, consistency.errors)
 
+  ##
+  ## 9. assert Nsurv never increases with time
+  ##
+
+  df_checkSurvIncrease <- data %>%
+    filter(!is.na(Nsurv)) %>%
+    group_by(replicate) %>%
+    arrange(time) %>%
+    mutate(Nprec = ifelse(time == 0, Nsurv, lag(Nsurv))) %>%
+    mutate( check_SurvIncrease = Nsurv <= Nprec)
+
+  if(all(df_checkSurvIncrease$check_SurvIncrease) != TRUE){
+    msg <-  "'Nsurv' increases at some time points."
+    errors <- errorTableAdd(errors, "NsurvIncrease", msg)
+  }
+
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
     survDataPlotFull(data, ylab = "Number of surviving individuals")
   }
