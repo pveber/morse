@@ -1,19 +1,23 @@
-#' Fits a TKTD for survival analysis using Bayesian inference
+#' Fits a TKTD model for survival analysis using Bayesian inference
 #' 
 #' This function estimates the parameters of a TKTD
 #' model for survival analysis using Bayesian inference. In this model,
-#' the survival rate of individuals is modeled as a function of the pollutant's
+#' the survival rate of individuals is modeled as a function of the contaminant
 #' concentration with a mechanistic description of toxic effects on survival over
 #' time.
 #' 
 #' Details of the model are presented in the vignette accompanying the package.
 #' 
 #' @param data An object of class \code{survData}.
-#' @param n.chains Number of MCMC chains. The minimum required number of chains
-#' is 2.
-#' @param quiet If \code{FALSE}, prints logs and progress bar from JAGS.
+#' @param model_type can be \code{"SD"} or \code{"IT"} to choose
+#'   between "Stochastic Death" or "Individual Tolerance" models
+#'   (resp.). See modeling vignette for details.
+#' @param n.chains Number of MCMC chains. The minimum required number
+#'   of chains is 2.
+#' @param quiet If \code{FALSE}, prints logs and progress bar from
+#'   JAGS.
 #' 
-#' @return The function returns an object of class \code{survFitCstC}, which is
+#' @return The function returns an object of class \code{survFitCstExp}, which is
 #' a list with the following fields:
 #' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
 #' credible intervals}

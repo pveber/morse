@@ -1,7 +1,4 @@
-#' Fitting models for survival analysis using Bayesian inference
-#'
-#' Survival analysis using Bayesian inference for \code{reproFitTT}, \code{survFitTT},
-#' \code{survFit.TKTDCstC} and \code{survFit.TKTDVarC} objects.
+#' Method to fit a model for survival data using Bayesian inference
 #'
 #' @param x an object used to select a method
 #' @param \dots Further arguments to be passed to generic methods
