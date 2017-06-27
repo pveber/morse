@@ -26,7 +26,8 @@ Imports:
     reshape2,
     rjags (>= 4.0),
     stats,
-    stringr
+    stringr,
+    zoo
 License: GPL (>=2)
 Suggests:
     knitr,
