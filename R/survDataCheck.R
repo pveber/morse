@@ -210,7 +210,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     replicates <- df_variation$replicate[! df_variation$decreasing]
     msg <- paste(
         "'Nsurv' increases at some time points in replicate(s) ",
-        paste(replicates, sep=", "),
+        paste(replicates, collapse=", "),
         ".",
         sep = "")
     errors <- errorTableAdd(errors, "NsurvIncrease", msg)
