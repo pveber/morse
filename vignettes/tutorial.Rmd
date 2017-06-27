@@ -208,7 +208,8 @@ between pollutant concentration, time and survival rate.
 
 ## TKTD model with constant exposure concentration
 
-Here is a typical session:
+Here is a typical session to analyse dose-dependent time-course data
+using the so-called "Stochastic Death" (SD) model:
 ```{r TKTDcst, cache=TRUE}
 # (1) load dataset
 data(propiconazole)
@@ -226,16 +227,42 @@ plot(dat, style = "ggplot", pool.replicate = FALSE)
 summary(dat)
 
 # (6) fit a TKTD model
-fit <- survFitTKTD(dat, quiet = TRUE)
-summary(fit)
+fit_cstSD <- survFitTKTD(dat, quiet = TRUE)
+summary(fit_cstSD)
 ```
 
 ```{r, cache=TRUE}
-plot(fit, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+plot(fit_cstSD, style = "ggplot", adddata = TRUE, one.plot = FALSE)
 ```
 
 ```{r, cache=TRUE}
-ppc(fit, style = "ggplot")
+ppc(fit_cstSD, style = "ggplot")
+```
+
+## Using an alternative model under constant exposure concentration
+
+The "Individual Tolerance" (IT) model is a variant of TKTD survival
+analysis. It can also be used with MORSE as demonstrated here:
+
+```{r TKTDcstIT, cache=TRUE}
+fit_cstIT <- survFit(dat, quiet = TRUE, model_type = "IT")
+```
+
+```{r, cache=TRUE}
+plot(fit_cstIT, facet.label = "conc")
+```
+
+```{r, cache=TRUE}
+ppc(fit_cstIT)
+```
+
+```{r, cache=TRUE}
+summary(fit_cstIT)
+```
+
+To have a summary of the estimation of parameters:
+```{r, cache=TRUE}
+fit_cstIT$estim.par
 ```
 
 # Reproduction data analyses
