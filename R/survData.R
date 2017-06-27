@@ -43,43 +43,28 @@
 #' @importFrom dplyr left_join rename
 #' 
 #' @export
-survData <- function(data) {
-  ### INPUT
-  # [data]: a [data.frame] with above mentionned requirements
-  #
-  ### OUTPUT
-  # a [data.frame] with additional class [survData]
-  # containing columns:
-  # - replicate, conc, time, Nsurv as in [data]
-  # - Ninit: number of initial individuals for the corresponding time series
+survData <- function(x) {
 
   # test the integrity of the data with survDataCheck
-  if (dim(survDataCheck(data, diagnosis.plot = FALSE))[1] > 0)
-    stop("The [data] argument is not well-formed, please use [survDataCheck] for details.")
+  if (dim(survDataCheck(x, diagnosis.plot = FALSE))[1] > 0)
+    stop("The [x] argument is not well-formed, please use [survDataCheck] for details.")
 
-  data <- data[order(data$replicate, data$conc, data$time), ]
+  x <- data.frame(
+    replicate = x$replicate,
+    time = x$time,
+    conc = x$conc,
+    Nsurv = x$Nsurv
+  )
 
-  data.t0 <- data[data$time == 0, c("replicate", "conc", "Nsurv")]
-  data.t0 <- rename(data.t0, Ninit = Nsurv)
-  out <- left_join(data, data.t0, by = c("replicate", "conc"))
+  child_class <-
+    if (is_exposure_constant(x)) "survDataCstExp"
+    else "survDataVarExp"
 
-  T <- sort(unique(data$time)) # observation times
-  Nindtime <- rep(0,dim(out)[1])
-  for (i in 2:length(T)) {
-    now <- out$time == T[i]
-    before <- out$time == T[i - 1]
-    Nindtime[now] <-
-      Nindtime[before] +
-      (out$Nsurv[before] - out$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
-      out$Nsurv[now] * (T[i] - T[i - 1])
-  }
+  class(x) <- c(child_class, "survData", "data.frame")
 
-  out <- cbind(out, Nindtime)
-  # force concentration as type double
-  out$conc <- as.double(out$conc)
-  class(out) <- c("survData", "data.frame")
-  return(out)
+  return(x)
 }
+
 
 #' Tests in a well-formed argument to function 'survData' if the concentration
 #' is constant and different from NA for each replicate
