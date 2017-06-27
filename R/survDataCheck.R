@@ -137,41 +137,6 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
                  " is duplicated.", sep = "")
     errors <- errorTableAdd(errors, "duplicatedID", msg)
   }
-  consistency <- function(subdata) {
-    # Function to be used on a subdataset corresponding to one replicate at one
-    # concentration.
-    # This function checks:
-    #   - if each replicate appears once and only once at each time
-    #   - if Nsurv is never increasing with time
-
-    errors <- errorTableCreate()
-
-    ##
-    ## 9. assert there is the same number of replicates for each conc and time
-    ##
-    if (length(subdata$replicate) != length(unique(data$time))) {
-      msg <- paste("Replicate ", unique(subdata$replicate),
-                   " is missing for at least one time points at concentration ",
-                   unique(subdata$conc), ".", sep = "")
-      errors <- errorTableAdd(errors, "missingReplicate", msg)
-    }
-
-    ##
-    ## 10. assert Nsurv never increases with time
-    ##
-    nsurv.increase <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
-    if (any(nsurv.increase)) {
-      msg <- paste("For replicate ", unique(subdata$replicate),
-                   " and concentration ", unique(subdata$conc),
-                   ", Nsurv increases at some time points.",
-                   sep = "")
-      errors <- errorTableAdd(errors, "NsurvIncrease", msg)
-    }
-    errors
-  }
-  res <- by(data, list(data$replicate, data$conc), consistency)
-  consistency.errors <- do.call("errorTableAppend", res)
-  errors <- errorTableAppend(errors, consistency.errors)
 
   ##
   ## 9. assert all replicates are available for each time point
