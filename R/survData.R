@@ -100,3 +100,27 @@ is_exposure_constant <- function(x) {
   has_NA <- sum(is.na(x$conc)) > 0
   return(!has_NA && all(df.test$count==1))
 }
+
+
+#' Computes the effective period of observation in individual days for a
+#' survival dataset
+#'
+#' @param x an object of class \code{survData}
+#' @return a numeric vector
+#'
+#' @export
+#'
+Nindtime <- function(x) {
+  x <- x[!is.na(x$Nsurv),]
+  T <- sort(unique(x$time)) # observation times
+  Nindtime <- rep(0,dim(x)[1])
+  for (i in 2:length(T)) {
+    now <- x$time == T[i]
+    before <- x$time == T[i - 1]
+    Nindtime[now] <-
+      Nindtime[before] +
+      (x$Nsurv[before] - x$Nsurv[now]) * ((T[i] - T[i - 1]) / 2) +
+      x$Nsurv[now] * (T[i] - T[i - 1])
+  }
+  return(Nindtime)
+}
