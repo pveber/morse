@@ -75,13 +75,10 @@ survFit.survDataCstExp <- function(data,
   time_start <- Sys.time()
   
   ### ensures model_type is one of "SD" and "IT"
-  if(is.null(model_type)) {
-    stop("You need to specify a 'model_type': 'SD' or 'IT'")
+  if(is.null(model_type) || ! (model_type %in% c("SD","IT"))) {
+    stop("You need to specify a 'model_type' among 'SD' or 'IT'")
   }
-  if(!model_type %in% c("SD","IT")) {
-    stop("'model_type' available for use are 'SD' or 'IT'")
-  }
-  
+
   ### check number of sample for the diagnostic procedure
   if (nbr.chain < 2) {
     stop('2 or more parallel chains required')
