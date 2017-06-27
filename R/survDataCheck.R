@@ -174,19 +174,22 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   errors <- errorTableAppend(errors, consistency.errors)
 
   ##
-  ## 9. assert there is the same number of replicates for each time
+  ## 9. assert all replicates are available for each time point
   ##
   df_repl <- data %>%
     filter(!is.na(Nsurv)) %>%
     group_by(time) %>%
-    summarise(total = length(replicate)) %>%
-    mutate(complete = total == max(total))
+    summarise(set = paste(sort(replicate), collapse = '-'))
 
-  if (! all(df_repl$complete)) {
-    times <- df_repl$time[! df_repl$complete]
+  if (length(unique(df_repl$set)) > 1) {
+    sets <- df_repl %>%
+      group_by(set) %>%
+      summarise(cardinal = length(set))
+    reference_set <- sets$set[which.max(sets$cardinal)]
+    diffs <- which(df_repl$set != reference_set)
     msg <- paste(
-        "Missing replicate(s) for time point(s) ",
-        paste(times, sep=", "),
+        "Changing set of replicates for time point(s) ",
+        paste(diffs, collapse = ", "),
         ".",
         sep = "")
     errors <- errorTableAdd(errors, "missingReplicate", msg)
