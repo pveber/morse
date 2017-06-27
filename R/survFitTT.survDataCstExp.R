@@ -12,7 +12,7 @@
 #' parameter estimates of the exposure-response model and estimates of the so-called
 #' LCx, that is the concentration of pollutant required to obtain an 1 - x survival
 #' rate.
-#' 
+#'
 #' @param data an object of class \code{survData}
 #' @param target.time the chosen endpoint to evaluate the effect of a given
 #' concentration of pollutant, by default the last time point available for
@@ -63,7 +63,7 @@
 #'
 #' @import rjags
 #' @importFrom dplyr filter
-#' 
+#'
 #' @export
 survFitTT.survDataCstExp <- function(data,
                                      target.time = NULL,
@@ -71,8 +71,10 @@ survFitTT.survDataCstExp <- function(data,
                                      n.chains = 3,
                                      quiet = FALSE) {
   # test class object
-  if(! is(data, "survData"))
-    stop("survFitTT: object of class survData expected")
+  if(! is(data, "survDataCstExp"))
+    stop("survFitTT: object of class survDataCstExp expected")
+
+  data$Ninit <- Ninit(data)
 
   # select Data at target.time and pool replicates
   dataTT <- selectDataTT(data, target.time)
@@ -281,4 +283,3 @@ survPARAMS <- function(mcmc, det.part) {
 llbinom3.model.text <- "\nmodel # Loglogistic binomial model with 3 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- d/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nd ~ dunif(dmin, dmax)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
 
 llbinom2.model.text <- "\nmodel # Loglogistic binomial model with 2 parameters\n\t\t{\t\nfor (i in 1:n)\n{\np[i] <- 1/ (1 + (xconc[i]/e)^b)\nNsurv[i]~ dbin(p[i], Ninit[i])\n}\n\n# specification of priors (may be changed if needed)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10, log10b)\ne <- pow(10, log10e)\n}\n"
-
