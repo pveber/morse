@@ -51,21 +51,23 @@ test_that("reproData", {
   
   lapply(datasets, function(x) {
     dat <- reproData(get(x))
-    expect_is(dat, c("reproData", "survData", "data.frame"))
+    dat.Nindtime <- Nindtime(dat)
+    dat.Nreprocumul <- Nreprocumul(dat)
+    expect_is(dat, c("reproData", "survDataCstExp", "survData", "data.frame"))
     expect_true(!is.null(dat))
     expect_true(any(!is.na(dat)))
-    expect_is(dat$Ninit, "integer")
-    expect_is(dat$Nindtime, "numeric")
-    expect_is(dat$Nreprocumul, "integer")
-    expect_true(all(dat$Nindtime >= 0))
-    expect_true(all(dat$Nreprocumul >= 0))
+    expect_is(Ninit(dat), "integer")
+    expect_is(dat.Nindtime, "numeric")
+    expect_is(dat.Nreprocumul, "integer")
+    expect_true(all(dat.Nindtime >= 0))
+    expect_true(all(dat.Nreprocumul >= 0))
     
     T <- sort(unique(dat$time))
     for (i in 2:length(T)) {
       now <- dat$time == T[i]
       before <- dat$time == T[i - 1]
-      expect_true(all(dat$Nindtime[before] <= dat$Nindtime[now]))
-      expect_true(all(dat$Nreprocumul[before] <= dat$Nreprocumul[now]))
+      expect_true(all(dat.Nindtime[before] <= dat.Nindtime[now]))
+      expect_true(all(dat.Nreprocumul[before] <= dat.Nreprocumul[now]))
     }
   })
 })
