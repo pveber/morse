@@ -49,8 +49,6 @@
 #' dat <- survData(zinc)
 #' class(dat)
 #'
-#' @importFrom dplyr left_join rename
-#'
 #' @export
 survData <- function(x) {
 
