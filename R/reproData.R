@@ -13,6 +13,8 @@
 #' expected requirements. Please run \code{\link{reproDataCheck}} to ensure
 #' \code{x} is well-formed.
 #'
+#' Note that experimental data with variable exposure is not supported.
+#'
 #' @aliases reproData
 #'
 #' @param x a dataframe as expected by \code{survData} containing one
@@ -39,6 +41,10 @@ reproData <- function(x) {
   # test the integrity of the data with reproDataCheck
   if (dim(reproDataCheck(x, diagnosis.plot = FALSE))[1] > 0)
     stop("The [x] argument is not well-formed, please use [reproDataCheck] for details.")
+
+  if (!is_exposure_constant(x)) {
+    stop("[x] displays variable exposure, which is not supported for reproduction analysis")
+  }
 
   x <- survData(x)
 
