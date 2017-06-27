@@ -13,17 +13,17 @@ vignette: >
 ---
 
 ```{r,include=FALSE, echo=FALSE}
-
 knitr::opts_chunk$set(fig.width = 7,
                       fig.height = 4,
                       cache = TRUE)
-
 ```
 
 
 ```{r, echo=FALSE, cache=TRUE, results='hide'}
 library(morse)
 library(ggplot2)
+library(tidyr)
+library(dplyr)
 ```
 
 The package MORSE is devoted to the analysis of data from standard toxicity
@@ -32,7 +32,7 @@ compute estimations of risk assessment indicators. This document illustrates
 a typical use of MORSE on survival and reproduction data, which can be followed
 to analyze new datasets.
 
-# Survival data analysis at target time
+# Survival data analysis at target time (TT)
 
 The following example shows all the stages to perform survival analysis on
 standard bioassay data and produce estimate values of the $LC_x$.
@@ -49,7 +49,7 @@ reference manual, and you can also inspect one of the datasets provided in
 the package (like `cadmium2`). First, we load the dataset and use the function
 `survDataCheck` to verify that it has the expected layout:
 
-```{r, cache=TRUE}
+```{r step1TT, cache=TRUE}
 data(cadmium2)
 survDataCheck(cadmium2)
 ```
@@ -61,7 +61,7 @@ basic representation used for the subsequent operations. Note that if the
 call to `survDataCheck` reports no error, it is guaranteed that `survData`
 will not fail.
 
-```{r, cache=TRUE}
+```{r step2TT, cache=TRUE}
 dat <- survData(cadmium2)
 head(dat)
 ```
@@ -71,7 +71,7 @@ head(dat)
 The function `plot` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
 
-```{r, cache=TRUE}
+```{r step3TT, cache=TRUE}
 plot(dat, style = "ggplot", pool.replicate = FALSE)
 ```
 
@@ -112,7 +112,7 @@ function. Once we have estimated the parameters, we can then calculate the $LC_x
 for any $x$. All this work is performed by the `survFitTT` function, which requires
 a `survData` object and the levels of $LC_x$ we need:
 
-```{r, results="hide", cache=TRUE}
+```{r step4TT, results="hide", cache=TRUE}
 fit <- survFitTT(dat,
                  target.time = 21,
                  lcx = c(10, 20, 30, 40, 50))
@@ -173,7 +173,6 @@ influence on the final estimation. For this reason this result should be
 considered unreliable.
 
 
-
 ## Step 5: validate the model with a posterior predictive check
 
 The estimation can be further validated using so-called posterior
@@ -182,7 +181,7 @@ corresponding estimated predictions, along with their 95% credible
 interval. If the fit is correct, we expect to see 95% of the data
 inside the intervals.
 
-```{r,cache=TRUE, results="hide"}
+```{r step5TT,cache=TRUE, results="hide"}
 ppc(fit, style = "ggplot")
 ```
 
@@ -201,14 +200,16 @@ As replicates are shifted on the x-axis, the bisecting line (y = x), is
 represented by steps, and is added to the plot in order to see if each
 prediction interval contains each observed value.
 
-# Survival analysis using a toxico-kinetic toxico-dynamic model
+# Survival analysis using a toxico-kinetic toxico-dynamic (TKTD) model
 
 The steps for TKTD data analysis are absolutely analogous to what we
 described for the analysis at target time. Here the goal is to estimate the relation
 between pollutant concentration, time and survival rate.
 
+## TKTD model with constant exposure concentration
+
 Here is a typical session:
-```{r, cache=TRUE}
+```{r TKTDcst, cache=TRUE}
 # (1) load dataset
 data(propiconazole)
 
