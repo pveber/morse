@@ -74,8 +74,6 @@ survFitTT.survDataCstExp <- function(data,
   if(! is(data, "survDataCstExp"))
     stop("survFitTT: object of class survDataCstExp expected")
 
-  data$Ninit <- Ninit(data)
-
   # select Data at target.time and pool replicates
   dataTT <- selectDataTT(data, target.time)
   dataTT <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, dataTT, sum), replicate = 1)
