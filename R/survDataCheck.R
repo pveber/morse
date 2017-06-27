@@ -174,7 +174,26 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   errors <- errorTableAppend(errors, consistency.errors)
 
   ##
-  ## 9. assert Nsurv never increases with time
+  ## 9. assert there is the same number of replicates for each time
+  ##
+  df_repl <- data %>%
+    filter(!is.na(Nsurv)) %>%
+    group_by(time) %>%
+    summarise(total = length(replicate)) %>%
+    mutate(complete = total == max(total))
+
+  if (! all(df_repl$complete)) {
+    times <- df_repl$time[! df_repl$complete]
+    msg <- paste(
+        "Missing replicate(s) for time point(s) ",
+        paste(times, sep=", "),
+        ".",
+        sep = "")
+    errors <- errorTableAdd(errors, "missingReplicate", msg)
+  }
+
+  ##
+  ## 10. assert Nsurv never increases with time
   ##
   df_variation <- data %>%
     filter(!is.na(Nsurv)) %>%
