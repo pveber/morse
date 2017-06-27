@@ -50,7 +50,7 @@ reproData <- function(x) {
 
   # force concentration as type double
   x$conc <- as.double(x$conc)
-  class(x) <- c("reproData", "survData","data.frame")
+  class(x) <- c("reproData", class(x))
   return(x)
 }
 
