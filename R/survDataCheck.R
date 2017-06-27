@@ -113,7 +113,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ## 6. assert all data are positive
   ##
   table <- subset(data, select = -c(replicate)) # remove replicate column
-  if (any(table < 0.0)) {
+  if (any(table < 0.0, na.rm = TRUE)) {
     msg <- "Data must contain only positive values."
     errors <- errorTableAdd(errors, "tablePositive", msg)
   }
@@ -179,6 +179,25 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
         ".",
         sep = "")
     errors <- errorTableAdd(errors, "NsurvIncrease", msg)
+  }
+
+  ##
+  ## 11. Assert max(time in data_conc) >= max(time in data_surv)
+  ##
+  df_checkMaxTimeSurv <- data %>%
+    filter(!is.na(Nsurv)) %>%
+    group_by(replicate) %>%
+    filter(time == max(time))
+  
+  df_checkMaxTimeConc <- data %>%
+    filter(!is.na(conc)) %>%
+    group_by(replicate) %>%
+    filter(time == max(time))
+  
+  if(!all(df_checkMaxTimeConc$time >= df_checkMaxTimeSurv$time) ){
+    msg <- "In each 'replicate', maximum time for concentration record should
+    be greater or equal to maximum time in survival data observation."
+    errors <- errorTableAdd(errors, "maxTimeDiffer", msg)
   }
 
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
