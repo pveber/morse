@@ -111,3 +111,21 @@ Nindtime <- function(x) {
   }
   return(Nindtime)
 }
+
+#' Computes a vector associating to each measurement in a \code{survData}
+#' object the initial number of individuals in the corresponding replicate
+#'
+#' @param x an object of class \code{survData}
+#' @return an integer vector
+#'
+#' @importFrom dplyr left_join
+#'
+#' @export
+#'
+Ninit <- function(x) {
+  x.t0 <- x[x$time == 0 & !is.na(x$Nsurv), c("replicate", "Nsurv")]
+  x.t0 <- data.frame(replicate = x.t0$replicate,
+                     Ninit = x.t0$Nsurv)
+  out <- left_join(x, x.t0, by = c("replicate"))
+  return(out$Ninit)
+}
