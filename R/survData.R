@@ -58,13 +58,6 @@ survData <- function(x) {
   if (dim(survDataCheck(x, diagnosis.plot = FALSE))[1] > 0)
     stop("The [x] argument is not well-formed, please use [survDataCheck] for details.")
 
-  x <- data.frame(
-    replicate = x$replicate,
-    time = x$time,
-    conc = x$conc,
-    Nsurv = x$Nsurv
-  )
-
   child_class <-
     if (is_exposure_constant(x)) "survDataCstExp"
     else "survDataVarExp"
