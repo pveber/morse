@@ -47,6 +47,7 @@ reproData <- function(x) {
   }
 
   x <- survData(x)
+  x$Nindtime <- Nindtime(x)
   x$Nreprocumul <- Nreprocumul(x)
 
   # force concentration as type double
