@@ -42,6 +42,23 @@ reproData <- function(x) {
 
   x <- survData(x)
 
+  # force concentration as type double
+  x$conc <- as.double(x$conc)
+  class(x) <- c("reproData", "survData","data.frame")
+  return(x)
+}
+
+#' Computes cumulated offspring for each line of a
+#' \code{reproData} object
+#'
+#' @param x an object of class \code{reproData}
+#' @return an integer vector
+#'
+#' @importFrom dplyr left_join
+#'
+#' @export
+#'
+Nreprocumul <- function(x) {
   T <- sort(unique(x$time)) # observation times
   Nreprocumul <- x$Nrepro
   for (i in 2:length(T)) {
@@ -50,9 +67,5 @@ reproData <- function(x) {
     Nreprocumul[now] <- Nreprocumul[before] + x$Nrepro[now]
   }
 
-  x <- cbind(x,Nreprocumul)
-  # force concentration as type double
-  x$conc <- as.double(x$conc)
-  class(x) <- c("reproData", "survData","data.frame")
-  return(x)
+  return(Nreprocumul)
 }
