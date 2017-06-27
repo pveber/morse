@@ -308,12 +308,12 @@ reproduction dataset includes the same information than a survival dataset plus
 the information on reproduction outputs. For that reason the S3 class `reproData`
 inherits from the class `survData`, which means that any operation on a `survData`
 object is legal on a `reproData` object. In particular, to use the plot function
-related to survival analysis on `reproData` object, we can use the `as.survData`
+related to survival analysis on `reproData` object, we can use `survData` as a
 conversion function:
 
 ```{r, cache=TRUE}
 dat <- reproData(cadmium2)
-plot(as.survData(dat))
+plot(survData(dat))
 ```
 
 
