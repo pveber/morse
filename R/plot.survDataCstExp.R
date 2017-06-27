@@ -43,17 +43,17 @@
 #' @importFrom stats aggregate
 #'
 #' @export
-plot.survData <- function(x,
-                          xlab,
-                          ylab = "Number of surviving individuals",
-                          main = NULL,
-                          concentration = NULL,
-                          style = "generic",
-                          pool.replicate = FALSE,
-                          addlegend = FALSE,
-                          remove.someLabels = FALSE, ...) {
+plot.survDataCstExp <- function(x,
+                                xlab,
+                                ylab = "Number of surviving individuals",
+                                main = NULL,
+                                concentration = NULL,
+                                style = "generic",
+                                pool.replicate = FALSE,
+                                addlegend = FALSE,
+                                remove.someLabels = FALSE, ...) {
 
-  if (!is(x,"survData"))
+  if (!is(x,"survDataCstExp"))
     stop("plot.survData: object of class survData expected")
   
   if (style == "generic" && remove.someLabels)
