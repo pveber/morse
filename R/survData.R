@@ -80,3 +80,23 @@ survData <- function(data) {
   class(out) <- c("survData", "data.frame")
   return(out)
 }
+
+#' Test if concentration of each replicate in a 'survData' object is constant
+#'
+#' @param x A data.frame
+#' @return a boolean \code{TRUE} if concentration in replicate is constant,
+#'  or \code{FALSE} if the concentration in at least one of the replicate is variable
+#'
+#' @export
+#' 
+test_cst_conc = function(x){
+  
+  # Test if concentration is constant in a same replicate
+  
+  df.test <- x %>%
+    group_by(replicate) %>%
+    summarise(count = n_distinct(conc))
+  
+  return(all(df.test$count==1))
+  
+}
