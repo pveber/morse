@@ -2,7 +2,8 @@
 
 S3method(plot,reproData)
 S3method(plot,reproFitTT)
-S3method(plot,survData)
+S3method(plot,survDataCstExp)
+S3method(plot,survDataVarExp)
 S3method(plot,survFit)
 S3method(plot,survFitTKTD)
 S3method(plot,survFitTT)
