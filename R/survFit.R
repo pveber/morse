@@ -151,7 +151,7 @@ survFit_load_model <- function(model.program,
                                data,
                                n.chains,
                                Nadapt,
-                               quiet = quiet) {
+                               quiet) {
   # create the JAGS model object
   # INPUTS:
   # - model.program: character string containing a jags model description

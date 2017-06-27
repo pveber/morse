@@ -142,7 +142,7 @@ survFit.survDataCstExp <- function(data,
     
     sampling.parameters <- modelSamplingParameters(model,
                                                    parameters_red,
-                                                   n.chains = nbr.chain, quiet)
+                                                   n.chains = nbr.chain, quiet = quiet)
     if (sampling.parameters$niter > 5e5)
       stop("The model needs too many iterations to provide reliable parameter estimates !")
     
@@ -158,14 +158,16 @@ survFit.survDataCstExp <- function(data,
   mcmc_Null =  coda.samples(model_Null,
                             variable.names = parameters_red,
                             n.iter = nbr.iter,
-                            thin = nbr.thin)
+                            thin = nbr.thin,
+                            progress.bar = ifelse(quiet, "none", "text"))
   
   ### model to check priors with the model
   update(model, nbr.warmup)
   mcmc =  coda.samples(model,
                        variable.names = parameters,
                        n.iter = nbr.iter,
-                       thin = nbr.thin)
+                       thin = nbr.thin,
+                       progress.bar = ifelse(quiet, "none", "text"))
   
   ##
   ## Cheking posterior range with data from experimental design:

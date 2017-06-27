@@ -49,7 +49,7 @@ selectDataTT <- function(data, target.time) {
 
 #' @import rjags
 #' @importFrom coda raftery.diag
-modelSamplingParameters <- function(model, parameters, n.chains, quiet = quiet) {
+modelSamplingParameters <- function(model, parameters, n.chains, quiet) {
   # estimate the number of iteration required for the estimation
   # by using the raftery.diag
   # INPUTS:
@@ -88,7 +88,7 @@ modelSamplingParameters <- function(model, parameters, n.chains, quiet = quiet) 
 }
 
 #' @import rjags
-calcDIC <- function(m.M, sampling.parameters, quiet = quiet) {
+calcDIC <- function(m.M, sampling.parameters, quiet) {
   # calculate the dic for a jags model
   # INPUTS
   # - m.M:  jags model object
