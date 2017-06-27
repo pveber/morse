@@ -81,22 +81,22 @@ survData <- function(data) {
   return(out)
 }
 
-#' Test if concentration of each replicate in a 'survData' object is constant
+#' Tests in a well-formed argument to function 'survData' if the concentration
+#' is constant and different from NA for each replicate
 #'
-#' @param x A data.frame
+#' @param x a data.frame
 #' @return a boolean \code{TRUE} if concentration in replicate is constant,
-#'  or \code{FALSE} if the concentration in at least one of the replicate is variable
+#'  or \code{FALSE} if the concentration in at least one of the replicates is variable
 #'
 #' @export
 #' 
-test_cst_conc = function(x){
+is_exposure_constant <- function(x) {
   
   # Test if concentration is constant in a same replicate
-  
   df.test <- x %>%
     group_by(replicate) %>%
     summarise(count = n_distinct(conc))
-  
-  return(all(df.test$count==1))
-  
+
+  has_NA <- sum(is.na(x$conc)) > 0
+  return(!has_NA && all(df.test$count==1))
 }
