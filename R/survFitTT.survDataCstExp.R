@@ -65,11 +65,11 @@
 #' @importFrom dplyr filter
 #' 
 #' @export
-survFitTT <- function(data,
-                      target.time = NULL,
-                      lcx = c(5, 10, 20, 50),
-                      n.chains = 3,
-                      quiet = FALSE) {
+survFitTT.survDataCstExp <- function(data,
+                                     target.time = NULL,
+                                     lcx = c(5, 10, 20, 50),
+                                     n.chains = 3,
+                                     quiet = FALSE) {
   # test class object
   if(! is(data, "survData"))
     stop("survFitTT: object of class survData expected")
