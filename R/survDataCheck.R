@@ -46,9 +46,13 @@
 #' survDataCheck(zinc, diagnosis.plot = TRUE)
 #'
 #' @importFrom stringr str_c
-#' 
+#' @importFrom magrittr '%>%'
+#' @importFrom dplyr arrange
+#' @importFrom dplyr mutate
+#'
 #' @export
 survDataCheck <- function(data, diagnosis.plot = TRUE) {
+
 
   ##
   ## 0. check we have a data.frame
@@ -75,9 +79,9 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 2. assert the first time point is zero for each (replicate, concentration)
   ##
-  subdata <- split(data, list(data$replicate, data$conc), drop = TRUE)
+  subdata <- split(data, list(data$replicate), drop = TRUE)
   if (any(unlist(lapply(subdata, function(x) x$time[1] != 0)))) {
-    msg <- "Data are required at time 0 for each concentration and each replicate."
+    msg <- "Data are required at time 0 for each replicate."
     errors <- errorTableAdd(errors, "firstTime0", msg)
   }
 
@@ -124,50 +128,58 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   }
 
   ##
-  ## 8 assert each (replicate, concentration, time) triplet is unique
+  ## 8. assert each (replicate, time) pair is unique
   ##
   ID <- idCreate(data) # ID vector
   if (any(duplicated(ID))) {
-    msg <- paste("The (replicate, conc, time) triplet ",
+    msg <- paste("The (replicate, time) pair ",
                  ID[duplicated(ID)],
                  " is duplicated.", sep = "")
     errors <- errorTableAdd(errors, "duplicatedID", msg)
   }
-  consistency <- function(subdata) {
-    # Function to be used on a subdataset corresponding to one replicate at one
-    # concentration.
-    # This function checks:
-    #   - if each replicate appears once and only once at each time
-    #   - if Nsurv is never increasing with time
 
-    errors <- errorTableCreate()
+  ##
+  ## 9. assert all replicates are available for each time point
+  ##
+  df_repl <- data %>%
+    filter(!is.na(Nsurv)) %>%
+    group_by(time) %>%
+    summarise(set = paste(sort(replicate), collapse = '-'))
 
-    ##
-    ## 9. assert there is the same number of replicates for each conc and time
-    ##
-    if (length(subdata$replicate) != length(unique(data$time))) {
-      msg <- paste("Replicate ", unique(subdata$replicate),
-                   " is missing for at least one time points at concentration ",
-                   unique(subdata$conc), ".", sep = "")
-      errors <- errorTableAdd(errors, "missingReplicate", msg)
-    }
-
-    ##
-    ## 10. assert Nsurv never increases with time
-    ##
-    nsurv.increase <- subdata$Nsurv[-length(subdata$Nsurv)] < subdata$Nsurv[-1]
-    if (any(nsurv.increase)) {
-      msg <- paste("For replicate ", unique(subdata$replicate),
-                   " and concentration ", unique(subdata$conc),
-                   ", Nsurv increases at some time points.",
-                   sep = "")
-      errors <- errorTableAdd(errors, "NsurvIncrease", msg)
-    }
-    errors
+  if (length(unique(df_repl$set)) > 1) {
+    sets <- df_repl %>%
+      group_by(set) %>%
+      summarise(cardinal = length(set))
+    reference_set <- sets$set[which.max(sets$cardinal)]
+    diffs <- which(df_repl$set != reference_set)
+    msg <- paste(
+        "Changing set of replicates for time point(s) ",
+        paste(diffs, collapse = ", "),
+        ".",
+        sep = "")
+    errors <- errorTableAdd(errors, "missingReplicate", msg)
   }
-  res <- by(data, list(data$replicate, data$conc), consistency)
-  consistency.errors <- do.call("errorTableAppend", res)
-  errors <- errorTableAppend(errors, consistency.errors)
+
+  ##
+  ## 10. assert Nsurv never increases with time
+  ##
+  df_variation <- data %>%
+    filter(!is.na(Nsurv)) %>%
+    group_by(replicate) %>%
+    arrange(time) %>%
+    mutate(Nprec = ifelse(time == min(time), Nsurv, lag(Nsurv))) %>%
+    mutate(decrease = Nsurv <= Nprec) %>%
+    summarise(decreasing = all(decrease))
+
+  if (! all(df_variation$decreasing)) {
+    replicates <- df_variation$replicate[! df_variation$decreasing]
+    msg <- paste(
+        "'Nsurv' increases at some time points in replicate(s) ",
+        paste(replicates, collapse=", "),
+        ".",
+        sep = "")
+    errors <- errorTableAdd(errors, "NsurvIncrease", msg)
+  }
 
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
     survDataPlotFull(data, ylab = "Number of surviving individuals")
