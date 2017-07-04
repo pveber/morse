@@ -9,21 +9,22 @@
 #' @param main main title for the plot
 #' @param concentration a numeric value corresponding to some concentration in
 #' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param style graphical backend, can be \code{'ggplot'} or \code{'generic'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
 #' @param \dots Further arguments to be passed to generic methods
-#' @note When \code{style = "ggplot"}, the function calls function
-#' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}
+#' 
+#' @note When \code{style = "generic"}, the function calls the generic function
+#' \code{\link[graphics]{plot}}
+#' @note When \code{style = "ggplot"}, the function return an object of class
+#'  \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}} 
+#' 
 #' @keywords plot
 #'
 #' @examples
-#'
-#' library(ggplot2)
-#'
 #' # (1) Load the data
 #' data(cadmium1)
 #' cadmium1 <- reproData(cadmium1)
@@ -32,7 +33,7 @@
 #' plot(cadmium1)
 #'
 #' # (3) Plot the reproduction data for a fixed concentration
-#' plot(cadmium1, concentration = 4.36, style = "ggplot")
+#' plot(cadmium1, concentration = 4.36, style = "generic")
 #'
 #' @import ggplot2
 #' @import grDevices
@@ -45,7 +46,7 @@ plot.reproData <- function(x,
                            ylab = "Cumulated Number of offspring",
                            main = NULL,
                            concentration = NULL,
-                           style = "generic",
+                           style = "ggplot",
                            pool.replicate = FALSE,
                            addlegend = FALSE,
                            remove.someLabels = FALSE, ...) {
