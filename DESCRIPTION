@@ -27,6 +27,7 @@ Imports:
     rjags (>= 4.0),
     stats,
     stringr,
+    tibble,
     zoo
 License: GPL (>=2)
 Suggests:
