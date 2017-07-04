@@ -40,6 +40,8 @@
 #'
 #' @keywords transformation
 #'
+#' @importFrom tibble as_tibble
+#' 
 #' @examples
 #'
 #' # (1) Load the survival dataset
@@ -52,6 +54,7 @@
 #' @export
 survData <- function(x) {
 
+  x <- as_tibble(x)
   # test the integrity of the data with survDataCheck
   if (dim(survDataCheck(x, diagnosis.plot = FALSE))[1] > 0)
     stop("The [x] argument is not well-formed, please use [survDataCheck] for details.")
@@ -62,7 +65,7 @@ survData <- function(x) {
     if (is_exposure_constant(x)) "survDataCstExp"
     else "survDataVarExp"
 
-  class(x) <- c(child_class, "survData", "data.frame")
+  class(x) <- c(child_class, "survData", class(x))
 
   return(x)
 }
