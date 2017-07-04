@@ -38,6 +38,7 @@
 #' credible intervals}
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior distributions}
 #' \item{model}{a JAGS model object}
+#' \item{warnings}{a data.frame with warning messages}
 #' \item{model.label}{a character string, \code{"P"} if the poisson model is used,
 #' \code{"GP"} if the gamma-poisson is used}
 #' \item{parameters}{a list of the parameters names used in the model}
@@ -245,10 +246,20 @@ reproFitTT <- function(data,
 
   # check if the maximum measured concentration is in the EC50's range of
   # 95% percentile
+  
+  warnings <- warningTableCreate() 
+  
   EC50 <- log10(estim.par["e", "median"])
-  if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc))))
-    warning("The EC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
-            call. = FALSE)
+  if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc)))){
+    ##store warning in warnings table
+    msg <- "The EC50 estimation (model parameter e) lies outside the range of
+    tested concentration and may be unreliable as the prior distribution on 
+    this parameter is defined from this range !"
+    warnings <- warningTableAdd(warnings, "EC50outRange", msg)
+    ## print the message
+    warning(msg, call. = FALSE)
+  }
+   
 
   # output
   OUT <- list(DIC = coda.arg$DIC,
@@ -256,6 +267,7 @@ reproFitTT <- function(data,
               estim.par = estim.par,
               det.part = "loglogistic",
               mcmc = mcmc,
+              warnings = warnings,
               model = coda.arg$model,
               model.label = coda.arg$model.label,
               parameters = coda.arg$parameters,
