@@ -15,15 +15,18 @@
 #' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param style graphical backend, can be \code{'ggplot'} or \code{'generic'}
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @note When \code{style = "ggplot"}, the function calls function
-#' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
+#' @note When \code{style = "generic"}, the function calls the generic function
+#' \code{\link[graphics]{plot}}
+#' @note When \code{style = "ggplot"}, the function return an object of class
+#'  \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}} 
+#' 
 #' 
 #' @seealso \code{\link[stats]{binom.test}}
 #'
@@ -40,8 +43,8 @@
 #' # (2) Plot dose-response
 #' plotDoseResponse(zinc)
 #'
-#' # (3) Plot dose-response with a ggplot style
-#' plotDoseResponse(zinc, style = "ggplot")
+#' # (3) Plot dose-response with a generic style
+#' plotDoseResponse(zinc, style = "generic")
 #'
 #' @import ggplot2
 #' @import grDevices
@@ -57,7 +60,7 @@ plotDoseResponse.survData <- function(x,
                                       ylab = "Survival rate",
                                       main = NULL,
                                       target.time = NULL,
-                                      style = "generic",
+                                      style = "ggplot",
                                       log.scale = FALSE,
                                       remove.someLabels = FALSE,
                                       addlegend = TRUE,

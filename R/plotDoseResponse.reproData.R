@@ -18,7 +18,7 @@
 #' @param main main title for the plot
 #' @param ylim Y-axis limits
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param style graphical backend, can be \code{'ggplot'} or \code{'generic'}
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
@@ -34,18 +34,15 @@
 #' @keywords plot
 #'
 #' @examples
-#'
-#' library(ggplot2)
-#'
 #' # (1) Load the data
 #' data(zinc)
-#' zinc <- reproData(zinc)
+#' zinc_rpr <- reproData(zinc)
 #'
 #' # (2) Plot dose-response
-#' plotDoseResponse(zinc)
+#' plotDoseResponse(zinc_rpr)
 #'
-#' # (3) Plot dose-response with a ggplot style
-#' plotDoseResponse(zinc, style = "ggplot")
+#' # (3) Plot dose-response with a generic style
+#' plotDoseResponse(zinc_rpr, style = "generic")
 #'
 #' @import ggplot2
 #' @import grDevices
@@ -63,7 +60,7 @@ plotDoseResponse.reproData <- function(x,
                                        main = NULL,
                                        ylim = NULL,
                                        target.time = NULL,
-                                       style = "generic",
+                                       style = "ggplot",
                                        log.scale = FALSE,
                                        remove.someLabels = FALSE,
                                        axis = TRUE,
