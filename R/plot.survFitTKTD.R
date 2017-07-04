@@ -84,7 +84,7 @@ plot.survFitTKTD <- function(x,
                              one.plot = FALSE,
                              adddata = FALSE,
                              addlegend = FALSE,
-                             style = "generic", ...) {
+                             style = "ggplot", ...) {
   
   if (one.plot && !is.null(concentration))
     one.plot <- FALSE
