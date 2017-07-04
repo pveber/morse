@@ -1,16 +1,16 @@
-#' Plotting method for \code{survDataVarC} objects
+#' Plotting method for \code{survDataVarExp} objects
 #'
 #' This is the generic \code{plot} S3 method for the \code{survDataVarC} class.
 #' It plots the number of survivors as a function of time.
 #'
-#' @param x an object of class \code{survDataVarC}
+#' @param x an object of class \code{survDataVarExp}
 #' @param xlab a title for the \eqn{x}-axis (optional)
 #' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
 #' @param facetting a logical value to use facetting on replicate
 #' @param level_facetting a vector of character...
 #'
-#' @note the function calls function \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
+#' @return an object of class \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}}
 #'
 #' @keywords plot
 #'
@@ -20,6 +20,7 @@
 #' @importFrom stats aggregate
 #'
 #' @export
+
 
 plot.survDataVarExp <- function(data,
                                 xlab = "Time",
