@@ -169,7 +169,7 @@ Ninit <- function(x) {
 #'
 #' @export
 #'
-survData_join <- function(exposure, survival) {
+survData_join <- function(x, y) {
 
   ##
   ## 1 assert column names are correct and assign join x or y to corresponding data.frame
