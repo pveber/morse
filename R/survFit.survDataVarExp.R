@@ -33,6 +33,7 @@
 survFit.survDataVarExp <- function(data,
                                  model_type = NULL,
                                  quiet = FALSE,
+                                 extend_time = 100,
                                  nbr.chain = 3,
                                  nbr.adapt = 1000,
                                  nbr.iter = NULL,
@@ -64,6 +65,7 @@ survFit.survDataVarExp <- function(data,
   ## Data and Priors for model
   ##
   
+  globalData = modelData(data, model_type = model_type, extend_time = extend_time)
   
   ### Remove the information of replicate since this is not used in JAGS, and so a warning message would be show
   
