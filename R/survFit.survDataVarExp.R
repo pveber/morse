@@ -152,14 +152,14 @@ survFit.survDataVarExp <- function(data,
   
   estim.par <- survFit_TKTD_params(mcmc, model_type = model_type)
   
-  warnings <- warningTableCreate()
+  warnings <- msgTableCreate()
   
   if (filter(estim.par, parameters == "kd")$Q97.5 > priorsData$kd_max){
     ## store warning in warnings table
     msg <- "The estimation of the dominant rate constant (model parameter kd) lies 
     outside the range used to define its prior distribution which indicates that this
     rate is very high and difficult to estimate from this experiment !"
-    warnings <- warningTableAdd(warnings, "kd_outRange", msg)
+    warnings <- msgTableAdd(warnings, "kd_outRange", msg)
     ## print the message
     warning(msg, call. = FALSE)
   }
@@ -170,7 +170,7 @@ survFit.survDataVarExp <- function(data,
     parameter hb) lies outside the range used to define its prior distribution 
     which indicates that this rate is very low and so difficult to estimate 
     from this experiment !"
-    warnings <- warningTableAdd(warnings, "hb_outRange", msg)
+    warnings <- msgTableAdd(warnings, "hb_outRange", msg)
     ## print the message
     warning(msg, call. = FALSE)
   }
@@ -182,7 +182,7 @@ survFit.survDataVarExp <- function(data,
       msg <- "The estimation of the killing rate (model parameter k) lies
       outside the range used to define its prior distribution which indicates
       that this rate is very high and difficult to estimate from this experiment !"
-      warnings <- warningTableAdd(warnings, "kk_outRange", msg)
+      warnings <- msgTableAdd(warnings, "kk_outRange", msg)
       ## print the message
       warning(msg, call. = FALSE)
     }
@@ -194,7 +194,7 @@ survFit.survDataVarExp <- function(data,
       (model parameter z) lies outside the range of tested concentration 
       and may be unreliable as the prior distribution on this parameter is
       defined from this range !"
-      warnings <- warningTableAdd(warnings, "z_outRange", msg)
+      warnings <- msgTableAdd(warnings, "z_outRange", msg)
       ## print the message
       warning(msg, call. = FALSE)
     }
@@ -209,7 +209,7 @@ survFit.survDataVarExp <- function(data,
       msg <- "The estimation of log-logistic median (model parameter alpha) 
       lies outside the range of tested concentration and may be unreliable as 
       the prior distribution on this parameter is defined from this range !"
-      warnings <- warningTableAdd(warnings, "alpha_outRange", msg)
+      warnings <- msgTableAdd(warnings, "alpha_outRange", msg)
       ## print the message
       warning(msg, call. = FALSE)
     }

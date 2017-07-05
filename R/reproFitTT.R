@@ -68,7 +68,7 @@
 #' }
 #'
 #' @import rjags
-#' 
+#'
 #' @export
 reproFitTT <- function(data,
                        stoc.part = "bestfit",
@@ -246,20 +246,20 @@ reproFitTT <- function(data,
 
   # check if the maximum measured concentration is in the EC50's range of
   # 95% percentile
-  
-  warnings <- warningTableCreate() 
-  
+
+  warnings <- msgTableCreate()
+
   EC50 <- log10(estim.par["e", "median"])
   if (!(min(log10(data$conc)) < EC50 & EC50 < max(log10(data$conc)))){
     ##store warning in warnings table
     msg <- "The EC50 estimation (model parameter e) lies outside the range of
-    tested concentration and may be unreliable as the prior distribution on 
+    tested concentration and may be unreliable as the prior distribution on
     this parameter is defined from this range !"
-    warnings <- warningTableAdd(warnings, "EC50outRange", msg)
+    warnings <- msgTableAdd(warnings, "EC50outRange", msg)
     ## print the message
     warning(msg, call. = FALSE)
   }
-   
+
 
   # output
   OUT <- list(DIC = coda.arg$DIC,
@@ -463,4 +463,3 @@ reproPARAMS <- function(mcmc, MODEL = "P") {
 llm.poisson.model.text <- "\nmodel # Loglogistic Poisson model\n{\n#\nfor (j in 1:n) # loop on replicates\n{\n# Explicit writting of a Poisson law for each replicate\n# mean is given by the theoretical curve\nytheo[j] <- d / (1 + pow(xconc[j]/e, b))\nnbtheo[j] <- ytheo[j]*Nindtime[j]\nNcumul[j] ~ dpois(nbtheo[j])\n}\n# Prior distributions\nd ~ dnorm(meand, taud)T(0,)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\n\nb <- pow(10,log10b)\ne <- pow(10,log10e)\n}\n"
 
 llm.gammapoisson.model.text <- "\nmodel # Loglogisitc Gamma poisson model\n{\n#\nfor (j in 1:n) # loop on replicates\n{\n# Explicit writting of a gamma-Poisson law for each replicate\n# the mean is given by a gamma law centered on the theoretical curve\nrate[j] <- d / (1 + pow(xconc[j]/e, b)) / omega\np[j] <- 1 / (Nindtime[j] * omega + 1)\nNcumul[j] ~ dnegbin(p[j], rate[j])\n}\n# Prior distributions\nd ~ dnorm(meand, taud)T(0,)\nlog10b ~ dunif(log10bmin, log10bmax)\nlog10e ~ dnorm(meanlog10e, taulog10e)\nlog10omega ~ dunif(log10omegamin, log10omegamax)\n\nomega <- pow(10,log10omega)\nb <- pow(10,log10b)\ne <- pow(10,log10e)\n}\n"
-

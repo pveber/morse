@@ -58,7 +58,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ## 0. check we have a data.frame
   ##
   if (!("data.frame" %in% class(data))) {
-    return(errorTableSingleton("dataframeExpected",
+    return(msgTableSingleton("dataframeExpected",
                                 "A dataframe is expected."))
   }
 
@@ -70,11 +70,11 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   if (length(missing.names) != 0) {
     msg <- paste("The column ", missing.names,
                  " is missing.", sep = "")
-    return(errorTableSingleton("missingColumn",msg))
+    return(msgTableSingleton("missingColumn",msg))
   }
 
   # Next errors do not prevent from checking others
-  errors <- errorTableCreate()
+  errors <- msgTableCreate()
 
   ##
   ## 2. assert the first time point is zero for each (replicate, concentration)
@@ -82,7 +82,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   subdata <- split(data, list(data$replicate), drop = TRUE)
   if (any(unlist(lapply(subdata, function(x) x$time[1] != 0)))) {
     msg <- "Data are required at time 0 for each replicate."
-    errors <- errorTableAdd(errors, "firstTime0", msg)
+    errors <- msgTableAdd(errors, "firstTime0", msg)
   }
 
   ##
@@ -90,7 +90,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   if (!is.double(data$conc) && !is.integer(data$conc)) {
     msg <- "Column 'conc' must contain only numerical values."
-    errors <- errorTableAdd(errors, "concNumeric", msg)
+    errors <- msgTableAdd(errors, "concNumeric", msg)
   }
 
   ##
@@ -98,7 +98,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   if (!is.numeric(data$time)) {
     msg <- "Column 'time' must contain only numerical values."
-    errors <- errorTableAdd(errors, "timeNumeric", msg)
+    errors <- msgTableAdd(errors, "timeNumeric", msg)
   }
 
   ##
@@ -106,7 +106,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   if (!is.integer(data$Nsurv)) {
     msg <- "Column 'Nsurv' must contain only integer values."
-    errors <- errorTableAdd(errors, "NsurvInteger", msg)
+    errors <- msgTableAdd(errors, "NsurvInteger", msg)
   }
 
   ##
@@ -115,7 +115,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   table <- subset(data, select = -c(replicate)) # remove replicate column
   if (any(table < 0.0, na.rm = TRUE)) {
     msg <- "Data must contain only positive values."
-    errors <- errorTableAdd(errors, "tablePositive", msg)
+    errors <- msgTableAdd(errors, "tablePositive", msg)
   }
 
   ##
@@ -124,7 +124,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   datatime0 <- data[data$time == 0, ]  # select data for initial time points
   if (any(datatime0$Nsurv == 0)) { # test if Nsurv != 0 at time 0
     msg <- "Nsurv should be different to 0 at time 0 for each concentration and each replicate."
-    errors <- errorTableAdd(errors, "Nsurv0T0", msg)
+    errors <- msgTableAdd(errors, "Nsurv0T0", msg)
   }
 
   ##
@@ -135,7 +135,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
     msg <- paste("The (replicate, time) pair ",
                  ID[duplicated(ID)],
                  " is duplicated.", sep = "")
-    errors <- errorTableAdd(errors, "duplicatedID", msg)
+    errors <- msgTableAdd(errors, "duplicatedID", msg)
   }
 
   ##
@@ -157,7 +157,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
         paste(diffs, collapse = ", "),
         ".",
         sep = "")
-    errors <- errorTableAdd(errors, "missingReplicate", msg)
+    errors <- msgTableAdd(errors, "missingReplicate", msg)
   }
 
   ##
@@ -178,7 +178,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
         paste(replicates, collapse=", "),
         ".",
         sep = "")
-    errors <- errorTableAdd(errors, "NsurvIncrease", msg)
+    errors <- msgTableAdd(errors, "NsurvIncrease", msg)
   }
 
   ##
@@ -197,7 +197,7 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   if(!all(df_checkMaxTimeConc$time >= df_checkMaxTimeSurv$time) ){
     msg <- "In each 'replicate', maximum time for concentration record should
     be greater or equal to maximum time in survival data observation."
-    errors <- errorTableAdd(errors, "maxTimeDiffer", msg)
+    errors <- msgTableAdd(errors, "maxTimeDiffer", msg)
   }
 
   if (diagnosis.plot && "NsurvIncrease" %in% errors$id) {
