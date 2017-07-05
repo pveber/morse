@@ -37,7 +37,7 @@ survFit.survDataVarExp <- function(data,
                                  nbr.adapt = 1000,
                                  nbr.iter = NULL,
                                  nbr.warmup = NULL,
-                                 nbr.thin = NULL){
+                                 nbr.thin = NULL, ...){
   
   ##
   ## Pre modelling measure and tests
@@ -64,15 +64,20 @@ survFit.survDataVarExp <- function(data,
   ## Data and Priors for model
   ##
   
-  globalData = modelData(data, model_type = model_type)
   
   ### Remove the information of replicate since this is not used in JAGS, and so a warning message would be show
   
-  modelData_ = globalData$modelData
-  modelData = modelData_ ; modelData$replicate = NULL
+  modelData <- globalData$modelData
   
-  modelData_Null_ = globalData$modelData_Null
-  modelData_Null = modelData_Null_ ; modelData_Null$replicate = NULL
+  modelData$replicate <- NULL
+  modelData$conc <- NULL
+  modelData$replicate_long <- NULL
+  
+  modelData_Null <- globalData$modelData_Null
+  modelData_Null$replicate <- NULL
+  modelData_Null$conc <- NULL
+  modelData_Null$replicate_long <- NULL
+  
   
   priorsData = globalData$priorsMinMax
   
@@ -86,7 +91,8 @@ survFit.survDataVarExp <- function(data,
     parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
     
     modelData$time = NULL # remove modelData$time for varSD model
-      
+    modelData_Null$time <- NULL  
+    
     file_to_use <- jags_TKTD_varSD
       
   } else if(model_type == "IT"){
@@ -223,20 +229,21 @@ survFit.survDataVarExp <- function(data,
   mcmcInfo = data.frame(nbr.iter = nbr.iter,
                         nbr.chain = nbr.chain,
                         nbr.adapt = nbr.adapt,
-                        nbr.thin=nbr.thin,
-                        nbr.warmup=nbr.warmup,
+                        nbr.thin = nbr.thin,
+                        nbr.warmup = nbr.warmup,
                         total_time = time_end)
   
   ##
   ## OUTPUT
   ##
   
-  OUT <- list(mcmc = mcmc,
+  OUT <- list(survData = data,
+              mcmc = mcmc,
               mcmc_Null = mcmc_Null,
               model = model,
               mcmcInfo = mcmcInfo,
+              modelData = globalData$modelData,
               warnings = warnings,
-              modelData = modelData_,
               model_type = model_type,
               estim.par = estim.par)
   

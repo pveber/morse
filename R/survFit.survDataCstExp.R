@@ -70,8 +70,9 @@ survFit.survDataCstExp <- function(data,
                                    nbr.adapt = 1000,
                                    nbr.iter = NULL,
                                    nbr.warmup = NULL,
-                                   nbr.thin = NULL){
-
+                                   nbr.thin = NULL,
+                                   ...){
+  
   ##
   ## Pre modelling measure and tests
   ##
@@ -92,16 +93,15 @@ survFit.survDataCstExp <- function(data,
   ##
   ## Data and Priors for model
   ##
-
-  globalData = modelData(data,
+  
+  globalData <- modelData(data,
                          model_type = model_type)
-
-  modelData_ = globalData$modelData
-  modelData = modelData_ ; modelData$replicate = NULL
-
-  modelData_Null_ = globalData$modelData_Null
-  modelData_Null = modelData_Null_ ; modelData_Null$replicate = NULL
-
+  modelData <- globalData$modelData
+  modelData$replicate = NULL
+  
+  modelData_Null <- globalData$modelData_Null
+  modelData_Null$replicate = NULL
+  
   priorsData = globalData$priorsMinMax
 
   ##
@@ -258,13 +258,14 @@ survFit.survDataCstExp <- function(data,
   ##
   ## OUTPUT
   ##
-
-  OUT <- list(mcmc = mcmc,
+  
+  OUT <- list(survData = data,
+              mcmc = mcmc,
               mcmc_Null = mcmc_Null,
               model = model,
               mcmcInfo = mcmcInfo,
+              modelData = globalData$modelData,
               warnings = warnings,
-              modelData = modelData_,
               model_type = model_type,
               estim.par = estim.par)
 
