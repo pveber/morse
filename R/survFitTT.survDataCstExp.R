@@ -33,6 +33,7 @@
 #' \item{det.part}{the name of the deterministic part of the used model}
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
 #' distributions}
+#' \item{warnings}{a data.frame with warning messages}
 #' \item{model}{a JAGS model object}
 #' \item{parameters}{a list of the parameters names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
@@ -133,16 +134,24 @@ survFitTT.survDataCstExp <- function(data,
   estim.LCx <- estimXCX(mcmc, lcx, "LC")
 
   # check if estimated LC50 lies in the tested concentration range
+
+  warnings <- msgTableCreate()
+
   LC50 <- log10(estim.par["e", "median"])
-  if (!(min(log10(data$conc)) < LC50 & LC50 < max(log10(data$conc))))
-    warning("The LC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
-            call. = FALSE)
+  if (!(min(log10(data$conc)) < LC50 & LC50 < max(log10(data$conc)))){
+    ##store warning in warnings table
+    msg <- "The EC50 estimation (model parameter e) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !"
+    warnings <- msgTableAdd(warnings, "EC50outRange", msg)
+    ## print the message
+    warning(msg, call. = FALSE)
+  }
 
   # output
   OUT <- list(estim.LCx = estim.LCx,
               estim.par = estim.par,
               det.part = det.part,
               mcmc = mcmc,
+              warnings = warnings,
               model = model,
               parameters = parameters,
               n.chains = summary(mcmc)$nchain,
