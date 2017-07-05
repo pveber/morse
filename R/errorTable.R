@@ -15,6 +15,23 @@ errorTableAdd <- function(t, id, msg) {
   errorTableAppend(t, newlines)
 }
 
+warningTableCreate <- function() {
+  t <- errorTableCreate()
+  class(t) <- c("warningTable", class(t))
+  t
+}
+
+warningTableAppend <- function(...) {
+  u <- errorTableAppend(...)
+  class(u) <- c("warningTable", class(u))
+  u
+}
+
+warningTableAdd <- function(t, id, msg) {
+  newlines <- data.frame(id = id, msg = msg, stringsAsFactors = FALSE)
+  warningTableAppend(t, newlines)
+}
+
 errorTableSingleton <- function(id, msg) {
   errorTableAdd(errorTableCreate(), id, msg)
 }
@@ -29,6 +46,20 @@ print.errorTable <- function(x, ...) {
   }
   else {
     cat("Error(s):\n")
+    for (m in x$msg) {
+      cat(paste("\t",m,"\n",sep=""))
+    }
+  }
+}
+
+
+#' @export
+print.warningTable <- function(x, ...) {
+  if (errorTableIsEmpty(x)) {
+    cat("No warning detected.\n")
+  }
+  else {
+    cat("Warning(s):\n")
     for (m in x$msg) {
       cat(paste("\t",m,"\n",sep=""))
     }

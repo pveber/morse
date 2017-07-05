@@ -24,6 +24,7 @@
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
 #' distributions}
 #' \item{model}{a JAGS model object}
+#' \item{warnings}{a data.frame with warning messages}
 #' \item{parameters}{a list of the parameters names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation}
@@ -177,27 +178,53 @@ survFit.survDataCstExp <- function(data,
   ## Cheking posterior range with data from experimental design:
   ##
   
+  warnings <- warningTableCreate() 
+  
   estim.par <- survFit_TKTD_params(mcmc, model_type = model_type)
   
   if (filter(estim.par, parameters == "kd")$Q97.5 > priorsData$kd_max){
-    warning("The estimation of the dominant rate constant (model parameter kd) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
-            call. = FALSE)
+    ##store warning in warnings table
+    msg <- "The estimation of the dominant rate constant (model parameter kd)
+    lies outside the range used to define its prior distribution which indicates
+    that this rate is very high and difficult to estimate from this experiment !"
+    warnings <- warningTableAdd(warnings, "kd_outRange", msg)
+    ## print the message
+    warning(msg, call. = FALSE)
   }
   if (filter(estim.par, parameters == "hb")$Q2.5 < priorsData$hb_min){
-    warning("The estimation of the natural instantaneous mortality rate (model parameter hb) lies outside the range used to define its prior distribution which indicates that this rate is very low and so difficult to estimate from this experiment !",
-            call. = FALSE)
+    ##store warning in warnings table
+    msg <- "The estimation of the natural instantaneous mortality rate
+    (model parameter hb) lies outside the range used to define its prior 
+    distribution which indicates that this rate is very low and so difficult
+    to estimate from this experiment !"
+    warnings <- warningTableAdd(warnings, "hb_outRange", msg)
+    ## print the message
+    warning(msg, call. = FALSE)
   }
   
   ### for SD model
   if(model_type == "SD"){
-    if (filter(estim.par, parameters == "kk")$Q97.5 > priorsData$kk_max)
-      warning("The estimation of the killing rate (model parameter k) lies outside the range used to define its prior distribution which indicates that this rate is very high and difficult to estimate from this experiment !",
-              call. = FALSE)
-    
+    if (filter(estim.par, parameters == "kk")$Q97.5 > priorsData$kk_max){
+      ##store warning in warnings table
+      msg <- "The estimation of the killing rate (model parameter kk) lies 
+      outside the range used to define its prior distribution which indicates 
+      that this rate is very high and difficult to estimate from this experiment !"
+      warnings <- warningTableAdd(warnings, "kk_outRange", msg)
+      ## print the message
+      warning(msg, call. = FALSE)
+    }
+
     if (filter(estim.par, parameters == "z")$Q2.5 < priorsData$conc_min ||
-        filter(estim.par, parameters == "z")$Q97.5 > priorsData$conc_max)
-      warning("The estimation of Non Effect Concentration threshold (NEC) (model parameter z) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
-              call. = FALSE)
+        filter(estim.par, parameters == "z")$Q97.5 > priorsData$conc_max){
+      ##store warning in warnings table
+      msg <- "The estimation of Non Effect Concentration threshold (NEC) 
+      (model parameter z) lies outside the range of tested concentration and
+      may be unreliable as the prior distribution on this parameter 
+      is defined from this range !"
+      warnings <- warningTableAdd(warnings, "z_outRange", msg)
+      ## print the message
+      warning(msg, call. = FALSE)
+    }
     
   }
   
@@ -205,10 +232,15 @@ survFit.survDataCstExp <- function(data,
   if(model_type == "IT"){
     
     if (filter(estim.par, parameters == "alpha")$Q2.5 < priorsData$conc_min ||
-        filter(estim.par, parameters == "alpha")$Q97.5 > priorsData$conc_max)
-      warning("The estimation of log-logistic median (model parameter alpha) lies outside the range of tested concentration and may be unreliable as the prior distribution on this parameter is defined from this range !",
-              call. = FALSE)
-    
+        filter(estim.par, parameters == "alpha")$Q97.5 > priorsData$conc_max){
+      ##store warning in warnings table
+      msg <- "The estimation of log-logistic median (model parameter alpha) lies
+      outside the range of tested concentration and may be unreliable as the prior
+      distribution on this parameter is defined from this range !"
+      warnings <- warningTableAdd(warnings, "alpha_outRange", msg)
+      ## print the message
+      warning(msg, call. = FALSE)
+    }
   }
   
   ### time end
@@ -231,6 +263,7 @@ survFit.survDataCstExp <- function(data,
               mcmc_Null = mcmc_Null,
               model = model,
               mcmcInfo = mcmcInfo,
+              warnings = warnings,
               modelData = modelData_,
               model_type = model_type,
               estim.par = estim.par)
