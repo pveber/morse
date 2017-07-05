@@ -51,7 +51,7 @@ test_that("reproData", {
   
   lapply(datasets, function(x) {
     dat <- reproData(get(x))
-    expect_is(dat, c("reproData", "survDataCstExp", "survData", "data.frame"))
+    expect_is(dat, c("reproData", "survDataCstExp", "survData", "tbl_df", "tbl", "data.frame"))
     expect_true(!is.null(dat))
     expect_true(any(!is.na(dat)))
     expect_is(dat$Ninit, "integer")
