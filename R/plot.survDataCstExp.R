@@ -23,9 +23,6 @@
 #' @keywords plot
 #'
 #' @examples
-#'
-#' library(ggplot2)
-#'
 #' # (1) Load the data
 #' data(zinc)
 #' zinc <- survData(zinc)
@@ -48,7 +45,7 @@ plot.survDataCstExp <- function(x,
                                 ylab = "Number of surviving individuals",
                                 main = NULL,
                                 concentration = NULL,
-                                style = "generic",
+                                style = "ggplot",
                                 pool.replicate = FALSE,
                                 addlegend = FALSE,
                                 remove.someLabels = FALSE, ...) {

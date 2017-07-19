@@ -32,11 +32,14 @@
 #' Transparent if \code{NULL}
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
 #' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
-#' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param style graphical backend, can be \code{'ggplot'} or \code{'generic'}
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @note When \code{style = "ggplot"}, the function calls function
-#' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
+#' @note When \code{style = "generic"}, the function calls the generic function
+#' \code{\link[graphics]{plot}}
+#' @note When \code{style = "ggplot"}, the function return an object of class
+#'  \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}} 
+#'
 #' 
 #' @import ggplot2
 #' @import grDevices
@@ -62,9 +65,9 @@
 #'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #'
 #'
-#' # (4) Plot the fitted curve with ggplot style
+#' # (4) Plot the fitted curve with generic style
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", cicol = "blue", style = "ggplot",
+#'      fitcol = "blue", cicol = "blue",
 #'      main = "Log-logistic response to concentration")
 #' }
 #' 
@@ -83,7 +86,7 @@ plot.reproFitTT <- function(x,
                             ribcol = "pink1",
                             addlegend = FALSE,
                             log.scale = FALSE,
-                            style = "generic", ...) {
+                            style = "ggplot", ...) {
   # plot the fitted curve estimated by reproFitTT
   # INPUTS
   # - x:  reproFitTT object

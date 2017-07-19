@@ -93,7 +93,7 @@ plot.survFitTT <- function(x,
                            adddata = FALSE,
                            addlegend = FALSE,
                            log.scale = FALSE,
-                           style = "generic", ...) {
+                           style = "ggplot", ...) {
   # plot the fitted curve estimated by survFitTT
   # INPUTS
   # - x:  survFitTt object
