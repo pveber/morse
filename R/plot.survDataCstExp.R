@@ -67,10 +67,11 @@ plot.survDataCstExp <- function(x,
                replicate = 1)
   }
 
+  x <- as.data.frame(x)
+  
   if (is.null(concentration)) {
     survDataPlotFull(x, xlab, ylab, style, remove.someLabels)
-  }
-  else {
+  }  else {
     survDataPlotFixedConc(x, xlab, ylab, main, concentration,
                           style, addlegend, remove.someLabels)
   }
@@ -139,8 +140,8 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
   
   time = NULL
   Nsurv = NULL
-  
-  data$response <- data[,resp]
+
+  data$response <- data[, resp]
   
   # create ggplot object Nsurv / time / replicate / conc
   fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
@@ -155,7 +156,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
                          unique(data$time)
                        }
     ) +
-    scale_y_continuous(breaks = unique(round(pretty(c(0, max(data[, resp])))))) +
+    scale_y_continuous(breaks = unique(round(pretty(c(0, max(response)))))) +
     expand_limits(x = 0, y = 0) +
     theme_minimal()
   
@@ -176,7 +177,8 @@ dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",
   else stop("Unknown plot style")
 }
 
-survDataPlotFull <- function(data, xlab, ylab, style = "generic",
+survDataPlotFull <- function(data, xlab, ylab,
+                             style = "ggplot",
                              remove.someLabels = FALSE) {
   dataPlotFull(data, xlab, ylab, "Nsurv", style, remove.someLabels)
 }
