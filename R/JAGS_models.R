@@ -135,7 +135,7 @@ jags_TKTD_varSD <-
 
   ##------ Computation of the likelihood
 
-  for( i in 1:n_dataLong){
+  for( i in 1:n_data_long){
 
     ###-------------- midpoint method
 
@@ -153,11 +153,11 @@ jags_TKTD_varSD <-
     H_int[replicate_ID_long[i], time_ID_long[i]] <- sum( h_midPoint[replicate_ID_long[i], 1:time_ID_long[i]] )
 
   }
-  for( i in 1:n_dataRed){
+  for( i in 1:n_data_red){
 
-    H[replicate_ID[i], time_ID[i]]  <- H_int[replicate_ID[i], time_ID_red[i]]
+    H[replicate_ID[i], time_ID_red[i]]  <- H_int[replicate_ID[i], time_ID_long_red[i]]
 
-    psurv[i] = exp( - H[replicate_ID[i], time_ID[i]])
+    psurv[i] = exp( - H[replicate_ID[i], time_ID_red[i]])
 
     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
@@ -169,7 +169,7 @@ jags_TKTD_varSD <-
 
   ###--- initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
   Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
-  for( i in 2:n_dataRed){
+  for( i in 2:n_data_red){
     Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 
@@ -203,7 +203,7 @@ jags_TKTD_varIT <-"model {
 
   ##------------------------------------ model
 
-  for( i in 1:n_dataLong){
+  for( i in 1:n_data_long){
 
     ###------------ midpoint method
 
@@ -215,13 +215,13 @@ jags_TKTD_varIT <-"model {
 
   }
 
-  for( i in 1:n_dataRed){
+  for( i in 1:n_data_red){
 
-    D[replicate_ID[i], time_ID[i]]  <- D_int[replicate_ID[i], time_ID_red[i]]
+    D[replicate_ID[i], time_ID_red[i]]  <- D_int[replicate_ID[i], time_ID_long_red[i]]
 
-    D_max[replicate_ID[i], time_ID[i]] <- max(D[replicate_ID[i],1:time_ID[i]])
+    D_max[replicate_ID[i], time_ID_red[i]] <- max(D[replicate_ID[i],1:time_ID_red[i]])
 
-    F[i]  <- D_max[replicate_ID[i], time_ID[i]]**beta / ( D_max[replicate_ID[i], time_ID[i]]**beta + alpha**beta )
+    F[i]  <- D_max[replicate_ID[i], time_ID_red[i]]**beta / ( D_max[replicate_ID[i], time_ID_red[i]]**beta + alpha**beta )
 
     psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
 
@@ -235,7 +235,7 @@ jags_TKTD_varIT <-"model {
 
   ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
   Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
-  for( i in 2:n_dataRed){
+  for( i in 2:n_data_red){
     Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 
