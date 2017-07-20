@@ -39,7 +39,7 @@
 #' @importFrom graphics plot
 #' 
 #' @export
-ppc.survFitTT <- function(x, style = "generic", ...) {
+ppc.survFitTT <- function(x, style = "ggplot", ...) {
   if (!is(x, "survFitTT"))
     stop("x is not of class 'survFitTT'!")
   
