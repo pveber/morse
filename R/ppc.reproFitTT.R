@@ -40,7 +40,7 @@
 #' @importFrom graphics plot
 #'
 #' @export
-ppc.reproFitTT <- function(x, style = "generic", ...) {
+ppc.reproFitTT <- function(x, style = "ggplot", ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
   
