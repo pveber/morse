@@ -1,5 +1,5 @@
 #
-# jags_TKTD_cstSD is the JAGS model used in `MORSE` 2.Y.Z packages in the function `survFit()`
+# jags_TKTD_cstSD is the JAGS model used in `MORSE` 2.Y.Z packages in the function `survFitTKTD()`
 #
 jags_TKTD_cstSD <-
   "model {
@@ -31,22 +31,11 @@ jags_TKTD_cstSD <-
       R[i] <- ifelse(conc[i] > z, z/xcor[i], 0.1)
       xcor[i] <- ifelse(conc[i] > 0, conc[i], 10)
 
-      psurv[i] <- exp(-hb * time[i] + ifelse(time[i] > tz[i], -kk * ((conc[i] - z) * (time[i] - tz[i]) + conc[i]/kd * ( exp(-kd * time[i]) - exp(-kd * tz[i]))), 0))
-
-      Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
-
-   ## ---------------------- generated data
-
-      Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
-
-    }
-
-    ###--------------- initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
-
-    Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
-    for( i in 2:n_data){
-      Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
-    }
+      tref[i] <- max(tprec[i], tz[i])
+      psurv[i] <- exp(-hb * (time[i] - tprec[i]) + ifelse(time[i] > tz[i], -kk * ((conc[i] - z) * (time[i] - tref[i]) + conc[i]/kd * ( exp(-kd * time[i]) - exp(-kd * tref[i]))), 0))
+     
+      Nsurv[i] ~ dbin(psurv[i] , Nprec[i])
+  }
 
 }"
 
@@ -68,7 +57,7 @@ model {
   hb_log10 ~ dnorm(hb_meanlog10, hb_taulog10)
 
   alpha_log10 ~ dnorm(alpha_meanlog10, alpha_taulog10)
-  beta_log10 ~ dunif(beta_minlog10, beta_maxlog10)
+  beta_log10 ~ dunif(beta_minlog10, beta_maxlog10) # unif -2, 2
 
   ##---------------------------------------- parameter transformation
 
@@ -84,24 +73,14 @@ model {
 
     D[replicate_ID[i], time_ID[i]] <- conc[i] * ( 1 - exp( - kd * time[i] ))
 
-    D_max[replicate_ID[i], time_ID[i]] <- max(D[replicate_ID[i],1:time_ID[i]])
+    D_max[replicate_ID[i], time_ID[i]] <- max(D[replicate_ID[i], 1:time_ID[i]])
 
     F[i]  <- D_max[replicate_ID[i], time_ID[i]]**beta / ( D_max[replicate_ID[i], time_ID[i]]**beta + alpha**beta )
 
     psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
-
+    
     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
-  ## ---------------------- generated data
-
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
-
-  }
-
-  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
-  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
-  for( i in 2:n_data){
-    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 
 }"
