@@ -72,7 +72,7 @@ priors_survData <- function(x, model_type = NULL){
   beta_minlog10 <- -2
   beta_maxlog10 <- 2
   
-  priorsMinMax<- list(
+  priorsMinMax <- list(
     conc_min = conc_min,
     conc_max = conc_max,
     
@@ -80,9 +80,7 @@ priors_survData <- function(x, model_type = NULL){
     kd_max = kd_max,
     
     hb_min = hb_min,
-    hb_max = hb_max
-    
-  )
+    hb_max = hb_max )
   
   ##
   ## Construction of the list of priors
@@ -134,42 +132,6 @@ priors_survData <- function(x, model_type = NULL){
   
   return(list(priorsList = priorsList,
               priorsMinMax = priorsMinMax))
-}
-
-
-#############################################################################
-#
-#    survFit_load_model
-#
-#############################################################################
-
-#' @import rjags
-survFit_load_model <- function(model.program,
-                               data,
-                               n.chains,
-                               Nadapt,
-                               quiet) {
-  # create the JAGS model object
-  # INPUTS:
-  # - model.program: character string containing a jags model description
-  # - data: list of data created by survCreateJagsData
-  # - nchains: Number of chains desired
-  # - Nadapt: length of the adaptation phase
-  # - quiet: silent option
-  # OUTPUT:
-  # - JAGS model
-  
-  # load model text in a temporary file
-  model.file <- tempfile() # temporary file address
-  fileC <- file(model.file) # open connection
-  writeLines(model.program, fileC) # write text in temporary file
-  close(fileC) # close connection to temporary file
-  
-  # creation of the jags model
-  model <- jags.model(file = model.file, data = data, n.chains = n.chains,
-                      n.adapt = Nadapt, quiet = quiet)
-  unlink(model.file)
-  return(model)
 }
 
 
@@ -241,7 +203,7 @@ survFit_TKTD_params <- function(mcmc, model_type) {
 ###############################################################################
 
 
-# To retrive posterior object from a gm_survFitTKTD object
+# To retrive posterior object from a survFit object
 #
 
 posteriorData = function(mcmc, model_type){

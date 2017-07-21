@@ -123,19 +123,12 @@ survFit.survDataCstExp <- function(data,
     file_to_use <- jags_TKTD_cstIT
   }
 
-  model_Null <- survFit_load_model(model.program = file_to_use,
-                                   data = modelData_Null,
-                                   n.chains = nbr.chain,
-                                   Nadapt = nbr.adapt,
-                                   quiet = TRUE)
 
-
-  model <- survFit_load_model(model.program = file_to_use,
-                              data = modelData,
-                              n.chains = nbr.chain,
-                              Nadapt = nbr.adapt,
-                              quiet = quiet)
-
+  model <- survLoadModel(model.program = file_to_use,
+                         data = jags.data_fit,
+                         n.chains = nbr.chain,
+                         Nadapt = nbr.adapt,
+                         quiet = quiet)
 
   ##
   ## estimate the number of iteration required for convergency of chains
