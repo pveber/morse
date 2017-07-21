@@ -35,10 +35,7 @@
 
 summary.survFit <- function(object, quiet = FALSE, ...) {
   
-  # quantiles of priors parameters
-  n.iter <- object$mcmcInfo$nbr.iter
-  
-  param <- object$modelData
+  param <- object$jags.data
   
   # kd
   kd_log10 <- qnorm(p = c(0.5, 0.025, 0.975),
@@ -71,7 +68,10 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
     
     z <- 10^z_log10
     
-    res <- rbind(kd, hb, z, kk)
+    res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
+                      median = c(kd[1], hb[1], z[1], kk[1]),
+                      Q2.5 = c(kd[2], hb[2], z[2], kk[2]),
+                      Q97.5 = c(kd[3], hb[3], z[3], kk[3]))
     
   }
   if(object$model_type == "IT"){
@@ -90,26 +90,28 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
     
     beta <- 10^beta_log10
     
-    res <- rbind(kd, hb, alpha, beta)
+    res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
+                      median = c(kd[1], hb[1], alpha[1], beta[1]),
+                      Q2.5 = c(kd[2], hb[2], alpha[2], beta[2]),
+                      Q97.5 = c(kd[3], hb[3], alpha[3], beta[3]))
     
   }
   
   
   ans1 <- format(data.frame(res), scientific = TRUE, digits = 4)
-  colnames(ans1) <- c("50%", "2.5%", "97.5%")
   
   # quantiles of estimated model parameters
-  ans2 <- object$estim.par
+  ans2 <- format(object$estim.par, scientific = TRUE, digits = 4)
   
   # print
   if (! quiet) {
     cat("Summary: \n\n")
-    cat("Priors on parameters (quantiles):\n\n")
+    cat("Priors of the parameters (quantiles) (select with '$Qpriors'):\n\n")
     print(ans1)
-    cat("\nPosterior of the parameters (quantiles):\n\n")
+    cat("\nPosterior of the parameters (quantiles) (select with '$Qposteriors'):\n\n")
     print(ans2)
   }
   
   invisible(list(Qpriors = ans1,
-                 Qpost = ans2))
+                 Qposteriors = ans2))
 }
