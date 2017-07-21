@@ -94,15 +94,13 @@ survFit.survDataCstExp <- function(data,
   ## Data and Priors for model
   ##
   
-  globalData <- modelData(data,
-                         model_type = model_type)
-  modelData <- globalData$modelData
-  modelData$replicate = NULL
+  globalData <- modelData(data,  model_type = model_type)
   
-  modelData_Null <- globalData$modelData_Null
-  modelData_Null$replicate = NULL
+  jags.data <- unlist(list(globalData$dataList, globalData$priorsList), recursive = FALSE)
   
-  priorsData = globalData$priorsMinMax
+  jags.data_fit <- jags.data ; jags.data_fit$replicate = NULL
+  
+  priorsMinMax = globalData$priorsMinMax
 
   ##
   ## Define model
@@ -110,15 +108,16 @@ survFit.survDataCstExp <- function(data,
 
   if(model_type == "SD"){
     ### Determine sampling parameters
-    parameters_red <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
-    parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    parameters_sampling <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
+    parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10", "psurv")
 
     file_to_use <- jags_TKTD_cstSD
 
   } else if(model_type == "IT"){
     ### Determine sampling parameters
-    parameters_red <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10")
-    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    parameters_sampling <- c("kd_log10", "hb_log10", "alpha_log10", "beta_log10")
+    
+    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv")
 
     file_to_use <- jags_TKTD_cstIT
   }
@@ -135,36 +134,31 @@ survFit.survDataCstExp <- function(data,
   ## by using the raftery.diag
   ##
 
-  if(is.null(nbr.warmup) | is.null(nbr.thin) | is.null(nbr.iter)){
+  if(is.null(nbr.warmup) | is.null(thin.interval) | is.null(nbr.iter)){
 
 
     sampling.parameters <- modelSamplingParameters(model,
-                                                   parameters_red,
+                                                   parameters_sampling,
                                                    n.chains = nbr.chain, quiet = quiet)
-    if (sampling.parameters$niter > 5e5)
+    
+    if (sampling.parameters$niter > 2e5){
       stop("The model needs too many iterations to provide reliable parameter estimates !")
+    }
+      
 
     nbr.warmup = sampling.parameters$burnin
-    nbr.thin = sampling.parameters$thin
+    thin.interval = sampling.parameters$thin
     nbr.iter = sampling.parameters$niter
 
   }
 
-  ### Null model to check priors with the model
-  update(model_Null, nbr.warmup)
-
-  mcmc_Null =  coda.samples(model_Null,
-                            variable.names = parameters_red,
-                            n.iter = nbr.iter,
-                            thin = nbr.thin,
-                            progress.bar = ifelse(quiet, "none", "text"))
-
   ### model to check priors with the model
   update(model, nbr.warmup)
+  
   mcmc =  coda.samples(model,
                        variable.names = parameters,
                        n.iter = nbr.iter,
-                       thin = nbr.thin,
+                       thin = thin.interval,
                        progress.bar = ifelse(quiet, "none", "text"))
 
   ##
@@ -175,7 +169,7 @@ survFit.survDataCstExp <- function(data,
 
   estim.par <- survFit_TKTD_params(mcmc, model_type = model_type)
 
-  if (filter(estim.par, parameters == "kd")$Q97.5 > priorsData$kd_max){
+  if (filter(estim.par, parameters == "kd")$Q97.5 > priorsMinMax$kd_max){
     ##store warning in warnings table
     msg <- "The estimation of the dominant rate constant (model parameter kd)
     lies outside the range used to define its prior distribution which indicates
@@ -184,7 +178,7 @@ survFit.survDataCstExp <- function(data,
     ## print the message
     warning(msg, call. = FALSE)
   }
-  if (filter(estim.par, parameters == "hb")$Q2.5 < priorsData$hb_min){
+  if (filter(estim.par, parameters == "hb")$Q2.5 < priorsMinMax$hb_min){
     ##store warning in warnings table
     msg <- "The estimation of the natural instantaneous mortality rate
     (model parameter hb) lies outside the range used to define its prior
@@ -197,7 +191,7 @@ survFit.survDataCstExp <- function(data,
 
   ### for SD model
   if(model_type == "SD"){
-    if (filter(estim.par, parameters == "kk")$Q97.5 > priorsData$kk_max){
+    if (filter(estim.par, parameters == "kk")$Q97.5 > priorsMinMax$kk_max){
       ##store warning in warnings table
       msg <- "The estimation of the killing rate (model parameter kk) lies
       outside the range used to define its prior distribution which indicates
@@ -207,8 +201,8 @@ survFit.survDataCstExp <- function(data,
       warning(msg, call. = FALSE)
     }
 
-    if (filter(estim.par, parameters == "z")$Q2.5 < priorsData$conc_min ||
-        filter(estim.par, parameters == "z")$Q97.5 > priorsData$conc_max){
+    if (filter(estim.par, parameters == "z")$Q2.5 < priorsMinMax$conc_min ||
+        filter(estim.par, parameters == "z")$Q97.5 > priorsMinMax$conc_max){
       ##store warning in warnings table
       msg <- "The estimation of Non Effect Concentration threshold (NEC)
       (model parameter z) lies outside the range of tested concentration and
@@ -224,8 +218,8 @@ survFit.survDataCstExp <- function(data,
   ### for IT model
   if(model_type == "IT"){
 
-    if (filter(estim.par, parameters == "alpha")$Q2.5 < priorsData$conc_min ||
-        filter(estim.par, parameters == "alpha")$Q97.5 > priorsData$conc_max){
+    if (filter(estim.par, parameters == "alpha")$Q2.5 < priorsMinMax$conc_min ||
+        filter(estim.par, parameters == "alpha")$Q97.5 > priorsMinMax$conc_max){
       ##store warning in warnings table
       msg <- "The estimation of log-logistic median (model parameter alpha) lies
       outside the range of tested concentration and may be unreliable as the prior
@@ -236,32 +230,41 @@ survFit.survDataCstExp <- function(data,
     }
   }
 
-  ### time end
-
-  time_end = Sys.time() - time_start
-
-  ### MCMC information
+  ##
+  ## MCMC information
+  ## 
   mcmcInfo = data.frame(nbr.iter = nbr.iter,
                         nbr.chain = nbr.chain,
                         nbr.adapt = nbr.adapt,
-                        nbr.thin=nbr.thin,
-                        nbr.warmup=nbr.warmup,
-                        total_time = time_end)
-
+                        thin.interval = thin.interval,
+                        nbr.warmup = nbr.warmup)
+  ##
+  ##
+  ##
+  transformed.data <- data.frame(
+    replicate = jags.data$replicate,
+    time = jags.data$time,
+    conc = jags.data$conc,
+    Nsurv = jags.data$Nsurv
+  ) %>%
+    group_by(replicate) %>%
+    mutate(Ninit = max(Nsurv, na.rm = TRUE))
+  
   ##
   ## OUTPUT
   ##
   
-  OUT <- list(survData = data,
+  OUT <- list(estim.par = estim.par,
               mcmc = mcmc,
-              mcmc_Null = mcmc_Null,
               model = model,
+              parameters = parameters,
               mcmcInfo = mcmcInfo,
-              modelData = globalData$modelData,
+              jags.data = jags.data,
               warnings = warnings,
               model_type = model_type,
-              estim.par = estim.par)
+              transformed.data = transformed.data,
+              original.data = data)
 
-  class(OUT) <- c("survFitCstExp","survFit")
+  class(OUT) <- c("survFitCstExp", "survFit")
   return(OUT)
 }
