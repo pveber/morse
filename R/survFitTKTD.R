@@ -241,7 +241,8 @@ survFitTKTD <- function(data,
   # Define model
 
   model <- survLoadModel(model.program = modelTKTDNorm,
-                         data = jags.data, n.chains,
+                         data = jags.data,
+                         n.chains,
                          Nadapt = 3000, quiet)
 
   # Determine sampling parameters
@@ -308,12 +309,12 @@ survFitTKTD <- function(data,
   #OUTPUT
   OUT <- list(estim.par = estim.par,
               mcmc = mcmc,
-              warnings = warnings,
               model = model,
               parameters = parameters,
               n.chains = summary(mcmc)$nchain,
               n.iter = list(start = summary(mcmc)$start,
                             end = summary(mcmc)$end),
+              warnings = warnings,
               n.thin = summary(mcmc)$thin,
               jags.data = jags.data,
               transformed.data = data)
