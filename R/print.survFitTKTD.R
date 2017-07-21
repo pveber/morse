@@ -16,10 +16,10 @@
 #' 
 #' \dontrun{
 #' # (3) Run the survFitTKTD function
-#' out <- survFitTT(dat, quiet = TRUE)
+#' out <- survFitTKTD(dat, quiet = TRUE)
 #' 
 #' # (4) Print the survFitTKTD object
-#' out
+#' print(out)
 #' }
 #' 
 #' @keywords print
