@@ -28,9 +28,7 @@
 #' \item{parameters}{a list of the parameters names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation}
-#' \item{n.iter}{a list of two indices indicating the beginning and end of
-#' monitored iterations}
-#' \item{n.thin}{a numerical value corresponding to the thinning interval}
+#' \item{mcmcInfo}{a data.frame with the number of iteration, chains, adaptation, warmup and the thinning interval.} 
 #' \item{jags.data}{a list a the data passed to the jags model}
 #'
 #' @keywords estimation
@@ -62,23 +60,19 @@
 #' @import rjags
 #' @importFrom dplyr group_by summarise filter
 #'
-
 survFit.survDataCstExp <- function(data,
                                    model_type = NULL,
                                    quiet = FALSE,
                                    nbr.chain = 3,
-                                   nbr.adapt = 1000,
+                                   nbr.adapt = 3000,
                                    nbr.iter = NULL,
                                    nbr.warmup = NULL,
-                                   nbr.thin = NULL,
+                                   thin.interval = NULL,
                                    ...){
   
   ##
   ## Pre modelling measure and tests
   ##
-
-  ### time start
-  time_start <- Sys.time()
 
   ### ensures model_type is one of "SD" and "IT"
   if(is.null(model_type) || ! (model_type %in% c("SD","IT"))) {
