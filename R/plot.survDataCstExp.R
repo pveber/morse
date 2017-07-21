@@ -35,6 +35,7 @@
 #'
 #' @import ggplot2
 #' @import grDevices
+#' @import dplyr
 #' @importFrom graphics plot axis legend lines par points title
 #' @importFrom methods is
 #' @importFrom stats aggregate
