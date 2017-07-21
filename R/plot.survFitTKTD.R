@@ -118,12 +118,10 @@ plot.survFitTKTD <- function(x,
     survFitPlotTKTDGeneric(data.credInt, dobs, xlab, ylab, main, concentration,
                            one.plot, spaghetti,
                            adddata, addlegend)
-  }
-  else if (style == "ggplot") {
+  }  else if (style == "ggplot") {
     survFitPlotTKTDGG(data.credInt, dobs, xlab, ylab, main, concentration,
                       one.plot, spaghetti, adddata, addlegend)
-  }
-  else stop("Unknown style")
+  }  else stop("Unknown style")
 }
 
 Surv <- function(Cw, time, ks, kd, NEC, m0)
