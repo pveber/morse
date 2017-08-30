@@ -145,7 +145,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
   data$response <- data[, resp]
   
   # create ggplot object Nsurv / time / replicate / conc
-  fg <- ggplot(data, aes(time, response, colour = factor(replicate))) +
+  fg <- ggplot(data = data, aes(time, response, colour = factor(replicate))) +
     geom_point() +
     geom_line() +
     labs(x = xlab, y = ylab) +
@@ -157,7 +157,7 @@ dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
                          unique(data$time)
                        }
     ) +
-    scale_y_continuous(breaks = unique(round(pretty(c(0, max(response)))))) +
+    scale_y_continuous(breaks = unique(round(pretty(c(0, max(data$response)))))) +
     expand_limits(x = 0, y = 0) +
     theme_minimal()
   
