@@ -48,3 +48,16 @@ test_that("modelData",{
   expect_length(modelData_IT$priorsMinMax,8)
   
 })
+
+
+# Test internal functions gather
+test_that("modelData internal functions",{
+  
+  data_FALSE <- data.frame(replicate = c("A","A","A", "B", "B", "B", "C", "C", "D", "D"),
+                           time= c(1,2,4,1,2,4,1,2,1,2),
+                           conc = rep(2,10))
+  
+  expect_false(checkTimeReplicate(x))
+
+})
+
