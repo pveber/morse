@@ -60,7 +60,7 @@ modelData.survDataCstExp <- function(x, model_type = NULL){
 }
 
 
-#' Gather replicate with same concentration
+#' Gather replicates with the same concentration
 #'
 #' @param x An object of class \code{survData}
 #'
@@ -68,14 +68,10 @@ modelData.survDataCstExp <- function(x, model_type = NULL){
 #'
 
 gather_survDataCstExp <- function(x){
-  ### Check the same number of (time, replicate) for a common concentration
-  df_checkTimeReplicate <- x %>%
-    dplyr::group_by(conc, time) %>%
-    dplyr::summarise(nbrReplicate_ConcTime = n_distinct(replicate)) %>%
-    dplyr::group_by(conc) %>%
-    dplyr::summarise(nbrReplicate_uniqueConc = length(unique(nbrReplicate_ConcTime))) 
   
-  if( all(df_checkTimeReplicate$nbrReplicate_uniqueConc == 1) ){
+  bool_checkTimeReplicate <- checkTimeReplicate(x)
+  
+  if( bool_checkTimeReplicate ){
     ### Sum Nsurv data for each (conc, time) couple
     x_dev <- x %>%
       dplyr::group_by(conc, time) %>%
@@ -88,6 +84,23 @@ gather_survDataCstExp <- function(x){
   }
   return(x_dev)
 }
+
+
+#' Check the same number of (time, replicate) for a common concentration
+#' 
+#' @param x 
+
+checkTimeReplicate <- function(x){
+  df_checkTimeReplicate <- x %>%
+    dplyr::group_by(conc, time) %>%
+    dplyr::summarise(nbrReplicate_ConcTime = n_distinct(replicate)) %>%
+    dplyr::group_by(conc) %>%
+    dplyr::summarise(nbrReplicate_uniqueConc = length(unique(nbrReplicate_ConcTime)))
+  
+  return(all(df_checkTimeReplicate$nbrReplicate_uniqueConc == 1))
+  
+}
+ 
 
 #' Add variables for Bayesian fitting
 #'
