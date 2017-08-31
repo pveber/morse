@@ -51,7 +51,7 @@
 #' @importFrom dplyr mutate
 #'
 #' @export
-survDataCheck <- function(data, diagnosis.plot = TRUE) {
+survDataCheck <- function(data, diagnosis.plot = FALSE) {
 
 
   ##
@@ -141,24 +141,24 @@ survDataCheck <- function(data, diagnosis.plot = TRUE) {
   ##
   ## 9. assert all replicates are available for each time point
   ##
-  df_repl <- data %>%
-    filter(!is.na(Nsurv)) %>%
-    group_by(time) %>%
-    summarise(set = paste(sort(replicate), collapse = '-'))
-
-  if (length(unique(df_repl$set)) > 1) {
-    sets <- df_repl %>%
-      group_by(set) %>%
-      summarise(cardinal = length(set))
-    reference_set <- sets$set[which.max(sets$cardinal)]
-    diffs <- which(df_repl$set != reference_set)
-    msg <- paste(
-        "Changing set of replicates for time point(s) ",
-        paste(diffs, collapse = ", "),
-        ".",
-        sep = "")
-    errors <- msgTableAdd(errors, "missingReplicate", msg)
-  }
+  # df_repl <- data %>%
+  #   filter(!is.na(Nsurv)) %>%
+  #   group_by(time) %>%
+  #   summarise(set = paste(sort(replicate), collapse = '-'))
+  # 
+  # if (length(unique(df_repl$set)) > 1) {
+  #   sets <- df_repl %>%
+  #     group_by(set) %>%
+  #     summarise(cardinal = length(set))
+  #   reference_set <- sets$set[which.max(sets$cardinal)]
+  #   diffs <- which(df_repl$set != reference_set)
+  #   msg <- paste(
+  #       "Changing set of replicates for time point(s) ",
+  #       paste(diffs, collapse = ", "),
+  #       ".",
+  #       sep = "")
+  #   errors <- msgTableAdd(errors, "missingReplicate", msg)
+  # }
 
   ##
   ## 10. assert Nsurv never increases with time
