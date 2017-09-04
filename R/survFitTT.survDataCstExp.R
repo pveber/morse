@@ -77,6 +77,8 @@ survFitTT.survDataCstExp <- function(data,
 
   # select Data at target.time and pool replicates
   dataTT <- selectDataTT(data, target.time)
+  
+  # Gather replicates according to time and conc
   dataTT <- cbind(aggregate(cbind(Nsurv, Ninit) ~ time + conc, dataTT, sum), replicate = 1)
 
 
