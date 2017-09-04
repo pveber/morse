@@ -24,6 +24,7 @@
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
 #' distributions}
 #' \item{model}{a JAGS model object}
+#' \item{dic}{return the Deviance Information Criterion (DIC) if \code{dic.compute} is \code{TRUE}}
 #' \item{warnings}{a data.frame with warning messages}
 #' \item{parameters}{a list of the parameters names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
@@ -68,6 +69,8 @@ survFit.survDataCstExp <- function(data,
                                    nbr.iter = NULL,
                                    nbr.warmup = NULL,
                                    thin.interval = NULL,
+                                   dic.compute = FALSE,
+                                   dic.type = "pD",
                                    ...){
   
   ##
@@ -94,7 +97,7 @@ survFit.survDataCstExp <- function(data,
   
   jags.data_fit <- jags.data ; jags.data_fit$replicate = NULL
   
-  priorsMinMax = globalData$priorsMinMax
+  priorsMinMax <- globalData$priorsMinMax
 
   ##
   ## Define model
@@ -148,6 +151,14 @@ survFit.survDataCstExp <- function(data,
 
   ### model to check priors with the model
   update(model, nbr.warmup)
+  
+  if(dic.compute == TRUE){ # Deviance Information Criterion
+    dic <- dic.samples(model,
+                       n.iter = nbr.iter,
+                       thin = thin.interval,
+                       type = dic.type) 
+  } else dic = NULL
+ 
   
   mcmc =  coda.samples(model,
                        variable.names = parameters,
@@ -251,6 +262,7 @@ survFit.survDataCstExp <- function(data,
   OUT <- list(estim.par = estim.par,
               mcmc = mcmc,
               model = model,
+              dic = dic,
               parameters = parameters,
               mcmcInfo = mcmcInfo,
               jags.data = jags.data,
