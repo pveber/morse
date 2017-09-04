@@ -171,10 +171,10 @@ survFit_TKTD_params <- function(mcmc, model_type) {
       z_inf95 <- 10^res.M$quantiles["z_log10", "2.5%"]
       z_sup95 <- 10^res.M$quantiles["z_log10", "97.5%"]
       
-      res <- data.frame(parameters = c("kd", "hb", "kk", "z"),
-                        median = c(kd, hb, kk, z),
-                        Q2.5 = c(kd_inf95, hb_inf95, kk_inf95, z_inf95),
-                        Q97.5 = c(kd_sup95, hb_sup95, kk_sup95, z_sup95))
+      res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
+                        median = c(kd, hb, z, kk),
+                        Q2.5 = c(kd_inf95, hb_inf95, z_inf95, kk_inf95),
+                        Q97.5 = c(kd_sup95, hb_sup95, z_sup95, kk_sup95))
       
     } else if (model_type == "IT"){
       alpha <- 10^res.M$quantiles["alpha_log10", "50%"]
