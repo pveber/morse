@@ -11,7 +11,7 @@
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
 #' The function plots both 95 \% credible intervals for the estimated survival
-#' rate (by default the red area around the fitted curve) and 95 \% confidence
+#' rate (by default the grey area around the fitted curve) and 95 \% confidence
 #' intervals for the observed survival rate (as black error bars if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
@@ -314,7 +314,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
          main = paste0("Concentration = ", unique(x[, "conc"])))
     
     if (spaghetti) {
-      color <- "gray"
+      color <- "grey"
       color_transparent <- adjustcolor(color, alpha.f = 0.05)
       by(z, z$variable, function(x) {
         lines(x[, "time"], x[, "value"], col = color_transparent)
@@ -322,15 +322,15 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
     } else {
       polygon(c(x[, "time"], rev(x[, "time"])), c(x[, "qinf95"],
                                                   rev(x[, "qsup95"])),
-              col = "pink", border = NA)
+              col = "grey70", border = NA)
     }
     
     lines(x[, "time"], x[, "q50"], # lines
-          col = "red")
+          col = "orange")
     lines(x[, "time"], x[, "qinf95"],
-          col = "pink")
+          col = "gray70")
     lines(x[, "time"], x[, "qsup95"], 
-          col = "pink")
+          col = "gray70")
     
     if (adddata) {
       points(y[, "time"],
@@ -347,7 +347,7 @@ survFitPlotTKTDGenericNoOnePlot <- function(data, dobs, xlab, ylab, spaghetti,
              lty = c(NA, ifelse(adddata, 1, NA), 1, 1),
              col = c(ifelse(adddata, "black", NA),
                      ifelse(adddata, "black", NA),
-                     "red", "pink"),
+                     "orange", "grey70"),
              legend = c(ifelse(adddata, "Observed values", NA),
                         ifelse(adddata, "Confidence interval", NA),
                         "Mean curve", "Credible limits"),
@@ -398,7 +398,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
                                        addlegend = FALSE) {
   
   # colors
-  valCols <- fCols(data, "red", "pink")
+  valCols <- fCols(data, "orange", "gray70")
   dataTmp <- data
   dataTmp[, c("Cred.Lim", "Mean.C")] <- list(NULL)
   dtheoQm <- melt(dataTmp,
@@ -422,7 +422,7 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
     gf <- ggplot(dobs) +
       geom_ribbon(data = data, aes(x = time, ymin = qinf95,
                                    ymax = qsup95),
-                  fill = valCols$cols4, col = valCols$cols4, alpha = 0.4)
+                  fill = valCols$cols4, color = valCols$cols4, alpha = 0.4)
   }
   
   if (!is.null(concentration)) {
@@ -433,10 +433,8 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
     gf <- gf + geom_line(data = data, aes(x = time, y = q50),
                          color = valCols$cols5)
   }
-  gf <- gf + geom_line(data = data, aes(x = time, y = qinf95,
-                                        color = Cred.Lim)) +
-    geom_line(data = data, aes(x = time, y = qsup95,
-                               color = Cred.Lim)) +
+  gf <- gf + geom_line(data = data, aes(x = time, y = qinf95), color = "grey60") +
+    geom_line(data = data, aes(x = time, y = qsup95), color = "grey60") +
     facet_wrap(~conc) +
     scale_linetype(name = "") +
     labs(x = xlab, y = ylab) + ggtitle(main) +
