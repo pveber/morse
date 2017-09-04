@@ -10,7 +10,7 @@
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
 #' The function plots both 95 \% credible intervals for the estimated survival
-#' rate (by default the red area around the fitted curve) and 95 \% confidence
+#' rate (by default the grey area around the fitted curve) and 95 \% confidence
 #' intervals for the observed survival rate (as black error bars if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
@@ -82,14 +82,14 @@ plot.survFitTT <- function(x,
                            xlab = "Concentration",
                            ylab = "Survival rate",
                            main = NULL,
-                           fitcol = "red",
+                           fitcol = "orange",
                            fitlty = 1,
                            fitlwd = 1,
                            spaghetti = FALSE,
-                           cicol = "red",
+                           cicol = "orange",
                            cilty = 2,
                            cilwd = 1,
-                           ribcol = "pink1",
+                           ribcol = "grey70",
                            adddata = FALSE,
                            addlegend = FALSE,
                            log.scale = FALSE,

@@ -7,7 +7,7 @@
 #' The fitted curve represents the \strong{estimated reproduction rate} after
 #' the target time has passed as a function of the concentration of pollutant.
 #' The function plots 95 \% credible intervals for the estimated reproduction
-#' rate (by default the red area around the fitted curve).
+#' rate (by default the grey area around the fitted curve).
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two intervals.
 #' If spaghetti = TRUE, the credible intervals are represented by two dotted
@@ -76,14 +76,14 @@ plot.reproFitTT <- function(x,
                             xlab = "Concentration",
                             ylab = "Nb of offspring per ind.day",
                             main = NULL,
-                            fitcol = "red",
+                            fitcol = "orange",
                             fitlty = 1,
                             fitlwd = 1,
                             spaghetti = FALSE,
-                            cicol = "red",
+                            cicol = "grey70",
                             cilty = 2,
                             cilwd = 1,
-                            ribcol = "pink1",
+                            ribcol = "grey70",
                             addlegend = FALSE,
                             log.scale = FALSE,
                             style = "ggplot", ...) {
