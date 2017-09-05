@@ -1,4 +1,4 @@
-#' Fits a TKTD for survival analysis using Bayesian inference
+#' Fits a TKTD model for survival analysis using Bayesian inference
 #'
 #' This function estimates the parameters of a TKTD
 #' model for survival analysis using Bayesian inference. In this model,
@@ -8,21 +8,29 @@
 #'
 #' Details of the model are presented in the vignette accompanying the package.
 #'
-#' @param data An object of class \code{survModelData}.
-#' @param n.chains Number of MCMC chains. The minimum required number of chains
-#' is 2.
-#' @return The function returns an object of class \code{survFitVarExp}, which is
+#' @param data An object of class \code{survData}.
+#' @param model_type can be \code{"SD"} or \code{"IT"} to choose
+#'   between "Stochastic Death" or "Individual Tolerance" models
+#'   (resp.). See modeling vignette for details.
+#' @param n.chains Number of MCMC chains. The minimum required number
+#'   of chains is 2.
+#' @param quiet If \code{FALSE}, prints logs and progress bar from
+#'   JAGS.
+#'
+#' @return The function returns an object of class \code{survFitCstExp}, which is
 #' a list with the following fields:
+#' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
+#' credible intervals}
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
 #' distributions}
+#' \item{model}{a JAGS model object}
+#' \item{dic}{return the Deviance Information Criterion (DIC) if \code{dic.compute} is \code{TRUE}}
 #' \item{warnings}{a data.frame with warning messages}
-#' \item{model}{a JAGS or STAN model object}
 #' \item{parameters}{a list of the parameters names used in the model}
-#' \item{nbr.chain}{an integer value corresponding to the number of chains used
+#' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation}
-#' \item{nbr.iter}{a list of two indices indicating the beginning and end of
-#' monitored iterations}
-#' \item{nbr.thin}{a numerical value corresponding to the thinning interval}
+#' \item{mcmcInfo}{a data.frame with the number of iteration, chains, adaptation, warmup and the thinning interval.} 
+#' \item{jags.data}{a list a the data passed to the jags model}
 #'
 #' @keywords estimation
 #
@@ -38,22 +46,19 @@ survFit.survDataVarExp <- function(data,
                                  nbr.adapt = 1000,
                                  nbr.iter = NULL,
                                  nbr.warmup = NULL,
-                                 nbr.thin = NULL, ...){
+                                 thin.interval = NULL,
+                                 limit.sampling = TRUE,
+                                 dic.compute = FALSE,
+                                 dic.type = "pD",
+                                 ...){
   
   ##
   ## Pre modelling measure and tests
   ##
-  
-  ### time start
-  time_start <- Sys.time()
-  
-  
+
   ### ensures model_type is one of "SD" and "IT"
-  if(is.null(model_type)) {
-    stop("You need to specify a 'model_type': 'SD' or 'IT'")
-  }
-  if(!model_type %in% c("SD","IT")) {
-    stop("'model_type' available are 'SD' or 'IT'")
+  if(is.null(model_type) || ! (model_type %in% c("SD","IT"))) {
+    stop("You need to specify a 'model_type' among 'SD' or 'IT'")
   }
   
   ### check number of sample for the diagnostic procedure
@@ -65,21 +70,17 @@ survFit.survDataVarExp <- function(data,
   ## Data and Priors for model
   ##
   
-  globalData = modelData(data, model_type = model_type, extend_time = extend_time)
+  globalData <- modelData(x = data, model_type = model_type, extend_time = extend_time)
   
   ### Remove the information of replicate since this is not used in JAGS, and so a warning message would be show
   
-  modelData <- globalData$modelData
+  jags.data <- globalData$modelData
   
-  modelData$replicate <- NULL
-  modelData$conc <- NULL
-  modelData$replicate_long <- NULL
+  jags.data_fit <- jags.data
   
-  modelData_Null <- globalData$modelData_Null
-  modelData_Null$replicate <- NULL
-  modelData_Null$conc <- NULL
-  modelData_Null$replicate_long <- NULL
-  
+  jags.data_fit$replicate <- NULL
+  jags.data_fit$conc <- NULL
+  jags.data_fit$replicate_long <- NULL
   
   priorsData = globalData$priorsMinMax
   
@@ -89,70 +90,61 @@ survFit.survDataVarExp <- function(data,
   
   if(model_type == "SD"){
     ### Determine sampling parameters
-    parameters_red <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
-    parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    parameters_sampling <- c("kd_log10", "hb_log10", "z_log10", "kk_log10")
+    parameters <- c("kd_log10", "hb_log10", "z_log10", "kk_log10", "psurv", "Nsurv_ppc")
     
-    modelData$time = NULL # remove modelData$time for varSD model
-    modelData_Null$time <- NULL  
+    jags.data_fit$time = NULL # remove jags.data_fit$time for varSD model
     
     file_to_use <- jags_TKTD_varSD
       
   } else if(model_type == "IT"){
     ### Determine sampling parameters
-    parameters_red <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10")
-    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    parameters_sampling <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10")
+    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv", "Nsurv_ppc")
     
     file_to_use <- jags_TKTD_varIT
   }
-  
-  model_Null <- survFit_load_model(model.program = file_to_use,
-                                   data = modelData_Null,
-                                   n.chains = nbr.chain,
-                                   Nadapt = nbr.adapt,
-                                   quiet = TRUE)
-  
-  
-  model <- survFit_load_model(model.program = file_to_use,
-                              data = modelData,
-                              n.chains = nbr.chain,
-                              Nadapt = nbr.adapt,
-                              quiet = TRUE)
-  
+
+  model <- survLoadModel(model.program = file_to_use,
+                         data = jags.data_fit,
+                         n.chains = nbr.chain,
+                         Nadapt = nbr.adapt,
+                         quiet = quiet)
+
   
   ##
   ## estimate the number of iteration required for convergency of chains
   ## by using the raftery.diag
   ##
   
-  if(is.null(nbr.warmup) | is.null(nbr.thin) | is.null(nbr.iter)){
+  if(is.null(nbr.warmup) | is.null(thin.interval) | is.null(nbr.iter)){
     
     sampling.parameters <- modelSamplingParameters(model,
-                                                   parameters_red,
-                                                   n.chains = nbr.chain, quiet)
+                                                   parameters_sampling,
+                                                   n.chains = nbr.chain, quiet = quiet)
     if (sampling.parameters$niter > 5e5)
       stop("The model needs too many iterations to provide reliable parameter estimates !")
     
     nbr.warmup = sampling.parameters$burnin
-    nbr.thin = sampling.parameters$thin
+    thin.interval = sampling.parameters$thin
     nbr.iter = sampling.parameters$niter
     
   }
-  
-  ### Null model to check priors with the model
-  update(model_Null, nbr.warmup)
-  
-  mcmc_Null =  coda.samples(model_Null,
-                            variable.names = parameters_red,
-                            n.iter = nbr.iter,
-                            thin = nbr.thin,
-                            quiet = TRUE)
-  
+
   ### model to check priors with the model
   update(model, nbr.warmup)
+  
+  if(dic.compute == TRUE){ # Deviance Information Criterion
+    dic <- dic.samples(model,
+                       n.iter = nbr.iter,
+                       thin = thin.interval,
+                       type = dic.type) 
+  } else dic = NULL
+  
   mcmc =  coda.samples(model,
                        variable.names = parameters,
                        n.iter = nbr.iter,
-                       thin = nbr.thin)
+                       thin = thin.interval)
   
   ##
   ## Cheking posterior range with data from experimental design:
@@ -223,32 +215,45 @@ survFit.survDataVarExp <- function(data,
     }
   }
   
-  ### time end
-  
-  time_end = Sys.time() - time_start
-  
-  ### MCMC information
+  ##
+  ## MCMC information
+  ## 
   mcmcInfo = data.frame(nbr.iter = nbr.iter,
                         nbr.chain = nbr.chain,
                         nbr.adapt = nbr.adapt,
-                        nbr.thin = nbr.thin,
-                        nbr.warmup = nbr.warmup,
-                        total_time = time_end)
+                        thin.interval = thin.interval,
+                        nbr.warmup = nbr.warmup)
+  
+
+  ##
+  ##
+  ##
+  transformed.data <- data.frame(
+    replicate = jags.data$replicate,
+    time = jags.data$time,
+    conc = jags.data$conc,
+    Nsurv = jags.data$Nsurv
+  ) %>%
+    group_by(replicate) %>%
+    mutate(Ninit = max(Nsurv, na.rm = TRUE))
   
   ##
   ## OUTPUT
   ##
   
-  OUT <- list(survData = data,
+  OUT <- list(estim.par = estim.par,
               mcmc = mcmc,
-              mcmc_Null = mcmc_Null,
               model = model,
+              dic = dic,
+              parameters = parameters,
               mcmcInfo = mcmcInfo,
-              modelData = globalData$modelData,
+              jags.data = jags.data,
               warnings = warnings,
               model_type = model_type,
-              estim.par = estim.par)
+              transformed.data = transformed.data,
+              original.data = data)
   
+
   class(OUT) <- c("survFitVarExp","survFit")
   return(OUT)
 }
