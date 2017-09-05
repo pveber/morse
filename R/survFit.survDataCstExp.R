@@ -69,6 +69,7 @@ survFit.survDataCstExp <- function(data,
                                    nbr.iter = NULL,
                                    nbr.warmup = NULL,
                                    thin.interval = NULL,
+                                   limit.sampling = TRUE,
                                    dic.compute = FALSE,
                                    dic.type = "pD",
                                    ...){
@@ -138,11 +139,10 @@ survFit.survDataCstExp <- function(data,
                                                    parameters_sampling,
                                                    n.chains = nbr.chain, quiet = quiet)
     
-    if (sampling.parameters$niter > 2e5){
+    if (sampling.parameters$niter > 2e5 & limit.sampling == TRUE){
       stop("The model needs too many iterations to provide reliable parameter estimates !")
     }
       
-
     nbr.warmup = sampling.parameters$burnin
     thin.interval = sampling.parameters$thin
     nbr.iter = sampling.parameters$niter
