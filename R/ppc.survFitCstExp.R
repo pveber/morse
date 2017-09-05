@@ -47,34 +47,34 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
     alpha <- 10^(tot.mcmc[, "alpha_log10"])
     beta <- 10^(tot.mcmc[, "beta_log10"])
   } else{
-    stop("'model_type must be 'SD' or 'IT'")
+    stop("'model_type' must be 'SD' or 'IT'")
   }
   
+  #NsurvObs <- x$jags.data$y
+  NsurvObs <- x$jags.data$Nsurv
+  
+  #n <- x$jags.data$ndat
+  n <- x$jags.data$n_data
+  
+  #xconc <- x$jags.data$x
+  xconc <- x$jags.data$conc
+  
+  #t <- x$jags.data$t
+  time <- x$jags.data$time
+  
+  Nprec <- x$jags.data$Nprec
   
   if(model_type == "SD"){
     
     niter <- nrow(tot.mcmc)
-    #n <- x$jags.data$ndat
-    n <- x$jags.data$n_data
-    
-    #xconc <- x$jags.data$x
-    xconc <- x$jags.data$conc
-    
-    #t <- x$jags.data$t
-    t <- x$jags.data$time
-    
+   
     tprec <- x$jags.data$tprec
-    
-    #NsurvObs <- x$jags.data$y
-    NsurvObs <- x$jags.data$Nsurv
-    
-    Nprec <- x$jags.data$Nprec
     
     NsurvPred <- matrix(NA, nrow = niter, ncol = n)
     psurv = NULL
     
     # bigtime <- x$jags.data$bigtime
-    bigtime <- max(x$jags.data$time) + 10
+    bigtime <- max(time) + 10
     
     for (i in 1:n) {
       for (j in 1:length(kd)) {
@@ -82,10 +82,10 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
         R <- ifelse(xconc[i] > z[j], z[j]/xcor, 0.1)
         tz <- ifelse(xconc[i] > z[j], -1 / kd[j] * log(1 - R), bigtime)
         tref <- max(tprec[i], tz)
-        psurv[j] <- exp(-hb[j] * (t[i] - tprec[i]) +
-                          if (t[i] > tz) {
-                            -kk[j] * ((xconc[i] - z[j]) * (t[i] - tref) +
-                                        xconc[i]/kd[j] * (exp(-kd[j] * t[i]) - exp(-kd[j] * tref)))
+        psurv[j] <- exp(-hb[j] * (time[i] - tprec[i]) +
+                          if (time[i] > tz) {
+                            -kk[j] * ((xconc[i] - z[j]) * (time[i] - tref) +
+                                        xconc[i]/kd[j] * (exp(-kd[j] * time[i]) - exp(-kd[j] * tref)))
                           } else {
                             0
                           })
@@ -95,25 +95,18 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
     NsurvPred <- t(NsurvPred)
   }
   if(model_type == "IT"){
-    # all theorical
-    conc.obs = unique(x$jags.data$conc)
-    time.obs = unique(x$jags.data$time)
     
-    k <- 1:length(conc.obs)
-    j <- 1:length(time.obs)
+    D.max <- matrix(nrow = length(kd), ncol = length(xconc) )
+    for(j in 1:n){
+      # xconc[j] * (1-exp(-kd * time[j])) is always the max compared to previous time !
+      D.max[,j] <- xconc[j] * (1-exp(-kd * time[j])) 
+    }
+    dtheo.IT <-  exp(-hb %*% t(time)) * (1 - plogis(log(D.max), location = log(alpha), scale = 1/beta))
     
-    dtheo.IT <- lapply(k, function(kit) { # concentration pour chaque concentration
-      Surv_IT(Cw = conc.obs[kit],
-              time = time.obs,
-              kd = kd,
-              hb = hb,
-              alpha = alpha,
-              beta = beta)
-    })
     # transpose dtheo
-    dtheo <- do.call("rbind", lapply(dtheo.IT, t))
+    dtheo <- t(dtheo.IT)
+    # dtheo <- do.call("rbind", lapply(dtheo.IT, t))
     
-    Nprec = x$jags.data$Nprec
     i_prec = x$jags.data$i_prec
     ncol_NsurvPred = ncol(dtheo)
     
