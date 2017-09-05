@@ -40,14 +40,14 @@
 #' @importFrom graphics plot
 #'
 #' @export
-ppc.reproFitTT <- function(x, style = "ggplot", ...) {
+ppc.reproFitTT <- function(x, style = "ggplot", main = NULL, ...) {
   if (!is(x, "reproFitTT"))
     stop("x is not of class 'reproFitTT'!")
   
   xlab <- "Observed Cumul. Nbr. of offspring"
   ylab <- "Predicted Cumul. Nbr. of offspring"
 
-  ppc_gen(EvalreproPpc(x), style, xlab, ylab)
+  ppc_gen(EvalreproPpc(x), style, xlab, ylab, main)
 }
 
 

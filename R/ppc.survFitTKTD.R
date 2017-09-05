@@ -39,14 +39,14 @@
 #' @importFrom graphics plot
 #' 
 #' @export
-ppc.survFitTKTD <- function(x, style = "ggplot", ...) {
+ppc.survFitTKTD <- function(x, style = "ggplot", main = NULL,...) {
   if (!is(x, "survFitTKTD"))
     stop("x is not of class 'survFitTKTD'!")
   
   xlab <- "Observed nb of survivors"
   ylab <- "Predicted nb of survivors"
   
-  ppc_gen(EvalsurvTKTDPpc(x), style, xlab, ylab)
+  ppc_gen(EvalsurvTKTDPpc(x), style, xlab, ylab, main)
 }
 
 #' @importFrom stats rbinom quantile

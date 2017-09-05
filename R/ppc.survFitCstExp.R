@@ -1,6 +1,6 @@
 #' Posterior predictive check plot for \code{survFitCstExp} objects
 #'
-#' This is the generic \code{ppc} S3 method for the \code{survFitTKTD} class. It
+#' This is the generic \code{ppc} S3 method for the \code{survFitCstExp} class. It
 #' plots the predicted values along with 95\% credible intervals
 #' versus the observed values for \code{survFit} objects.
 #'
@@ -14,7 +14,7 @@
 #' values are low. That way we ensure green intervals do intersect the
 #' bisecting line.
 #'
-#' @param x An object of class \code{survFit}
+#' @param x An object of class \code{survFitCstExp}
 #' @param style graphical backend
 #' @param \dots Further arguments to be passed to generic methods
 #'
@@ -24,12 +24,12 @@
 #'
 #' @export
 #' 
-ppc.survFitCstExp <- function(x, style = "ggplot", ...) {
+ppc.survFitCstExp <- function(x, style = "ggplot", main = NULL, ...) {
 
   xlab <- "Observed nb of survivors"
   ylab <- "Predicted nb of survivors"
   
-  ppc_gen(EvalsurvTKTDPpc_CstExp(x), style, xlab, ylab)
+  ppc_gen(EvalsurvTKTDPpc_CstExp(x), style, xlab, ylab, main)
 }
 
 #' @importFrom stats rbinom quantile
