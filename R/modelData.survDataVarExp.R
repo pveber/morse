@@ -98,13 +98,9 @@ modelData.survDataVarExp <- function(x,
   ## =========== Object to return
   ##
   
-  ### Model data Null (without observations of Nsurv)
-  modelData_Null <- modelData
-  modelData_Null$Nsurv <- NULL # remove Nsurv from mdelData
-  
+
   ### OUT ================
   OUT_modelDATA <- list(modelData = modelData,
-                        modelData_Null = modelData_Null,
                         priorsList = priorsData$priorsList,
                         priorsMinMax = priorsData$priorsMinMax)
   
