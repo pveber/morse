@@ -59,14 +59,14 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
   #xconc <- x$jags.data$x
   xconc <- x$jags.data$conc
   
+  #t <- x$jags.data$t
+  time <- x$jags.data$time
   
   Nprec <- x$jags.data$Nprec
   
   if(model_type == "SD"){
     
     niter <- nrow(tot.mcmc)
-    #t <- x$jags.data$t
-    t <- x$jags.data$time
    
     tprec <- x$jags.data$tprec
     
@@ -74,7 +74,7 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
     psurv = NULL
     
     # bigtime <- x$jags.data$bigtime
-    bigtime <- max(x$jags.data$time) + 10
+    bigtime <- max(time) + 10
     
     for (i in 1:n) {
       for (j in 1:length(kd)) {
@@ -82,10 +82,10 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
         R <- ifelse(xconc[i] > z[j], z[j]/xcor, 0.1)
         tz <- ifelse(xconc[i] > z[j], -1 / kd[j] * log(1 - R), bigtime)
         tref <- max(tprec[i], tz)
-        psurv[j] <- exp(-hb[j] * (t[i] - tprec[i]) +
-                          if (t[i] > tz) {
-                            -kk[j] * ((xconc[i] - z[j]) * (t[i] - tref) +
-                                        xconc[i]/kd[j] * (exp(-kd[j] * t[i]) - exp(-kd[j] * tref)))
+        psurv[j] <- exp(-hb[j] * (time[i] - tprec[i]) +
+                          if (time[i] > tz) {
+                            -kk[j] * ((xconc[i] - z[j]) * (time[i] - tref) +
+                                        xconc[i]/kd[j] * (exp(-kd[j] * time[i]) - exp(-kd[j] * tref)))
                           } else {
                             0
                           })
