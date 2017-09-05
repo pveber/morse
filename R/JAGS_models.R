@@ -140,18 +140,12 @@ jags_TKTD_varSD <-
 
     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
-  ## ---------------------- generated data
-
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
-
-  }
-
-  ###--- initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
-  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
-  for( i in 2:n_data_red){
-    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
-  }
-
+ ## ---------------------- generated data 
+ 
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i]) 
+ 
+  } 
+ 
 }"
 
 
@@ -206,16 +200,17 @@ jags_TKTD_varIT <-"model {
 
     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
-  ## ---------------------- generated data
 
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
-
-  }
-
-  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
-  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
-  for( i in 2:n_data_red){
-    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
-  }
+  ## ---------------------- generated data 
+ 
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i]) 
+ 
+  } 
+ 
+  # ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue). 
+  # Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1]) 
+  # for( i in 2:n_data_red){ 
+  #   Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1])) 
+  # }
 
 }"
