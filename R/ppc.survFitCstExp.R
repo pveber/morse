@@ -50,25 +50,25 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
     stop("'model_type must be 'SD' or 'IT'")
   }
   
+  #NsurvObs <- x$jags.data$y
+  NsurvObs <- x$jags.data$Nsurv
+  
+  #n <- x$jags.data$ndat
+  n <- x$jags.data$n_data
+  
+  #xconc <- x$jags.data$x
+  xconc <- x$jags.data$conc
+  
+  
+  Nprec <- x$jags.data$Nprec
   
   if(model_type == "SD"){
     
     niter <- nrow(tot.mcmc)
-    #n <- x$jags.data$ndat
-    n <- x$jags.data$n_data
-    
-    #xconc <- x$jags.data$x
-    xconc <- x$jags.data$conc
-    
     #t <- x$jags.data$t
     t <- x$jags.data$time
-    
+   
     tprec <- x$jags.data$tprec
-    
-    #NsurvObs <- x$jags.data$y
-    NsurvObs <- x$jags.data$Nsurv
-    
-    Nprec <- x$jags.data$Nprec
     
     NsurvPred <- matrix(NA, nrow = niter, ncol = n)
     psurv = NULL
