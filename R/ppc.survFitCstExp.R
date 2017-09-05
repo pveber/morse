@@ -47,7 +47,7 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
     alpha <- 10^(tot.mcmc[, "alpha_log10"])
     beta <- 10^(tot.mcmc[, "beta_log10"])
   } else{
-    stop("'model_type must be 'SD' or 'IT'")
+    stop("'model_type' must be 'SD' or 'IT'")
   }
   
   #NsurvObs <- x$jags.data$y
