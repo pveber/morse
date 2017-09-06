@@ -1,7 +1,8 @@
-#' Lethal Concentration for \code{x} percent of the population
+#' Predict Lethal Concentration for x\% of the population at time \code{time.LCx} 
 #' 
+#' Predict median and 95\%CIs of the Lethal Concentration for x\% of the population.
 #' 
-#' @param x an object used to select a method
+#' @param object An object used to select a method
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @export
