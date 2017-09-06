@@ -26,7 +26,7 @@
 #' 
 #' @export
 summary.reproData <- function(object, quiet = FALSE, ...) {
-  res <- summary.survData(object, quiet = quiet)
+  res <- summary.survDataCstExp(object, quiet = quiet)
   
   # matrix of number of offspring (sum of all replicate) by time / conc
   ans3 <- tapply(object$Nrepro,
