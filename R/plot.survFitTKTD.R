@@ -422,7 +422,9 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
     gf <- ggplot(dobs) +
       geom_ribbon(data = data, aes(x = time, ymin = qinf95,
                                    ymax = qsup95),
-                  fill = valCols$cols4, color = valCols$cols4, alpha = 0.4)
+                  fill = valCols$cols4,
+                  # color = valCols$cols4,
+                  alpha = 0.4)
   }
   
   if (!is.null(concentration)) {
@@ -433,8 +435,9 @@ survFitPlotTKTDGGNoOnePlot <- function(data, dobs, xlab, ylab, main, spaghetti,
     gf <- gf + geom_line(data = data, aes(x = time, y = q50),
                          color = valCols$cols5)
   }
-  gf <- gf + geom_line(data = data, aes(x = time, y = qinf95), color = "grey60") +
-    geom_line(data = data, aes(x = time, y = qsup95), color = "grey60") +
+  gf <- gf +
+    # geom_line(data = data, aes(x = time, y = qinf95), color = "grey70") +
+    # geom_line(data = data, aes(x = time, y = qsup95), color = "grey70") +
     facet_wrap(~conc) +
     scale_linetype(name = "") +
     labs(x = xlab, y = ylab) + ggtitle(main) +
