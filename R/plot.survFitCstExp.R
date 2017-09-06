@@ -62,8 +62,7 @@ plot.survFitCstExp <- function(x,
                          addlegend = FALSE,
                          style = "ggplot", ...) {
   
-  if (one.plot && !is.null(concentration))
-    one.plot <- FALSE
+  if (one.plot && !is.null(concentration)) one.plot <- FALSE
   
   if ((addlegend && is.null(concentration)) ||
       (addlegend && !one.plot))
@@ -110,7 +109,7 @@ survTKTDConfInt_CstExp <- function(x) {
   # OUTPUT:
   # - ci : confidente interval
 
-  ci <- apply(df, 1, function(x) {
+  ci <- apply(x$transformed.data, 1, function(x) {
     binom.test(as.numeric(x["Nsurv"]), as.numeric(x["Ninit"]))$conf.int
   })
   ci <- as.data.frame(t(ci))
@@ -204,7 +203,7 @@ survFitPlotCITKTD_CstExp <- function(x) {
                                rep(tfin, length(concobs)),
                                dtheo))
   
-  names(dtheo) <- c("conc", "time", paste0("X", 1:length(z)))
+  names(dtheo) <- c("conc", "time", paste0("X", 1:length(kd)))
   
   # divide number of mcmc by 50
   sel <- sample(ncol(dtheo[3:ncol(dtheo)]))[1:ceiling(ncol(dtheo) / 50)]
