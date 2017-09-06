@@ -19,11 +19,8 @@ knitr::opts_chunk$set(fig.width = 7,
 ```
 
 
-```{r, echo=FALSE, cache=TRUE, results='hide'}
+```{r, echo=FALSE, results='hide'}
 library(morse)
-library(ggplot2)
-library(tidyr)
-library(dplyr)
 ```
 
 The package MORSE is devoted to the analysis of data from standard toxicity
@@ -72,8 +69,9 @@ The function `plot` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
 
 ```{r step3TT, cache=TRUE}
-plot(dat, style = "ggplot", pool.replicate = FALSE)
+plot(dat, pool.replicate = FALSE)
 ```
+
 
 Two graphical styles are available, `"generic"` for standar `R` plots or
 `"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`
@@ -83,17 +81,19 @@ dataset, we set this option to `FALSE`.
 
 By fixing the concentration to a (tested) value, we can visualize one subplot
 in particular:
+
 ```{r, cache=TRUE}
 plot(dat, concentration = 124, addlegend = TRUE,
-     pool.replicate = FALSE, style = "ggplot")
+     pool.replicate = FALSE, style ="generic")
 ```
+
 
 We can also plot the survival rate with the confidence intervale on the data
 at a given time point as a function of the concentration, by using the function
 `plot.DoseResponse` and by fixing `target.time`:
 
 ```{r, cache=TRUE}
-plotDoseResponse(dat, target.time = 21, style = "ggplot", addlegend = TRUE)
+plotDoseResponse(dat, target.time = 21, addlegend = TRUE)
 ```
 
 The function `summary` provides some descriptive statistics on the experimental design.
@@ -126,7 +126,7 @@ quantiles of the posterior (as a measure of uncertainty, a.k.a. credible
 intervals). These can seen using the `summary` method:
 
 
-```{r, cache=TRUE}
+```{r step4TTsummary, cache=TRUE}
 summary(fit)
 ```
 
@@ -136,9 +136,8 @@ that the data was helpful to reduce the uncertainty on the true value of
 the parameters. This simple check can be performed using the summary function.
 
 The fit can also be plotted:
-```{r, cache=TRUE}
-plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
-     addlegend = TRUE)
+```{r step4TTplot, cache=TRUE}
+plot(fit, log.scale = TRUE, adddata = TRUE,   addlegend = TRUE)
 ```
 This representation shows the estimated relation between concentration of
 pollutant and survival rate (red curve). It is computed by choosing for each
@@ -155,10 +154,16 @@ probable value of the survival rate for a tested concentration. In favorable
 situations, we expect that the credible interval around the estimated curve
 and the confidence interval around experimental points will largely overlap.
 
+A similar plot is obtained with the style `generic`:
+```{r, cache=TRUE}
+plot(fit, log.scale = TRUE, style = "generic", adddata = TRUE, addlegend = TRUE)
+```
+
+
 Note that `survFitTT` will warn you if the estimated $LC_{50}$ lies outside the
 range of tested concentrations, as in the following example:
 
-```{r, results="hide", cache=TRUE}
+```{r wrongTT, results="hide", cache=TRUE}
 data("cadmium1")
 wrong_fit <- survFitTT(survData(cadmium1),
                        target.time = 21,
@@ -182,7 +187,7 @@ interval. If the fit is correct, we expect to see 95% of the data
 inside the intervals.
 
 ```{r step5TT,cache=TRUE, results="hide"}
-ppc(fit, style = "ggplot")
+ppc(fit)
 ```
 
 In this plot, each black dot represents an observation made at some
@@ -221,48 +226,88 @@ survDataCheck(propiconazole)
 dat <- survData(propiconazole)
 
 # (4) represent the number of survivor as a function time
-plot(dat, style = "ggplot", pool.replicate = FALSE)
+plot(dat, pool.replicate = FALSE)
 
 # (5) check information on the experimental design
 summary(dat)
+```
 
+### TKTD model SD
+
+```{r TKTDcstSD, cache=TRUE}
 # (6) fit a TKTD model
-fit_cstSD <- survFitTKTD(dat, quiet = TRUE)
+# fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
+# save(fit_cstSD, file = "tests/testdata/fit_cstSD.rda")
+load(file = "../tests/testdata/fit_cstSD.rda")
+```
+
+```{r, cache=TRUE}
 summary(fit_cstSD)
 ```
 
 ```{r, cache=TRUE}
-plot(fit_cstSD, style = "ggplot", adddata = TRUE, one.plot = FALSE)
+plot(fit_cstSD)
 ```
 
 ```{r, cache=TRUE}
-ppc(fit_cstSD, style = "ggplot")
+plot(fit_cstSD, adddata = TRUE)
 ```
 
-## Using an alternative model under constant exposure concentration
+```{r, cache=TRUE}
+ppc(fit_cstSD)
+```
+
+It is also possible to plot the Lethal concentration at any time
+
+```{r cstSDLCx, cache=TRUE}
+# LC50 at max of time:
+LCx_cstSD <- LCx(fit_cstSD, X = 50)
+plot(LCx_cstSD)
+
+# LC50 at time = 2
+LCx(fit_cstSD, X = 50, time_LCx = 2) %>% plot()
+
+# LC50 at time = 15
+LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
+```
+
+
+### Using an alternative model under constant exposure concentration: model IT
 
 The "Individual Tolerance" (IT) model is a variant of TKTD survival
 analysis. It can also be used with MORSE as demonstrated here:
 
 ```{r TKTDcstIT, cache=TRUE}
-fit_cstIT <- survFit(dat, quiet = TRUE, model_type = "IT")
+# fit_cstIT <- survFit(dat, model_type = "IT")
+# save(fit_cstIT, file = "tests/testdata/fit_cstIT.rda")
+load(file = "../tests/testdata/fit_cstIT.rda")
+```
+
+To have a summary of the estimation of parameters:
+```{r, cache=TRUE}
+summary(fit_cstIT)
+# OR
+fit_cstIT$estim.par
 ```
 
 ```{r, cache=TRUE}
-plot(fit_cstIT, facet.label = "conc")
+plot(fit_cstIT, adddata= TRUE)
 ```
 
 ```{r, cache=TRUE}
 ppc(fit_cstIT)
 ```
 
-```{r, cache=TRUE}
-summary(fit_cstIT)
-```
+```{r cstITLCx, cache=TRUE}
+# LC50 at time 
+LCx_cstIT <- LCx(fit_cstIT, X = 50)
+plot(LCx_cstIT)
 
-To have a summary of the estimation of parameters:
-```{r, cache=TRUE}
-fit_cstIT$estim.par
+# LC50 at time = 2
+LCx(fit_cstIT, X = 50, time_LCx = 2) %>% plot()
+
+# LC50 at time = 15
+LCx(fit_cstIT, X = 50, time_LCx = 15) %>% plot()
 ```
 
 ## TKTD model with time-variable exposure concentration
@@ -287,9 +332,13 @@ plot(dat)
 summary(dat)
 ```
 
+### TKTD model SD
+
 ```{r TKTDvarSD, cache=TRUE}
 # (6) fit a TKTD SD model
-fit_varSD <- survFit(dat, quiet = TRUE, model_type = "SD")
+# fit_varSD <- survFit(dat, quiet = FALSE, model_type = "SD")
+# save(fit_varSD, file = "tests/testdata/fit_varSD.rda")
+load(file = "../tests/testdata/fit_varSD.rda")
 ```
 
 ```{r, cache=TRUE}
@@ -298,16 +347,29 @@ summary(fit_varSD)
 ```
 
 ```{r, cache=TRUE}
-plot(fit_varSD, data_type = "number")
+plot(fit_varSD)
 ```
 
 ```{r, cache=TRUE}
 ppc(fit_varSD)
 ```
 
+```{r varSDLCx, cache=TRUE}
+# LC50 at time = 4
+LCx_varSD <- LCx(fit_varSD, X = 50, time_LCx = 4, conc_range = c(0,100))
+plot(LCx_varSD)
+
+# LC50 at time = 30
+LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
+```
+
+### TKTD model IT
+
 ```{r TKTDvarIT, cache=TRUE}
 # (8) now fit an IT TKTD model
-fit_varIT <- survFit(dat, quiet = TRUE, model_type = "IT")
+# fit_varIT <- survFit(dat, quiet = FALSE, model_type = "IT")
+# save(fit_varIT, file = "tests/testdata/fit_varIT.rda")
+load(file = "../tests/testdata/fit_varIT.rda")
 ```
 
 ```{r, cache=TRUE}
@@ -322,6 +384,15 @@ plot(fit_varIT)
 ```{r, cache=TRUE}
 ppc(fit_varIT)
 ```
+
+```{r varITLCx, cache=TRUE}
+# LC50 at time = 4
+LCx(fit_varIT, X = 50, time_LCx = 4, conc_range = c(0,200)) %>% plot()
+
+# LC50 at time = 30
+LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
+```
+
 
 # Reproduction data analyses
 
@@ -341,9 +412,7 @@ reproDataCheck(cadmium2)
 dat <- reproData(cadmium2)
 
 # (4) represent the cumulated number of offspring as a function time
-plot(dat, style = "ggplot", pool.replicate = FALSE)
-plot(dat, concentration = 124, addlegend = TRUE, style = "ggplot",
-     pool.replicate = FALSE)
+plot(dat, concentration = 124, addlegend = TRUE, pool.replicate = FALSE)
 
 # (5) represent the reproduction rate as a function of concentration
 plotDoseResponse(dat, target.time = 56, style = "ggplot")
@@ -365,7 +434,7 @@ plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
 ```
 
 ```{r, cache=TRUE}
-ppc(fit, style = "ggplot")
+ppc(fit)
 ```
 As in survival analysis, we assume that the reproduction rate per individual-day
 is a log-logistic function of the concentration. More details and parameter
