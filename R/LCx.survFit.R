@@ -38,8 +38,8 @@ LCx.survFit = function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 
   return(object_LCx)
 }
 
-#' dose response curve
-#' 
+# dose response curve
+# 
 doseResponse_survFitCstExp <- function(x, time_LCx,
                                        conc_range, npoints){
   
@@ -111,8 +111,8 @@ Surv_IT_LCx <- function(Cw, time, kd, hb, alpha, beta)
   return(S)
 }
 
-#' points for LCx
-#' 
+# points for LCx
+# 
 
 pointsLCx <- function(df_dose, X_prop){
   

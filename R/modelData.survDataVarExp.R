@@ -108,12 +108,12 @@ modelData.survDataVarExp <- function(x,
   
 }
 
-#' Create a dataset for survival analysis when the replicate of concentration is variable
-#'
-#' @param x An object of class \code{survData}
-#'
-#' @return A dataframe
-#'
+# Create a dataset for survival analysis when the replicate of concentration is variable
+#
+# @param x An object of class \code{survData}
+#
+# @return A dataframe
+#
 survData_interpolate <- function(x, extend_time = 100){
   
   ## data.frame with time

@@ -209,18 +209,18 @@ predict.survFitVarExp <- function(x,
   
 }
 
-#' Survival function for "IT" model with external concentration changing with time
-#'
-#' @param Cw A scalar of external concentration
-#' @param time A vector of time
-#' @param kk a vector of parameter
-#' @param kd a vector of parameter
-#' @param z a vector of parameter
-#' @param hb a vector of parameter
-#' 
-#'
-#' @return A matrix generate with coda.samples() function
-#'
+# Survival function for "IT" model with external concentration changing with time
+#
+# @param Cw A scalar of external concentration
+# @param time A vector of time
+# @param kk a vector of parameter
+# @param kd a vector of parameter
+# @param z a vector of parameter
+# @param hb a vector of parameter
+# 
+#
+# @return A matrix generate with coda.samples() function
+#
 
 Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   
@@ -240,18 +240,18 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   return(S)
 }
 
-#' Survival function for "IT" model with external concentration changing with time
-#'
-#' @param Cw A scalar of external concentration
-#' @param time A vector of time
-#' @param kk a vector of parameter
-#' @param kd a vector of parameter
-#' @param z a vector of parameter
-#' @param hb a vector of parameter
-#' 
-#'
-#' @return A matrix generate with coda.samples() function
-#'
+# Survival function for "IT" model with external concentration changing with time
+#
+# @param Cw A scalar of external concentration
+# @param time A vector of time
+# @param kk a vector of parameter
+# @param kd a vector of parameter
+# @param z a vector of parameter
+# @param hb a vector of parameter
+# 
+#
+# @return A matrix generate with coda.samples() function
+#
 
 Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta)
 {
