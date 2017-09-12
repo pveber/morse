@@ -1,9 +1,18 @@
-#' Create a dataset for survival analysis for survDataCstExp object
+#' Create a dataset for survival analysis for \code{survDataCstExp} object
 #'
 #' @param x An object of class \code{survData}
 #' @param model_type TKTD model type ('SD' or 'IT')
 #'
-#' @return A list
+#' @examples 
+#' 
+#' # (1) Load the data
+#' data("propiconazole")
+#' 
+#' # (2) Create an object 'survData'
+#' dat <- survData(propiconazole)
+#' 
+#' # (3) Create the list of object to be pass in JAGS
+#' modelData(dat, model_type = "IT")
 #'
 #' @export
 #' 
