@@ -23,9 +23,8 @@
 #' \code{tablePositive} \tab some data are negative \cr
 #' \code{Nsurv0T0} \tab \code{Nsurv} is 0 at time 0 for some (concentration, replicate) \cr
 #' \code{duplicateID} \tab there are two identical (\code{replicate}, \code{conc}, \code{time}) triplets \cr
-#' \code{missingReplicate} \tab a replicate is missing at some (time point, concentration) \cr
 #' \code{NsurvIncrease} \tab \code{Nsurv} increases at some time point of some (concentration, replicate) \cr
-#' \code{ReplicateLabel} \tab replicate labels differ between two time points at some concentration \cr
+#' \code{maxTimeDiffer} \tab maximum time for concentration is lower than maximum time in for survival \cr
 #' }
 #'
 #' @note If an error of type \code{dataframeExpected} or \code{missingColumn} is
