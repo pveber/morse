@@ -3,10 +3,17 @@ Type: Package
 Title: MOdelling Tools for Reproduction and Survival Data in Ecotoxicology
 Version: 3.0.0
 Date: 2017-09-06
-Author: Marie Laure Delignette-Muller [aut], Philippe Ruiz [aut], Sandrine
-    Charles [aut], Wandrille Duchemin [ctb], Christelle Lopes [ctb], Guillaume Kon-
-    Kam-king [ctb], Philippe Veber [aut], Virgile Baudrot [aut]
+Author:
+    Virgile Baudrot [aut],
+    Sandrine Charles [aut],
+    Marie Laure Delignette-Muller [aut],
+    Wandrille Duchemin [ctb],
+    Guillaume Kon-Kam-king [ctb],
+    Christelle Lopes [ctb],
+    Philippe Ruiz [aut],
+    Philippe Veber [aut]
 Maintainer: Philippe Veber <philippe.veber@univ-lyon1.fr>
+URL: https://cran.r-project.org/web/packages/morse/index.html
 Description: Tools for ecotoxicologists and regulators dedicated to the
     mathematical and statistical modelling of bioassay data. They use advanced and
     innovative methods for a valuable quantitative environmental risk assessment.
