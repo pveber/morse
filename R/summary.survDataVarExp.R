@@ -16,11 +16,11 @@
 #' # (1) Load the data
 #' data(propiconazole_pulse_exposure)
 #' 
-#' # (2) Create a survData object
-#' propiconazole_pulse_exposure <- survData(propiconazole_pulse_exposure)
+#' # (2) Create a survDataVarExp object
+#' out <- survData(propiconazole_pulse_exposure)
 #' 
 #' # (3) Summarize the dataset
-#' summary(propiconazole_pulse_exposure)
+#' summary(out)
 #' 
 #' @keywords summary
 #' 

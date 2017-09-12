@@ -1,9 +1,9 @@
-#' Summary for \code{survFitTKTD} objects
+#' Summary for \code{survFit} objects
 #'
-#' This is the generic \code{summary} S3 methode for the \code{survFitTKTD} class.
+#' This is the generic \code{summary} S3 methode for the \code{survFit} class.
 #' It shows the quantiles of priors and posteriors on parameters.
 #'
-#' @param object an object of class \code{survFitTKTD}
+#' @param object an object of class \code{survFit}
 #' @param quiet when \code{FALSE}, prints summary on standard output
 #' @param \dots Further arguments to be passed to generic methods.
 #'
@@ -19,10 +19,10 @@
 #' dat <- survData(propiconazole)
 #'
 #' \dontrun{
-#' # (3) Run the survFitTKTD function
-#' out <- survFitTKTD(dat)
+#' # (3) Run the survFit function
+#' out <- survFit(dat, model_type = "SD")
 #'
-#' # (4) summarize the survFitTKTD object
+#' # (4) summarize the survFit object
 #' summary(out)
 #' }
 #'
