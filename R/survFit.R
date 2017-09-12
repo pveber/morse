@@ -18,9 +18,24 @@ survFit <- function(x, ...){
 #' Create a list of scalars giving priors to use in Bayesian modelling
 #'
 #' @param x An object of class \code{survData}
+#' @param model_type TKTD model type ('SD' or 'IT')
 #' 
-#' @return A list of scalar for parameterization of priors for Bayesian modeling
+#' @return A list for parameterization of priors for Bayesian modeling with JAGS
 #'
+#' @examples 
+#' 
+#' # (1) Load the data
+#' data(cadmium1)
+#' 
+#' # (2) Create a survData object
+#' dat <- survData(cadmium1)
+#' 
+#' # (3) Create priors for SD model_type
+#' priors_survData(dat, model_type = "SD")
+#' 
+#' # (4) Create priors for IT model_type
+#' priors_survData(dat, model_type = "IT")
+#' 
 #' @export
 
 

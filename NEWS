@@ -1,5 +1,19 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.0.0
+=============
+
+NEW FEATURES
+- add survival dataset for pulse exposure: 'propiconazole_pulse_exposure'.
+- add S3 'survFit' method for TKTD modeling with model SD or IT for both 'time constant exposure' or 'time varying exposure'.
+- add 'LCx' function to plot Lethal Concentration for x percent of the population for survFit model (TKTD SD or IT with constant or varying exposure).
+- add option 'main' to add title in plot for PPC.
+- add section for 'survFit' TKTD IT and SD (cst and var exposure) in the tutorial vignette.
+
+BUG FIXES
+- change the require dataset for survData and reproData: replicates are unique for each time-serie all over concentration profiles
+- change the struture of all datasets included to satisfy that all replicates are unique for each time-serie all over concentration profiles.
+
 Version 2.2.0
 =============
 

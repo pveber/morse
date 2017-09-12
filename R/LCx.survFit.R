@@ -1,11 +1,27 @@
-#' Lethal Concentration for \code{x} percent of the population
+#' Predict Lethal Concentration for x\% of the population at time 
+#' \code{time_LCx} for \code{survFit} object
 #' 
 #' 
-#' @param object an object of class \code{survFit}
+#' @param object An object of class \code{survFit}
 #' @param X Percentage of population dying: 50 for LC50, 10 for LC10, ...
-#' @param time_LCx a number giving the time at which LCx has to be applied. If NULL, latest time of experiment is used.
-#' @param conc_range a vector of length 2 with minimal and maximal value of the range of concentration. If NULL, range is
+#' @param time_LCx A number giving the time at which LCx has to be applied. If NULL, latest time of experiment is used.
+#' @param conc_range A vector of length 2 with minimal and maximal value of the range of concentration. If NULL, range is
 #' define between 0 and the maximal concentration used in the experiment.
+#' 
+#' @examples 
+#' 
+#' # (1) Load the data
+#' data("propiconazole")
+#' 
+#' # (2) Create an object of class 'survData'
+#' dat <- survData("propiconazole")
+#' 
+#' ## Not run
+#' # (3) Run the survFit function with model_type SD (or IT)
+#' out_SD <- survFit(dat, model_type = "SD")
+#' 
+#' # (4) estimate LC50 at time 4
+#' LCx(out_SD, X = 50, time_LCx = 4)
 #' 
 #' @import zoo
 #' 
@@ -38,8 +54,8 @@ LCx.survFit = function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 
   return(object_LCx)
 }
 
-#' dose response curve
-#' 
+# dose response curve
+# 
 doseResponse_survFitCstExp <- function(x, time_LCx,
                                        conc_range, npoints){
   
@@ -111,8 +127,8 @@ Surv_IT_LCx <- function(Cw, time, kd, hb, alpha, beta)
   return(S)
 }
 
-#' points for LCx
-#' 
+# points for LCx
+# 
 
 pointsLCx <- function(df_dose, X_prop){
   

@@ -1,4 +1,4 @@
-#' Fits a TKTD model for survival analysis using Bayesian inference
+#' Fits a TKTD model for survival analysis using Bayesian inference for \code{survDataVarExp} object
 #'
 #' This function estimates the parameters of a TKTD
 #' model for survival analysis using Bayesian inference. In this model,
@@ -8,13 +8,26 @@
 #'
 #' Details of the model are presented in the vignette accompanying the package.
 #'
-#' @param data An object of class \code{survData}.
+#' @param data An object of class \code{survDataVarExp}.
 #' @param model_type can be \code{"SD"} or \code{"IT"} to choose
 #'   between "Stochastic Death" or "Individual Tolerance" models
 #'   (resp.). See modeling vignette for details.
-#' @param n.chains Number of MCMC chains. The minimum required number
-#'   of chains is 2.
 #' @param quiet If \code{FALSE}, prints logs and progress bar from
+#'   JAGS.
+#' @param extend_time Number of for each replicate used for linear 
+#' interpolation (comprise between time to compute and fitting accuracy)
+#' @param nbr.chain Number of MCMC chains. The minimum required number 
+#' of chains is 2.
+#' @param nbr.adapt the number of iterations for adaptation. If \code{nbr.adapt} = 0
+#'  then no adaptation takes place.
+#' @param nbr.iter number of iterations to monitor
+#' @param nbr.warmup 
+#' @param thin.interval thinning interval for monitors
+#' @param limit.sampling if \code{FALSE} (default is \code{TRUE}), there is no limit to the number of iterations
+#' in MCMC imposed by the \code{diaftery.diag} test.
+#' @param dic.compute if \code{TRUE} (default is \code{FALSE}), it generate penalized deviance samples to compute
+#' the Deviance Information Criterion (DIC) with the \code{rjags} package
+#' @param dic.type type of penalty to use. A string identifying the type of penalty: “pD” or “popt”
 #'   JAGS.
 #'
 #' @return The function returns an object of class \code{survFitCstExp}, which is

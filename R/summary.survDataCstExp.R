@@ -1,9 +1,9 @@
-#' Summary for \code{survData} objects
+#' Summary for \code{survDataCstExp} objects
 #' 
-#' The generic \code{summary} S3 method for the \code{survData} class provides
+#' The generic \code{summary} S3 method for the \code{survDataCstExp} class provides
 #' information about the structure of the dataset and the experimental design.
 #' 
-#' @param object an object of class \code{survData}
+#' @param object an object of class \code{survDataCstExp}
 #' @param quiet when \code{FALSE}, prints summary on standard output
 #' @param \dots Further arguments to be passed to generic methods
 #' 
@@ -15,11 +15,11 @@
 #' # (1) Load the data
 #' data(cadmium1)
 #' 
-#' # (2) Create a survData object
-#' cadmium1 <- survData(cadmium1)
+#' # (2) Create a survDataCstExp object
+#' dat <- survData(cadmium1)
 #' 
 #' # (3) Summarize the dataset
-#' summary(cadmium1)
+#' summary(dat)
 #' 
 #' @keywords summary
 #' 

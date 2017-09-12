@@ -145,7 +145,7 @@ survTKTDPARAMS <- function(mcmc) {
   return(res)
 }
 
-#' Fits a TKTD for survival analysis using Bayesian inference
+#' Fits a TKTD for survival analysis using Bayesian inference for \code{survDataTKTD} object
 #'
 #' This function estimates the parameters of a TKTD
 #' model for survival analysis using Bayesian inference. In this model,

@@ -44,7 +44,7 @@
 #' # Now we insert an error in the dataset, by setting a non-zero number of
 #' # offspring at some time, although there is no surviving individual in the
 #' # replicate from the previous time point.
-#' copper$Nrepro[148] <- as.integer(1)
+#' copper[148, "Nrepro"] <- as.integer(1)
 #' reproDataCheck(copper)
 #'
 #' @export

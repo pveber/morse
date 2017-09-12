@@ -8,6 +8,21 @@
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords print
+#' 
+#' @examples
+#' # (1) Load the data
+#' data(propiconazole_pulse_exposure)
+#' 
+#' # (2) Create a survData object
+#' dat <- survData(propiconazole_pulse_exposure)
+#' 
+#' \dontrun{
+#' # (3) Run the survFit function
+#' out <- survFit(dat, model_type="SD")
+#' 
+#' # (4) Print the survFit object
+#' print(out)
+#' }
 #'
 #' @export
 print.survFitVarExp <- function(x, ...) {

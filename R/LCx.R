@@ -1,4 +1,4 @@
-#' Predict Lethal Concentration for x\% of the population at time \code{time.LCx} 
+#' Predict Lethal Concentration for x\% of the population at time \code{time_LCx} 
 #' 
 #' Predict median and 95\%CIs of the Lethal Concentration for x\% of the population.
 #' 

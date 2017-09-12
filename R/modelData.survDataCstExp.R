@@ -1,9 +1,18 @@
-#' Create a dataset for survival analysis for survDataCstExp object
+#' Create a dataset for survival analysis for \code{survDataCstExp} object
 #'
 #' @param x An object of class \code{survData}
 #' @param model_type TKTD model type ('SD' or 'IT')
 #'
-#' @return A list
+#' @examples 
+#' 
+#' # (1) Load the data
+#' data("propiconazole")
+#' 
+#' # (2) Create an object 'survData'
+#' dat <- survData(propiconazole)
+#' 
+#' # (3) Create the list of object to be pass in JAGS
+#' modelData(dat, model_type = "IT")
 #'
 #' @export
 #' 
@@ -60,12 +69,12 @@ modelData.survDataCstExp <- function(x, model_type = NULL){
 }
 
 
-#' Gather replicates with the same concentration
-#'
-#' @param x An object of class \code{survData}
-#'
-#' @return A dataframe
-#'
+# Gather replicates with the same concentration
+#
+# @param x An object of class \code{survData}
+#
+# @return A dataframe
+#
 
 gather_survDataCstExp <- function(x){
   
@@ -86,9 +95,9 @@ gather_survDataCstExp <- function(x){
 }
 
 
-#' Check the same number of (time, replicate) for a common concentration
-#' 
-#' @param x 
+# Check the same number of (time, replicate) for a common concentration
+# 
+# @param x 
 
 checkTimeReplicate <- function(x){
   df_checkTimeReplicate <- x %>%
@@ -102,12 +111,12 @@ checkTimeReplicate <- function(x){
 }
  
 
-#' Add variables for Bayesian fitting
-#'
-#' @param x An object of class \code{data.frame}
-#'
-#' @return A dataframe
-#'
+# Add variables for Bayesian fitting
+#
+# @param x An object of class \code{data.frame}
+#
+# @return A dataframe
+#
 addVariable_survDataCstExp <- function(x){
   ## Creation of additional variable:
   ## - tprec: previous time

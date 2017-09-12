@@ -24,10 +24,14 @@
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
+#' @param spaghetti if \code{TRUE}, draws a set of survival curves using
+#' parameters drawn from the posterior distribution.
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
 #' one plot instead of one per concentration.
 #' @param adddata if \code{TRUE}, adds the observed data to the plot
-#' with (frequentist) confidence intervals
+#' with (frequentist) confidence intervals.
+#' @param mcmc_size A scalar refering to the size of the MCMC used for
+#'  sampling parameters, by default, all the MCMC is used.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
@@ -209,18 +213,18 @@ predict.survFitVarExp <- function(x,
   
 }
 
-#' Survival function for "IT" model with external concentration changing with time
-#'
-#' @param Cw A scalar of external concentration
-#' @param time A vector of time
-#' @param kk a vector of parameter
-#' @param kd a vector of parameter
-#' @param z a vector of parameter
-#' @param hb a vector of parameter
-#' 
-#'
-#' @return A matrix generate with coda.samples() function
-#'
+# Survival function for "IT" model with external concentration changing with time
+#
+# @param Cw A scalar of external concentration
+# @param time A vector of time
+# @param kk a vector of parameter
+# @param kd a vector of parameter
+# @param z a vector of parameter
+# @param hb a vector of parameter
+# 
+#
+# @return A matrix generate with coda.samples() function
+#
 
 Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   
@@ -240,18 +244,18 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   return(S)
 }
 
-#' Survival function for "IT" model with external concentration changing with time
-#'
-#' @param Cw A scalar of external concentration
-#' @param time A vector of time
-#' @param kk a vector of parameter
-#' @param kd a vector of parameter
-#' @param z a vector of parameter
-#' @param hb a vector of parameter
-#' 
-#'
-#' @return A matrix generate with coda.samples() function
-#'
+# Survival function for "IT" model with external concentration changing with time
+#
+# @param Cw A scalar of external concentration
+# @param time A vector of time
+# @param kk a vector of parameter
+# @param kd a vector of parameter
+# @param z a vector of parameter
+# @param hb a vector of parameter
+# 
+#
+# @return A matrix generate with coda.samples() function
+#
 
 Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta)
 {
