@@ -8,7 +8,7 @@
 #' curves. The \eqn{LC_{x}}/\eqn{EC_{x}} and parameters of the curve are
 #' provided along with an indication of the uncertainty of the estimation.
 #' It can be used to perform an estimation of \eqn{NEC} (No Effect Concentration)
-#' value by fitting a toxico-kinetic toxico-dynamic model.
+#' value by fitting a Toxico-Kinetic Toxico-Dynamic (TKTD) model.
 #'
 #' Estimation procedures in MORSE can be used without a deep knowledge of
 #' their underlying probabilistic model or inference methods. Rather, they
@@ -25,6 +25,7 @@
 #' \item explore a dataset
 #' \item plot a dataset
 #' \item fit a model on a dataset and output the expected estimates
+#' \item check goodness of fit with posterior preditive check plot (ppc)
 #' }
 #' Those steps are presented in more details in the "Tutorial" vignette, while
 #' a more formal description of the estimation procedures are provided in the
@@ -43,7 +44,7 @@
 #' described in the tutorial vignette.
 #'
 #' \tabular{ll}{ Package: \tab morse\cr Type: \tab Package\cr Version: \tab
-#' 2.2.0\cr Date: \tab 2016-03-03\cr License: \tab GPL (>=2)\cr }
+#' 3.0.0\cr Date: \tab 2017-09-15\cr License: \tab GPL (>=2)\cr }
 #'
 #' @name morse-package
 #' @aliases morse-package morse
@@ -55,8 +56,9 @@
 #' <wandrille.duchemin@@insa-lyon.fr>, Christelle Lopes
 #' <christelle.lopes@@univ-lyon1.fr>, Guillaume Kon-Kam-king
 #' <guillaume.kon-kam-king@@univ-lyon1.fr>, Philippe Veber
-#' <philippe.veber@@univ-lyon1.fr>
-#'
+#' <philippe.veber@@univ-lyon1.fr>, Virgile Baudrot 
+#' <virgile.baudrot@@posteo.net>
+#' 
 #' Maintainer: Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>
 #' @seealso \code{\link[rjags]{rjags}},
 #' \code{\link[ggplot2]{ggplot}}
@@ -85,8 +87,10 @@ NULL
 #' @docType data
 #' @usage data(cadmium1)
 #' @format A data frame with 200 observations of the following five variables:
-#' \describe{ \item{\code{replicate}}{A vector of class \code{integer} with
-#' the replicate code (\code{1} to \code{4}).} \item{\code{conc}}{A vector of
+#' \describe{
+#' \item{\code{replicate}}{A vector of class \code{numeric} with
+#' the replicate code (\code{1} to \code{20}).}
+#' \item{\code{conc}}{A vector of
 #' class \code{numeric} with the cadmium concentrations in \eqn{\mu g.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
 #' (in days from the beginning of the experiment \eqn{t = 0}).}
@@ -120,8 +124,8 @@ NULL
 #' @docType data
 #' @usage data(cadmium2)
 #' @format A data frame with 612 observations of the following five variables:
-#' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
-#' replicate code (\code{A} to \code{F}).} \item{\code{conc}}{A vector of
+#' \describe{ \item{\code{replicate}}{A vector of class \code{numeric} with the
+#' replicate code (\code{1} to \code{36}).} \item{\code{conc}}{A vector of
 #' class \code{integer} with the cadmium concentrations in \eqn{\mu g.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
 #' (in days from the beginning of the experiment \eqn{t = 0}).}
@@ -159,8 +163,8 @@ NULL
 #' @docType data
 #' @usage data(chlordan)
 #' @format A data frame with 1320 observations of the following five variables:
-#' \describe{ \item{\code{replicate}}{A vector of class \code{integer} with
-#' the replicate code (\code{1} to \code{10}).} \item{\code{conc}}{A vector of
+#' \describe{ \item{\code{replicate}}{A vector of class \code{numeric} with
+#' the replicate code (\code{1} to \code{60}).} \item{\code{conc}}{A vector of
 #' class \code{numeric} with the chlordan concentrations in \eqn{\mu
 #' g.L^{-1}}.} \item{\code{time}}{A vector of class \code{integer} with the
 #' time points (in days from the beginning of the experiment \eqn{t = 0}).}
@@ -192,8 +196,8 @@ NULL
 #' @docType data
 #' @usage data(copper)
 #' @format A data frame with 240 observations of the following five variables:
-#' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
-#' replicate code (\code{A} to \code{C}).} \item{\code{conc}}{A vector of
+#' \describe{ \item{\code{replicate}}{A vector of class \code{numeric} with the
+#' replicate code (\code{1} to \code{15}).} \item{\code{conc}}{A vector of
 #' class \code{numeric} with the copper concentrations in \eqn{\mu g.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
 #' (in days from the beginning of the experiment \eqn{t = 0}).}
@@ -211,41 +215,6 @@ NULL
 
 
 
-
-
-
-#' Reproduction and survival datasets for \emph{Daphnia magna} exposed to zinc
-#' during 21 days
-#'
-#' Reproduction and survival datasets of chronic laboratory bioassays with
-#' \emph{Daphnia magna} freshwater invertebrate exposed to four concentrations
-#' of one metal contaminant (zinc) during 21 days. Four concentrations were
-#' tested with three replicates per concentration. Each replicate contained 20
-#' organisms. Reproduction and survival were monitored at 15 time points.
-#'
-#'
-#' @name zinc
-#' @docType data
-#' @usage data(zinc)
-#' @format A data frame with 180 observations on the following five variables:
-#' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
-#' replicate code (\code{A} to \code{C}).} \item{\code{conc}}{A vector of
-#' class \code{numeric} with zinc concentrations in \eqn{mg.L^{-1}}.}
-#' \item{\code{time}}{A vector of class \code{integer} with the time points
-#' (in days from the beginning of the experiment \eqn{t = 0}).}
-#' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
-#' alive individuals at each time point for each concentration and each
-#' replicate.} \item{\code{Nrepro}}{A vector of class \code{integer} with the
-#' number of offspring at each time point for each concentration and each
-#' replicate.} }
-#' @references Billoir, E.,Delignette-Muller, M.L., Pery, A.R.R. and
-#' Charles S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
-#' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
-#' @keywords datasets
-NULL
-
-
-
 #' Survival datasets for \emph{Daphnia magna} exposed to dichromate
 #' during 21 days
 #'
@@ -260,7 +229,7 @@ NULL
 #' @docType data
 #' @usage data(dichromate)
 #' @format A data frame with 60 observations on the following four variables:
-#' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
+#' \describe{ \item{\code{replicate}}{A vector of class \code{numeric} with the
 #' replicate code (\code{1}).} \item{\code{conc}}{A vector of
 #' class \code{numeric} with dichromate concentrations in \eqn{mg.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
@@ -291,7 +260,7 @@ NULL
 #' @usage data(propiconazole)
 #' @format A data frame with 75 observations on the following four variables:
 #' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
-#' replicate code (\code{SC} for the control and \code{A1} to code {G2}).}
+#' replicate code (\code{SC} for the control and \code{A1} to \code{G2}).}
 #' \item{\code{conc}}{A vector of class \code{numeric} with propiconazole
 #' concentrations in \eqn{mg.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
@@ -314,14 +283,15 @@ NULL
 #'
 #' Survival datasets of laboratory bioassays with \emph{Gammarus pulex}
 #' freshwater invertebrate exposed to several profiles of concentrations
-#' of one fungicide (propiconazole).
+#' (time varying concnetration for each time series)
+#' of one fungicide (propiconazole) during 10 days.
 #'
 #' @name propiconazole_pulse_exposure
 #' @docType data
 #' @usage data(propiconazole_pulse_exposure)
 #' @format A data frame with 74 observations on the following four variables:
 #' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
-#' replicate code.}
+#' replicate code (\code{varControl}, \code{varA}, \code{varB} and \code{varC}).}
 #' \item{\code{conc}}{A vector of class \code{numeric} with propiconazole
 #' concentrations in \eqn{mg.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
@@ -334,5 +304,36 @@ NULL
 #' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
 #'
+#' @keywords datasets
+NULL
+
+
+#' Reproduction and survival datasets for \emph{Daphnia magna} exposed to zinc
+#' during 21 days
+#'
+#' Reproduction and survival datasets of chronic laboratory bioassays with
+#' \emph{Daphnia magna} freshwater invertebrate exposed to four concentrations
+#' of one metal contaminant (zinc) during 21 days. Four concentrations were
+#' tested with three replicates per concentration. Each replicate contained 20
+#' organisms. Reproduction and survival were monitored at 15 time points.
+#'
+#'
+#' @name zinc
+#' @docType data
+#' @usage data(zinc)
+#' @format A data frame with 180 observations on the following five variables:
+#' \describe{ \item{\code{replicate}}{A vector of class \code{numeric} with the
+#' replicate code (\code{1} to \code{12}).} \item{\code{conc}}{A vector of
+#' class \code{numeric} with zinc concentrations in \eqn{mg.L^{-1}}.}
+#' \item{\code{time}}{A vector of class \code{integer} with the time points
+#' (in days from the beginning of the experiment \eqn{t = 0}).}
+#' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
+#' alive individuals at each time point for each concentration and each
+#' replicate.} \item{\code{Nrepro}}{A vector of class \code{integer} with the
+#' number of offspring at each time point for each concentration and each
+#' replicate.} }
+#' @references Billoir, E.,Delignette-Muller, M.L., Pery, A.R.R. and
+#' Charles S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
+#' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords datasets
 NULL
