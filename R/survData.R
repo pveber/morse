@@ -9,7 +9,7 @@
 #' resulting object, in addition to its \code{survData} class, inherits the
 #' class \code{survDataCstExp} or \code{survDataVarExp} respectively.
 #'
-#' The \code{data} argument describes experimental results from a survival
+#' The \code{x} argument describes experimental results from a survival
 #' assay. Each line of the \code{data.frame}
 #' corresponds to one experimental measurement, that is a number of alive
 #' individuals for a given concentration of pollutant at a certain time
@@ -17,11 +17,11 @@
 #' or the number of alive individuals may be missing. The dataset is inferred
 #' to be in constant exposure if the concentration is constant for each
 #' replicate and systematically available. The function \code{survData} fails if
-#' \code{data} does not meet the
+#' \code{x} does not meet the
 #' expected requirements. Please run \code{\link{survDataCheck}} to ensure
-#' \code{data} is well-formed.
+#' \code{x} is well-formed.
 #'
-#' @param data a \code{data.frame} containing the following four columns:
+#' @param x a \code{data.frame} containing the following four columns:
 #' \itemize{
 #' \item \code{replicate}: a vector of class \code{integer} or factor for replicate
 #' identification. A given replicate value should identify the same group of
@@ -52,6 +52,7 @@
 #' class(dat)
 #'
 #' @export
+#' 
 survData <- function(x) {
 
   x <- as_tibble(x)
@@ -73,15 +74,26 @@ survData <- function(x) {
 }
 
 
-#' Tests in a well-formed argument to function 'survData' if the concentration
-#' is constant and different from NA for each replicate
+#' Test in a well-formed argument to function 'survData' if the concentration
+#' is constant and different from NA for each replicate (each time-serie)
 #'
 #' @param x a data.frame
-#' @return a boolean \code{TRUE} if concentration in replicate is constant,
-#'  or \code{FALSE} if the concentration in at least one of the replicates is variable
+#' @return a boolean \code{TRUE} if concentration in \code{replicate} is constant,
+#'  or \code{FALSE} if the concentration in at least one of the replicates is variable.
 #'
+#' @examples
+#'
+#' # (1) Load the survival dataset and test if concentration in replicates are constant
+#' data("propiconazole")
+#' is_exposure_constant(propiconazole)
+#' is_exposure_constant(survData(propiconazole))
+#'
+#'  # (1) Load the survival dataset and test if concentration in replicates are constant
+#' data("propiconazole_pulse_exposure") 
+#' is_exposure_constant(propiconazole_pulse_exposure)
+#' 
 #' @export
-#'
+#' 
 is_exposure_constant <- function(x) {
 
   # Test if concentration is constant in a same replicate
@@ -94,14 +106,12 @@ is_exposure_constant <- function(x) {
 }
 
 
-#' Computes the effective period of observation in individual days for a
-#' survival dataset
-#'
-#' @param x an object of class \code{survData}
-#' @return a numeric vector
-#'
-#' @export
-#'
+# Computes the effective period of observation in individual days for a
+# survival dataset
+#
+# @param x an object of class \code{survData}
+# @return a numeric vector
+#
 Nindtime <- function(x) {
   x <- x[!is.na(x$Nsurv),]
   T <- sort(unique(x$time)) # observation times
@@ -117,16 +127,14 @@ Nindtime <- function(x) {
   return(Nindtime)
 }
 
-#' Computes a vector associating to each measurement in a \code{survData}
-#' object the initial number of individuals in the corresponding replicate
-#'
-#' @param x an object of class \code{survData}
-#' @return an integer vector
-#'
-#' @importFrom dplyr left_join
-#'
-#' @export
-#'
+# Computes a vector associating to each measurement in a \code{survData}
+# object the initial number of individuals in the corresponding replicate
+#
+# @param x an object of class \code{survData}
+# @return an integer vector
+#
+# @importFrom dplyr left_join
+#
 Ninit <- function(x) {
   x.t0 <- x[x$time == 0 & !is.na(x$Nsurv), c("replicate", "Nsurv")]
   x.t0 <- data.frame(replicate = x.t0$replicate,
@@ -136,27 +144,27 @@ Ninit <- function(x) {
 }
 
 
-#' Joins a concentration and a survival dataset into an argument for 'survData'
+#' Joins a concentration with a survival datasets into an argument for 'survData'
 #'
 #' This function joins two datasets, one for exposure measurements, the other
 #' for survival measurements, into a single dataframe that can be used
 #' with the \code{survData} function.
 #'
-#' @param exposure a \code{data.frame} containing the following three columns:
+#' @param x a \code{data.frame} containing the following three columns:
 #' \itemize{
-#' \item \code{replicate}: a vector of class \code{integer} or factor for replicate
+#' \item \code{replicate}: a vector of class \code{integer} or \code{factor} for replicate
 #' identification
 #' \item \code{time}: a vector of class \code{integer} with time points, min value must be 0
 #' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
-#' alive individuals at each time point for each concentration and each replicate
+#' alive individuals at some or all time point for each replicate
 #' }
-#' @param concentration a \code{data.frame} containing the following three columns:
+#' @param y a \code{data.frame} containing the following three columns:
 #' \itemize{
 #' \item \code{replicate}: a vector of class \code{integer} or factor for replicate
 #' identification
 #' \item \code{time}: a vector of class \code{integer} with time points, min value must be 0
-#' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
-#' alive individuals at each time point for each concentration and each replicate
+#' \item \code{conc}: a vector of class \code{numeric} providing the concentration
+#'  at some or all time point for each replicate
 #' }
 #'#'
 #' @return a dataframe suitable for `survData`
