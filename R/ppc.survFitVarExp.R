@@ -11,8 +11,26 @@
 #' observed value and in red otherwise.
 #'
 #' @param x An object of class \code{survFitVarExp}
-#' @param style graphical backend
+#' @param xlab A label for the \eqn{X}-axis, by default \code{Observed nb of survivors}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Predicted nb of survivors}.
+#' @param main A main title for the plot.
 #' @param \dots Further arguments to be passed to generic methods
+#'
+#' @examples
+#'
+#' # (1) Load the data
+#' data(propiconazole_pulse_exposure)
+#'
+#' # (2) Create an object of class "survData"
+#' dat <- survData(propiconazole_pulse_exposure)
+#'
+#' \dontrun{
+#' # (3) Run the survFitTKTD function with the TKTD model
+#' out <- survFit(dat, model_type = "SD")
+#'
+#' # (4) Plot observed versus predicted values
+#' ppc(out)
+#' }
 #'
 #' @export
 
@@ -60,7 +78,7 @@ ppc.survFitVarExp <- function(x,
 
 #' @param x An object of class \code{survFitVarExp}
 
-posteriorData = function(x){
+posteriorData <- function(x){
   
   model_type = x$model_type
   mcmc = x$mcmc
