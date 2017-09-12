@@ -17,7 +17,7 @@
 #' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @note When \code{style = "ggplot"}, the function calls function
+#' @note When \code{style = "ggplot"} (default), the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #'
 #' @keywords plot
@@ -28,10 +28,10 @@
 #' zinc <- survData(zinc)
 #'
 #' # (2) Plot survival data with a ggplot style
-#' plot(zinc, style = "ggplot")
+#' plot(zinc)
 #'
 #' # (3) Plot the survival data for a fixed concentration
-#' plot(zinc, concentration = 0.66, style = "ggplot")
+#' plot(zinc, concentration = 0.66)
 #'
 #' @import ggplot2
 #' @import grDevices

@@ -1,17 +1,34 @@
 #' Plotting method for \code{LCx} objects
 #'
 #' This is the generic \code{plot} S3 method for the
-#' \code{LCx}.Plot of Lethal Concentration for \code{x} percent of the population.
+#' \code{plot} of Lethal Concentration for \code{x} percent of the population.
 #'
 #'
 #' @param x An object of class \code{LCx}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
-#'
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
+#' 
+#' @examples 
+#' 
+#' # (1) Load the data
+#' data("propiconazole")
+#' 
+#' # (2) Create an object of class 'survData'
+#' dat <- survData("propiconazole")
+#' 
+#' ## Not run
+#' # (3) Run the survFit function with model_type SD (or IT)
+#' out_SD <- survFit(dat, model_type = "SD")
+#' 
+#' # (4) estimate LC50 at time 4
+#' LCx_SD <- LCx(out_SD, X = 50, time_LCx = 4)
+#' 
+#' # (5) plot the object of class 'LCx'
+#' plot(LCx_SD)
 #'
 #' @export
 #'

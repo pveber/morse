@@ -8,7 +8,7 @@
 #' @param ylab a label for the \eqn{y}-axis
 #' @param main main title for the plot
 #' @param facetting a logical value to use facetting on replicate
-#' @param level_facetting a vector of character...
+#' @param facetting_level a vector of character
 #'
 #' @return an object of class \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}}
 #'
