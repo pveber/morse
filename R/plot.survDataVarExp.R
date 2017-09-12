@@ -25,14 +25,14 @@
 plot.survDataVarExp <- function(data,
                                 xlab = "Time",
                                 ylab = "Number of survivors",
-                                mainlab = NULL,
+                                main = NULL,
                                 facetting = TRUE,
-                                facetting.level = NULL){
+                                facetting_level = NULL){
   
   data_plt = filter( data , !is.na(Nsurv))
   
-  if(!is.null(facetting.level)){
-    data_plt$replicate = factor(data_plt$replicate, levels = facetting.level)
+  if(!is.null(facetting_level)){
+    data_plt$replicate = factor(data_plt$replicate, levels = facetting_level)
   }
   
   plt = ggplot(data_plt, aes(x = time, y = Nsurv, group = replicate, color = conc)) +
@@ -48,7 +48,7 @@ plot.survDataVarExp <- function(data,
       legend.key.height = unit(0.15, "in"),
       legend.position = "top"
     ) +
-    labs(title = mainlab,
+    labs(title = main,
          x = xlab,
          y = ylab,
          colour = "Concentration" # legend title
