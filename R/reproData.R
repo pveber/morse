@@ -56,16 +56,16 @@ reproData <- function(x) {
   return(x)
 }
 
-#' Computes cumulated offspring for each line of a
-#' \code{reproData} object
-#'
-#' @param x an object of class \code{reproData}
-#' @return an integer vector
-#'
-#' @importFrom dplyr left_join
-#'
-#' @export
-#'
+# Computes cumulated offspring for each line of a
+# \code{reproData} object
+#
+# @param x an object of class \code{reproData}
+# @return an integer vector
+#
+# @importFrom dplyr left_join
+#
+# @export
+#
 Nreprocumul <- function(x) {
   T <- sort(unique(x$time)) # observation times
   Nreprocumul <- x$Nrepro
