@@ -235,30 +235,47 @@ summary(dat)
 
 ### TKTD model SD
 
-```{r TKTDcstSD, cache=TRUE}
+For *Stochastic Death* model, we have to specified the `model_type` as `SD`:
+
+
+```{r, eval=FALSE, echo=TRUE}
+# (6) fit a TKTD model
+fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
+```
+
+```{r TKTDcstSD, cache=TRUE, echo=FALSE}
 # (6) fit a TKTD model
 # fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
 # save(fit_cstSD, file = "tests/testdata/fit_cstSD.rda")
 load(file = "../tests/testdata/fit_cstSD.rda")
 ```
 
+Then, the function `summary` provides a summary of parameters estimates, medians and their 95 \% credible intervals.
+
 ```{r, cache=TRUE}
 summary(fit_cstSD)
 ```
+
+The function `plot` provides a representation of the fitting for each replicates
 
 ```{r, cache=TRUE}
 plot(fit_cstSD)
 ```
 
+Original data can be plot by using the option `adddata = TRUE`
+
 ```{r, cache=TRUE}
 plot(fit_cstSD, adddata = TRUE)
 ```
+
+A posterior predictive check is also possible using the function `ppc`:
 
 ```{r, cache=TRUE}
 ppc(fit_cstSD)
 ```
 
-It is also possible to plot the Lethal concentration at any time
+Compared to arget time analysis, TKTD modelling allows to compute and plot the Lethal Concentration for any percentage of population and at any time.
+When time is not specified in `time_LCx`, then the maximal time found in the dataset is used.
 
 ```{r cstSDLCx, cache=TRUE}
 # LC50 at max of time:
@@ -267,7 +284,11 @@ plot(LCx_cstSD)
 
 # LC50 at time = 2
 LCx(fit_cstSD, X = 50, time_LCx = 2) %>% plot()
+```
 
+Warning messages are returned when the range of concentration is not appropriated with one or more LCx point(s). 
+
+```{r}
 # LC50 at time = 15
 LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
 ```
@@ -275,10 +296,15 @@ LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
 
 ### Using an alternative model under constant exposure concentration: model IT
 
-The "Individual Tolerance" (IT) model is a variant of TKTD survival
-analysis. It can also be used with MORSE as demonstrated here:
+The *Individual Tolerance* (IT) model is a variant of TKTD survival
+analysis with *SD*. It can also be used with MORSE as demonstrated here. For *IT* model, we have to specified the `model_type` as `IT`:
 
-```{r TKTDcstIT, cache=TRUE}
+```{r, eval=FALSE, echo=TRUE}
+fit_cstIT <- survFit(dat, model_type = "IT")
+```
+
+
+```{r TKTDcstIT, cache=TRUE, echo=FALSE}
 # fit_cstIT <- survFit(dat, model_type = "IT")
 # save(fit_cstIT, file = "tests/testdata/fit_cstIT.rda")
 load(file = "../tests/testdata/fit_cstIT.rda")
@@ -335,7 +361,12 @@ summary(dat)
 
 ### TKTD model SD
 
-```{r TKTDvarSD, cache=TRUE}
+```{r, eval=FALSE, echo=TRUE}
+# (6) fit a TKTD SD model
+fit_varSD <- survFit(dat, model_type = "SD")
+```
+
+```{r TKTDvarSD, cache=TRUE, echo=FALSE }
 # (6) fit a TKTD SD model
 # fit_varSD <- survFit(dat, quiet = FALSE, model_type = "SD")
 # save(fit_varSD, file = "tests/testdata/fit_varSD.rda")
@@ -366,7 +397,12 @@ LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
 
 ### TKTD model IT
 
-```{r TKTDvarIT, cache=TRUE}
+```{r, eval=FALSE, echo=TRUE}
+# fit an IT TKTD model
+fit_varIT <- survFit(dat, quiet = FALSE, model_type = "IT")
+```
+
+```{r TKTDvarIT, cache=TRUE, echo=FALSE}
 # (8) now fit an IT TKTD model
 # fit_varIT <- survFit(dat, quiet = FALSE, model_type = "IT")
 # save(fit_varIT, file = "tests/testdata/fit_varIT.rda")
