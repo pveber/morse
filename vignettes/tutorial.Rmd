@@ -21,6 +21,7 @@ knitr::opts_chunk$set(fig.width = 7,
 
 ```{r, echo=FALSE, results='hide'}
 library(morse)
+library(dplyr)
 ```
 
 The package MORSE is devoted to the analysis of data from standard toxicity
