@@ -91,15 +91,40 @@ assume a uniform prior for $d$ between 0 and 1.
 
 \subsection{Toxico-kinetic toxico-dynamic modeling}
 
+\begin{table}
+\label{tab:parameters}
+\caption{Parameters and symbols used for GUTS-SD and GUTS-IT models (different symbols are used within pubications as in \cite{jager2011, delignette2017}). The unit $[D]$ refers to unit of actual damage, $n.d$ for non dimensional. For GUT-IT model, we assume a log-logistic distribution.}
+\begin{tabular}{l c c c c}
+Parameter & Symbol (1) & Symbol (2) & Unit & Model \\
+\hline
+Background hazard rate & $h_b$ & $m_0$ & $d^{-1}$ & SD and IT\\
+%
+Dominant toxicokinetic rate & $k_d$ & $k_d$ & $d^{-1}$ & SD and IT \\
+%
+Threshold for effects & $z$ & $NEC$ & $[D]$ & SD \\
+%
+Killing rate & $k_k$ & $k_s$ & $[D]^{-1}.d^{-1}$ & SD \\
+%
+Median of the threshold effect distribution & $\alpha$ & & $[D]$ & IT \\
+%
+Shape of the threshold effect distribution & $\beta$ & & n.d. & IT \\
+%
+\hline
+\end{tabular}
+\end{table}
+
+
 For datasets featuring time series measurements, more complete models
 can be used to estimate the effect of a contaminant on survival. We
 assume the bioassay consists in exposing an initial number $n_i^0$ of
 individuals to a constant dose $c_i$ of contaminant, and following the
 number $n_i^k$ of survivors at time $t_k$ (with $t_0 < t_1 < \dots <
 t_m$ and $t_0 = 0$), providing a collection $D = {(c_i, t_k,
-  n_i^k)}_{i,k}$ of experiments. In MORSE, we implement a
-toxico-kinetic toxico-dynamic (TKTD) model variant known as the
-\emph{reduced stochastic death} model~\cite{nyman2012}, which we
+  n_i^k)}_{i,k}$ of experiments. In MORSE, we implement two
+toxico-kinetic toxico-dynamic (TKTD) models variant included in 
+the General Unified Threshold model for Survival (GUTS)~\cite{jager2011}.
+One is known as the \emph{reduced stochastic death} model~\cite{nyman2012} or
+GUTS-SD and the other is the \emph{individual tolerance} model or GUTS-IT, which we
 describe now.
 
 \newcommand*{\diffdchar}{\mathrm{d}}
@@ -109,7 +134,7 @@ describe now.
 \newcommand*{\tNEC}{t^{\tiny \NEC}}
 
 
-\paragraph{Modelling} The number of survivors at time $t_k$ given the
+\paragraph{GUTS Modelling} The number of survivors at time $t_k$ given the
 number of survivors at time $t_{k-1}$ is assumed to follow a binomial
 distribution:
 $$
@@ -121,11 +146,23 @@ of survival at time $t$, we have:
 $$
 f_i(t_{k-1}, t_k) = \frac{S_i(t_k)}{S_i(t_{k-1})}
 $$
+
+The calculation of $S_i(t)$ depends on the model of survival GUTS-SD or GUTS-IT~\cite{jager2011}.
+
+In GUTS-SD, all organisms are assumed to have the same internal concentration 
+threshold (denoted $NEC$), and, once exceeded, the instantaneous probability 
+to die increases linearly with the internal concentration.
+
+In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
+exceeded in one individual, this individual dies immediately.
+
+\paragraph{GUTS-SD}
+
 $S_i$ can be calculated by integrating the \emph{instantaneous mortality
 rate} $h_i$:
 \begin{equation}
   \label{eq:survivaldef}
-  S_i(t) = \exp \left(\int_0^t - h_i(u)\mbox{d}u \right)
+  S_i(t) = \exp \left( \int_0^t - h_i(u)\mbox{d}u \right)
 \end{equation}
 In the model, the function $h_i$ is expressed using the internal
 concentration of contaminant (that is, the concentration inside an
@@ -175,12 +212,12 @@ recovery.
 When $c_i > \NEC$, it takes time $\tNEC_i$ before the internal
 concentration reaches $\NEC$, where:
 $$
-\tNEC_i = - \frac{1}{k_d} \log (1 - \frac{\NEC}{c_i}).
+\tNEC_i = - \frac{1}{k_d} \log \left(1 - \frac{\NEC}{c_i} \right).
 $$
 Before that happens, Eq.~\ref{eq:bgsurvival} applies, while for $t >
 \tNEC_i$, integrating Eq.~\ref{eq:survivaldef} results in:
 $$
-S_i(t) = \exp(- m_0 t - k_s(c_i - \NEC)(t - \tNEC_i) - \frac{k_s c_i}{k_d}(e^{- k_d t} - e^{-k_d \tNEC_i}))
+S_i(t) = \exp \left(- m_0 t - k_s(c_i - \NEC) (t - \tNEC_i) - \frac{k_s c_i}{k_d} \left(e^{- k_d t} - e^{-k_d \tNEC_i} \right) \right)
 $$
 
 In brief, given values for our four parameters $m_0$, $k_s$, $k_d$ and
@@ -189,8 +226,25 @@ conditional survival probabilities. In MORSE those parameters are
 estimated using Bayesian inference. The next paragraph describes our
 choice of priors.
 
-\paragraph{Inference} Posterior distributions for $m_0$, $k_s$, $k_d$ and
-$\NEC$ are computed with JAGS. We set prior distributions on those
+
+\paragraph{GUTS-IT}
+
+With the function $f$ denoting the probability distribution of threshold effect in the population, then, the probability to survive until time $t$ is given by: 
+
+$$
+S_i(t) = \int_{\max\limits_{0<\tau<t} \Cint_i(\tau)}^{\infty} f(\NEC) d\NEC = 1- F(\max\limits_{0<\tau<t} \Cint_i)
+$$
+
+where $F$ denotes the cumulative distribution function of $f$. Assuming a log-logistic distribution yields for $S$:
+
+$$
+S_i(t) = \exp(- m_0 t) \left( 1 - \frac{1}{1+ \left( \frac{c_i(1-\exp(-k_d t ))}{\alpha} \right)^{- \beta}} \right)
+$$
+
+where $\alpha>0$ is the scale parameter (and also the median) and $\beta>0$ is the shape parameter.  
+
+\paragraph{Inference} Posterior distributions for alla parameters $m_0$, $k_s$, $k_d$, $\NEC$,
+$\alpha$ and $\beta$ are computed with JAGS. We set prior distributions on those
 parameters based on the actual experimental design used in a
 bioassay. For instance, we assume the NEC is close to the range of
 tested concentrations. For each parameter $\theta$, we derive in a similar
@@ -198,8 +252,8 @@ manner a minimum ($\theta^{\min}$) and a maximum ($\theta^{\max}$)
 value and state that the prior on $\theta$ is a log-normal
 distribution. More precisely, we choose:
 $$
-\log_{10} \theta \sim \mathcal{N}(\frac{\log_{10} \theta^{\min} + \log_{10} \theta^{\max}}{2},
-                                 \frac{\log_{10} \theta^{\max} - \log_{10} \theta^{\min}}{4})
+\log_{10} \theta \sim \mathcal{N}\left(\frac{\log_{10} \theta^{\min} + \log_{10} \theta^{\max}}{2},
+                                 \frac{\log_{10} \theta^{\max} - \log_{10} \theta^{\min}}{4} \right)
 $$
 With this choice, $\theta^{\min}$ and $\theta^{\max}$ correspond to the
 2.5 and 97.5 percentiles of the prior distribution on $\theta$. For
@@ -208,6 +262,7 @@ each of our parameters, this gives:
 \item $\NEC^{\min} = \min_{i, c_i \neq 0} c_i$  and $\NEC^{\max} = \max_i c_i$,
   which amounts to say that the NEC is most probably contained in the
   range of experimentally tested concentrations
+\item and similarly, $\alpha^{\min} = \min_{i, c_i \neq 0} c_i$  and $\alpha^{\max} = \max_i c_i$
 \item for the mortality rate $m_0$, we assume a maximum value
   corresponding to situations where half the indivuals are lost at the
   first observation time in the control (time $t_1$), that is:
@@ -258,6 +313,10 @@ each of our parameters, this gives:
   difference between two tested concentrations, this leads to:
   $$
   e^{- k_s^{\min} \Delta^{\max} t_m} = 0.001 \Leftrightarrow k_s^{\min} = - \frac{1}{\Delta^{\max} t_m} \log 0.999
+  $$
+\item for the shape parameter $\beta$, we used a quasi non-informative log-uniform distribution:
+  $$
+  \log_{10} \beta \sim \mathcal{U}(−2, 2)
   $$
 \end{itemize}
 
