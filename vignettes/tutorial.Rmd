@@ -1,5 +1,5 @@
 ---
-title: "MORSE tutorial"
+title: "morse tutorial"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
@@ -24,39 +24,41 @@ library(morse)
 library(dplyr)
 ```
 
-The package MORSE is devoted to the analysis of data from standard toxicity
-bioassays. It provides a simple workflow to explore/visualize a dataset, and
+The package `morse` is devoted to the analysis of data from standard toxicity
+tests. It provides a simple workflow to explore/visualize a dataset, and
 compute estimations of risk assessment indicators. This document illustrates
-a typical use of MORSE on survival and reproduction data, which can be followed
-to analyze new datasets.
+a typical use of `morse` on survival and reproduction data, which can be followed
+step-by-step to analyze new datasets.
 
 # Survival data analysis at target time (TT)
 
-The following example shows all the stages to perform survival analysis on
-standard bioassay data and produce estimate values of the $LC_x$.
+The following example shows all the steps to perform survival analysis on
+standard toxicity test data and to produce estimated values of the $LC_x$.
 We will use a dataset of the library named `cadmium2`, which contains both
-survival and reproduction data from a chronic laboratory bioassay. In this
+survival and reproduction data from a chronic laboratory toxicity test. In this
 experiment, snails were exposed to six concentrations of a metal contaminant
 (cadmium) during 56 days.
 
 ## Step 1: check the structure and the dataset integrity
 
-The data from a survival assay should be gathered in a `data.frame` with a
+The data from a survival toxicity test should be gathered in a `data.frame` with a
 specific layout. This is documented in the paragraph on `survData` in the
 reference manual, and you can also inspect one of the datasets provided in
-the package (like `cadmium2`). First, we load the dataset and use the function
-`survDataCheck` to verify that it has the expected layout:
+the package (e.g., `cadmium2`). First, we load the dataset and use the function
+`survDataCheck` to check that it has the expected layout:
 
 ```{r step1TT, cache=TRUE}
 data(cadmium2)
 survDataCheck(cadmium2)
 ```
 
+The output `## No message` just informs that the dataset is well-formed.
+
 ## Step 2: create a `survData` object
 
-The class `survData` represents \emph{validated} survival data and is the
-basic representation used for the subsequent operations. Note that if the
-call to `survDataCheck` reports no error, it is guaranteed that `survData`
+The class `survData` corresponds to \emph{validated} survival data and is the
+basic layout used for the subsequent operations. Note that if the
+call to `survDataCheck` reports no error (i.e., `## No message`), it is guaranteed that `survData`
 will not fail.
 
 ```{r step2TT, cache=TRUE}
@@ -74,13 +76,13 @@ plot(dat, pool.replicate = FALSE)
 ```
 
 
-Two graphical styles are available, `"generic"` for standar `R` plots or
-`"ggplot"` to call the package `ggplot2`. If the argument `pool.replicate`
-is `TRUE` the datapoints for a given time and concentration are pooled
+Two graphical styles are available, `"generic"` for standard `R` plots or
+`"ggplot"` to call package `ggplot2` (default). If argument `pool.replicate`
+is `TRUE`, datapoints at a given time-point and a given concentration are pooled
 and only the mean number of survivors is plotted. To observe the full
 dataset, we set this option to `FALSE`.
 
-By fixing the concentration to a (tested) value, we can visualize one subplot
+By fixing the concentration at a (tested) value, we can visualize one subplot
 in particular:
 
 ```{r, cache=TRUE}
@@ -89,15 +91,16 @@ plot(dat, concentration = 124, addlegend = TRUE,
 ```
 
 
-We can also plot the survival rate with the confidence intervale on the data
-at a given time point as a function of the concentration, by using the function
-`plot.DoseResponse` and by fixing `target.time`:
+We can also plot the survival rate, at a given time-point, as a function of 
+concentration, with binomial confidence intervals around the data. This is 
+achieved by using function `plotDoseResponse` and by fixing the option 
+`target.time` (default is the end of the experiment).
 
 ```{r, cache=TRUE}
 plotDoseResponse(dat, target.time = 21, addlegend = TRUE)
 ```
 
-The function `summary` provides some descriptive statistics on the experimental design.
+Function `summary` provides some descriptive statistics on the experimental design.
 
 ```{r, cache=TRUE}
 summary(dat)
@@ -105,13 +108,13 @@ summary(dat)
 
 ## Step 4: fit an exposure-response model to the survival data at target time
 
-Now we are ready to fit a probabilistic model for the survival data, which aims
-at finding the relation between concentration of pollutant and mean survival rate
-at the target time. Our model assumes the latter is a log-logistic function of
-the former, and the work here is to estimate the parameters of this log-logistic
-function. Once we have estimated the parameters, we can then calculate the $LC_x$
+Now we are ready to fit a probabilistic model to the survival data, in order to
+describe the relationship between the concentration in chemical compound and survival rate
+at the target time. Our model assumes this latter is a log-logistic function of
+the former, from which the package delivers estimates of the parameters.
+Once we have estimated the parameters, we can then calculate the $LC_x$ values
 for any $x$. All this work is performed by the `survFitTT` function, which requires
-a `survData` object and the levels of $LC_x$ we need:
+a `survData` object as input and the levels of $LC_x$ we want:
 
 ```{r step4TT, results="hide", cache=TRUE}
 fit <- survFitTT(dat,
@@ -119,12 +122,12 @@ fit <- survFitTT(dat,
                  lcx = c(10, 20, 30, 40, 50))
 ```
 
-The returned value is an object of class `survFitTT` and provides the estimated
-parameters as a posterior[^1] distribution, in order to model our uncertainty on
-their true value. For the parameters of the models, as well as the $LC_x$
-values, we report the median (as the estimated value) and the 2.5 \% and 97.5 \%
+The returned value is an object of class `survFitTT` providing the estimated
+parameters as a posterior[^1] distribution, which quantifies the uncertainty on
+their true value. For the parameters of the models, as well as for the $LC_x$
+values, we report the median (as the point estimated value) and the 2.5 \% and 97.5 \%
 quantiles of the posterior (as a measure of uncertainty, a.k.a. credible
-intervals). These can seen using the `summary` method:
+intervals). They can be obtained by using the `summary` method:
 
 
 ```{r step4TTsummary, cache=TRUE}
@@ -133,18 +136,19 @@ summary(fit)
 
 If the inference went well, it is expected that the difference between
 quantiles in the posterior will be reduced compared to the prior, meaning
-that the data was helpful to reduce the uncertainty on the true value of
+that the data were helpful to reduce the uncertainty on the true value of
 the parameters. This simple check can be performed using the summary function.
 
 The fit can also be plotted:
 ```{r step4TTplot, cache=TRUE}
 plot(fit, log.scale = TRUE, adddata = TRUE,   addlegend = TRUE)
 ```
-This representation shows the estimated relation between concentration of
-pollutant and survival rate (red curve). It is computed by choosing for each
+
+This representation shows the estimated relationship between concentration of
+chemical compound and survival rate (orange curve). It is computed by choosing for each
 parameter the median value of its posterior. To assess the uncertainty on this
-estimation, we compute many such curves this time by sampling the parameters
-in the posterior distribution. This gives rise to the pink band, showing for
+estimation, we compute many such curves by sampling the parameters
+in the posterior distribution. This gives rise to the grey band, showing for
 any given concentration an interval (called credible interval) containing the
 survival rate 95% of the time in the posterior distribution. The experimental
 data points are represented in black and correspond to the observed survival
@@ -153,27 +157,27 @@ pooling all replicates. The black error bars correspond to a 95% confidence
 interval, which is another, more straightforward way to bound the most
 probable value of the survival rate for a tested concentration. In favorable
 situations, we expect that the credible interval around the estimated curve
-and the confidence interval around experimental points will largely overlap.
+and the confidence interval around the experimental data largely overlap.
 
-A similar plot is obtained with the style `generic`:
+A similar plot is obtained with the style `"generic"`:
 ```{r, cache=TRUE}
 plot(fit, log.scale = TRUE, style = "generic", adddata = TRUE, addlegend = TRUE)
 ```
 
 
-Note that `survFitTT` will warn you if the estimated $LC_{50}$ lies outside the
+Note that `survFitTT` will warn you if the estimated $LC_{x}$ lie outside the
 range of tested concentrations, as in the following example:
 
 ```{r wrongTT, results="hide", cache=TRUE}
 data("cadmium1")
-wrong_fit <- survFitTT(survData(cadmium1),
+doubtful_fit <- survFitTT(survData(cadmium1),
                        target.time = 21,
                        lcx = c(10, 20, 30, 40, 50))
-plot(wrong_fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
+plot(doubtful_fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
      addlegend = TRUE)
 ```
 
-In this example, the experimental design did not include sufficiently high
+In this example, the experimental design does not include sufficiently high
 concentrations, and we are missing measurements that would have a major
 influence on the final estimation. For this reason this result should be
 considered unreliable.
@@ -181,7 +185,7 @@ considered unreliable.
 
 ## Step 5: validate the model with a posterior predictive check
 
-The estimation can be further validated using so-called posterior
+The fit can be further validated using so-called posterior
 predictive checks: the idea is to plot the observed values against the
 corresponding estimated predictions, along with their 95% credible
 interval. If the fit is correct, we expect to see 95% of the data
@@ -191,31 +195,29 @@ inside the intervals.
 ppc(fit)
 ```
 
-In this plot, each black dot represents an observation made at some
-concentration, and the number of survivors at target time is given by
-the value on X-axis. Using the concentration and the fitted model, we
-can produce a corresponding prediction of the expected number of
+In this plot, each black dot represents an observation made at a given
+concentration, and the corresponding number of survivors at target time is given by
+the value on the *x-axis*. Using the concentration and the fitted model, we
+can produce the corresponding prediction of the expected number of
 survivors at that concentration. This prediction is given by the
-Y-axis. Ideally observations and predictions should coincide, so we'd
+*y-axis*. Ideally observations and predictions should coincide, so we'd
 expect to see the black dots on the points of coordinate $Y = X$. Our
 model provides a tolerable variation around the predited mean value
 as an interval where we expect 95% of the dots to be in average. The
 intervals are represented in green if they overlap with the line $Y=X$,
 and in red otherwise.
-As replicates are shifted on the x-axis, the bisecting line (y = x), is
-represented by steps, and is added to the plot in order to see if each
-prediction interval contains each observed value.
 
-# Survival analysis using a toxico-kinetic toxico-dynamic (TKTD) model
+# Survival analysis using a toxico-kinetic toxico-dynamic (TK-TD) model
 
-The steps for TKTD data analysis are absolutely analogous to what we
-described for the analysis at target time. Here the goal is to estimate the relation
-between pollutant concentration, time and survival rate.
+The steps for a TK-TD data analysis are absolutely analogous to what we
+described for the analysis at target time. Here the goal is to estimate the relationship
+between chemical compound concentration, time and survival rate.
 
-## TKTD model with constant exposure concentration
+## TK-TD model with constant exposure concentrations
 
-Here is a typical session to analyse dose-dependent time-course data
-using the so-called "Stochastic Death" (SD) model:
+Here is a typical session to analyse concentration-dependent time-course data
+using the so-called ["Stochastic Death" (SD) model](modelling.pdf):
+
 ```{r TKTDcst, cache=TRUE}
 # (1) load dataset
 data(propiconazole)
@@ -226,67 +228,69 @@ survDataCheck(propiconazole)
 # (3) create a `survData` object
 dat <- survData(propiconazole)
 
-# (4) represent the number of survivor as a function time
+# (4) represent the number of survivors as a function of time
 plot(dat, pool.replicate = FALSE)
 
 # (5) check information on the experimental design
 summary(dat)
 ```
 
-### TKTD model SD
+### TK-TD model "SD"
 
-For *Stochastic Death* model, we have to specified the `model_type` as `SD`:
+To fit the *Stochastic Death* model, we have to specify the `model_type` as `"SD"`:
 
 
 ```{r, eval=FALSE, echo=TRUE}
-# (6) fit a TKTD model
-fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
+# (6) fit the TK-TD model SD
+fit_cstSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
 
 ```{r TKTDcstSD, cache=TRUE, echo=FALSE}
-# (6) fit a TKTD model
+# (6) fit a TK-TD model
 # fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
 # save(fit_cstSD, file = "tests/testdata/fit_cstSD.rda")
 load(file = "../tests/testdata/fit_cstSD.rda")
 ```
 
-Then, the function `summary` provides a summary of parameters estimates, medians and their 95 \% credible intervals.
+Then, the `summary` function provides parameters estimates as medians and 95\% credible intervals.
 
 ```{r, cache=TRUE}
+# (7) summary of parameters estimates
 summary(fit_cstSD)
 ```
 
-The function `plot` provides a representation of the fitting for each replicates
+The `plot` function provides a representation of the fitting for each replicates
 
 ```{r, cache=TRUE}
 plot(fit_cstSD)
 ```
 
-Original data can be plot by using the option `adddata = TRUE`
+Original data can be added by using the option `adddata = TRUE`
 
 ```{r, cache=TRUE}
 plot(fit_cstSD, adddata = TRUE)
 ```
 
-A posterior predictive check is also possible using the function `ppc`:
+A posterior predictive check is also possible using function `ppc`:
 
 ```{r, cache=TRUE}
 ppc(fit_cstSD)
 ```
 
-Compared to arget time analysis, TKTD modelling allows to compute and plot the Lethal Concentration for any percentage of population and at any time.
-When time is not specified in `time_LCx`, then the maximal time found in the dataset is used.
+Compared to the target time analysis, TK-TD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the dataset is used.
 
 ```{r cstSDLCx, cache=TRUE}
-# LC50 at max of time:
+# LC50 at the maximum time-point:
 LCx_cstSD <- LCx(fit_cstSD, X = 50)
 plot(LCx_cstSD)
 
 # LC50 at time = 2
 LCx(fit_cstSD, X = 50, time_LCx = 2) %>% plot()
+## Note the use of the pipe operator, `%>%`, which is a powerful tool for clearly expressing a sequence of multiple operations.
+## For more information on pipes, see: http://r4ds.had.co.nz/pipes.html
 ```
 
-Warning messages are returned when the range of concentration is not appropriated with one or more LCx point(s). 
+Warning messages are returned when the range of concentrations is not appropriated for one or more LCx calculation(s). 
 
 ```{r}
 # LC50 at time = 15
@@ -294,13 +298,13 @@ LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
 ```
 
 
-### Using an alternative model under constant exposure concentration: model IT
+### TK-TD model "IT"
 
-The *Individual Tolerance* (IT) model is a variant of TKTD survival
-analysis with *SD*. It can also be used with MORSE as demonstrated here. For *IT* model, we have to specified the `model_type` as `IT`:
+The *Individual Tolerance* (IT) model is a variant of TK-TD survival
+analysis. It can also be used with `morse` as demonstrated hereafter. For the *IT* model, we have to specify the `model_type` as `"IT"`:
 
 ```{r, eval=FALSE, echo=TRUE}
-fit_cstIT <- survFit(dat, model_type = "IT")
+fit_cstIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
 
 
@@ -310,7 +314,8 @@ fit_cstIT <- survFit(dat, model_type = "IT")
 load(file = "../tests/testdata/fit_cstIT.rda")
 ```
 
-To have a summary of the estimation of parameters:
+We can first get a summary of the estimated parameters:
+
 ```{r, cache=TRUE}
 summary(fit_cstIT)
 # OR
@@ -326,7 +331,7 @@ ppc(fit_cstIT)
 ```
 
 ```{r cstITLCx, cache=TRUE}
-# LC50 at time 
+# LC50 at the maximum time-point:
 LCx_cstIT <- LCx(fit_cstIT, X = 50)
 plot(LCx_cstIT)
 
@@ -337,10 +342,10 @@ LCx(fit_cstIT, X = 50, time_LCx = 2) %>% plot()
 LCx(fit_cstIT, X = 50, time_LCx = 15) %>% plot()
 ```
 
-## TKTD model with time-variable exposure concentration
+## TK-TD model under time-variable exposure concentration
 
-Here is a typical session fitting an SD and IT model for a dataset
-with variable exposure concentration.
+Here is a typical session fitting an SD or an IT model for a dataset
+under time-variable exposure scenario.
 
 ```{r TKTDvar, cache=TRUE}
 # (1) load dataset
@@ -352,22 +357,22 @@ survDataCheck(propiconazole_pulse_exposure)
 # (3) create a `survData` object
 dat <- survData(propiconazole_pulse_exposure)
 
-# (4) represent the number of survivor as a function time
+# (4) represent the number of survivor as a function of time
 plot(dat)
 
 # (5) check information on the experimental design
 summary(dat)
 ```
 
-### TKTD model SD
+### TK-TD model "SD"
 
 ```{r, eval=FALSE, echo=TRUE}
-# (6) fit a TKTD SD model
-fit_varSD <- survFit(dat, model_type = "SD")
+# (6) fit the TK-TD model SD
+fit_varSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
 
 ```{r TKTDvarSD, cache=TRUE, echo=FALSE }
-# (6) fit a TKTD SD model
+# (6) fit a TK-TD SD model
 # fit_varSD <- survFit(dat, quiet = FALSE, model_type = "SD")
 # save(fit_varSD, file = "tests/testdata/fit_varSD.rda")
 load(file = "../tests/testdata/fit_varSD.rda")
@@ -395,15 +400,15 @@ plot(LCx_varSD)
 LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
 ```
 
-### TKTD model IT
+### TK-TD model "IT"
 
 ```{r, eval=FALSE, echo=TRUE}
-# fit an IT TKTD model
-fit_varIT <- survFit(dat, quiet = FALSE, model_type = "IT")
+# fit a TK-TD model IT
+fit_varIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
 
 ```{r TKTDvarIT, cache=TRUE, echo=FALSE}
-# (8) now fit an IT TKTD model
+# (8) now fit an IT TK-TD model
 # fit_varIT <- survFit(dat, quiet = FALSE, model_type = "IT")
 # save(fit_varIT, file = "tests/testdata/fit_varIT.rda")
 load(file = "../tests/testdata/fit_varIT.rda")
@@ -431,11 +436,11 @@ LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
 ```
 
 
-# Reproduction data analyses
+# Reproduction data analysis at target-time
 
-The steps in reproduction data analysis are absolutely analogous to what we
-described for survival data. This time the goal is to estimate the relation
-between pollutant concentration and reproduction rate per individual-day.
+The steps for reproduction data analysis are absolutely analogous to what we
+described for survival data. Here, the aim is to estimate the relationship
+between the chemical compound concentration and the reproduction rate per individual-day.
 
 Here is a typical session:
 ```{r, cache=TRUE}
@@ -448,16 +453,16 @@ reproDataCheck(cadmium2)
 # (3) create a `reproData` object
 dat <- reproData(cadmium2)
 
-# (4) represent the cumulated number of offspring as a function time
+# (4) represent the cumulated number of offspring as a function of time
 plot(dat, concentration = 124, addlegend = TRUE, pool.replicate = FALSE)
 
 # (5) represent the reproduction rate as a function of concentration
-plotDoseResponse(dat, target.time = 56, style = "ggplot")
+plotDoseResponse(dat, target.time = 56)
 
 # (6) check information on the experimental design
 summary(dat)
 
-# (7) fit an exposure-response model at target-time
+# (7) fit a concentration-effect model at target-time
 fit <- reproFitTT(dat, stoc.part = "bestfit",
                   target.time = 21,
                   ecx = c(10, 20, 30, 40, 50),
@@ -466,25 +471,27 @@ summary(fit)
 ```
 
 ```{r, cache=TRUE}
-plot(fit, log.scale = TRUE, style = "ggplot", adddata = TRUE,
+plot(fit, log.scale = TRUE, adddata = TRUE,
+     cicol = "orange",
      addlegend = TRUE)
 ```
 
 ```{r, cache=TRUE}
 ppc(fit)
 ```
-As in survival analysis, we assume that the reproduction rate per individual-day
-is a log-logistic function of the concentration. More details and parameter
-signification can be found in the Modeling vignette.
 
+As in the survival analysis, we assume that the reproduction rate per individual-day
+is a log-logistic function of the concentration. More details and parameter
+signification can be found in the [modelling vignette](modelling.pdf).
 
 ## Model comparison
 
-For reproduction analysis, we consider one model which neglects inter-individual
+For reproduction analyses, we compare one model which neglects the inter-individual
 variability (named "Poisson") and another one which takes it into account
-(named "gamma Poisson"). You can choose either one using the option `stoc.part`,
-but by setting it to `"bestfit"`, you let `reproFitTT` decide which models fits the
-data best. The choice can be seen by calling the `summary` function:
+(named "gamma Poisson"). You can choose either one or the other with the option `stoc.part`.
+Setting this option to `"bestfit"`, you let `reproFitTT` decides which models fits the
+data best. The corresponding choice can be seen by calling the `summary` function:
+
 ```{r, cache=TRUE}
 summary(fit)
 ```
@@ -495,13 +502,13 @@ parameter called `omega`, which quantifies the inter-individual variability
 
 ## Reproduction data and survival functions
 
-In MORSE, reproduction datasets are a special case of survival datasets: a
-reproduction dataset includes the same information than a survival dataset plus
-the information on reproduction outputs. For that reason the S3 class `reproData`
+In `morse`, reproduction datasets are a special case of survival datasets: a
+reproduction dataset includes the same information as in a survival dataset plus
+the information on reproduction outputs. For that reason, the S3 class `reproData`
 inherits from the class `survData`, which means that any operation on a `survData`
-object is legal on a `reproData` object. In particular, to use the plot function
-related to survival analysis on `reproData` object, we can use `survData` as a
-conversion function:
+object is legal on a `reproData` object. In particular, in order to use the plot function
+related to the survival analysis on a `reproData` object, we can use `survData` as a
+conversion function first:
 
 ```{r, cache=TRUE}
 dat <- reproData(cadmium2)
@@ -513,7 +520,7 @@ plot(survData(dat))
 from the data starting from a so-called *prior*, which is a probability
 distribution representing an initial guess on the true parameters, before
 seing the data. The *posterior* distribution represents the uncertainty on
-the parameters after seeing the data and combining it with the prior. To obtain
+the parameters after seeing the data and combining them with the prior. To obtain
 a point estimate of the parameters, it is typical to compute the mean or median
-of the posterior and quantify the uncertainty by reporting the standard
-deviation or inter-quantile distance.
+of the posterior. We can quantify the uncertainty by reporting the standard
+deviation or an inter-quantile distance from this posterior distribution.

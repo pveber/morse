@@ -33,7 +33,7 @@ summary.reproData <- function(object, quiet = FALSE, ...) {
                  list(as.factor(object$conc), as.factor(object$time)), sum)
   
   if (! quiet) {
-    cat("\nNumber of offspring (sum of replicate) per time and concentration: \n")
+    cat("\nNumber of offspring (sum of replicates) per time and concentration: \n")
     print(ans3)
   }
   

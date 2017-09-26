@@ -92,9 +92,9 @@ summary.reproFitTT <- function(object, quiet = FALSE, ...) {
       cat("The ", object$det.part, " model with a Poisson stochastic part was used !\n\n")
     cat("Priors on parameters (quantiles):\n\n")
     print(ans1)
-    cat("\nPosterior of the parameters (quantiles):\n\n")
+    cat("\nPosteriors of the parameters (quantiles):\n\n")
     print(ans2)
-    cat("\nPosterior of the ECx (quantiles):\n\n")
+    cat("\nPosteriors of the ECx (quantiles):\n\n")
     print(ans3)
   }
 
