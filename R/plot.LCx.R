@@ -36,7 +36,7 @@
 #'
 plot.LCx <- function(x,
                      xlab = "Concentration",
-                     ylab = "Survival rate \n median and 95CI",
+                     ylab = "Survival rate \n median and 95 CI",
                      main = NULL, ...){
   
   df_dose <- x$df_dose
@@ -55,7 +55,7 @@ plot.LCx <- function(x,
   )
   
   if(is.null(main)){
-    main <- paste("Dose response curve: LC for", X_prop*100, "% at time", time_LCx)
+    main <- paste("Concentation-response curve: LC", X_prop*100, " at time", time_LCx)
   } 
   
   
