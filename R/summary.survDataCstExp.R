@@ -35,7 +35,7 @@ summary.survDataCstExp <- function(object, quiet = FALSE, ...) {
   if (! quiet) {
     cat("\nNumber of replicates per time and concentration: \n")
     print(ans1)
-    cat("\nNumber of survivors (sum of replicate) per time and concentration: \n")
+    cat("\nNumber of survivors (sum of replicates) per time and concentration: \n")
     print(ans2)
   }
   

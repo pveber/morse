@@ -77,9 +77,9 @@ summary.survFitTKTD <- function(object, quiet = FALSE, ...) {
   if (! quiet) {
     cat("Summary: \n\n")
     cat("Priors on parameters (quantiles):\n\n")
-    print(ans1)
-    cat("\nPosterior of the parameters (quantiles):\n\n")
-    print(ans2)
+    print(ans1, row.names = FALSE)
+    cat("\nPosteriors of the parameters (quantiles):\n\n")
+    print(ans2, row.names = FALSE)
   }
   
   invisible(list(Qpriors = ans1,
