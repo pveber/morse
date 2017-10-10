@@ -1,21 +1,19 @@
-#' Create a dataset for survival analysis for \code{survDataCstExp} object
-#'
-#' @param x An object of class \code{survData}
-#' @param model_type TKTD model type ('SD' or 'IT')
-#'
-#' @examples 
-#' 
-#' # (1) Load the data
-#' data("propiconazole")
-#' 
-#' # (2) Create an object 'survData'
-#' dat <- survData(propiconazole)
-#' 
-#' # (3) Create the list of object to be pass in JAGS
-#' modelData(dat, model_type = "IT")
-#'
-#' @export
-#' 
+# Create a dataset to analyse a \code{survDataCstExp} object
+#
+# @param x An object of class \code{survData}
+# @param model_type TK-TD GUTS model type ('SD' or 'IT')
+#
+# @examples 
+# 
+# # (1) Load the data
+# data("propiconazole")
+# 
+# # (2) Create an object 'survData'
+# dataset <- survData(propiconazole)
+# 
+# # (3) Create the list of object to be pass in JAGS
+# modelData(dataset, model_type = "IT")
+#
 modelData.survDataCstExp <- function(x, model_type = NULL){
   
   ## 1. Gather replicate when there is the same constante concentration
