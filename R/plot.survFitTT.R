@@ -1,29 +1,29 @@
 #' Plotting method for \code{survFitTT} objects
 #'
 #' This is the generic \code{plot} S3 method for the \code{survFitTT} class. It
-#' plots exposure-response fits for target time survival analysis.
+#' plots concentration-response fit under target time survival analysis.
 #'
-#' The fitted curve represents the \strong{estimated survival rate} after
-#' the target time has passed as a function of the concentration of pollutant;
+#' The fitted curve represents the \strong{estimated survival rate} at
+#' the target time as a function of the concentration of chemical compound;
 #' When \code{adddata = TRUE} the black dots depict the \strong{observed survival
 #' rate} at each tested concentration. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
-#' The function plots both 95 \% credible intervals for the estimated survival
-#' rate (by default the grey area around the fitted curve) and 95 \% confidence
-#' intervals for the observed survival rate (as black error bars if
+#' The function plots both 95\% credible intervals for the estimated survival
+#' rate (by default the grey area around the fitted curve) and 95\% binomial confidence
+#' intervals for the observed survival rate (as black segments if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two intervals.
 #' If spaghetti = TRUE, the credible intervals are represented by two dotted
 #' lines limiting the credible band, and a spaghetti plot is added to this band.
-#' It consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (10 \% of the MCMC chains are randomly
+#' This spaghetti plot consists of the representation of simulated curves using parameter values
+#' sampled in the posterior distribution (10\% of the MCMC chains are randomly
 #' taken for this sample).
 #'
 #' @param x an object of class \code{survFitTT}
-#' @param xlab a title for the \eqn{x}-axis
-#' @param ylab a title for the \eqn{y}-axis
+#' @param xlab a label for the \eqn{X}-axis, default is \code{Concentration}
+#' @param ylab a label for the \eqn{Y}-axis, default is \code{Survival rate}
 #' @param main main title for the plot
 #' @param fitcol color of the fitted curve
 #' @param fitlty line type of the fitted curve
@@ -33,12 +33,12 @@
 #' @param cicol color of the 95 \% credible interval limits
 #' @param cilty line type for the 95 \% credible interval limits
 #' @param cilwd width of the 95 \% credible interval limits
-#' @param ribcol color of the ribbon between the lower and upper credible limits.
+#' @param ribcol color of the ribbon between lower and upper credible limits.
 #' Transparent if \code{NULL}
-#' @param adddata if \code{TRUE}, adds the observed data with confidence interval
+#' @param adddata if \code{TRUE}, adds the observed data with confidence intervals
 #' to the plot
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
-#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log scale
+#' @param log.scale if \code{TRUE}, displays \eqn{X}-axis in log-scale
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods
 #' @note When \code{style = "ggplot"}, the function calls function

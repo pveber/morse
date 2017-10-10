@@ -1,8 +1,8 @@
 #' Plotting method for \code{survFit} objects
 #'
 #' This is the generic \code{plot} S3 method for the
-#' \code{survFit}.  It plots the fits obtained for each
-#' concentration of pollutant in the original dataset.
+#' \code{survFit}.  It plots the fit obtained for each
+#' concentration of chemical compound in the original dataset.
 #'
 #' The fitted curves represent the \strong{estimated survival rate} as a function
 #' of time for each concentration.
@@ -10,28 +10,30 @@
 #' rate} at each time point. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
-#' The function plots both 95 \% credible intervals for the estimated survival
-#' rate (by default the grey area around the fitted curve) and 95 \% confidence
+#' The function plots both 95\% credible intervals for the estimated survival
+#' rate (by default the grey area around the fitted curve) and 95\%  binomial confidence
 #' intervals for the observed survival rate (as black error bars if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
-#' a good fit is expected to display a large overlap between the two intervals.
-#' It consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
+#' a good fit is expected to display a large overlap between the two types of intervals.
+#' If \code{spaghetti = TRUE}, the credible intervals are represented by two
+#' dotted lines limiting the credible band, and a spaghetti plot is added to this band.
+#' This spaghetti plot consists of the representation of simulated curves using parameter values
+#' sampled in the posterior distribution (2\% of the MCMC chains are randomly
 #' taken for this sample).
 #'
 #' @param x An object of class \code{survFit}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
-#' @param concentration A numeric value corresponding to some concentration in
+#' @param concentration A numeric value corresponding to some specific concentrations in
 #' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration.
 #' @param spaghetti if \code{TRUE}, draws a set of survival curves using
 #' parameters drawn from the posterior distribution
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
-#' one plot instead of one per concentration.
+#' one plot instead of one plot per concentration.
 #' @param adddata if \code{TRUE}, adds the observed data to the plot
-#' with (frequentist) confidence intervals
+#' with (frequentist binomial) confidence intervals
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot.
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param \dots Further arguments to be passed to generic methods.

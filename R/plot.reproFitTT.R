@@ -1,44 +1,43 @@
 #' Plotting method for \code{reproFitTT} objects
 #' 
 #' This is the generic \code{plot} S3 method for the \code{reproFitTT} class.
-#' It plots exposure-response fits for target time reproduction
+#' It plots the concentration-effect fit under target time reproduction
 #' analysis.
 #' 
-#' The fitted curve represents the \strong{estimated reproduction rate} after
-#' the target time has passed as a function of the concentration of pollutant.
-#' The function plots 95 \% credible intervals for the estimated reproduction
-#' rate (by default the grey area around the fitted curve).
-#' Both types of intervals are taken at the same level. Typically
-#' a good fit is expected to display a large overlap between the two intervals.
+#' The fitted curve represents the \strong{estimated reproduction rate} at the target time
+#'  as a function of the chemical compound concentration.
+#' The function plots 95\% credible intervals for the estimated reproduction
+#' rate (by default the grey area around the fitted curve). Typically
+#' a good fit is expected to display a large overlap between the two types of intervals.
 #' If spaghetti = TRUE, the credible intervals are represented by two dotted
 #' lines limiting the credible band, and a spaghetti plot is added to this band.
 #' It consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (10 \% of the MCMC chains are randomly
+#' sampled in the posterior distribution (10\% of the MCMC chains are randomly
 #' taken for this sample).
 #'
 #' @param x an object of class \code{reproFitTT}
-#' @param xlab a title for the \eqn{x}-label
-#' @param ylab a title for the \eqn{y}-label
+#' @param xlab a label for the \eqn{X}-axis, by default \code{Concentration}
+#' @param ylab a label for the \eqn{Y}-axis, by default \code{Nb of offspring per ind/day}
 #' @param main main title for the plot
-#' @param fitcol color used for the fitted curve
-#' @param fitlty line type for the fitted curve
+#' @param fitcol color of the fitted curve
+#' @param fitlty line type of the fitted curve
 #' @param fitlwd width of the fitted curve
 #' @param spaghetti if \code{TRUE}, the credible interval is represented by 
 #' multiple curves
-#' @param cicol color for the 95 \% credible limits of the fitted curve
-#' @param cilty line type for the 95 \% credible limits of the fitted curve
-#' @param cilwd width of the 95 \% credible limits of the fitted curve
-#' @param ribcol color of the ribbon between the lower and upper credible limits.
+#' @param cicol color of the 95 \% credible limits
+#' @param cilty line type of the 95 \% credible limits
+#' @param cilwd width of the 95 \% credible limits
+#' @param ribcol color of the ribbon between lower and upper credible limits.
 #' Transparent if \code{NULL}
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
-#' @param log.scale if \code{TRUE}, displays \eqn{x}-axis in log-scale
+#' @param log.scale if \code{TRUE}, displays \eqn{X}-axis in log-scale
 #' @param style graphical backend, can be \code{'ggplot'} or \code{'generic'}
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @note When \code{style = "generic"}, the function calls the generic function
 #' \code{\link[graphics]{plot}}
 #' @note When \code{style = "ggplot"}, the function return an object of class
-#'  \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}} 
+#'  \code{ggplot}, see function \code{\link[ggplot2]{ggplot}} 
 #'
 #' 
 #' @import ggplot2
@@ -57,24 +56,24 @@
 #' data(cadmium1)
 #'
 #' # (2) Create an object of class "reproData"
-#' dat <- reproData(cadmium1)
+#' dataset <- reproData(cadmium1)
 #'
 #' \dontrun{
-#' # (3) Run the reproFitTT function with the log-logistic gamma-poisson model
-#' out <- reproFitTT(dat, stoc.part = "gammapoisson",
+#' # (3) Run the reproFitTT function with the log-logistic gamma-Poisson model
+#' out <- reproFitTT(dataset, stoc.part = "gammapoisson",
 #'                   ecx = c(5, 10, 15, 20, 30, 50, 80), quiet = TRUE)
 #'
 #'
 #' # (4) Plot the fitted curve with generic style
 #' plot(out, xlab = expression("Concentration in" ~ mu~g.L^{-1}),
-#'      fitcol = "blue", cicol = "blue",
+#'      fitcol = "blue", cicol = "lightblue",
 #'      main = "Log-logistic response to concentration")
 #' }
 #' 
 #' @export
 plot.reproFitTT <- function(x,
                             xlab = "Concentration",
-                            ylab = "Nb of offspring per ind.day",
+                            ylab = "Nb of offspring per ind/day",
                             main = NULL,
                             fitcol = "orange",
                             fitlty = 1,

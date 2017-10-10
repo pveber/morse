@@ -4,13 +4,14 @@
 #' It plots the number of survivors as a function of time.
 #'
 #' @param x an object of class \code{survDataVarExp}
-#' @param xlab a title for the \eqn{x}-axis (optional)
-#' @param ylab a label for the \eqn{y}-axis
+#' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
+#' @param ylab a label for the \eqn{Y}-axis, by default \code{Number of survivors}
 #' @param main main title for the plot
-#' @param facetting a logical value to use facetting on replicate
-#' @param facetting_level a vector of character
+#' @param one.plot if \code{TRUE}, draws all the estimated curves in
+#' one plot instead of one per \code{replicate}
+#' @param facetting_level a vector of \code{characters} to rank \code{replicates} in the multi plot (i.e. \code{one.plot == FALSE})
 #'
-#' @return an object of class \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}}
+#' @return an object of class \code{ggplot}, see function \code{\link[ggplot2]{ggplot}}
 #'
 #' @keywords plot
 #'
