@@ -1,12 +1,13 @@
-#' Predict Lethal Concentration for x\% of the population at time 
-#' \code{time_LCx} for \code{survFit} object
-#' 
+#' Predict \eqn{x}\% Lethal Concentration at the maximum time point (default)
+#' for a \code{survFit} object.
 #' 
 #' @param object An object of class \code{survFit}
-#' @param X Percentage of population dying: 50 for LC50, 10 for LC10, ...
-#' @param time_LCx A number giving the time at which LCx has to be applied. If NULL, latest time of experiment is used.
-#' @param conc_range A vector of length 2 with minimal and maximal value of the range of concentration. If NULL, range is
-#' define between 0 and the maximal concentration used in the experiment.
+#' @param X Percentage of individuals dying (e.g., \eqn{50} for \eqn{LC_{50}}, \eqn{10} for \eqn{LC_{10}}, ...)
+#' @param time_LCx A number giving the time at which  \eqn{LC_{x}} has to be estimated. 
+#' If NULL, the latest time point of the experiment is used.
+#' @param conc_range A vector of length 2 with minimal and maximal value of the 
+#' range of concentration. If NULL, the range is
+#' define between 0 and the highest tested concentration of the experiment.
 #' 
 #' @examples 
 #' 
@@ -14,14 +15,15 @@
 #' data("propiconazole")
 #' 
 #' # (2) Create an object of class 'survData'
-#' dat <- survData("propiconazole")
+#' dataset <- survData("propiconazole")
 #' 
-#' ## Not run
+#' \dontrun{
 #' # (3) Run the survFit function with model_type SD (or IT)
-#' out_SD <- survFit(dat, model_type = "SD")
+#' out_SD <- survFit(dataset, model_type = "SD")
 #' 
 #' # (4) estimate LC50 at time 4
 #' LCx(out_SD, X = 50, time_LCx = 4)
+#' }
 #' 
 #' @import zoo
 #' 
