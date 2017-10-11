@@ -19,7 +19,7 @@
 #' If \code{spaghetti = TRUE}, the credible intervals are represented by two
 #' dotted lines limiting the credible band, and a spaghetti plot is added to this band.
 #' This spaghetti plot consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (2\% of the MCMC chains are randomly
+#' sampled in the posterior distribution (10\% of the MCMC chains are randomly
 #' taken for this sample).
 #'
 #' @param x An object of class \code{survFit}.
@@ -33,7 +33,7 @@
 #' @param adddata if \code{TRUE}, adds the observed data to the plot
 #' with (frequentist binomial) confidence intervals.
 #' @param mcmc_size A numerical value refering by default to the size of the mcmc in object \code{survFit}.
-#'  This option is specific to \code{survFitVarCst} objects for which computing time may be long.
+#'  This option is specific to \code{survFitVarExp} objects for which computing time may be long.
 #'  \code{mcmc_size} can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation.
 #'  
