@@ -50,11 +50,11 @@
 #' data(propiconazole)
 #'
 #' # (2) Create an object of class "survData"
-#' dat <- survData(propiconazole)
+#' dataset  <- survData(propiconazole)
 #'
 #' \dontrun{
-#' # (3) Run the survFit function
-#' out <- survFit(dat, model_type = "SD")
+#' # (3) Run the survFit function with TK-TD model 'SD' or 'IT' 
+#' out <- survFit(dataset , model_type = "SD")
 #'
 #' # (4) Summary look the estimated values (parameters)
 #' summary(out)

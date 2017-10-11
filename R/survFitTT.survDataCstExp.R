@@ -3,7 +3,7 @@
 #' This function estimates the parameters of an exposure-response
 #' model for target-time survival analysis using Bayesian inference. In this model,
 #' the survival rate of individuals after some time (called target time) is modeled
-#' as a function of the pollutant's concentration. The actual number of
+#' as a function of the chemical compound concentration. The actual number of
 #' surviving individuals is then modeled as a stochastic function of the survival
 #' rate. Details of the model are presented in the
 #' vignette accompanying the package.
