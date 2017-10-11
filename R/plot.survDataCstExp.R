@@ -4,16 +4,16 @@
 #' It plots the number of survivors as a function of time.
 #'
 #' @param x an object of class \code{survData}
-#' @param xlab a title for the \eqn{x}-axis (optional)
-#' @param ylab a label for the \eqn{y}-axis
+#' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
+#' @param ylab a label for the \eqn{Y}-axis, by default \code{Number of survivors}
 #' @param main main title for the plot
-#' @param concentration a numeric value corresponding to some concentration in
+#' @param concentration a numeric value corresponding to some concentration(s) in
 #' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param pool.replicate if \code{TRUE}, the datapoints of each replicate are
 #' summed for a same concentration
 #' @param addlegend if \code{TRUE}, adds a default legend to the plot
-#' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
+#' @param remove.someLabels if \code{TRUE}, removes 3/4 of \eqn{X}-axis labels in
 #' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods
 #' 
@@ -30,7 +30,7 @@
 #' # (2) Plot survival data with a ggplot style
 #' plot(zinc)
 #'
-#' # (3) Plot the survival data for a fixed concentration
+#' # (3) Plot the survival data for one specific concentration
 #' plot(zinc, concentration = 0.66)
 #'
 #' @import ggplot2
@@ -42,8 +42,8 @@
 #'
 #' @export
 plot.survDataCstExp <- function(x,
-                                xlab,
-                                ylab = "Number of surviving individuals",
+                                xlab = "Time",
+                                ylab = "Number of survivors",
                                 main = NULL,
                                 concentration = NULL,
                                 style = "ggplot",

@@ -4,8 +4,8 @@
 #' It plots the cumulated number of offspring as a function of time.
 #'
 #' @param x an object of class \code{reproData}
-#' @param xlab a title for the \eqn{x}-axis (optional)
-#' @param ylab a title for the \eqn{y}-axis
+#' @param xlab label of the \eqn{X}-axis
+#' @param ylab label of the \eqn{Y}-axis, by default \code{Cumulated Number of offspring}
 #' @param main main title for the plot
 #' @param concentration a numeric value corresponding to some concentration in
 #' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration
@@ -27,12 +27,14 @@
 #' @examples
 #' # (1) Load the data
 #' data(cadmium1)
+#' 
+#' # (2) Create an object of class 'reproData'
 #' cadmium1 <- reproData(cadmium1)
 #'
-#' # (2) Plot the reproduction data
+#' # (3) Plot the reproduction data
 #' plot(cadmium1)
 #'
-#' # (3) Plot the reproduction data for a fixed concentration
+#' # (4) Plot the reproduction data for a fixed concentration
 #' plot(cadmium1, concentration = 4.36, style = "generic")
 #'
 #' @import ggplot2

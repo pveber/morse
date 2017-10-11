@@ -1,9 +1,9 @@
-#' Plot Dose-response from raw data
+#' Plot dose-response from raw data
 #' 
-#' Plots the response as a function of the concentration (for a given
-#' target time).
+#' Plots the response of the effect as a function of the concentration at a given
+#' target time.
 #' 
-#' @param x an object used to select a method
+#' @param x an object used to select a method \code{plotDoseRespons}
 #' @param \dots Further arguments to be passed to generic methods
 
 #' @export

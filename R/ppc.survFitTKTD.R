@@ -27,7 +27,7 @@
 #' dat <- survData(propiconazole)
 #'
 #' \dontrun{
-#' # (3) Run the survFitTKTD function with the TKTD model
+#' # (3) Run the survFitTKTD function with the TKTD model ('SD' only)
 #' out <- survFitTKTD(dat)
 #'
 #' # (4) Plot observed versus predicted values

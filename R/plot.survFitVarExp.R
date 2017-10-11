@@ -1,8 +1,8 @@
 #' Plotting method for \code{survFit} objects
 #'
 #' This is the generic \code{plot} S3 method for the
-#' \code{survFit}.  It plots the fits obtained for each
-#' concentration of pollutant in the original dataset.
+#' \code{survFit}.  It plots the fit obtained for each
+#' concentration of chemical compound in the original dataset.
 #'
 #' The fitted curves represent the \strong{estimated survival rate} as a function
 #' of time for each concentration.
@@ -10,14 +10,16 @@
 #' rate} at each time point. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
-#' The function plots both 95 \% credible intervals for the estimated survival
-#' rate (by default the grey area around the fitted curve) and 95 \% confidence
-#' intervals for the observed survival rate (as black error bars if
+#' The function plots both 95\% binomial credible intervals for the estimated survival
+#' rate (by default the grey area around the fitted curve) and 95\% binomial confidence
+#' intervals for the observed survival rate (as black segments if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
-#' a good fit is expected to display a large overlap between the two intervals.
-#' It consists of the representation of simulated curves using parameter values
-#' sampled in the posterior distribution (2 \% of the MCMC chains are randomly
+#' a good fit is expected to display a large overlap between the two types of  intervals.
+#' If \code{spaghetti = TRUE}, the credible intervals are represented by two
+#' dotted lines limiting the credible band, and a spaghetti plot is added to this band.
+#' This spaghetti plot consists of the representation of simulated curves using parameter values
+#' sampled in the posterior distribution (2\% of the MCMC chains are randomly
 #' taken for this sample).
 #'
 #' @param x An object of class \code{survFit}.
@@ -25,20 +27,45 @@
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
 #' @param spaghetti if \code{TRUE}, draws a set of survival curves using
-#' parameters drawn from the posterior distribution.
+#' parameters drawn from the posterior distribution
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
-#' one plot instead of one per concentration.
+#' one plot instead of one plot per concentration.
 #' @param adddata if \code{TRUE}, adds the observed data to the plot
-#' with (frequentist) confidence intervals.
-#' @param mcmc_size A scalar refering to the size of the MCMC used for
-#'  sampling parameters, by default, all the MCMC is used.
+#' with (frequentist binomial) confidence intervals.
+#' @param mcmc_size A numerical value refering by default to the size of the mcmc in object \code{survFit}.
+#'  This option is specific to \code{survFitVarCst} objects for which computing time may be long.
+#'  \code{mcmc_size} can be used to reduce the number of mcmc samples in order to speed up
+#'  the computation.
+#'  
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
+#' 
+#' @examples
 #'
+#' # (1) Load the survival data
+#' data("propiconazole_pulse_exposure")
+#'
+#' # (2) Create an object of class "survData"
+#' dataset <- survData(propiconazole_pulse_exposure)
+#'
+#' \dontrun{
+#' # (3) Run the survFit function
+#' out <- survFit(dataset , model_type = "SD")
+#'
+#' # (4) Summary look the estimated values (parameters)
+#' summary(out)
+#'
+#' # (5) Plot the fitted curve
+#' plot(out, adddata = FALSE)
+#'
+#' # (6) Plot the fitted curve with ggplot style and CI as spaghetti
+#' plot(out, spaghetti = TRUE)
+#' }
+#' 
 #' @export
 #' 
-#'
+#' @importFrom tidyr gather
 #'
 plot.survFitVarExp <- function(x,
                                xlab = "Time",

@@ -25,7 +25,7 @@
 #' dat <- survData(propiconazole_pulse_exposure)
 #'
 #' \dontrun{
-#' # (3) Run the survFitTKTD function with the TKTD model
+#' # (3) Run the survFitTKTD function with the TKTD model ('SD' or 'IT')
 #' out <- survFit(dat, model_type = "SD")
 #'
 #' # (4) Plot observed versus predicted values
@@ -76,7 +76,7 @@ ppc.survFitVarExp <- function(x,
 }
 
 
-#' @param x An object of class \code{survFitVarExp}
+# @param x An object of class \code{survFitVarExp}
 
 posteriorData <- function(x){
   

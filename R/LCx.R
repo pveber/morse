@@ -1,6 +1,6 @@
-#' Predict Lethal Concentration for x\% of the population at time \code{time_LCx} 
+#' Predict \eqn{X}\% Lethal Concentration at the maximum time point (default).
 #' 
-#' Predict median and 95\%CIs of the Lethal Concentration for x\% of the population.
+#' Predict median and 95\% credible interval of the x\% Lethal Concentration.
 #' 
 #' @param object An object used to select a method
 #' @param \dots Further arguments to be passed to generic methods
