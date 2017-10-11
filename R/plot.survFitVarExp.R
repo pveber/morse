@@ -81,6 +81,7 @@ plot.survFitVarExp <- function(x,
   df_predictTotal <- predict(x = x, spaghetti = spaghetti, mcmc_size = mcmc_size)
   
   df_prediction <-  df_predictTotal$df_quantile
+  df_spaghetti <-  df_predictTotal$df_spaghetti
   
   df_observation <- filter(x$original.data, !is.na(Nsurv))
   
@@ -94,14 +95,7 @@ plot.survFitVarExp <- function(x,
       scale_x_continuous(name = xlab) +
       scale_y_continuous(name = ylab,
                          limits = c(0,1)) +
-      theme(legend.position = "top") +
-    # Prediction
-    geom_ribbon(data = df_prediction,
-                aes(x = time, ymin = qinf95,ymax = qsup95, group = replicate),
-                fill = "grey30", alpha = 0.4) +
-    geom_line(data = df_prediction,
-              aes(x = time, y = q50, group = replicate),
-              col="orange", size = 1)
+      theme(legend.position = "top")
   
   # Observation
   if(adddata == TRUE){
@@ -110,15 +104,35 @@ plot.survFitVarExp <- function(x,
                aes(x = time, y = Nsurv/Ninit, group = replicate))
   }
   
-  # # spaghetti
-  # if(spaghetti == TRUE){
-  #   
-  #   df_spaghetti <- predictTotal$df_spaghetti[, 1:1000]
-  #     
-  #   plt <- plt +
-  #     geom_lines(data = df_observation,
-  #                aes(x = time, y = ??? , group = replicate))
-  # }
+  # spaghetti
+  if(spaghetti == TRUE){
+
+    df_spaghetti_gather <- df_spaghetti %>%
+      tidyr::gather(survRate_key, survRate_value, -c(time,conc,replicate))
+
+    plt <- plt +
+      geom_line(data = df_spaghetti_gather,
+                aes(x = time, y = survRate_value, group = interaction(survRate_key, replicate)),
+                alpha = 0.02) +
+      geom_line(data = df_prediction,
+                aes(x = time, y= qinf95, group = replicate),
+                color = "orange", linetype = 2) +
+      geom_line(data = df_prediction,
+                aes(x = time, y = qsup95, group = replicate),
+                color = "orange", linetype = 2)
+  }
+  if(spaghetti != TRUE){
+    plt <- plt + 
+      geom_ribbon(data = df_prediction,
+                  aes(x = time, ymin = qinf95,ymax = qsup95, group = replicate),
+                  fill = "grey30", alpha = 0.4)
+  }
+  
+  # Prediction
+  plt <- plt +
+    geom_line(data = df_prediction,
+              aes(x = time, y = q50, group = replicate),
+              col="orange", size = 1)
     
   # facetting
   if(one.plot == FALSE){
