@@ -7,13 +7,13 @@
 #' survival analysis can be used with \code{reproData} objects.
 #'
 #' The \code{x} argument contains the experimental data, and should have
-#' the same structure that the argument of \code{survData}, plus a single
-#' additional colum providing the total number of offspring observed since the
+#' the same structure than the argument of \code{survData}, plus a single
+#' additional column providing the total number of offspring observed since the
 #' last time point. The function fails if \code{x} does not meet the
 #' expected requirements. Please run \code{\link{reproDataCheck}} to ensure
 #' \code{x} is well-formed.
 #'
-#' Note that experimental data with variable exposure is not supported.
+#' Note that experimental data with time-variable exposure are not supported.
 #'
 #' @aliases reproData
 #'
