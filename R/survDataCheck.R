@@ -10,13 +10,13 @@
 #' @param data any object
 #' @param diagnosis.plot if \code{TRUE}, the function may produce diagnosis plots
 #'
-#' @return The function returns a dataframe with two columns \code{id} and \code{msg} of
-#' character strings. When no error is detected this dataframe is empty.
-#' Here is the list of possible error \code{id}s and their signification:
+#' @return The function returns a dataframe of class \code{msgTable} and \code{data.frame} with two columns: \code{id} and \code{msg} of
+#' character strings. When no error is detected the object is empty.
+#' Here is the list of possible error \code{id}s with their meaning:
 #' \tabular{rl}{
 #' \code{dataframeExpected} \tab an object of class \code{data.frame} is expected \cr
 #' \code{missingColumn} \tab at least one expected column heading is missing \cr
-#' \code{firstTime0} \tab the first time point for some (concentration, replicate) is not 0 \cr
+#' \code{firstTime0} \tab the first time point for some (concentration, replicate) couples is not 0 \cr
 #' \code{concNumeric} \tab column \code{conc} contains a value of class other than \code{numeric} \cr
 #' \code{timeNumeric} \tab column \code{time} contains a value of class other than \code{numeric} \cr
 #' \code{NsurvInteger} \tab column \code{Nsurv} contains a value of class other than \code{integer} \cr
@@ -24,7 +24,7 @@
 #' \code{Nsurv0T0} \tab \code{Nsurv} is 0 at time 0 for some (concentration, replicate) \cr
 #' \code{duplicateID} \tab there are two identical (\code{replicate}, \code{conc}, \code{time}) triplets \cr
 #' \code{NsurvIncrease} \tab \code{Nsurv} increases at some time point of some (concentration, replicate) \cr
-#' \code{maxTimeDiffer} \tab maximum time for concentration is lower than maximum time in for survival \cr
+#' \code{maxTimeDiffer} \tab maximum time for concentration is lower than maximum time for survival \cr
 #' }
 #'
 #' @note If an error of type \code{dataframeExpected} or \code{missingColumn} is
@@ -39,8 +39,8 @@
 #' survDataCheck(zinc)
 #'
 #' # Now we insert an error in the dataset, by artificially increasing the
-#' # number of survivors at some time point, in such a way that the number
-#' # of indivuals increases in some replicate
+#' # number of survivors at a given time point, in such a way that the number
+#' # of indivuals increases in the corresponding replicate
 #' zinc[25, "Nsurv"] <- as.integer(20)
 #' survDataCheck(zinc, diagnosis.plot = TRUE)
 #'

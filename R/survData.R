@@ -5,17 +5,17 @@
 #' can then be used for plotting and model fitting. It can also be used
 #' to generate \emph{individual-time} estimates.
 #'
-#' Survival datasets can be in either constant or variable exposure. The
+#' Survival datasets can be under either constant or time-variable exposure profile. The
 #' resulting object, in addition to its \code{survData} class, inherits the
 #' class \code{survDataCstExp} or \code{survDataVarExp} respectively.
 #'
 #' The \code{x} argument describes experimental results from a survival
-#' assay. Each line of the \code{data.frame}
+#' toxicity test. Each line of the \code{data.frame}
 #' corresponds to one experimental measurement, that is a number of alive
-#' individuals for a given concentration of pollutant at a certain time
-#' during the assay in a certain replicate. Note that either the concentration
+#' individuals at a given concentration at a given time point and in a given replicate.
+#'  Note that either the concentration
 #' or the number of alive individuals may be missing. The dataset is inferred
-#' to be in constant exposure if the concentration is constant for each
+#' to be under constant exposure if the concentration is constant for each
 #' replicate and systematically available. The function \code{survData} fails if
 #' \code{x} does not meet the
 #' expected requirements. Please run \code{\link{survDataCheck}} to ensure
@@ -23,12 +23,12 @@
 #'
 #' @param x a \code{data.frame} containing the following four columns:
 #' \itemize{
-#' \item \code{replicate}: a vector of class \code{integer} or factor for replicate
+#' \item \code{replicate}: a vector of class \code{integer} or \code{factor} for replicate
 #' identification. A given replicate value should identify the same group of
 #' individuals followed in time
 #' \item \code{conc}: a vector of class \code{numeric} with tested concentrations
 #' (positive values, may contain NAs)
-#' \item \code{time}: a vector of class \code{integer} with time points, min value must be 0
+#' \item \code{time}: a vector of class \code{integer} with time points, minimal value must be 0
 #' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
 #' alive individuals at each time point for each concentration and each replicate
 #' (may contain NAs)
@@ -75,20 +75,21 @@ survData <- function(x) {
 
 
 #' Test in a well-formed argument to function 'survData' if the concentration
-#' is constant and different from NA for each replicate (each time-serie)
+#' is constant and different from \code{NA} for each replicate (each time-serie)
 #'
-#' @param x a data.frame
+#' @param x an object of class \code{data.frame}
 #' @return a boolean \code{TRUE} if concentration in \code{replicate} is constant,
-#'  or \code{FALSE} if the concentration in at least one of the replicates is variable.
+#'  or \code{FALSE} if the concentration in at least one of the replicates is time-variable,
+#'  and/or if \code{NA} occures. 
 #'
 #' @examples
 #'
-#' # (1) Load the survival dataset and test if concentration in replicates are constant
+#' # (1) Load the survival dataset and test if concentration in replicates is constant
 #' data("propiconazole")
 #' is_exposure_constant(propiconazole)
 #' is_exposure_constant(survData(propiconazole))
 #'
-#'  # (1) Load the survival dataset and test if concentration in replicates are constant
+#'  # (1) Load the survival dataset and test if concentration in replicates is constant
 #' data("propiconazole_pulse_exposure") 
 #' is_exposure_constant(propiconazole_pulse_exposure)
 #' 
@@ -144,7 +145,8 @@ Ninit <- function(x) {
 }
 
 
-#' Joins a concentration with a survival datasets into an argument for 'survData'
+#' Joins a concentration with a survival dataset into an argument for 'survData'
+#' when the concentration varies over time
 #'
 #' This function joins two datasets, one for exposure measurements, the other
 #' for survival measurements, into a single dataframe that can be used
@@ -156,7 +158,7 @@ Ninit <- function(x) {
 #' identification
 #' \item \code{time}: a vector of class \code{integer} with time points, min value must be 0
 #' \item \code{Nsurv}: a vector of class \code{integer} providing the number of
-#' alive individuals at some or all time point for each replicate
+#' alive individuals at some or all time points for each replicate
 #' }
 #' @param y a \code{data.frame} containing the following three columns:
 #' \itemize{
@@ -164,14 +166,14 @@ Ninit <- function(x) {
 #' identification
 #' \item \code{time}: a vector of class \code{integer} with time points, min value must be 0
 #' \item \code{conc}: a vector of class \code{numeric} providing the concentration
-#'  at some or all time point for each replicate
+#'  at some or all time points for each replicate
 #' }
-#'#'
+#' 
 #' @return a dataframe suitable for `survData`
 #'
 #' @examples
 #'
-#' # (1) Load the two survival dataset
+#' # (1) Load the two survival datasets
 #' data(propiconazole_pulse_exposure)
 #' exposure <- propiconazole_pulse_exposure[,c("replicate", "time", "conc")]
 #' survival <- propiconazole_pulse_exposure[,c("replicate", "time", "Nsurv")]
