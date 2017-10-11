@@ -261,23 +261,23 @@ NULL
 
 
 #' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
-#' during 4 days
+#' during four days
 #'
 #' Survival datasets of chronic laboratory toxicity tests with
 #' \emph{Gammarus pulex} freshwater invertebrate exposed to eight concentrations
-#' of one fungicide (propiconazole) during 4 days. Height
+#' of one fungicide (propiconazole) during four days. Eight
 #' concentrations were tested with two replicates of 10 organisms per concentration.
-#' Survival is monitored at 5 time points.
+#' Survival is monitored at five time points.
 #'
 #'
 #' @name propiconazole
 #' @docType data
 #' @usage data(propiconazole)
-#' @format A data frame with 75 observations on the following four variables:
+#' @format A dataframe with 75 observations on the following four variables:
 #' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
-#' replicate code (\code{SC} for the control and \code{A1} to \code{G2}).}
+#' replicate code (\code{SC} for the control and \code{A1} to \code{G2} for other profiles).}
 #' \item{\code{conc}}{A vector of class \code{numeric} with propiconazole
-#' concentrations in \eqn{mg.L^{-1}}.}
+#' concentrations in \eqn{\mu mol.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
 #' (in days from the beginning of the experiment \eqn{t = 0}).}
 #' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
@@ -293,12 +293,12 @@ NULL
 
 
 #' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
-#' during 10 days with time variable
-#' exposure concentration (non-standard pulsed toxicity experiment)
+#' during 10 days with time-variable
+#' exposure concentration (non-standard pulsed toxicity experiments)
 #'
 #' Survival datasets of laboratory toxicity tests with \emph{Gammarus pulex}
-#' freshwater invertebrate exposed to several profiles of concentrations
-#' (time varying concnetration for each time series)
+#' freshwater invertebrates exposed to several profiles of concentrations
+#' (time-variable concentration for each time series)
 #' of one fungicide (propiconazole) during 10 days.
 #'
 #' @name propiconazole_pulse_exposure
@@ -308,7 +308,7 @@ NULL
 #' \describe{ \item{\code{replicate}}{A vector of class \code{factor} with the
 #' replicate code (\code{varControl}, \code{varA}, \code{varB} and \code{varC}).}
 #' \item{\code{conc}}{A vector of class \code{numeric} with propiconazole
-#' concentrations in \eqn{mg.L^{-1}}.}
+#' concentrations in \eqn{\mu mol.L^{-1}}.}
 #' \item{\code{time}}{A vector of class \code{integer} with the time points
 #' (in days from the beginning of the experiment \eqn{t = 0}).}
 #' \item{\code{Nsurv}}{A vector of class \code{integer} with the number of
