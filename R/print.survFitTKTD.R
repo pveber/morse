@@ -11,7 +11,7 @@
 #' # (1) Load the data
 #' data(propiconazole)
 #' 
-#' # (2) Create a survData object
+#' # (2) Create an object of class 'survData'
 #' dat <- survData(propiconazole)
 #' 
 #' \dontrun{

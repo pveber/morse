@@ -11,7 +11,7 @@
 #' # (1) Load the data
 #' data(cadmium1)
 #' 
-#' # (2) Create a survData object
+#' # (2) Create an object of class 'survData'
 #' cadmium1 <- survData(cadmium1)
 #' 
 #' \dontrun{
@@ -21,7 +21,7 @@
 #'                  quiet = TRUE)
 #' 
 #' # (4) Print the survFitTT object
-#' out
+#' print(out)
 #' }
 #' 
 #' @keywords print

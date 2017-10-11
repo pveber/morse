@@ -11,7 +11,7 @@
 #' # (1) Load the data
 #' data(cadmium1)
 #' 
-#' # (2) Create a reproData object
+#' # (2) Create an object of class 'reproData'
 #' cadmium1 <- reproData(cadmium1)
 #' 
 #' \dontrun{
@@ -21,7 +21,7 @@
 #' quiet = TRUE)
 #' 
 #' # (4) Print the reproFitTT object
-#' out
+#' print(out)
 #' }
 #' 
 #' @keywords print
