@@ -1,17 +1,17 @@
-#' Summary for \code{reproFitTT} objects
+#' Summary of \code{reproFitTT} object
 #'
 #' This is the generic \code{summary} S3 method for the \code{reproFitTT} class.
 #' It shows the quantiles of priors and posteriors on parameters
-#' and the quantiles of the posterior on the ECx.
+#' and the quantiles of the posterior on the ECx estimates.
 #'
 #' @param object an object of class \code{reproFitTT}
-#' @param quiet when \code{FALSE}, prints summary on standard output
+#' @param quiet when \code{TRUE}, does not print
 #' @param \dots Further arguments to be passed to generic methods
 #'
-#' @return The function returns a list with the following fields:
-#' \item{Qpriors}{quantiles for the model's prior}
-#' \item{Qposteriors}{quantiles for the model's posteriors}
-#' \item{QECx}{quantiles for ECx values}
+#' @return The function returns a list with the following information:
+#' \item{Qpriors}{quantiles of the model priors}
+#' \item{Qposteriors}{quantiles of the model posteriors}
+#' \item{QECx}{quantiles of ECx estimates}
 #'
 #' @examples
 #' # (1) Load the data

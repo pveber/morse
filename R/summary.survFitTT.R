@@ -1,17 +1,17 @@
-#' Summary for \code{survFitTT} objects
+#' Summary of \code{survFitTT} object
 #'
 #' This is the generic \code{summary} S3 method for the \code{survFitTT} class.
 #' It shows the quantiles of priors and posteriors on parameters and the quantiles
-#' of the posterior on the LCx.
+#' of the posteriors on the LCx estimates.
 #'
 #' @param object an object of class \code{survFitTT}
-#' @param quiet when \code{FALSE}, prints summary on standard output
+#' @param quiet when \code{TRUE}, does not print
 #' @param \dots Further arguments to be passed to generic methods
 #'
-#' @return The function returns a list with the following fields:
-#' \item{Qpriors}{quantiles for the model's prior}
-#' \item{Qposteriors}{quantiles for the model's posteriors}
-#' \item{QLCx}{quantiles for LCx values}
+#' @return The function returns a list with the following information:
+#' \item{Qpriors}{quantiles of the model priors}
+#' \item{Qposteriors}{quantiles of the model posteriors}
+#' \item{QLCx}{quantiles of LCx estimates}
 #'
 #' @examples
 #' # (1) Load the data
