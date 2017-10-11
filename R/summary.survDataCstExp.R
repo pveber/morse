@@ -1,15 +1,15 @@
-#' Summary for \code{survDataCstExp} objects
+#' Summary of \code{survDataCstExp} object
 #' 
 #' The generic \code{summary} S3 method for the \code{survDataCstExp} class provides
 #' information about the structure of the dataset and the experimental design.
 #' 
 #' @param object an object of class \code{survDataCstExp}
-#' @param quiet when \code{FALSE}, prints summary on standard output
+#' @param quiet when \code{TRUE}, does not print
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @return The function returns a list with the following fields:
+#' @return The function returns a list with the following information:
 #' \item{NbrepTimeConc}{nb of replicates for all concentrations and time points}
-#' \item{NbsurvTimeConc}{nb of surviving ind. for all concentrations and time points}
+#' \item{NbsurvTimeConc}{nb of survivors. for all concentrations and time points}
 #' 
 #' @examples
 #' # (1) Load the data

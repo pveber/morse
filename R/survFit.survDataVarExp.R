@@ -46,7 +46,30 @@
 #' \item{jags.data}{a list a the data passed to the jags model}
 #'
 #' @keywords estimation
-#
+#' 
+#' 
+#' @examples
+#'
+#' # (1) Load the survival data
+#' data("propiconazole_pulse_exposure")
+#'
+#' # (2) Create an object of class "survData"
+#' dataset <- survData(propiconazole_pulse_exposure)
+#'
+#' \dontrun{
+#' # (3) Run the survFit function with TK-TD model 'SD' or 'IT' 
+#' out <- survFit(dataset , model_type = "SD")
+#'
+#' # (4) Summary look the estimated values (parameters)
+#' summary(out)
+#'
+#' # (5) Plot the fitted curve
+#' plot(out, adddata = FALSE)
+#'
+#' # (6) Plot the fitted curve with ggplot style and CI as spaghetti
+#' plot(out, spaghetti = TRUE)
+#' }
+#' 
 #' @export
 #' @import rjags
 #'

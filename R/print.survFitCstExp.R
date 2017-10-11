@@ -1,21 +1,21 @@
 #' Print of \code{survFit} object
 #' 
-#' This is the generic \code{print} S3 method for the \code{survFit} class.
+#' This is the generic \code{print} S3 method for the \code{survFitCstExp} class.
 #' It prints the underlying JAGS model and some information on the Bayesian 
 #' inference procedure.
 #' 
-#' @param x An object of class \code{survFit}
+#' @param x An object of class \code{survFitCstExp}
 #' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @examples
 #' # (1) Load the data
 #' data(propiconazole)
 #' 
-#' # (2) Create a survData object
+#' # (2) Create an object of class 'survData'
 #' dat <- survData(propiconazole)
 #' 
 #' \dontrun{
-#' # (3) Run the survFit function
+#' # (3) Run the survFit function with TK-TD model 'SD' or 'IT' 
 #' out <- survFit(dat, quiet = TRUE, model_type="SD")
 #' 
 #' # (4) Print the survFit object
@@ -25,7 +25,7 @@
 #' @keywords print
 #' 
 #' @export
-print.survFit <- function(x, ...) {
+print.survFitCstExp <- function(x, ...) {
   # print the model text and the Jags Computing information
   # for an object of class survFit
   

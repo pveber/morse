@@ -184,11 +184,11 @@ survTKTDPARAMS <- function(mcmc) {
 #' data(propiconazole)
 #'
 #' # (2) Create an object of class "survData"
-#' dat <- survData(propiconazole)
+#' dataset <- survData(propiconazole)
 #'
 #' \dontrun{
 #' # (3) Run the survFitTKTD function
-#' out <- survFitTKTD(dat)
+#' out <- survFitTKTD(dataset)
 #'
 #' # (4) Summary look the estimated values (parameters)
 #' summary(out)

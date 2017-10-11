@@ -14,11 +14,11 @@
 #' data(propiconazole_pulse_exposure)
 #' 
 #' # (2) Create a survData object
-#' dat <- survData(propiconazole_pulse_exposure)
+#' dataset <- survData(propiconazole_pulse_exposure)
 #' 
 #' \dontrun{
-#' # (3) Run the survFit function
-#' out <- survFit(dat, model_type="SD")
+#' # (3) Run the survFit function with TK-TD model 'SD' or 'IT' 
+#' out <- survFit(dataset, model_type="SD")
 #' 
 #' # (4) Print the survFit object
 #' print(out)
@@ -32,15 +32,14 @@ print.survFitVarExp <- function(x, ...) {
   mcmcInfo = x$mcmcInfo
   
   # M.C.M.C. informations
-  nbr.thin = mcmc_info$nbr.thin
+  nbr.thin = mcmcInfo$nbr.thin
   mcmc_info =
-    cat("Model:\n")
+  cat("Model:\n")
   print(x$model)
   cat("\nComputing information:\n\n")
-  cat("\n", "Number of iterations per chain = ", mcmcInfo$nbr.iter, "\n")
-  cat("Thinning interval =", mcmcInfo$nbr.thin, "\n")
-  cat("Number of chains =", mcmcInfo$nbr.chains, "\n")
-  cat("Number iterations in warmup per chain =", mcmcInfo$nbr.warmups, "\n")
-  cat("Total time computing (specific of computer) =", mcmcInfo$total_time, "\n")
-  cat("Sample size per chain =", mcmcInfo$nbr.iter / mcmcInfo$nbr.thin , "\n")
+  cat("Number of iterations per chain = ", mcmcInfo$nbr.iter, "\n")
+  cat("Thinning interval =", mcmcInfo$thin.interval, "\n")
+  cat("Number of chains =", mcmcInfo$nbr.chain, "\n")
+  cat("Number iterations in warmup per chain =", mcmcInfo$nbr.warmup, "\n")
+  cat("Sample size per chain =", mcmcInfo$nbr.iter / mcmcInfo$thin.interval , "\n")
 }

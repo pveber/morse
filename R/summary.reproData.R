@@ -1,14 +1,14 @@
-#' Summary for \code{reproData} objects
+#' Summary of \code{reproData} object
 #' 
 #' This is the generic \code{summary} S3 method for the \code{reproData} class.
 #' It provides information about the structure of the dataset and the experimental
 #' design.
 #' 
 #' @param object an object of class \code{reproData}
-#' @param quiet if \code{TRUE}, does no prints
+#' @param quiet if \code{TRUE}, does not print
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @return The function returns a list with the same fields than 
+#' @return The function returns a list with the same information than 
 #' \code{\link{summary.survData}} plus an additional one:
 #' \item{NboffTimeConc}{nb of offspring for all concentrations and time points}
 #' 

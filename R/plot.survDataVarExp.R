@@ -7,8 +7,7 @@
 #' @param xlab a label for the \eqn{X}-axis, by default \code{Time}
 #' @param ylab a label for the \eqn{Y}-axis, by default \code{Number of survivors}
 #' @param main main title for the plot
-#' @param one.plot if \code{TRUE}, draws all the estimated curves in
-#' one plot instead of one per \code{replicate}
+#' @param one.plot if \code{TRUE}, draws all the points in one plot instead of one per \code{replicate}
 #' @param facetting_level a vector of \code{characters} to rank \code{replicates} in the multi plot (i.e. \code{one.plot == FALSE})
 #'
 #' @return an object of class \code{ggplot}, see function \code{\link[ggplot2]{ggplot}}
@@ -23,14 +22,14 @@
 #' @export
 
 
-plot.survDataVarExp <- function(data,
+plot.survDataVarExp <- function(x,
                                 xlab = "Time",
                                 ylab = "Number of survivors",
                                 main = NULL,
-                                facetting = TRUE,
+                                one.plot = FALSE,
                                 facetting_level = NULL){
   
-  data_plt = filter( data , !is.na(Nsurv))
+  data_plt = filter( x , !is.na(Nsurv))
   
   if(!is.null(facetting_level)){
     data_plt$replicate = factor(data_plt$replicate, levels = facetting_level)
@@ -66,11 +65,11 @@ plot.survDataVarExp <- function(data,
     geom_point() +
     geom_line()
   
-  if(facetting == TRUE){
-    plt = plt + facet_wrap(~ replicate, ncol = 2)
-  } else if(facetting != TRUE){
+  if(one.plot == FALSE){
+    plt <- plt + facet_wrap(~ replicate, ncol = 2)
+  } else if(one.plot == TRUE){
     plt
-  } else stop("'facetting' is a logical 'TRUE' or 'FALSE'.")
+  } else stop("'one.plot' is a logical 'TRUE' or 'FALSE'.")
   
   return(plt)
 }
