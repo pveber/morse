@@ -9,7 +9,6 @@
 #'  class \code{survFit} used for fitting.
 #' @param spaghetti If \code{TRUE}, return a set of survival curves using
 #' parameters drawn from the posterior distribution.
-#' @param mcmc_size A numerical value refering by default to the size of the mcmc in object \code{survFit}.
 #'  \code{mcmc_size} can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation.
 #' 
@@ -28,7 +27,7 @@
 #' # (4) Create a new data table for prediction
 #' data_4prediction <- data.frame(time = 1:10, conc = c(0,5,30,30,0,0,5,30,15,0), replicate= rep("predict", 10))
 #'
-#' # (5) Predict on a new data set
+#' # (5) Predict on a new dataset
 #' predict_out <- predict(x = out, data_predict = data_4prediction, spaghetti = TRUE)
 #'
 #' }

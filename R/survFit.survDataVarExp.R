@@ -1,12 +1,21 @@
 #' Fits a TKTD model for survival analysis using Bayesian inference for \code{survDataVarExp} object
 #'
-#' This function estimates the parameters of a TKTD
+#' This function estimates the parameters of a TKTD ('SD' or 'IT')
 #' model for survival analysis using Bayesian inference. In this model,
-#' the survival rate of individuals is modeled as a function of the pollutant's
-#' concentration with a mechanistic description of toxic effects on survival over
+#' the survival rate of individuals is modeled as a function of the chemical compound
+#' concentration with a mechanistic description of the effects on survival over
 #' time.
 #'
-#' Details of the model are presented in the vignette accompanying the package.
+#' The function \code{survFit} return the parameter estimates of Toxicokinetic-toxicodynamic (TK-TD) models
+#' \code{SD} for 'Stochastic Death' or \code{IT} fo 'Individual Tolerance'.
+#' TK-TD models, and particularly the General Unified Threshold model of
+#' Survival (GUTS), provide a consistent process-based
+#' framework to analyse both time and concentration dependent datasets.
+#' In GUTS-SD, all organisms are assumed to have the same internal concentration 
+#' threshold (denoted \eqn{z}), and, once exceeded, the instantaneous probability
+#' to die increases linearly with the internal concentration.
+#' In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
+#' exceeded in one individual, this individual dies immediately.
 #'
 #' @param data An object of class \code{survDataVarExp}.
 #' @param model_type can be \code{"SD"} or \code{"IT"} to choose
@@ -16,35 +25,41 @@
 #'   JAGS.
 #' @param extend_time Number of for each replicate used for linear 
 #' interpolation (comprise between time to compute and fitting accuracy)
-#' @param nbr.chain Number of MCMC chains. The minimum required number 
+#' @param n.chains A positive integer specifying the number of MCMC chains. The minimum required number 
 #' of chains is 2.
-#' @param nbr.adapt the number of iterations for adaptation. If \code{nbr.adapt} = 0
+#' @param n.adapt A positive integer specifying the number of iterations for adaptation. If \code{n.adapt} = 0
 #'  then no adaptation takes place.
-#' @param nbr.iter number of iterations to monitor
-#' @param nbr.warmup 
-#' @param thin.interval thinning interval for monitors
+#' @param n.iter A positive integer specifying the number of iterations to monitor for each chain.
+#' @param n.warmup A positive integer specifying the number of warmup (aka burnin) iterations per chain. 
+#' @param thin.interval A positive integer specifying the period to monitor.
 #' @param limit.sampling if \code{FALSE} (default is \code{TRUE}), there is no limit to the number of iterations
-#' in MCMC imposed by the \code{diaftery.diag} test.
-#' @param dic.compute if \code{TRUE} (default is \code{FALSE}), it generate penalized deviance samples to compute
+#' in MCMC imposed by the \code{raftery.diag} test.
+#' @param dic.compute if \code{TRUE} (default is \code{FALSE}), it generates penalized deviance samples to compute
 #' the Deviance Information Criterion (DIC) with the \code{rjags} package
-#' @param dic.type type of penalty to use. A string identifying the type of penalty: “pD” or “popt”
-#'   JAGS.
+#' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
+#'  (see function \code{\link[rjags]{dic.samples}})
 #'
-#' @return The function returns an object of class \code{survFitCstExp}, which is
-#' a list with the following fields:
-#' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
+#' @return The function returns an object of class \code{survFitVarExp}, which is
+#' a list with the following information:
+#' \item{estim.par}{a table of the estimated parameters as medians and 95\%
 #' credible intervals}
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
-#' distributions}
+#' distribution}
 #' \item{model}{a JAGS model object}
 #' \item{dic}{return the Deviance Information Criterion (DIC) if \code{dic.compute} is \code{TRUE}}
-#' \item{warnings}{a data.frame with warning messages}
-#' \item{parameters}{a list of the parameters names used in the model}
+#' \item{warnings}{a table with warning messages}
+#' \item{parameters}{a list of parameter names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation}
-#' \item{mcmcInfo}{a data.frame with the number of iteration, chains, adaptation, warmup and the thinning interval.} 
-#' \item{jags.data}{a list a the data passed to the jags model}
+#' \item{mcmcInfo}{a table with the number of iterations, chains, adaptation, warmup and the thinning interval} 
+#' \item{jags.data}{a list of the data passed to the JAGS model}
+#' \item{model_type}{the type of TK-TD model used: \code{SD} or \code{IT}}
 #'
+#' @references Jager, T., Albert, C., Preuss, T. G. and Ashauer, R. (2011) 
+#' General unified threshold model of survival-a toxicokinetic-toxicodynamic
+#'  framework for ecotoxicology, \emph{Environmental Science and Technology}, 45, 2529-2540.
+#' 303-314.
+#' 
 #' @keywords estimation
 #' 
 #' 
@@ -60,7 +75,7 @@
 #' # (3) Run the survFit function with TK-TD model 'SD' or 'IT' 
 #' out <- survFit(dataset , model_type = "SD")
 #'
-#' # (4) Summary look the estimated values (parameters)
+#' # (4) Summarize look the estimated parameters
 #' summary(out)
 #'
 #' # (5) Plot the fitted curve

@@ -1,49 +1,48 @@
-#' Fits a Bayesian exposure-response model for target-time survival analysis
+#' Fits a Bayesian concentration-response model for target-time survival analysis
 #'
-#' This function estimates the parameters of an exposure-response
+#' This function estimates the parameters of an concentration-response
 #' model for target-time survival analysis using Bayesian inference. In this model,
-#' the survival rate of individuals after some time (called target time) is modeled
+#' the survival rate of individuals at a given time point (called target time) is modeled
 #' as a function of the chemical compound concentration. The actual number of
 #' surviving individuals is then modeled as a stochastic function of the survival
 #' rate. Details of the model are presented in the
 #' vignette accompanying the package.
 #'
 #' The function returns
-#' parameter estimates of the exposure-response model and estimates of the so-called
-#' LCx, that is the concentration of pollutant required to obtain an 1 - x survival
-#' rate.
+#' parameter estimates of the concentration-response model and estimates of the so-called
+#' \eqn{LC_x}, that is the concentration of chemical compound required to get an \eqn{(1 - x/100)} survival rate.
 #'
 #' @param data an object of class \code{survData}
-#' @param target.time the chosen endpoint to evaluate the effect of a given
-#' concentration of pollutant, by default the last time point available for
+#' @param target.time the chosen endpoint to evaluate the effect of the chemical compound
+#' concentration, by default the last time point available for
 #' all concentrations
 #' @param lcx desired values of \eqn{x} (in percent) for which to compute
-#' \eqn{LC_{x}}{LCx}
+#' \eqn{LC_x}.
 #' @param n.chains number of MCMC chains, the minimum required number of chains
 #' is 2
 #' @param quiet if \code{TRUE}, does not print messages and progress bars from
 #' JAGS
 #'
 #' @return The function returns an object of class \code{survFitTT}, which is a
-#' list with the following fields:
-#' \item{estim.LCx}{a table of the estimated LCX along with their 95 \%
+#' list with the following information:
+#' \item{estim.LCx}{a table of the estimated \eqn{LC_x} along with their 95\%
 #' credible intervals}
-#' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
+#' \item{estim.par}{a table of the estimated parameters (medians) and 95\%
 #' credible intervals}
 #' \item{det.part}{the name of the deterministic part of the used model}
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
-#' distributions}
-#' \item{warnings}{a data.frame with warning messages}
+#' distribution}
+#' \item{warnings}{a table with warning messages}
 #' \item{model}{a JAGS model object}
-#' \item{parameters}{a list of the parameters names used in the model}
+#' \item{parameters}{a list of parameter names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation}
-#' \item{n.iter}{a list of two indices indicating the beginning and end of
+#' \item{n.iter}{a list of two indices indicating the beginning and the end of
 #' monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
-#' \item{jags.data}{a list a the data passed to the jags model}
+#' \item{jags.data}{a list of the data passed to the JAGS model}
 #' \item{transformed.data}{the \code{survData} object passed to the function}
-#' \item{dataTT}{the dataset with which one the parameters are estimated}
+#' \item{dataTT}{the dataset with which the parameters are estimated}
 #'
 #' @keywords estimation
 #

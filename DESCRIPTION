@@ -1,8 +1,7 @@
 Package: morse
 Type: Package
-Title: MOdelling Tools for Reproduction and Survival Data in Ecotoxicology
+Title: MOdelling tools for Reproduction and Survival data in Ecotoxicology
 Version: 3.0.0
-Date: 2017-09-06
 Author:
     Virgile Baudrot [aut],
     Sandrine Charles [aut],
@@ -15,11 +14,11 @@ Author:
 Maintainer: Philippe Veber <philippe.veber@univ-lyon1.fr>
 URL: https://cran.r-project.org/web/packages/morse/index.html
 Description: Tools for ecotoxicologists and regulators dedicated to the
-    mathematical and statistical modelling of bioassay data. They use advanced and
+    mathematical and statistical modelling of toxicity test data. They use advanced and
     innovative methods for a valuable quantitative environmental risk assessment.
 Depends:
     R (>= 3.0.0)
-SystemRequirements: jags (>= 4.0.0) (see http://mcmc-jags.sourceforge.net)
+SystemRequirements: JAGS (>= 4.0.0) (see http://mcmc-jags.sourceforge.net)
 Imports:
     coda,
     dplyr,
@@ -35,6 +34,7 @@ Imports:
     stats,
     stringr,
     tibble,
+    tidyr,
     zoo
 License: GPL (>=2)
 Suggests:
