@@ -111,7 +111,7 @@ NULL
 #' Comparison of toxicity tests with different exposure time patterns: The added
 #' value of dynamic modelling in predictive ecotoxicology, \emph{Ecotoxicology
 #' and Environmental Safety}, 75, 80-86.
-#' @keywords datasets
+#' @keywords dataset
 NULL
 
 
@@ -158,7 +158,7 @@ NULL
 #' Optimizing the design of a reproduction toxicity test with the pond snail Lymnaea stagnalis,
 #' \emph{Regulatory Toxicology and Pharmacology}, vol. 81 pp.47-56.
 #' 
-#' @keywords datasets
+#' @keywords dataset
 NULL
 
 
@@ -191,7 +191,7 @@ NULL
 #' @references Manar, R., Bessi, H. and Vasseur, P. (2009) Reproductive effects
 #' and bioaccumulation of chlordan in Daphnia magna, \emph{Environmental
 #' Toxicology and Chemistry}, 28, 2150-2159.
-#' @keywords datasets
+#' @keywords dataset
 NULL
 
 
@@ -202,7 +202,7 @@ NULL
 #'
 #' Reproduction and survival datasets of chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to five concentrations
-#' of one metal contaminant (copper) during 21 days. Five concentrations were
+#' of copper during 21 days. Five concentrations were
 #' tested, with three replicates per concentration. Each replicate contained 20
 #' organisms. Reproduction and survival were monitored at 16 time points.
 #'
@@ -224,16 +224,16 @@ NULL
 #' @references Billoir, E., Delignette-Muller, M.L., Pery, A.R.R. and
 #' Charles, S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
-#' @keywords datasets
+#' @keywords dataset
 NULL
 
 
 
 
-#' Survival datasets for \emph{Daphnia magna} exposed to dichromate
+#' Survival dataset for \emph{Daphnia magna} exposed to dichromate
 #' during 21 days
 #'
-#' Survival datasets of chronic laboratory toxicity tests with
+#' Survival dataset of chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to six concentrations
 #' of one oxidizing agent (potassium dichromate) during 21 days. Six
 #' concentrations were tested with one replicate of 50 organisms per concentration.
@@ -255,15 +255,15 @@ NULL
 #' @references Bedaux, J., Kooijman, SALM (1994) Statistical analysis of toxicity tests,
 #' based on hazard modeling, \emph{Environmental and Ecological Statistics}, 1,
 #' 303-314.
-#' @keywords datasets
+#' @keywords dataset
 NULL
 
 
 
-#' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
+#' Survival dataset for \emph{Gammarus pulex} exposed to propiconazole
 #' during four days
 #'
-#' Survival datasets of chronic laboratory toxicity tests with
+#' Survival dataset of chronic laboratory toxicity tests with
 #' \emph{Gammarus pulex} freshwater invertebrate exposed to eight concentrations
 #' of one fungicide (propiconazole) during four days. Eight
 #' concentrations were tested with two replicates of 10 organisms per concentration.
@@ -288,15 +288,15 @@ NULL
 #' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
 #'
-#' @keywords datasets
+#' @keywords dataset
 NULL
 
 
-#' Survival datasets for \emph{Gammarus pulex} exposed to propiconazole
+#' Survival dataset for \emph{Gammarus pulex} exposed to propiconazole
 #' during 10 days with time-variable
 #' exposure concentration (non-standard pulsed toxicity experiments)
 #'
-#' Survival datasets of laboratory toxicity tests with \emph{Gammarus pulex}
+#' Survival dataset of laboratory toxicity tests with \emph{Gammarus pulex}
 #' freshwater invertebrates exposed to several profiles of concentrations
 #' (time-variable concentration for each time series)
 #' of one fungicide (propiconazole) during 10 days.
@@ -319,16 +319,16 @@ NULL
 #' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
 #'
-#' @keywords datasets
+#' @keywords dataset
 NULL
 
 
 #' Reproduction and survival datasets for \emph{Daphnia magna} exposed to zinc
 #' during 21 days
 #'
-#' Reproduction and survival datasets of chronic laboratory toxicity tests with
+#' Reproduction and survival datasets of a chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to four concentrations
-#' of one metal contaminant (zinc) during 21 days. Four concentrations were
+#' of zinc during 21 days. Four concentrations were
 #' tested with three replicates per concentration. Each replicate contained 20
 #' organisms. Reproduction and survival were monitored at 15 time points.
 #'
@@ -350,5 +350,5 @@ NULL
 #' @references Billoir, E.,Delignette-Muller, M.L., Pery, A.R.R. and
 #' Charles S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
-#' @keywords datasets
+#' @keywords dataset
 NULL

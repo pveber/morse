@@ -54,7 +54,7 @@ modelData.survDataVarExp <- function(x,
   
   modelData <- priorsData$priorsList
   
-  ### reduce data set: To remove NA in Nsurv column
+  ### reduce dataset: To remove NA in Nsurv column
   modelData$time <-  x_reduce$time
   modelData$conc <-  x_reduce$conc
   modelData$replicate <-  x_reduce$replicate
