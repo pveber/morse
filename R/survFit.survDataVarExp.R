@@ -93,10 +93,10 @@ survFit.survDataVarExp <- function(data,
                                  model_type = NULL,
                                  quiet = FALSE,
                                  extend_time = 100,
-                                 nbr.chain = 3,
-                                 nbr.adapt = 1000,
-                                 nbr.iter = NULL,
-                                 nbr.warmup = NULL,
+                                 n.chains = 3,
+                                 n.adapt = 1000,
+                                 n.iter = NULL,
+                                 n.warmup = NULL,
                                  thin.interval = NULL,
                                  limit.sampling = TRUE,
                                  dic.compute = FALSE,
@@ -113,7 +113,7 @@ survFit.survDataVarExp <- function(data,
   }
   
   ### check number of sample for the diagnostic procedure
-  if (nbr.chain < 2) {
+  if (n.chains < 2) {
     stop('2 or more parallel chains required')
   }
   
@@ -158,8 +158,8 @@ survFit.survDataVarExp <- function(data,
 
   model <- survLoadModel(model.program = file_to_use,
                          data = jags.data_fit,
-                         n.chains = nbr.chain,
-                         Nadapt = nbr.adapt,
+                         n.chains = n.chains,
+                         Nadapt = n.adapt,
                          quiet = quiet)
 
   
@@ -168,33 +168,33 @@ survFit.survDataVarExp <- function(data,
   ## by using the raftery.diag
   ##
   
-  if(is.null(nbr.warmup) | is.null(thin.interval) | is.null(nbr.iter)){
+  if(is.null(n.warmup) | is.null(thin.interval) | is.null(n.iter)){
     
     sampling.parameters <- modelSamplingParameters(model,
                                                    parameters_sampling,
-                                                   n.chains = nbr.chain, quiet = quiet)
+                                                   n.chains = n.chains, quiet = quiet)
     if (sampling.parameters$niter > 5e5)
       stop("The model needs too many iterations to provide reliable parameter estimates !")
     
-    nbr.warmup = sampling.parameters$burnin
+    n.warmup = sampling.parameters$burnin
     thin.interval = sampling.parameters$thin
-    nbr.iter = sampling.parameters$niter
+    n.iter = sampling.parameters$niter
     
   }
 
   ### model to check priors with the model
-  update(model, nbr.warmup)
+  update(model, n.warmup)
   
   if(dic.compute == TRUE){ # Deviance Information Criterion
     dic <- dic.samples(model,
-                       n.iter = nbr.iter,
+                       n.iter = n.iter,
                        thin = thin.interval,
                        type = dic.type) 
   } else dic = NULL
   
   mcmc =  coda.samples(model,
                        variable.names = parameters,
-                       n.iter = nbr.iter,
+                       n.iter = n.iter,
                        thin = thin.interval)
   
   ##
@@ -269,11 +269,11 @@ survFit.survDataVarExp <- function(data,
   ##
   ## MCMC information
   ## 
-  mcmcInfo = data.frame(nbr.iter = nbr.iter,
-                        nbr.chain = nbr.chain,
-                        nbr.adapt = nbr.adapt,
+  mcmcInfo = data.frame(n.iter = n.iter,
+                        n.chains = n.chains,
+                        n.adapt = n.adapt,
                         thin.interval = thin.interval,
-                        nbr.warmup = nbr.warmup)
+                        n.warmup = n.warmup)
   
 
   ##

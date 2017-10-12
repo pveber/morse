@@ -37,9 +37,9 @@ print.survFitVarExp <- function(x, ...) {
   cat("Model:\n")
   print(x$model)
   cat("\nComputing information:\n\n")
-  cat("Number of iterations per chain = ", mcmcInfo$nbr.iter, "\n")
+  cat("Number of iterations per chain = ", mcmcInfo$n.iter, "\n")
   cat("Thinning interval =", mcmcInfo$thin.interval, "\n")
-  cat("Number of chains =", mcmcInfo$nbr.chain, "\n")
-  cat("Number iterations in warmup per chain =", mcmcInfo$nbr.warmup, "\n")
-  cat("Sample size per chain =", mcmcInfo$nbr.iter / mcmcInfo$thin.interval , "\n")
+  cat("Number of chains =", mcmcInfo$n.chains, "\n")
+  cat("Number iterations in warmup per chain =", mcmcInfo$n.warmup, "\n")
+  cat("Sample size per chain =", mcmcInfo$n.iter / mcmcInfo$thin.interval , "\n")
 }
