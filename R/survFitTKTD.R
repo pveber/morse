@@ -149,11 +149,10 @@ survTKTDPARAMS <- function(mcmc) {
 #'
 #' This function estimates the parameters of a TKTD
 #' model for survival analysis using Bayesian inference. In this model,
-#' the survival rate of individuals is modeled as a function of the pollutant's
-#' concentration with a mechanistic description of toxic effects on survival over
+#' the survival rate of individuals is modeled as a function of the chemical compound
+#' concentration with a mechanistic description of the effects on survival over
 #' time.
-#'
-#' Details of the model are presented in the vignette accompanying the package.
+#' 
 #'
 #' @param data An object of class \code{survData}.
 #' @param n.chains Number of MCMC chains. The minimum required number of chains
@@ -161,21 +160,26 @@ survTKTDPARAMS <- function(mcmc) {
 #' @param quiet If \code{FALSE}, prints logs and progress bar from JAGS.
 #'
 #' @return The function returns an object of class \code{survFitTKTD}, which is
-#' a list with the following fields:
-#' \item{estim.par}{a table of the estimated parameters (medians) and 95 \%
+#' a list with the following information:
+#' \item{estim.par}{a table of the estimated parameters as medians and 95\%
 #' credible intervals}
 #' \item{mcmc}{an object of class \code{mcmc.list} with the posterior
-#' distributions}
-#' \item{warnings}{a data.frame with warning messages}
+#' distribution}
+#' \item{warnings}{a table with warning messages}
 #' \item{model}{a JAGS model object}
-#' \item{parameters}{a list of the parameters names used in the model}
+#' \item{parameters}{a list of parameter names used in the model}
 #' \item{n.chains}{an integer value corresponding to the number of chains used
 #' for the MCMC computation}
-#' \item{n.iter}{a list of two indices indicating the beginning and end of
+#' \item{n.iter}{a list of two indices indicating the beginning and the end of
 #' monitored iterations}
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
-#' \item{jags.data}{a list a the data passed to the jags model}
-#'
+#' \item{jags.data}{a list of data passed to the JAGS model}
+#' 
+#' @references Bedaux, J., Kooijman, SALM (1994) Statistical analysis of toxicity tests,
+#' based on hazard modeling, \emph{Environmental and Ecological Statistics}, 1,
+#' 303-314.
+#' 
+#' 
 #' @keywords estimation
 #
 #' @examples
@@ -190,7 +194,7 @@ survTKTDPARAMS <- function(mcmc) {
 #' # (3) Run the survFitTKTD function
 #' out <- survFitTKTD(dataset)
 #'
-#' # (4) Summary look the estimated values (parameters)
+#' # (4) Summarize look the estimated parameters
 #' summary(out)
 #'
 #' # (5) Plot the fitted curve
