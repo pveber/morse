@@ -43,6 +43,7 @@ plot.LCx <- function(x,
   df_dose <- x$df_dose
   df_LCx <- x$df_LCx
   X_prop <- x$X_prop
+  X_prop_provided <- x$X_prop_provided
   time_LCx <- x$time_LCx
   
   # loc.x.legend = max(df_dose$concentration)-0.4*max(df_dose$concentration)
@@ -56,7 +57,7 @@ plot.LCx <- function(x,
   )
   
   if(is.null(main)){
-    main <- paste("Concentation-response curve: LC", X_prop*100, " at time", time_LCx)
+    main <- paste("Concentation-response curve: LC", X_prop_provided*100, " at time", time_LCx)
   } 
   
   

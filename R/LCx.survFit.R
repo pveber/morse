@@ -40,17 +40,25 @@ LCx.survFit = function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 
     conc_range = seq(conc_range[1], conc_range[2], length.out = npoints)
   }
   
+  if(min(conc_range) != 0){
+    stop("Minimal value of 'conc_range' must be 0.")
+  }
+  
   if(is.null(time_LCx)){
     time_LCx = max(object$jags.data$time)
   }
   
   df_dose <- doseResponse_survFitCstExp(x = object, time_LCx = time_LCx, conc_range, npoints)
   
-  X_prop <- X/100
+  median_backgroundMortality_Conc0 = dplyr::filter(df_dose, concentration == 0)$q50
+  
+  X_prop_provided <- (100-X)/100
+  
+  X_prop <- (100-X)/100*median_backgroundMortality_Conc0
   
   df_LCx <- pointsLCx(df_dose, X_prop)
   
-  object_LCx <- list(X_prop = X/100, time_LCx = time_LCx, df_LCx = df_LCx , df_dose = df_dose)
+  object_LCx <- list(X_prop = X_prop, X_prop_provided = X_prop_provided, time_LCx = time_LCx, df_LCx = df_LCx , df_dose = df_dose)
   class(object_LCx) <- c("LCx", "list")
   
   return(object_LCx)
