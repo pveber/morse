@@ -28,6 +28,7 @@ Imports:
     ggplot2 (>= 2.1.0),
     grid,
     gridExtra,
+    magrittr,
     methods,
     reshape2,
     rjags (>= 4.0),
