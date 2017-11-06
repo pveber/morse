@@ -239,7 +239,6 @@ summary(dat)
 
 To fit the *Stochastic Death* model, we have to specify the `model_type` as `"SD"`:
 
-
 ```{r, eval=FALSE, echo=TRUE}
 # (6) fit the TK-TD model SD
 fit_cstSD <- survFit(dat, quiet = TRUE, model_type = "SD")
@@ -457,7 +456,7 @@ dat <- reproData(cadmium2)
 plot(dat, concentration = 124, addlegend = TRUE, pool.replicate = FALSE)
 
 # (5) represent the reproduction rate as a function of concentration
-plotDoseResponse(dat, target.time = 56)
+plotDoseResponse(dat, target.time = 28)
 
 # (6) check information on the experimental design
 summary(dat)
