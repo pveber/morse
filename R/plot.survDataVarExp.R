@@ -9,7 +9,8 @@
 #' @param main main title for the plot
 #' @param one.plot if \code{TRUE}, draws all the points in one plot instead of one per \code{replicate}
 #' @param facetting_level a vector of \code{characters} to rank \code{replicates} in the multi plot (i.e. \code{one.plot == FALSE})
-#'
+#' @param \dots Further arguments to be passed to generic methods
+#' 
 #' @return an object of class \code{ggplot}, see function \code{\link[ggplot2]{ggplot}}
 #'
 #' @keywords plot
@@ -27,7 +28,8 @@ plot.survDataVarExp <- function(x,
                                 ylab = "Number of survivors",
                                 main = NULL,
                                 one.plot = FALSE,
-                                facetting_level = NULL){
+                                facetting_level = NULL,
+                                ...){
   
   data_plt = filter( x , !is.na(Nsurv))
   

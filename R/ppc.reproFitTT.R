@@ -18,6 +18,7 @@
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Observed Cumul. Nbr. of offspring}
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Predicted Cumul. Nbr. of offspring}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param main main title for the plot
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @examples

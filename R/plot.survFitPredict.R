@@ -46,10 +46,11 @@
 #' out <- survFit(dataset , model_type = "SD")
 #'
 #' # (4) Create a new data table for prediction
-#' data_4prediction <- data.frame(time = 1:10, conc = c(0,5,5,5,0,0,5,5,5,5), replicate= rep("predict", 10))
+#' data_4prediction <- data.frame(time = 1:10, conc = c(0,5,5,5,0,0,5,5,5,5),
+#'  replicate= rep("predict", 10))
 #'
 #' # (5) Predict on a new dataset
-#' predict_out <- predict(x = out, data_predict = data_4prediction, spaghetti = TRUE)
+#' predict_out <- predict(out, data_predict = data_4prediction, spaghetti = TRUE)
 #'
 #' # (6) Plot the predicted curve
 #' plot(predict_out)

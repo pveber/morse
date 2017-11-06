@@ -15,6 +15,7 @@
 #'
 #' @param x An object of class \code{survFitTT}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
+#' @param main main title for the plot
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @examples

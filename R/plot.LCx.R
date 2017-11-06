@@ -18,7 +18,7 @@
 #' data("propiconazole")
 #' 
 #' # (2) Create an object of class 'survData'
-#' dataset <- survData("propiconazole")
+#' dataset <- survData(propiconazole)
 #' 
 #' \dontrun{
 #' # (3) Run the survFit function with model_type SD (or IT)

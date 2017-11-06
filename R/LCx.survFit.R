@@ -8,6 +8,8 @@
 #' @param conc_range A vector of length 2 with minimal and maximal value of the 
 #' range of concentration. If NULL, the range is
 #' define between 0 and the highest tested concentration of the experiment.
+#' @param npoints Number of time point in \code{conc_range} between 0 and the maximal concentration. 100 by default.
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
 #' 
@@ -15,7 +17,7 @@
 #' data("propiconazole")
 #' 
 #' # (2) Create an object of class 'survData'
-#' dataset <- survData("propiconazole")
+#' dataset <- survData(propiconazole)
 #' 
 #' \dontrun{
 #' # (3) Run the survFit function with model_type SD (or IT)
@@ -29,7 +31,7 @@
 #' 
 #' @export
 #' 
-LCx.survFit = function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 100){
+LCx.survFit = function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 100, ...){
   
   if(is.null(conc_range)){
     conc_range = seq(0, max(object$jags.data$conc), length.out = npoints)

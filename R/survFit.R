@@ -1,10 +1,10 @@
 #' Method to fit a model for survival data using Bayesian inference
 #'
-#' @param x an object used to select a method 'survFit'
+#' @param data an object used to select a method 'survFit'
 #' @param \dots Further arguments to be passed to generic methods
 
 #' @export
-survFit <- function(x, ...){
+survFit <- function(data, ...){
   UseMethod("survFit")
 }
 

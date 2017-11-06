@@ -22,6 +22,7 @@
 #' is 2
 #' @param quiet if \code{TRUE}, does not print messages and progress bars from
 #' JAGS
+#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{survFitTT}, which is a
 #' list with the following information:
@@ -69,7 +70,8 @@ survFitTT.survDataCstExp <- function(data,
                                      target.time = NULL,
                                      lcx = c(5, 10, 20, 50),
                                      n.chains = 3,
-                                     quiet = FALSE) {
+                                     quiet = FALSE,
+                                     ...) {
   # test class object
   if(! is(data, "survDataCstExp"))
     stop("survFitTT: object of class survDataCstExp expected")

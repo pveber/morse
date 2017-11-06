@@ -7,6 +7,6 @@
 #' 
 #' @export
 #' 
-LCx <- function(x, ...){
+LCx <- function(object, ...){
   UseMethod("LCx")
 }

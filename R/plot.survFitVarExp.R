@@ -78,7 +78,7 @@ plot.survFitVarExp <- function(x,
                                ...) {
   
   
-  df_predictTotal <- predict(x = x, spaghetti = spaghetti, mcmc_size = mcmc_size)
+  df_predictTotal <- predict(x, spaghetti = spaghetti, mcmc_size = mcmc_size)
   
   df_prediction <-  df_predictTotal$df_quantile
   df_spaghetti <-  df_predictTotal$df_spaghetti

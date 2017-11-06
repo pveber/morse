@@ -38,6 +38,7 @@
 #' the Deviance Information Criterion (DIC) with the \code{rjags} package
 #' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
 #'  (see function \code{\link[rjags]{dic.samples}})
+#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{survFitVarExp}, which is
 #' a list with the following information:
