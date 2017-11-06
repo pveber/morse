@@ -5,78 +5,85 @@
 \usepackage{amsfonts}
 
 %\VignetteIndexEntry{Models}
-\title{Models in MORSE package}
+\title{Models in 'morse' package}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 
 \maketitle
 
-This document describes the statistical models used in MORSE to
+This document describes the statistical models used in 'morse' to
 analyze survival and reproduction data, and as such serves as a
 mathematical specification of the package. For a more practical
-introduction, please consult the ``Tutorial'' vignette; for
+introduction, please consult the ``Tutorial'' vignette ; for
 information on the structure and contents of the library, please
 consult the reference manual.
 
 Model parameters are estimated using Bayesian inference,
 where posterior distributions are computed from the
-likelihood of observed data and prior distributions on the
+likelihood of observed data combined with prior distributions on the
 parameters. These priors are specified after each model description.
 
-\section{Survival bioassays}
-In a survival bioassay, subjects are exposed to a controlled dose of a
+\section{Survival toxicity tests}
+In a survival toxicity test, subjects are exposed to a measured concentration of a
 contaminant over a given period of time and the number of surviving
-individuals is measured at certain time points during exposition. In
-most standard bioassays, the dose is held constant throughout the
-whole experiment, which we will assume here. An experiment is
-generally replicated several times and also repeated for various
-levels of the contaminant.
+organisms is measured at certain time points during exposure.
+In most standard toxicity tests, the concentration is held constant throughout the
+whole experiment, which we will assume for \emph{\ref{subsect:TT}~Analysis of target
+time survival toxicity tests}, but not for \emph{\ref{subsect:TKTD}~Toxicokinetic-Toxicodynamic modeling}
+which can handled time variable exposure.
+In the case of constant exposure, an experiment is generally replicated
+several times and also repeated for various levels of the contaminant.
+For time-variable exposure, a profile of exposure is usually unique,
+and the experiment is repeated with several profiles of exposures. 
 
-In so-called \emph{final time} bioassays, the mortality is measured
-only at the end of the experiment. The chosen time point is called
-\emph{target time}. Let us see how this particular case is handled in
-MORSE.
+In so-called \emph{target time} toxicity tests, the mortality is usually analyzed
+at the end of the experiment. The chosen time point for this analysis is called
+\emph{target time}. Let us see how this particular case is handled in 'morse'.
 
-\subsection{Analysis of final time survival bioassays}
+\subsection{Analysis of target time survival toxicity tests}
+\label{subsect:TT}
 
-A dataset from a final time survival bioassay is a collection $D = \{
+A dataset from a target time survival toxicity test is a collection $D = \{
 (c_i, n_i^{init}, n_i) \}_i$ of experiments, where $c_i$ is the tested
-concentration, $n_i^{init}$ the initial number of individuals and
-$n_i$ the number of individuals at the target time. Triplets such that
+concentration, $n_i^{init}$ the initial number of organisms and
+$n_i$ the number of organisms at the chosen target time. Triplets such that
 $c_i = 0$ correspond to control experiments.
 
-\paragraph{Modelling} In the particular case of endpoint assays, the
-model used in MORSE is defined as follows. Let $t$ be the target time
+\subsubsection{Modelling}
+In the particular case of target time analysis, the
+model used in 'morse' is defined as follows. Let $t$ be the target time
 in days. We suppose the \emph{mean survival rate after $t$ days} is
 given by a function $f$ of the contaminant level $c$. We also suppose
-that the death of two individuals are two independent events. Hence,
-given an initial number $n^{init}_i$ of individuals in the bioassay,
-we obtain that the number $N_i$ of surviving individuals at time $t$
-follows a binomial distribution:
+that the death of two organisms are two independent events. Hence,
+given an initial number $n^{init}_i$ of organisms in the toxicity test at
+concentration $c_i$, we obtain that the number $N_i$ of surviving organisms 
+at time $t$ follows a binomial distribution:
 $$
 N_i \sim \mathcal{B}(n^{init}_i, f(c_i))
 $$
 Note that this model neglects inter-replicate variations, as a given
-concentration of pollutant implies a fixed value of the survival
-rate. There may be various possibilities for $f$. In MORSE we assume:
+concentration of contaminant implies a fixed value of the survival
+rate. There may be various possibilities for $f$. In 'morse' we assume a 
+three parameters log-logistic function:
 $$
 f(c) = \frac{d}{1 + (\frac{c}{e})^b}
 $$
 where $b$, $e$ and $d$ are (positive) parameters. In particular $d$
-corresponds to the survival rate in absence of pollutant and $e$
-corresponds to the $LC_{50}$. The parameter $b$ is related to the
-effect intensity of the contaminant.
+corresponds to the survival rate in absence of contaminant and $e$
+corresponds to the $LC_{50}$.
+Parameter $b$ is related to the effect intensity of the contaminant.
 
-\paragraph{Inference} Posterior distributions for parameters $b$,
-$d$ and $e$ are estimated using JAGS with the following priors:
+\subsubsection{Inference}
+Posterior distributions for parameters $b$,
+$d$ and $e$ are estimated using the JAGS software~\cite{rjags2016} with the following priors:
 \begin{itemize}
 \item we assume the range of tested concentrations in an
   experiment is chosen to contain the $LC_{50}$ with high
   probability. More formally, we choose:
-  $$\log_{10} e \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})$$
+  $$\log_{10} e \sim \mathcal{N}\left(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4} \right)$$
   which implies $e$ has a probability slightly higher than 0.95 to lie
-  between the minimum and the maximum tested concentration.
+  between the minimum and the maximum tested concentrations.
 \item we choose a quasi non-informative prior distribution for the
   shape parameter $b$:
   $$\log_{10} b \sim \mathcal{U}(-2,2)$$
@@ -89,49 +96,52 @@ The prior on $d$ is chosen as follows: if we observe
 no mortality in control experiments then we set $d = 1$, otherwise we
 assume a uniform prior for $d$ between 0 and 1.
 
-\subsection{Toxico-kinetic toxico-dynamic modeling}
-
-\begin{table}
-\label{tab:parameters}
-\caption{Parameters and symbols used for GUTS-SD and GUTS-IT models (different symbols are used within pubications as in \cite{jager2011, delignette2017}). The unit $[D]$ refers to unit of actual damage, $n.d$ for non dimensional. For GUT-IT model, we assume a log-logistic distribution.}
-\begin{tabular}{l c c c c}
-Parameter & Symbol (1) & Symbol (2) & Unit & Model \\
-\hline
-Background hazard rate & $h_b$ & $m_0$ & $d^{-1}$ & SD and IT\\
-%
-Dominant toxicokinetic rate & $k_d$ & $k_d$ & $d^{-1}$ & SD and IT \\
-%
-Threshold for effects & $z$ & $NEC$ & $[D]$ & SD \\
-%
-Killing rate & $k_k$ & $k_s$ & $[D]^{-1}.d^{-1}$ & SD \\
-%
-Median of the threshold effect distribution & $\alpha$ & & $[D]$ & IT \\
-%
-Shape of the threshold effect distribution & $\beta$ & & n.d. & IT \\
-%
-\hline
-\end{tabular}
-\end{table}
-
+\subsection{Toxicokinetic-Toxicodynamic modeling}
+\label{subsect:TKTD}
 
 For datasets featuring time series measurements, more complete models
-can be used to estimate the effect of a contaminant on survival. We
-assume the bioassay consists in exposing an initial number $n_i^0$ of
-individuals to a constant dose $c_i$ of contaminant, and following the
+can be used to estimate the effect of a contaminant on survival.
+We assume the toxicity test consists in exposing an initial number $n_i^0$ of
+organisms to a concentration $c_i(t)$ of contaminant (constant or time-variable), and following the
 number $n_i^k$ of survivors at time $t_k$ (with $t_0 < t_1 < \dots <
-t_m$ and $t_0 = 0$), providing a collection $D = {(c_i, t_k,
-  n_i^k)}_{i,k}$ of experiments. In MORSE, we implement two
-toxico-kinetic toxico-dynamic (TKTD) models variant included in 
+t_m$ and $t_0 = 0$), thus providing a collection $D = {(c_i, t_k,
+  n_i^k)}_{i,k}$ of experiments.
+In 'morse', we propose two
+Toxicokinetic-Toxicodynamic (TKTD) models belonging to
 the General Unified Threshold model for Survival (GUTS)~\cite{jager2011}.
 One is known as the \emph{reduced stochastic death} model~\cite{nyman2012} or
-GUTS-SD and the other is the \emph{individual tolerance} model or GUTS-IT, which we
+GUTS-SD and the other is the \emph{reduced organism tolerance} model or GUTS-IT, which we
 describe now.
 
 \newcommand*{\diffdchar}{\mathrm{d}}
 \newcommand*{\dd}{\mathop{\diffdchar\!}}
-\newcommand*{\NEC}{\mbox{\it NEC}}
 \newcommand*{\Cint}{C^{\mbox{\tiny INT}}}
-\newcommand*{\tNEC}{t^{\tiny \NEC}}
+
+\newcommand*{\z}{z_w}
+\newcommand*{\tz}{t^z}
+
+
+\begin{table}
+\label{tab:parameters}
+\caption{Parameters and symbols used for GUTS-SD and GUTS-IT models. Alternative symbols are used within pubications (see for instance \cite{jager2011, delignette2017}). The unit $[D]$ refers to unit of actual damage, $n.d$ for non dimensional. For GUTS-IT model, we assume a log-logistic distributions, but other distribution are occasionally use \cite{albert2016}.}
+\begin{tabular}{p{6.5cm} c c c c}
+Parameters & Symbols & Alternative symbols & Units & Models \\
+\hline
+Background hazard rate & $h_b$ & $m_0$ & $\text{time}^{-1}$ & SD and IT\\
+%
+Dominant toxicokinetic rate & $k_d$ & $k_e$ & $\text{time}^{-1}$ & SD and IT \\
+%
+Threshold for effects & $\z$ & $\mbox{\it NEC}$, $z$ & $[D]$ & SD \\
+%
+Killing rate & $b_w$ & $k_s$, $k_k$ & $[D]^{-1}.\text{time}^{-1}$ & SD \\
+%
+Median of the threshold effect distribution & $m_i$ & $\alpha$ & $[D]$ & IT \\
+%
+Shape of the threshold effect distribution & $\beta$ & - & n.d. & IT \\
+%
+\hline
+\end{tabular}
+\end{table}
 
 
 \paragraph{GUTS Modelling} The number of survivors at time $t_k$ given the
@@ -147,141 +157,163 @@ $$
 f_i(t_{k-1}, t_k) = \frac{S_i(t_k)}{S_i(t_{k-1})}
 $$
 
-The calculation of $S_i(t)$ depends on the model of survival GUTS-SD or GUTS-IT~\cite{jager2011}.
-
-In GUTS-SD, all organisms are assumed to have the same internal concentration 
-threshold (denoted $NEC$), and, once exceeded, the instantaneous probability 
-to die increases linearly with the internal concentration.
-
-In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
-exceeded in one individual, this individual dies immediately.
-
-\paragraph{GUTS-SD}
-
-$S_i$ can be calculated by integrating the \emph{instantaneous mortality
+The formulation of the survival probability $S_i(t)$ in GUTS~\cite{jager2011} is given by integrating the \emph{instantaneous mortality
 rate} $h_i$:
 \begin{equation}
   \label{eq:survivaldef}
   S_i(t) = \exp \left( \int_0^t - h_i(u)\mbox{d}u \right)
 \end{equation}
-In the model, the function $h_i$ is expressed using the internal
+
+In the model, function $h_i$ is expressed using the internal
 concentration of contaminant (that is, the concentration inside an
-individual) $\Cint_i(t)$, more precisely:
+organism) $\Cint_i(t)$. More precisely:
 $$
-h_i(t) = k_s \max(\Cint_i(t) - \NEC, 0) + m_0
+h_i(t) = b_w \max(\Cint_i(t) - \z, 0) + h_b
 $$
-where:
+where (see table \ref{tab:parameters}):
 \begin{itemize}
-\item $k_s$ is called \emph{killing rate} and expressed in
-  concentration$^{-1}$.time$^{-1}$,
-\item $\NEC$ is the so-called \emph{no effect concentration} and
+\item $b_w$ is the \emph{killing rate} and expressed in
+  concentration$^{-1}$.time$^{-1}$ ;
+\item $\z$ is the so-called \emph{no effect concentration} and
   represents a concentration threshold under which the contaminant has
-  no effect on individuals,
-\item $m_0$ is the \emph{background mortality} (mortality in absence of
+  no effect on organisms ;
+\item $h_b$ is the \emph{background mortality} (mortality in absence of
   contaminant), expressed in time$^{-1}$.
 \end{itemize}
 
 \noindent The internal concentration is assumed to be driven by the external
 concentration, following:
+\begin{equation}
+\frac{\dd \Cint_i}{\dd t}(t) = k_d (c_i(t) - \Cint_i(t))
+\label{eq:dynInternalConc}
+\end{equation}
+
+We caal parameter $k_d$ of Eq.~\eqref{eq:dynInternalConc} the 
+``dominant rate'' (expressed in time$^{-1}$). It
+represents the speed at which the internal concentration in
+contaminant converges to the external concentration. The model could
+be equivalently written using an internal damage instead of an
+internal concentration as a dose metric~\cite{jager2011}.
+
+\bigskip
+
+If we denote $f(\z)$ the probability distribution of the no effect concentration threshold, $\z$, then the survival function is given by:
+\begin{equation}
+S(t) = \int_0^t S_i(t) f(\z) \mbox{d} \z = \int \exp \left( \int_0^t - h_i(u)\mbox{d} u \right) f(\z) \mbox{d} \z 
+\end{equation}
+
+Then, the calculation of $S(t)$ depends on the model of survival, GUTS-SD or GUTS-IT~\cite{jager2011}:
+
+\paragraph{GUTS-SD} In GUTS-SD, all organisms are assumed to have the same internal concentration 
+threshold (denoted $\z$), and, once exceeded, the instantaneous probability 
+to die increases linearly with the internal concentration.
+In this situation, $f(\z)$ is a Dirac delta distribution, and the survival rate is given by Eq.~\eqref{eq:survivaldef}. 
+
+\paragraph{GUTS-IT} In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
+exceeded for one organism, this organism dies immediately.
+In other words, the killing rate is infinitely high (e.g. $k_k = + \infty$), and the survival rate is given by:
 $$
-\frac{\dd \Cint_i}{\dd t}(t) = k_d (c_i - \Cint_i(t))
+S_i(t) = e^{-h_b t} \int_{\max\limits_{0<\tau <t}(\Cint_i(\tau))}^{+\infty} f(\z) \mbox{d} \z = e^{-h_b t}(1- F(\max\limits_{0<\tau<t} \Cint_i(\tau)))
 $$
-which we can integrate to obtain:
+where $F$ denotes the cumulative distribution function of $f$.
+
+\bigskip
+
+Here, the exposure concentration $c_i(t)$ is not supposed constant.
+In the case of time variable exposure concentration, we use an Euler ODE integrator to solve the models GUTS-SD and GUTS-IT.
+When the exposure concentration is constant, then, explicit formulation of integrated equations are used. We present them in the next subsection.
+
+\subsubsection{For constant concentration exposure}
+
+If $c_i(t)$ is constant, and assuming $\Cint_i(0) = 0$, then we can integrate the previous equation \eqref{eq:dynInternalConc} to obtain:
 \begin{equation}
 \label{eq:cint}
 \Cint_i(t) = c_i(1 - e^{-k_d t})
 \end{equation}
-assuming $\Cint_i(0) = 0$. We call the parameter $k_d$ of
-Eq.~\ref{eq:cint} the ``dominant rate'' (expressed in time$^{-1}$). It
-represents the speed at which the internal concentration in
-contaminant converges to the external concentration. The model could
-be equivalently written using an internal damage instead of an
-internal concentration as a dose metric~\cite{jager2011}. With the
-data we assume is available, it is not possible to distinguish
-dynamical effects due to toxico-kinetic elimination and damage
-recovery.
 
-\bigskip
+\paragraph{GUTS-SD}
 
-\noindent In the case $c_i <
-\NEC$, the individuals are never affected by the contaminant:
+In the case $c_i < \z$, the organisms are never affected by the contaminant:
 \begin{equation}
   \label{eq:bgsurvival}
-  S_i(t) = exp( - m_0 t )
+  S_i(t) = \exp( - h_b t )
 \end{equation}
-When $c_i > \NEC$, it takes time $\tNEC_i$ before the internal
-concentration reaches $\NEC$, where:
+When $c_i > \z$, it takes time $\tz_i$ before the internal
+concentration reaches $\z$, where:
 $$
-\tNEC_i = - \frac{1}{k_d} \log \left(1 - \frac{\NEC}{c_i} \right).
+\tz_i = - \frac{1}{k_d} \log \left(1 - \frac{\z}{c_i} \right).
 $$
-Before that happens, Eq.~\ref{eq:bgsurvival} applies, while for $t >
-\tNEC_i$, integrating Eq.~\ref{eq:survivaldef} results in:
+Before that happens, Eq.~\eqref{eq:bgsurvival} applies, while for $t >
+\tz_i$, integrating Eq.~\eqref{eq:survivaldef} results in:
 $$
-S_i(t) = \exp \left(- m_0 t - k_s(c_i - \NEC) (t - \tNEC_i) - \frac{k_s c_i}{k_d} \left(e^{- k_d t} - e^{-k_d \tNEC_i} \right) \right)
+S_i(t) = \exp \left(- h_b t - b_w(c_i - \z) (t - \tz_i) - \frac{b_w c_i}{k_d} \left(e^{- k_d t} - e^{-k_d \tz_i} \right) \right)
 $$
 
-In brief, given values for our four parameters $m_0$, $k_s$, $k_d$ and
-$\NEC$, we can simulate trajectories by using $S_i$ to compute
-conditional survival probabilities. In MORSE those parameters are
-estimated using Bayesian inference. The next paragraph describes our
-choice of priors.
-
+In brief, given values for the four parameters $h_b$, $b_w$, $k_d$ and
+$\z$, we can simulate trajectories by using $S_i(t)$ to compute
+conditional survival probabilities. In 'morse', those parameters are
+estimated using Bayesian inference. The choice of priors is defined hereafter.
 
 \paragraph{GUTS-IT}
 
-With the function $f$ denoting the probability distribution of threshold effect in the population, then, the probability to survive until time $t$ is given by: 
+With constant concentration, Eq.~\ref{eq:cint} provides that $\Cint_i(t)$ is an increasing function, meaning that:
 
 $$
-S_i(t) = \int_{\max\limits_{0<\tau<t} \Cint_i(\tau)}^{\infty} f(\NEC) d\NEC = 1- F(\max\limits_{0<\tau<t} \Cint_i)
+\max\limits{0 < \tau < t} (\Cint_i(\tau)) = c_i(1 - e^{-k_d t})
 $$
 
-where $F$ denotes the cumulative distribution function of $f$. Assuming a log-logistic distribution yields for $S$:
+Therefore, assuming a log-logistic distribution for $f$ yields:
 
 $$
-S_i(t) = \exp(- m_0 t) \left( 1 - \frac{1}{1+ \left( \frac{c_i(1-\exp(-k_d t ))}{\alpha} \right)^{- \beta}} \right)
+S_i(t) = \exp(- h_b t) \left( 1 - \frac{1}{1+ \left( \frac{c_i(1-\exp(-k_d t ))}{m_i} \right)^{- \beta}} \right)
 $$
 
-where $\alpha>0$ is the scale parameter (and also the median) and $\beta>0$ is the shape parameter.  
+where $m_i>0$ is the scale parameter (and also the median) and $\beta>0$ is the shape parameter of the log-logistic distribution.  
 
-\paragraph{Inference} Posterior distributions for alla parameters $m_0$, $k_s$, $k_d$, $\NEC$,
-$\alpha$ and $\beta$ are computed with JAGS. We set prior distributions on those
+\subsubsection{Inference}
+
+Posterior distributions for all parameters $h_b$, $b_w$, $k_d$, $\z$,
+$m_i$ and $\beta$ are computed with JAGS~\cite{rjags2016}.
+We set prior distributions on those
 parameters based on the actual experimental design used in a
-bioassay. For instance, we assume the NEC is close to the range of
-tested concentrations. For each parameter $\theta$, we derive in a similar
+toxicity test.
+For instance, we assume $\z$ has a high probability to lie within 
+the range of tested concentrations.
+For each parameter $\theta$, we derive in a similar
 manner a minimum ($\theta^{\min}$) and a maximum ($\theta^{\max}$)
 value and state that the prior on $\theta$ is a log-normal
-distribution. More precisely, we choose:
+distribution \cite{delignette2017}.
+More precisely:
 $$
-\log_{10} \theta \sim \mathcal{N}\left(\frac{\log_{10} \theta^{\min} + \log_{10} \theta^{\max}}{2},
+\log_{10} \theta \sim \mathcal{N}\left(\frac{\log_{10} \theta^{\min} + \log_{10} \theta^{\max}}{2} \, , \,
                                  \frac{\log_{10} \theta^{\max} - \log_{10} \theta^{\min}}{4} \right)
 $$
 With this choice, $\theta^{\min}$ and $\theta^{\max}$ correspond to the
-2.5 and 97.5 percentiles of the prior distribution on $\theta$. For
-each of our parameters, this gives:
+2.5 and 97.5 percentiles of the prior distribution on $\theta$. For each parameter, this gives:
 \begin{itemize}
-\item $\NEC^{\min} = \min_{i, c_i \neq 0} c_i$  and $\NEC^{\max} = \max_i c_i$,
-  which amounts to say that the NEC is most probably contained in the
-  range of experimentally tested concentrations
-\item and similarly, $\alpha^{\min} = \min_{i, c_i \neq 0} c_i$  and $\alpha^{\max} = \max_i c_i$
-\item for the mortality rate $m_0$, we assume a maximum value
+\item $\z^{\min} = \min_{i, c_i \neq 0} c_i$  and $\z^{\max} = \max_i c_i$,
+  which amounts to say that $\z$ is most probably contained in the
+  range of experimentally tested concentrations ;
+\item similarly, $m_i^{\min} = \min_{i, c_i \neq 0} c_i$  and $m_i^{\max} = \max_i c_i$ ;
+\item for background mortality rate $h_b$, we assume a maximum value
   corresponding to situations where half the indivuals are lost at the
   first observation time in the control (time $t_1$), that is:
   $$
-  e^{- m_0^{\max} t_1} = 0.5 \Leftrightarrow m_0^{\max} = - \frac{1}{t_1} \log 0.5
+  e^{- h_b^{\max} t_1} = 0.5 \Leftrightarrow h_b^{\max} = - \frac{1}{t_1} \log 0.5
   $$
-  To derive a minimum value for $m_0$, we set the maximal survival
-  probability at the end of the bioassay in control condition to
+  To derive a minimum value for $h_b$, we set the maximal survival
+  probability at the end of the toxicity test in control condition to
   0.999, which corresponds to saying that the average lifetime of the
   considered species is at most a thousand times longer than the
   duration of the experiment. This gives:
   $$
-  e^{- m_0^{\min} t_m} = 0.999 \Leftrightarrow m_0^{\min} = - \frac{1}{t_m} \log 0.999
+  e^{- h_b^{\min} t_m} = 0.999 \Leftrightarrow h_b^{\min} = - \frac{1}{t_m} \log 0.999
   $$
 \item $k_d$ is the parameter describing the speed at which the
   internal concentration of contaminant equilibrates with the external
   concentration. We suppose its value is such that the internal
   concentration can at most reach 99.9\% of the external concentration
-  within the first observation point, implying the maximum value for
+  before the first time point, implying the maximum value for
   $k_d$ is:
   $$
   1 - e^{- k_d^{\max} t_1} = 0.999 \Leftrightarrow k_d^{\max} = - \frac{1}{t_1} \log 0.001
@@ -292,169 +324,171 @@ each of our parameters, this gives:
   $$
   1 - e^{- k_d^{\min} t_m} = 0.001 \Leftrightarrow k_d^{\min} = - \frac{1}{t_m} \log 0.999
   $$
-\item $k_s$ is the parameter relating the internal concentration of
+\item $b_w$ is the parameter relating the internal concentration of
   contaminant to the instantaneous mortality. To fix a maximum value,
   we state that between the closest two tested concentrations, the
-  survival probability at the first observation point should not be
+  survival probability at the first time point should not be
   divided by more than one thousand, assuming (infinitely) fast
   equilibration of internal and external concentrations. This last
   assumption means we take the limit $k_d \rightarrow + \infty$ and
-  approximate $S_i(t)$ with $\exp(- (m_0 + k_s(c_i -
-  \NEC))t)$. Denoting $\Delta^{\min}$ the minimum difference between
+  approximate $S_i(t)$ with $\exp(- (h_b + b_w(c_i -
+  \z))t)$. Denoting $\Delta^{\min}$ the minimum difference between
   two tested concentrations, we obtain:
   $$
-  e^{- k_s^{\max} \Delta^{\min} t_1} = 0.001 \Leftrightarrow k_s^{\max} = - \frac{1}{\Delta^{\min} t_1} \log 0.001
+  e^{- b_w^{\max} \Delta^{\min} t_1} = 0.001 \Leftrightarrow b_w^{\max} = - \frac{1}{\Delta^{\min} t_1} \log 0.001
   $$
-  Analogously we set a minimum value for $k_s$ saying that the
-  survival probability at the last observation time for the maximum
+  Analogously we set a minimum value for $b_w$ saying that the
+  survival probability at the last time point for the maximum
   concentration should not be higher than 99.9\% of what it is for the
   minimal tested concentration. For this we assume again $k_d
   \rightarrow + \infty$. Denoting $\Delta^{\max}$ the maximum
   difference between two tested concentrations, this leads to:
   $$
-  e^{- k_s^{\min} \Delta^{\max} t_m} = 0.001 \Leftrightarrow k_s^{\min} = - \frac{1}{\Delta^{\max} t_m} \log 0.999
+  e^{- b_w^{\min} \Delta^{\max} t_m} = 0.001 \Leftrightarrow b_w^{\min} = - \frac{1}{\Delta^{\max} t_m} \log 0.999
   $$
-\item for the shape parameter $\beta$, we used a quasi non-informative log-uniform distribution:
-  $$
-  \log_{10} \beta \sim \mathcal{U}(−2, 2)
-  $$
+\item for the shape parameter $\beta$, we used a quasi non-informative log-uniform distribution: $$\log_{10} \beta \sim \mathcal{U}(-2,2)$$
 \end{itemize}
 
-\section{Reproduction bioassays}
 
-In a reproduction bioassay, we observe the number of offspring
-produced by a population of adult individuals subjected to a certain
-dose of a contaminant over a given period of time. The offspring
-(young individuals, clutches or eggs) are regularly counted and
-removed from the medium at each observation, so that the reproducing
+\section{Reproduction toxicity tests}
+
+In a reproduction toxicity test, we observe the number of offspring
+produced by a sample of adult organisms exposed to a certain
+concentration of a contaminant over a given period of time. The offspring
+(young organisms, clutches or eggs) are regularly counted and
+removed from the medium at each time point, so that the reproducing
 population cannot increase. It can decrease however, if some
-individuals die during the experiment. The same procedure is usually
-repeated with various concentrations of contaminant, in order to
+organisms die during the experiment. The same procedure is usually
+repeated at various concentrations of contaminant, in order to
 establish a quantitative relationship between the reproduction rate
 and the concentration of contaminant in the medium.
 
-As mentionned already, it is often the case that part of the
-individuals of an bioassay die during the observation period. In
+As already mentionned, it is often the case that part of the
+organisms die during the observation period. In
 previous approaches, it was proposed to consider the cumulated number
 of reproduction outputs without accounting for
 mortality~\cite{OECD2004,OECD2008}, or to exclude replicates where
-mortality occurred~\cite{OECD2012}.  However, individuals may have
+mortality occurred~\cite{OECD2012}.  However, organisms may have
 reproduced before dying and thus contributed to the observed
-response. In addition, individuals dying the first are the most
+response. In addition, organisms dying the first are probably the most
 sensitive, so the information on reproduction of these prematurely
-dead individuals is valuable and ignoring it is likely to bias the
+dead organisms is valuable ; ignoring it is likely to bias the
 results in a non-conservative way. This is particularly critical at
 high concentrations, when mortality may be very high.
 
-In a bioassay, mortality is usually regularly recorded, \textit{i.e}.
-at each timepoint when reproduction outputs are counted.  Using these
-data, we can approximately estimate for each individual the period it
+In a toxicity test, mortality is usually regularly recorded, \textit{i.e}.
+at each time point when reproduction outputs are counted.  Using these
+data, we can approximately estimate for each organism the period it
 has stayed alive (which we assume coincides with the period it may
 reproduce).  As commonly done in epidemiology for incidence rate
 calculations, we can then calculate, for one replicate, the total sum
-of the periods of observation of each individual before its death (see
+of the periods of observation of each organism before its death (see
 next paragraph). This sum can be expressed as a number of
-individual-days. Hence, reproduction can be evaluated through the
-number of outputs per individual-day.
+organism-days. Hence, reproduction can be evaluated through the
+number of outputs per organism-day.
 
 In the following, we denote $M_{ijk}$ the observed number of surviving
-individuals for concentration $c_i$, replicate $j$ and time $t_k$.
+organisms at concentration $c_i$, replicate $j$ and time $t_k$.
 
-\subsection{Estimation of the effective observation time}
+\subsection{Estimation of the effective observation period}
 
-We define the effective observation time as the sum for all
-individuals of the time they spent alive in the experiment. It is
-counted in individual-days and will be denoted $NID_{ij}$ for
-concentration $c_i$ and replicate $j$. As mentionned earlier,
+We define the effective observation period as the sum for all
+organisms of the time they spent alive in the experiment.
+It is counted in organism-days and will be denoted $NID_{ij}$ at
+concentration $c_i$ and replicate $j$.
+As mentionned earlier,
 mortality is observed at particular time points only, so the real life
-time of an individual is unknown and in practice we use the following
-simple estimation: if an individual is alive at $t_k$
+time of an organism is unknown and in practice we use the following
+simple estimation: if an organism is alive at $t_k$
 but dead at $t_{k+1}$, its real life time is approximated as
 $\frac{t_{k+1}+t_k}{2}$.
 
-With this assumption, the effective observation time for concentration
+With this assumption, the effective observation period at concentration
 $c_i$ and replicate $j$ is then given by:
 $$
 NID_{ij} =   \sum_k M_{ij(k+1)} (t_{k+1} - t_k)
-           + (M_{ijk} - M_{ij(k+1)})(\frac{t_{k+1}+t_k}{2} - t_k)
+           + (M_{ijk} - M_{ij(k+1)})\left( \frac{t_{k+1}+t_k}{2} - t_k \right)
 $$
 
 \subsection{Target time analysis}
 In this paragraph, we describe our so-called ``target time analysis'',
 where we model the cumulated number of offspring up to a target time
-as a function of pollutant concentration and effective observation
-time in this period (cumulated life times of all individuals in the
+as a function of contaminant concentration and effective observation
+time in this period (cumulated life times of all organisms in the
 experiment, as described above). A more detailed presentation can be
 found in \cite{delignette2014}.
 
-We keep the convention that the index $i$ is used for concentration
+We keep the convention that index $i$ is used for concentration
 levels and $j$ for replicates. The data will therefore correspond to a
-set $\{(nid_{ij}, n_{ij})\}_i$ of pairs, where $nid_{ij}$ denotes the
-effective observation time and $n_{ij}$ the number of reproduction
+set $\{(NID_{ij}, N_{ij})\}_i$ of pairs, where $NID_{ij}$ denotes the
+effective observation period and $N_{ij}$ the number of reproduction
 output. These observations are supposed to be drawn independently from
 a distribution that is a function of the level of contaminant $c_i$.
 
 
-\paragraph{Modelling} We assume here that the effect of the considered
+\subsubsection{Modelling}
+We assume here that the effect of the considered
 contaminant on the reproduction rate\footnote{that is, the number of
-  reproduction outputs during the experiment per individual-day} does
-not depend on the exposure time, but only on the concentration of the
-contaminant. More precisely, the reproduction rate in an
-experiment with a concentration $c_i$ of contaminant is modelled by a
-three-parameter log-logistic model, that writes as follows:
+  reproduction outputs during the experiment per organism-day} does
+not depend on the exposure period, but only on the concentration of the
+contaminant.
+More precisely, the reproduction rate in an
+experiment at concentration $c_i$ of contaminant is modelled by a
+three-parameters log-logistic model, that writes as follows:
 \[
 f(c;\theta)=\frac{d}{1+(\frac{c}{e})^b} \quad \textrm{with} \quad
 \theta=(e,b,d)
 \]
 Here $d$ corresponds to the reproduction rate in absence of
-contaminant (control condition), and $e$ to the value of the
+contaminant (control condition) and $e$ to the value of the
 $EC_{50}$, that is the concentration dividing the average number of
-offspring by two with respect to the control condition.  Now the
-number of reproduction outputs $N_{ij}$ for concentration $c_i$ in
+offspring by two with respect to the control condition. Then the
+number of reproduction outputs $N_{ij}$ at concentration $c_i$ in
 replicate $j$ can be modelled using a Poisson distribution:
 $$
 N_{ij} \sim Poisson(f(c_i ; \theta) \times NID_{ij})
 $$
 This model is later referred to as ``Poisson model''.  If there
 happens to be a non-negligible variability of the reproduction rate
-between replicates for a some fixed concentration, we propose a second
+between replicates at some fixed concentrations, we propose a second
 model, named ``gamma-Poisson model'', stating that:
 $$
 N_{ij} \sim Poisson(F_{ij} \times NID_{ij})
 $$
-where the reproduction rate $F_{ij}$ for at $c_i$ in replicate $j$ is
+where the reproduction rate $F_{ij}$ at $c_i$ in replicate $j$ is
 a random variable following a gamma distribution. Introducing a
 dispersion parameter $\omega$, we assume that:
 $$
-F_{ij} \sim gamma(\frac{f(c_i;\theta)}{\omega}, \frac{1}{\omega})
+F_{ij} \sim gamma\left( \frac{f(c_i;\theta)}{\omega}, \frac{1}{\omega} \right)
 $$
-Note that a gamma distribution of parameters $\alpha$ and $\beta$ has
-mean $\frac{\alpha}{\beta}$ and variance $\frac{\alpha}{\beta^2}$,
+Note that a gamma distribution of parameters $m_i$ and $\beta$ has
+mean $\frac{m_i}{\beta}$ and variance $\frac{m_i}{\beta^2}$,
 that is here $f(c_i;\theta)$ and $\omega f(c_i;\theta)$
 respectively. Hence $\omega$ can be considered as an overdispersion
 parameter (the greater its value, the greater the inter-replicate
 variability)
 
 
-\paragraph{Inference} Posterior distributions for parameters $b$,
-$d$ and $e$ are estimated using JAGS with the following priors:
+\subsubsection{Inference}
+Posterior distributions for parameters $b$,
+$d$ and $e$ are estimated using JAGS~\cite{rjags2016} with the following priors:
 \begin{itemize}
 \item we assume the range of tested concentrations in an
   experiment is chosen to contain the $EC_{50}$ with high
   probability. More formally, we choose:
-  $$\log_{10} e \sim \mathcal{N}(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4})$$
+  $$\log_{10} e \sim \mathcal{N} \left(\frac{\log_{10} (\min_i c_i) + \log_{10} (\max_i c_i)}{2}, \frac{\log_{10} (\max_i c_i) - \log_{10} (\min_i c_i)}{4} \right)$$
   which implies $e$ has a probability slightly higher than 0.95 to lie
-  between the minimum and the maximum tested concentration.
+  between the minimum and the maximum tested concentrations.
 \item we choose a quasi non-informative prior distribution for the
   shape parameter $b$:
   $$\log_{10} b \sim \mathcal{U}(-2,2)$$
 
 \item
   as $d$ corresponds to the reproduction rate without contaminant, we
-  set a normal prior $\mathcal{N}(\mu_d,\sigma_d)$ using the data:
+  set a normal prior $\mathcal{N}(\mu_d,\sigma_d)$ using the control:
   \begin{align*}
-    \mu_d & = \frac{1}{r_0} \sum_j \frac{n_{0j}}{nid_{0j}}\\
-    \sigma_d & = \sqrt{\frac{\sum_j (\frac{n_{0j}}{nid_{0j}} - \mu_d)^2}{r_0(r_0 - 1)}}\\
+    \mu_d & = \frac{1}{r_0} \sum_j \frac{N_{0j}}{NID_{0j}}\\
+    \sigma_d & = \sqrt{\frac{\sum_j \left( \frac{N_{0j}}{NID_{0j}} - \mu_d\right)^2}{r_0(r_0 - 1)}}\\
   \end{align*}
   where $r_0$ is the number of replicates in the control
   condition. Note that since they are used to estimate the prior
@@ -468,8 +502,8 @@ $$log_{10}(\omega) \sim \mathcal{U}(-4,4)$$
 \begin{align*}
 \end{align*}
 
-For a given dataset, the procedure implemented in MORSE will fit both
-models (Poisson and gamma-Poisson), and use an information criterion
+For a given dataset, the procedure implemented in 'morse' will fit both
+models (Poisson and gamma-Poisson) and use an information criterion
 known as Deviance Information Criterion (DIC) to choose the most
 appropriate. In situations where overdispersion (that is
 inter-replicate variability) is negligible, using the Poisson model
