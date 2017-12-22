@@ -1,6 +1,6 @@
 Package: morse
 Type: Package
-Title: MOdelling tools for Reproduction and Survival data in Ecotoxicology
+Title: Modelling Tools for Reproduction and Survival Data in Ecotoxicology
 Version: 3.0.0
 Author:
     Virgile Baudrot [aut],
@@ -12,7 +12,7 @@ Author:
     Philippe Ruiz [aut],
     Philippe Veber [aut]
 Maintainer: Philippe Veber <philippe.veber@univ-lyon1.fr>
-URL: https://cran.r-project.org/web/packages/morse/index.html
+URL: https://cran.r-project.org/package=morse
 Description: Tools for ecotoxicologists and regulators dedicated to the
     mathematical and statistical modelling of toxicity test data. They use advanced and
     innovative methods for a valuable quantitative environmental risk assessment.
