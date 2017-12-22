@@ -35,11 +35,14 @@
 #' 
 #' @export
 #'
-predict.survFit <- function(x,
+predict.survFit <- function(object,
                             data_predict = NULL,
                             spaghetti = FALSE,
-                            mcmc_size = NULL){
-  
+                            mcmc_size = NULL, ...) {
+  x <- object # Renaming to satisfy CRAN checks on S3 methods
+              # arguments should be named the same when declaring a
+              # method and its instantiations
+
   # Initialisation
   mcmc <- x$mcmc
   model_type <- x$model_type
