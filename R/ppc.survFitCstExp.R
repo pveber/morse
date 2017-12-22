@@ -49,7 +49,7 @@ ppc.survFitCstExp <- function(x, style = "ggplot", main = NULL, ...) {
   ppc_gen(EvalsurvTKTDPpc_CstExp(x), style, xlab, ylab, main)
 }
 
-#' @importFrom stats rbinom quantile
+#' @importFrom stats rbinom quantile plogis
 EvalsurvTKTDPpc_CstExp <- function(x) {
   tot.mcmc <- do.call("rbind", x$mcmc)
 

@@ -25,7 +25,9 @@
 #' out <- survFit(dataset , model_type = "SD")
 #'
 #' # (4) Create a new data table for prediction
-#' data_4prediction <- data.frame(time = 1:10, conc = c(0,5,30,30,0,0,5,30,15,0), replicate= rep("predict", 10))
+#' data_4prediction <- data.frame(time = 1:10,
+#'                                conc = c(0,5,30,30,0,0,5,30,15,0),
+#'                                replicate= rep("predict", 10))
 #'
 #' # (5) Predict on a new dataset
 #' predict_out <- predict(x = out, data_predict = data_4prediction, spaghetti = TRUE)

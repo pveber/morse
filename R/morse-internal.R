@@ -5,7 +5,10 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c(
   "transf_conc", "obs", "pred", "..n..", "Points", "conc", "Line", "Nsurv",
   "time", "Conf.Int", "Cred.Lim", "Obs", "P50", "P2.5", "P97.5", "variable",
   "value", "jittered_conc", "reproRateInf", "reproRateSup", "curv_conc", "q50",
-  "psurv"
+  "psurv", "concentration", ".", "time_ID", "i_row", "nbrReplicate_ConcTime",
+  "time_ID_red", "x.pts", "y.pts", "pts.leg", "survRate_key", "survRate_value",
+  "Nsurv_qinf95", "Nsurv_qsup95", "col_range", "Nsurv_q50", "Nprec", "decrease",
+  "time_ID_long"
 ))
 
 

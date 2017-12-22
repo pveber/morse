@@ -31,7 +31,7 @@
 #' 
 #' @export
 #' 
-LCx.survFit = function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 100, ...){
+LCx.survFit <- function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 100, ...){
   
   if(is.null(conc_range)){
     conc_range = seq(0, max(object$jags.data$conc), length.out = npoints)

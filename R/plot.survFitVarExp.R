@@ -65,6 +65,7 @@
 #' 
 #' @export
 #' 
+#' @importFrom stats predict
 #' @importFrom tidyr gather
 #'
 plot.survFitVarExp <- function(x,

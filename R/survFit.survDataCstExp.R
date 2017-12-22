@@ -85,6 +85,7 @@
 #'
 #' @export
 #' @import rjags
+#' @importFrom stats update
 #' @importFrom dplyr group_by summarise filter
 #'
 survFit.survDataCstExp <- function(data,
