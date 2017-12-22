@@ -6,7 +6,7 @@
 
 #' @import rjags
 #' 
-#' @export
+
 
 survLoadModel <- function(model.program,
                           data,

@@ -9,7 +9,7 @@
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @return The function returns a list with the same information than 
-#' \code{\link{summary.survData}} plus an additional one:
+#' \code{\link{summary.survDataCstExp}} plus an additional one:
 #' \item{NboffTimeConc}{nb of offspring for all concentrations and time points}
 #' 
 #' @examples

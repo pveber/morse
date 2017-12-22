@@ -3,13 +3,13 @@
 #' This is the generic \code{predict} S3 method for the \code{survFit} class.
 #' It provides simulation for "SD" or "IT" models under constant or time-variable exposure.
 #'
-#' @param x A object of class \code{survFit}
+#' @param object An object of class \code{survFit}
 #' @param data_predict A dataframe with three columns \code{time}, \code{conc} and \code{replicate}
 #'  used for prediction. If \code{NULL}, prediction is based on \code{x} object of 
 #'  class \code{survFit} used for fitting.
 #' @param spaghetti If \code{TRUE}, return a set of survival curves using
 #' parameters drawn from the posterior distribution.
-#'  \code{mcmc_size} can be used to reduce the number of mcmc samples in order to speed up
+#' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation.
 #' 
 #' @examples 
