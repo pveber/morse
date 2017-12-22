@@ -239,16 +239,9 @@ summary(dat)
 
 To fit the *Stochastic Death* model, we have to specify the `model_type` as `"SD"`:
 
-```{r, eval=FALSE, echo=TRUE}
+```{r, cache=TRUE, echo=TRUE}
 # (6) fit the TK-TD model SD
 fit_cstSD <- survFit(dat, quiet = TRUE, model_type = "SD")
-```
-
-```{r TKTDcstSD, cache=TRUE, echo=FALSE}
-# (6) fit a TK-TD model
-# fit_cstSD <- survFit(dat, quiet = FALSE, model_type = "SD")
-# save(fit_cstSD, file = "tests/testdata/fit_cstSD.rda")
-load(file = "../tests/testdata/fit_cstSD.rda")
 ```
 
 Then, the `summary` function provides parameters estimates as medians and 95\% credible intervals.
@@ -302,15 +295,8 @@ LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
 The *Individual Tolerance* (IT) model is a variant of TK-TD survival
 analysis. It can also be used with `morse` as demonstrated hereafter. For the *IT* model, we have to specify the `model_type` as `"IT"`:
 
-```{r, eval=FALSE, echo=TRUE}
+```{r, echo=TRUE, cache=TRUE}
 fit_cstIT <- survFit(dat, quiet = TRUE, model_type = "IT")
-```
-
-
-```{r TKTDcstIT, cache=TRUE, echo=FALSE}
-# fit_cstIT <- survFit(dat, model_type = "IT")
-# save(fit_cstIT, file = "tests/testdata/fit_cstIT.rda")
-load(file = "../tests/testdata/fit_cstIT.rda")
 ```
 
 We can first get a summary of the estimated parameters:
@@ -365,16 +351,9 @@ summary(dat)
 
 ### TK-TD model "SD"
 
-```{r, eval=FALSE, echo=TRUE}
+```{r, echo=TRUE, cache=TRUE}
 # (6) fit the TK-TD model SD
 fit_varSD <- survFit(dat, quiet = TRUE, model_type = "SD")
-```
-
-```{r TKTDvarSD, cache=TRUE, echo=FALSE }
-# (6) fit a TK-TD SD model
-# fit_varSD <- survFit(dat, quiet = FALSE, model_type = "SD")
-# save(fit_varSD, file = "tests/testdata/fit_varSD.rda")
-load(file = "../tests/testdata/fit_varSD.rda")
 ```
 
 ```{r, cache=TRUE}
@@ -401,16 +380,9 @@ LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
 
 ### TK-TD model "IT"
 
-```{r, eval=FALSE, echo=TRUE}
+```{r, echo=TRUE, cache=TRUE}
 # fit a TK-TD model IT
 fit_varIT <- survFit(dat, quiet = TRUE, model_type = "IT")
-```
-
-```{r TKTDvarIT, cache=TRUE, echo=FALSE}
-# (8) now fit an IT TK-TD model
-# fit_varIT <- survFit(dat, quiet = FALSE, model_type = "IT")
-# save(fit_varIT, file = "tests/testdata/fit_varIT.rda")
-load(file = "../tests/testdata/fit_varIT.rda")
 ```
 
 ```{r, cache=TRUE}
