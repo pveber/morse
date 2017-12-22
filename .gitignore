@@ -8,10 +8,11 @@
 .Rdata
 .RData
 ..pdf
+..Rcheck
+Rplot.pdf
 
 # RStudio files
 .Rproj.user/
-.Rbuildignore
 r-mosaic.Rproj
 
 # eclipse files
@@ -32,6 +33,11 @@ vignettes/*.aux
 vignettes/*.R
 vignettes/*_cache
 vignettes/*_files
+vignettes/modelling.tex
+vignettes/tutorial.md
+vignettes/modelling-concordance.tex
+vignettes/figure/
+morse.Rcheck/
 
 *.Rproj
 
