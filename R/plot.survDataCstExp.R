@@ -16,7 +16,7 @@
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of \eqn{X}-axis labels in
 #' \code{'ggplot'} style to avoid label overlap
 #' @param \dots Further arguments to be passed to generic methods
-#' 
+#'
 #' @note When \code{style = "ggplot"} (default), the function calls function
 #' \code{\link[ggplot2]{ggplot}} and returns an object of class \code{ggplot}.
 #'
@@ -53,11 +53,11 @@ plot.survDataCstExp <- function(x,
 
   if (!is(x,"survDataCstExp"))
     stop("plot.survData: object of class survData expected")
-  
+
   if (style == "generic" && remove.someLabels)
     warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
             call. = FALSE)
-  
+
   if (is.null(concentration) && addlegend)
     warning("'addlegend' argument is valid only when 'concentration' is not null.",
             call. = FALSE)
@@ -69,7 +69,7 @@ plot.survDataCstExp <- function(x,
   }
 
   x <- as.data.frame(x)
-  
+
   if (is.null(concentration)) {
     survDataPlotFull(x, xlab, ylab, style, remove.someLabels)
   }  else {
@@ -102,7 +102,8 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
   par(mfrow = plotMatrixGeometry(length(unique(data$conc))))
 
   by(data, data$conc, function(x) {
-    # bakground
+    x <- as.data.frame(x)
+    # background
     plot(x$time, rep(0, length(x$time)),
          xlab = xlab,
          ylab = ylab,
@@ -113,8 +114,9 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
          yaxt = "n")
 
     # axis
-    axis(side = 1, at = sort(unique(x[, "time"])))
+    axis(side = 1, at = sort(unique(as.data.frame(x)[, "time"])))
     axis(side = 2, at = unique(round(pretty(c(0, max(x[, resp]))))))
+
 
     # lines and points
     by(x, x$replicate, function(y) {
@@ -130,7 +132,7 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
     # title
     title(paste("Conc: ", unique(x$conc), sep = ""))
   })
-  
+
   par(mfrow = c(1, 1))
 }
 
@@ -138,32 +140,34 @@ dataPlotFullGeneric <- function(data, xlab, ylab, resp) {
 # and one color for each replicate
 #' @import ggplot2
 dataPlotFullGG <- function(data, xlab, ylab, resp, remove.someLabels) {
-  
+
+  data <- as.data.frame(data)
   time = NULL
   Nsurv = NULL
 
   data$response <- data[, resp]
-  
+
   # create ggplot object Nsurv / time / replicate / conc
   fg <- ggplot(data = data, aes(time, response, colour = factor(replicate))) +
-    geom_point() +
-    geom_line() +
-    labs(x = xlab, y = ylab) +
-    facet_wrap(~conc, ncol = 2) +
-    scale_x_continuous(breaks = unique(data$time),
-                       labels = if (remove.someLabels) {
-                         exclude_labels(unique(data$time))
-                       } else {
-                         unique(data$time)
-                       }
-    ) +
-    scale_y_continuous(breaks = unique(round(pretty(c(0, max(data$response)))))) +
-    expand_limits(x = 0, y = 0) +
-    theme_minimal()
-  
-  fd <- fg + theme(legend.position = "none") # remove legend
-  
-  return(fd)
+        geom_point() +
+        geom_line()  +
+        labs(x = xlab, y = ylab) +
+        facet_wrap(~conc, ncol = 2) +
+        scale_x_continuous(breaks = unique(data$time),
+                           labels = if (remove.someLabels) {
+                             exclude_labels(unique(data$time))
+                           } else {
+                             unique(data$time)
+                           }
+        ) +
+        scale_y_continuous(breaks = unique(round(pretty(c(0, max(data$response)))))) +
+        expand_limits(x = 0, y = 0) +
+        theme_minimal()
+
+   fd <- fg + theme(legend.position = "none") # remove legend
+
+   return(fd)
+
 }
 
 dataPlotFull <- function(data, xlab, ylab, resp, style = "generic",

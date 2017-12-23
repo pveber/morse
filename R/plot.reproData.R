@@ -16,18 +16,18 @@
 #' @param remove.someLabels if \code{TRUE}, removes 3/4 of X-axis labels in
 #' \code{'ggplot'} style to avoid the label overlap
 #' @param \dots Further arguments to be passed to generic methods
-#' 
+#'
 #' @note When \code{style = "generic"}, the function calls the generic function
 #' \code{\link[graphics]{plot}}
 #' @note When \code{style = "ggplot"}, the function return an object of class
-#'  \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}} 
-#' 
+#'  \code{gg} and \code{ggplot}, see function \code{\link[ggplot2]{ggplot}}
+#'
 #' @keywords plot
 #'
 #' @examples
 #' # (1) Load the data
 #' data(cadmium1)
-#' 
+#'
 #' # (2) Create an object of class 'reproData'
 #' cadmium1 <- reproData(cadmium1)
 #'
@@ -41,7 +41,7 @@
 #' @import grDevices
 #' @importFrom methods is
 #' @importFrom stats aggregate
-#' 
+#'
 #' @export
 plot.reproData <- function(x,
                            xlab,
@@ -54,21 +54,21 @@ plot.reproData <- function(x,
                            remove.someLabels = FALSE, ...) {
   if (!is(x, "reproData"))
     stop("plot.reproData: object of class reproData expected")
-  
+
   if (style == "generic" && remove.someLabels)
     warning("'remove.someLabels' argument is valid only in 'ggplot' style.",
             call. = FALSE)
-  
+
   if (is.null(concentration) && addlegend)
     warning("'addlegend' argument is valid only when 'concentration' is not null.",
             call. = FALSE)
-  
+
   if (pool.replicate) {
     # agregate by sum of replicate
     x <- cbind(aggregate(cbind(Nreprocumul, Nsurv, Ninit) ~ time + conc, x, sum),
                replicate = 1)
   }
-  
+
   if (is.null(concentration)) {
     reproDataPlotFull(x, xlab, ylab, style, remove.someLabels)
   }
