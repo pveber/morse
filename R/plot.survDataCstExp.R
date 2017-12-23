@@ -198,7 +198,9 @@ dataPlotFixedConc <- function(x,
                               addlegend = FALSE,
                               remove.someLabels = FALSE) {
 
-  if (missing(xlab)) xlab <- "Time"
+  x <- as.data.frame(x) # x is interpreted as a tibble
+
+    if (missing(xlab)) xlab <- "Time"
 
   legend.position <- ifelse(resp == "Nsurv", "bottomleft", "topleft")
 
