@@ -11,6 +11,7 @@
 #' parameters drawn from the posterior distribution.
 #' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation.
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
 #'
