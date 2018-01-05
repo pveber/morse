@@ -4,3 +4,4 @@
 ^vignettes/*.bbl
 ^vignettes/*.blg
 vignettes/figure
+morse_*.tar.gz
