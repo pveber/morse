@@ -15,11 +15,11 @@ test_that("modelData",{
   
   # dataList
   expect_named(modelData_SD$dataList,  c("replicate", "time", "conc", "Nsurv", "Nprec",
-                              "n_data", "i_prec"), ignore.order = TRUE)
+                                         "n_data", "tprec"), ignore.order = TRUE)
   expect_length(modelData_SD$dataList, 7)
   
   expect_named(modelData_IT$dataList,  c("replicate", "time", "conc", "Nsurv", "Nprec",
-                              "n_data", "i_prec", "replicate_ID", "time_ID"),
+                                         "n_data", "i_prec", "replicate_ID", "time_ID"),
                ignore.order = TRUE)
   expect_length(modelData_IT$dataList, 9)
   
@@ -57,7 +57,7 @@ test_that("modelData internal functions",{
                            time= c(1,2,4,1,2,4,1,2,1,2),
                            conc = rep(2,10))
   
-  expect_false(checkTimeReplicate(x))
+  expect_false(checkTimeReplicate(data_FALSE))
 
 })
 
