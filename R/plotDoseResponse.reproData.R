@@ -116,6 +116,7 @@ reproDoseResponseCIGeneric <- function(x, conc_val, jittered_conc,
                                        transf_data_conc, display.conc, ylim,
                                        axis, main, addlegend) {
   
+  x <- as.data.frame(x)
   if (is.null(ylim)) ylim <- c(0, max(x$reproRateSup))
   plot(jittered_conc, x$resp,
        ylim = ylim,
