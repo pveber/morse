@@ -33,7 +33,6 @@ Imports:
     reshape2,
     rjags (>= 4.0),
     stats,
-    stringr,
     tibble,
     tidyr,
     zoo
