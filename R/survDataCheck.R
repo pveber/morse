@@ -44,7 +44,6 @@
 #' zinc[25, "Nsurv"] <- as.integer(20)
 #' survDataCheck(zinc, diagnosis.plot = TRUE)
 #'
-#' @importFrom stringr str_c
 #' @importFrom magrittr '%>%'
 #' @importFrom dplyr arrange
 #' @importFrom dplyr mutate

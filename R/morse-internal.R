@@ -16,10 +16,9 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c(
 # replicate, and time columns. The result can be used as identifiers
 # for the rows of the data.set.
 #
-#' @importFrom stringr str_c
 #'
 idCreate <- function(data) {
-  str_c(data[, "replicate"],
+  paste(data[, "replicate"],
         data[, "time"],
         sep = "_")
 }
