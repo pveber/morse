@@ -10,7 +10,21 @@
 #' define between 0 and the highest tested concentration of the experiment.
 #' @param npoints Number of time point in \code{conc_range} between 0 and the maximal concentration. 100 by default.
 #' @param \dots Further arguments to be passed to generic methods
+#'
+#' @return The function returns an object of class \code{LCx}, which is a list
+#'  with the following information:
+#' \item{X_prop}{Rate of individuals dying considering the median
+#'  of the background mortality at concentraion 0 (i.e. (100-X)/100*median_backgroundMortality_Conc0)}
+#' \item{X_prop_provided}{Rate of individuals dying as provided in arguments (i.e. (100-X)/100)}
+#' \item{time_LCx}{A number giving the time at which  \eqn{LC_{x}} has to be
+#'  estimated as provided in arguments or if NULL, the latest time point of the
+#'   experiment is used.}
+#' \item{df_LCx}{A \code{data.frame} with quantiles (median, 2.5\% and 97.5\%)
+#'  of \eqn{LC_{X}} at time \code{time_LCx} for \eqn{X}\% of individuals}
+#' \item{df_dose}{A \code{data.frame} with four columns: \code{concentration}, and median \code{q50} and 95\% credible interval
+#'  (\code{qinf95} and \code{qsup95}) of the survival rate at time \code{time_LCx}}
 #' 
+#'    
 #' @examples 
 #' 
 #' # (1) Load the data
@@ -60,7 +74,11 @@ LCx.survFit <- function(object, X, time_LCx = NULL, conc_range = NULL, npoints =
   
   df_LCx <- pointsLCx(df_dose, X_prop)
   
-  object_LCx <- list(X_prop = X_prop, X_prop_provided = X_prop_provided, time_LCx = time_LCx, df_LCx = df_LCx , df_dose = df_dose)
+  object_LCx <- list(X_prop = X_prop,
+                     X_prop_provided = X_prop_provided,
+                     time_LCx = time_LCx,
+                     df_LCx = df_LCx,
+                     df_dose = df_dose)
   class(object_LCx) <- c("LCx", "list")
   
   return(object_LCx)
