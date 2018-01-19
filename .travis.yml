@@ -11,14 +11,24 @@ before_script:
 before_install:
  - sudo apt-get install r-cran-rjags -y
 
+r_build_args: --no-build-vignettes --no-manual --no-resave-data
+r_check_args: --no-build-vignettes --no-manual
+
 r_packages:
  - coda
  - dplyr
  - epitools
  - ggplot2
+ - grid
  - gridExtra
- - reshape2
- - stringr
  - knitr
+ - magrittr
+ - methods
+ - reshape2
+ - rjags
+ - stats
+ - tibble
+ - tidyr
+ - zoo
  - rmarkdown
  - testthat
