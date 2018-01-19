@@ -1,10 +1,25 @@
 #' Predict \eqn{x}\% Lethal Concentration at any specified time point for 
 #' a \code{survFit} object.
 #' 
-#' The function \code{LCx}, \eqn{x}\% Lethal Concentration, is use to compute
+#' The function \code{LCx}, \eqn{x}\% Lethal Concentration (\eqn{LC_x}), is use to compute
 #'  the dose required to kill \eqn{x}\% of the members of a tested population
 #'  after a specified test duration (\code{time_LCx}) (default is the maximum
 #'  time point of the experiment).
+#'  
+#'  Mathematical definition of \eqn{x}\% Lethal Concentration at time \eqn{t},
+#'  denoted \eqn{LC(x,t)}, is:
+#'  
+#'  \eqn{S(LC(x,t), t) = S(0, t)*(1- x/100)},
+#'  
+#'  where \eqn{S(LC(x,t), t)} is the survival rate at concentration
+#'  \eqn{LC(x,t)} at time \eqn{t}, and \eqn{S(0,t)} is the survival rate at
+#'  no concentration (i.e. concentration is \eqn{0}) at time \eqn{t} which
+#'  reflect the background mortality \eqn{h_b}:
+#'  
+#'  \eqn{S(0, t) = exp(-hb* t)}.
+#'   
+#'  In the function \code{LCx}, we use the median of \eqn{S(0,t)} to rescale the
+#'  \eqn{x}\% Lethal Concentration at time \eqn{t}.
 #' 
 #' @param object An object of class \code{survFit}
 #' @param X Percentage of individuals dying (e.g., \eqn{50} for \eqn{LC_{50}}, \eqn{10} for \eqn{LC_{10}}, ...)
@@ -18,9 +33,9 @@
 #'
 #' @return The function returns an object of class \code{LCx}, which is a list
 #'  with the following information:
-#' \item{X_prop}{Rate of individuals dying considering the median
-#'  of the background mortality at concentraion 0 (i.e. (100-X)/100*median_backgroundMortality_Conc0)}
-#' \item{X_prop_provided}{Rate of individuals dying as provided in arguments (i.e. (100-X)/100)}
+#' \item{X_prop}{Rate of individuals surviving considering the median
+#'  of the background mortality at concentraion 0 (i.e. \eqn{S(0, t)*(1- x/100)})}
+#' \item{X_prop_provided}{Rate of individuals surviving as provided in arguments (i.e. (100-X)/100)}
 #' \item{time_LCx}{A number giving the time at which  \eqn{LC_{x}} has to be
 #'  estimated as provided in arguments or if NULL, the latest time point of the
 #'   experiment is used.}
