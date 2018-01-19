@@ -201,15 +201,14 @@ survFitPlotCITKTD_CstExp <- function(x) {
   q50 <- apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE)
   
   
-  dtheo <- as.data.frame(cbind(rep(concobs, rep(npoints, length(concobs))),
-                               rep(tfin, length(concobs)),
-                               dtheo))
-  
-  names(dtheo) <- c("conc", "time", paste0("X", 1:length(kd)))
-  
+  dtheo <- as.data.frame(dtheo)
+  colnames(dtheo) <- paste0("X", 1:length(kd))
   # divide number of mcmc by 50
-  sel <- sample(ncol(dtheo[3:ncol(dtheo)]))[1:ceiling(ncol(dtheo) / 50)]
-  dtheo <- cbind(dtheo[, 1:2], dtheo[, sel])
+  sel <- sample(ncol(dtheo))[1:ceiling(ncol(dtheo) / 50)]
+  dtheo <- dtheo[, sel]
+  
+  dtheo$conc <- rep(concobs, rep(npoints, length(concobs)))
+  dtheo$time <- rep(tfin, length(concobs))
   
   # add credible limits
   dtheo$qinf95 <- qinf95
@@ -221,6 +220,7 @@ survFitPlotCITKTD_CstExp <- function(x) {
   dtheo$Mean.C <- "Mean curve"
   # vector color
   dtheo$color <- as.numeric(as.factor(dtheo$conc))
-  
+
+
   return(dtheo)
 }
