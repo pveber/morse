@@ -1,5 +1,10 @@
-#' Predict \eqn{x}\% Lethal Concentration at the maximum time point (default)
-#' for a \code{survFit} object.
+#' Predict \eqn{x}\% Lethal Concentration at any specified time point for 
+#' a \code{survFit} object.
+#' 
+#' The function \code{LCx}, \eqn{x}\% Lethal Concentration, is use to compute
+#'  the dose required to kill \eqn{x}\% of the members of a tested population
+#'  after a specified test duration (\code{time_LCx}) (default is the maximum
+#'  time point of the experiment).
 #' 
 #' @param object An object of class \code{survFit}
 #' @param X Percentage of individuals dying (e.g., \eqn{50} for \eqn{LC_{50}}, \eqn{10} for \eqn{LC_{10}}, ...)
