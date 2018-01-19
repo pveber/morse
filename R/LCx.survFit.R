@@ -34,8 +34,8 @@
 #' @return The function returns an object of class \code{LCx}, which is a list
 #'  with the following information:
 #' \item{X_prop}{Rate of individuals surviving considering the median
-#'  of the background mortality at concentraion 0 (i.e. \eqn{S(0, t)*(1- x/100)})}
-#' \item{X_prop_provided}{Rate of individuals surviving as provided in arguments (i.e. (100-X)/100)}
+#'  of the background mortality (i.e. \eqn{S(0, t)*(1- x/100)})}
+#' \item{X_prop_provided}{Rate of individuals surviving as provided in arguments (i.e. \eqn{(100-X)/100)}}
 #' \item{time_LCx}{A number giving the time at which  \eqn{LC_{x}} has to be
 #'  estimated as provided in arguments or if NULL, the latest time point of the
 #'   experiment is used.}
