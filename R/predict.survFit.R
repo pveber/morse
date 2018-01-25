@@ -31,7 +31,7 @@
 #'                                replicate= rep("predict", 10))
 #'
 #' # (5) Predict on a new dataset
-#' predict_out <- predict(x = out, data_predict = data_4prediction, spaghetti = TRUE)
+#' predict_out <- predict(object = out, data_predict = data_4prediction, spaghetti = TRUE)
 #'
 #' }
 #' 
