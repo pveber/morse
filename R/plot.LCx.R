@@ -46,22 +46,30 @@ plot.LCx <- function(x,
   X_prop_provided <- x$X_prop_provided
   time_LCx <- x$time_LCx
   
-  # loc.x.legend = max(df_dose$concentration)-0.4*max(df_dose$concentration)
+  # Check if df_LCx are not all NA:
+  if(all(is.na(df_LCx$LCx))){
+    warning(paste0("No LCx can be computed at X=", X_prop_provided*100, " and time_LCx=", time_LCx, 
+                   "\nSee the grey dotted line on the graph does not cross zone of credible interval.",
+                   "\nUse LCx function 'LCx' with other values for arguments 'time_LCx' (default is the maximum time of the experimental data),
+and/or other 'X'."))
+  } else{
+    legend.point = data.frame(
+      x.pts = df_LCx$LCx,
+      y.pts = rep(X_prop,3),
+      pts.leg = c(paste("median: ", round(df_LCx$LCx[1],digits = 2)),
+                  paste("quantile 2.5%: ", round(df_LCx$LCx[2],digits = 2)),
+                  paste("quantile 97.5%: ", round(df_LCx$LCx[3],digits = 2)))
+    )
+  }
   
-  legend.point = data.frame(
-    x.pts = df_LCx$LCx,
-    y.pts = rep(X_prop,3),
-    pts.leg = c(paste("median: ", round(df_LCx$LCx[1],digits = 2)),
-                paste("quantile 2.5%: ", round(df_LCx$LCx[2],digits = 2)),
-                paste("quantile 97.5%: ", round(df_LCx$LCx[3],digits = 2)))
-  )
   
   if(is.null(main)){
     main <- paste("Concentation-response curve: LC", X_prop_provided*100, " at time", time_LCx)
   } 
   
-  
   LCx_plt <- ggplot() + theme_minimal() +
+    theme(legend.position = "top",
+          legend.title = element_blank())+
     scale_y_continuous(limits = c(0,1)) +
     labs(title = main,
          x = xlab,
@@ -70,18 +78,19 @@ plot.LCx <- function(x,
                 aes(x = concentration, ymin = qinf95, ymax = qsup95), fill = "lightgrey") + 
     geom_line(data = df_dose,
               aes( x = concentration, y = q50), color ="orange") +
+    geom_hline(yintercept = X_prop, col="grey70", linetype=2)
+  
     # LCx points
-    geom_hline(yintercept = X_prop, col="grey70", linetype=2) +
-    
-    geom_point(data = legend.point,
-               aes(x = x.pts, y=y.pts,
-                   color= pts.leg))+
-    theme(legend.position = "top",
-          legend.title = element_blank())+
-    scale_color_manual(values=c("orange", "black", "black"))
+    if(!all(is.na(df_LCx$LCx))){
+      LCx_plt <- LCx_plt  +
+        geom_point(data = legend.point,
+                   aes(x = x.pts, y=y.pts,
+                       color= pts.leg))+
+        
+        scale_color_manual(values=c("orange", "black", "black"))
+    }
     
   LCx_plt 
-  
   
   return(LCx_plt)
   
