@@ -56,7 +56,7 @@ test_that("survDataCheck", {
   zinc7 <- zinc
   zinc7[107, "replicate"] <- "1"
   failswith_id(zinc7, "duplicatedID")
-  failswith_id(zinc7, "missingReplicate")
+# failswith_id(zinc7, "missingReplicate")
 
   zinc8 <- zinc
   zinc8[25, "Nsurv"] <- 20
@@ -67,7 +67,7 @@ test_that("survDataCheck", {
   zinc9[, "replicate"] <- as.character(zinc9[, "replicate"])
   zinc9[12, "replicate"] <- "D"
   zinc9[, "replicate"] <- as.factor(zinc9[, "replicate"])
-  failswith_id(zinc9, "missingReplicate")
+#  failswith_id(zinc9, "missingReplicate")
   failswith_id(zinc9, "firstTime0")
 
   zinc10 <- zinc
@@ -76,18 +76,18 @@ test_that("survDataCheck", {
 
   cadmium19 <- cadmium1
   cadmium19[12, "replicate"] <- 5
-  failswith_id(cadmium19, "missingReplicate")
+#  failswith_id(cadmium19, "missingReplicate")
   failswith_id(cadmium19, "firstTime0")
 })
 
-##
-## Test survData_join
-##
+#
+# Test survData_join
+#
 data("propiconazole_pulse_exposure")
 
 test_that("survData_join", {
   skip_on_cran()
-  
+
   exposure <- propiconazole_pulse_exposure[,c("replicate", "time", "conc")]
   survival <- propiconazole_pulse_exposure[,c("replicate", "time", "Nsurv")]
 
@@ -95,9 +95,9 @@ test_that("survData_join", {
 
   survData_join <- survData(survData_join(exposure, survival))
   survData_origin <- survData(propiconazole_pulse_exposure)
-  
+
   expect_equal(survData_join, survData_origin)
-  
+
 })
 
 

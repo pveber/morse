@@ -13,13 +13,14 @@ gen_failswith_ids <- function(check, dataset, ids) {
 }
 
 check_all_datasets <- function(datasets, check) {
-  empty_error_table <- errorTableCreate()
+  empty_error_table <- msgTableCreate()
 
   lapply(datasets, function(x) {
     errors <- check(get(x))
     expect_equal(errors, empty_error_table, info = paste(c(x,errors$msg), collapse = "\n"))
     expect_is(errors, c("errorTable",
                         "data.frame"))
-    expect_true(morse:::errorTableIsEmpty(errors))
+    expect_true(morse:::msgTableIsEmpty(errors))
   })
 }
+
