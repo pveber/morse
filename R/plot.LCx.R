@@ -48,7 +48,7 @@ plot.LCx <- function(x,
   
   # Check if df_LCx are not all NA:
   if(all(is.na(df_LCx$LCx))){
-    warning(paste0("No LCx can be computed at X=", X_prop_provided*100, " and time_LCx=", time_LCx, 
+    warning(paste0("No LCx can be computed at X=", 100-X_prop_provided*100, " and time_LCx=", time_LCx, 
                    "\nSee the grey dotted line on the graph does not cross zone of credible interval.",
                    "\nUse LCx function 'LCx' with other values for arguments 'time_LCx' (default is the maximum time of the experimental data),
 and/or other 'X'."))
@@ -64,7 +64,7 @@ and/or other 'X'."))
   
   
   if(is.null(main)){
-    main <- paste("Concentation-response curve: LC", X_prop_provided*100, " at time", time_LCx)
+    main <- paste("Concentation-response curve: LC", 100 - X_prop_provided*100, " at time", time_LCx)
   } 
   
   LCx_plt <- ggplot() + theme_minimal() +

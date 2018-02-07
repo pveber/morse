@@ -194,7 +194,7 @@ pointsLCx <- function(df_dose, X_prop){
   } else {
     LCX_q50 = NA
     
-    warning(paste("No median for LC", X_prop * 100,
+    warning(paste("No median for survival rate of", X_prop,
                   " in the range of concentrations under consideration: [",
                   min(df_dose$concentration), ";", max(df_dose$concentration), "]"))
   }
@@ -211,7 +211,7 @@ pointsLCx <- function(df_dose, X_prop){
   } else{
     LCX_qinf95 = NA
     
-    warning(paste("No 95%inf for LC", X_prop * 100,
+    warning(paste("No 95%inf for survival rate of", X_prop ,
                   " in the range of concentrations under consideration: [",
                   min(df_dose$concentration), ";", max(df_dose$concentration), "]"))
   }
@@ -229,7 +229,7 @@ pointsLCx <- function(df_dose, X_prop){
   } else{
     
     LCX_qsup95 = NA
-    warning(paste("No 95%sup for LC", X_prop * 100,
+    warning(paste("No 95%sup for survival rate of", X_prop,
                   " in the range of concentrations under consideration: [",
                   min(df_dose$concentration), ";", max(df_dose$concentration), "]"))
   }
