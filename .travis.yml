@@ -1,8 +1,8 @@
 # Sample .travis.yml for R projects
 
 language: r
-warnings_are_errors: true
-sudo: required
+# warnings_are_errors: true
+sudo: true
 bioc_required: false
 
 before_script:
@@ -11,8 +11,17 @@ before_script:
 before_install:
  - sudo apt-get install r-cran-rjags -y
 
-r_build_args: --no-build-vignettes --no-manual --no-resave-data
-r_check_args: --no-build-vignettes --no-manual --as-cran
+# r_build_args: --no-build-vignettes --no-manual --no-resave-data
+# r_check_args: --no-build-vignettes --no-manual --as-cran
+
+# r_build_args: '--no-build-vignettes'
+# r_check_args: '--ignore-vignettes --no-examples'
+
+script: 
+ - |
+   travis_wait 90 R CMD build .
+   travis_wait 90 R CMD check morse*tar.gz
+
 
 r_packages:
  - coda
