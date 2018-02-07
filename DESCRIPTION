@@ -13,6 +13,7 @@ Author:
     Philippe Veber [aut]
 Maintainer: Philippe Veber <philippe.veber@univ-lyon1.fr>
 URL: https://cran.r-project.org/package=morse
+BugReports: https://github.com/pveber/morse
 Description: Tools for ecotoxicologists and regulators dedicated to the
     mathematical and statistical modelling of toxicity test data. They use advanced and
     innovative methods for a valuable quantitative environmental risk assessment.
