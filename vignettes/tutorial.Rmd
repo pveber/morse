@@ -239,7 +239,7 @@ summary(dat)
 
 To fit the *Stochastic Death* model, we have to specify the `model_type` as `"SD"`:
 
-```{r, cache=TRUE, echo=TRUE}
+```{r fitcstSD, cache=TRUE, echo=TRUE}
 # (6) fit the TK-TD model SD
 fit_cstSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
@@ -295,7 +295,7 @@ LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
 The *Individual Tolerance* (IT) model is a variant of TK-TD survival
 analysis. It can also be used with `morse` as demonstrated hereafter. For the *IT* model, we have to specify the `model_type` as `"IT"`:
 
-```{r, echo=TRUE, cache=TRUE}
+```{r fitcstIT, echo=TRUE, cache=TRUE}
 fit_cstIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
 
@@ -323,8 +323,8 @@ plot(LCx_cstIT)
 # LC50 at time = 2
 LCx(fit_cstIT, X = 50, time_LCx = 2) %>% plot()
 
-# LC50 at time = 15
-LCx(fit_cstIT, X = 50, time_LCx = 15) %>% plot()
+# LC30 at time = 15
+LCx(fit_cstIT, X = 30, time_LCx = 15) %>% plot()
 ```
 
 ## TK-TD model under time-variable exposure concentration
@@ -351,7 +351,7 @@ summary(dat)
 
 ### TK-TD model "SD"
 
-```{r, echo=TRUE, cache=TRUE}
+```{r fitvarSD, echo=TRUE, cache=TRUE}
 # (6) fit the TK-TD model SD
 fit_varSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
@@ -380,7 +380,7 @@ LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
 
 ### TK-TD model "IT"
 
-```{r, echo=TRUE, cache=TRUE}
+```{r fitvarIT, echo=TRUE, cache=TRUE}
 # fit a TK-TD model IT
 fit_varIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
@@ -404,6 +404,46 @@ LCx(fit_varIT, X = 50, time_LCx = 4, conc_range = c(0,200)) %>% plot()
 
 # LC50 at time = 30
 LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
+```
+
+## Multiplication factors: a 'margin of safety'
+
+GUTS models can be used to simulate the survival of the organisms using the field exposure patterns. Hopefully, this real exposure profile does not result in any related mortality, but a critical question is to know how far the exposure profile is from adverse effect, that is a "margin of safety".
+
+This idea is then to multiply the concentration in the real profile by a "multiplication factor", denoted $MF_x$, resulting in $x\%$ (classically $10\%$ or $50\%$) of additional death at a specified time (for instance, at the end of the exposure period ).
+
+The multiplication factor $MF_x$ then informs the "margin of safety", used to assess if the risk is considered acceptable or not.
+
+Computing an $MF_x$ is easy with the function `MFx`. It only requires the object `survFit` and the exposure profile, argument `profile` in the function. The chosen percentage of survival reduction is specified with argument `x_MFx`, the default is $10$, and the chosen time-point can be specified with `time_MFx`, by default the maximal time-point in the dataset is used. 
+
+There is no explicit formulation of $MF_x$ (at least for the GUTS-SD model), so the `accuracy` argument can be used to change the accuracy of the convergence level.
+
+
+```{r, cache=TRUE}
+# (1) upload or build a data frame with the exposure profile
+data_4prediction <- data.frame(time = 1:10,
+                               conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
+
+# (2) Use the fit on constant exposure eropiconazole with model SD (see previously)
+MFx_PRZ_cstSD_4pred <- MFx(object = fit_cstSD, profile = data_4prediction)
+# As the computing can be long, the function print the `accuracy` for each step of tested multiplication factor.
+```
+
+Then, we can plot the survival rate with both initial profile, and the initial profile multiplied by the obtained multiplicationf factor.
+
+```{r, cache=TRUE}
+# (3) Plot the survival rate with the multiplication factor.
+plot(MFx_PRZ_cstSD_4pred)
+```
+
+Multiplication factor is also available for the GUTS IT model (option `quiet = TRUE` remove the output):
+
+```{r, cache=TRUE}
+# (2) Use the fit on constant exposure propiconazole with model IT. No computing of 
+MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, profile = data_4prediction, time_MFx = 4, quiet = TRUE)
+
+# (3) Plot the survival rate with the multiplication factor.
+plot(MFx_PRZ_cstIT_4pred)
 ```
 
 
