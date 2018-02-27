@@ -79,7 +79,6 @@ plot.MFx <- function(x,
                      xend = time_MFx, yend = final_x_MFx),
                  arrow = arrow(length = unit(0.2,"cm")))
   
-  MFx_plt
   return(MFx_plt)
   
 }
