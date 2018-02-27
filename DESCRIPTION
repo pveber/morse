@@ -1,7 +1,7 @@
 Package: morse
 Type: Package
 Title: Modelling Tools for Reproduction and Survival Data in Ecotoxicology
-Version: 3.0.1
+Version: 3.1.0
 Author:
     Virgile Baudrot [aut],
     Sandrine Charles [aut],
