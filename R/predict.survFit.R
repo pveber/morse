@@ -11,6 +11,8 @@
 #' parameters drawn from the posterior distribution.
 #' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation.
+#' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
+#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
@@ -41,7 +43,9 @@
 predict.survFit <- function(object,
                             data_predict = NULL,
                             spaghetti = FALSE,
-                            mcmc_size = NULL, ...) {
+                            mcmc_size = NULL,
+                            hb_value = TRUE,
+                            ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
               # arguments should be named the same when declaring a
               # method and its instantiations
@@ -102,8 +106,9 @@ predict.survFit <- function(object,
   
   mctot = do.call("rbind", mcmc.samples)
   kd = 10^mctot[, "kd_log10"]
-  hb <- 10^mctot[, "hb_log10"]
   
+  hb <- ifelse(hb_value == TRUE, 10^mctot[, "hb_log10"], rep(0, nrow(mctot)))
+
   k = 1:length(unique_replicate)
   
   
