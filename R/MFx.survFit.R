@@ -17,7 +17,8 @@
 #' 
 #' @param object An object of class \code{survFit}
 #' @param profile A dataframe with two columns \code{time} and \code{conc}.
-#' @param x_MFx Percentage of survival reduction (e.g., \eqn{50} for \eqn{MF_{50}}, \eqn{10} for \eqn{MF_{10}}, ...)
+#' @param x_MFx Percentage of survival reduction (e.g., \eqn{50} for \eqn{MF_{50}},
+#'  \eqn{10} for \eqn{MF_{10}}, ...). The default is 50.
 #' @param time_MFx A number giving the time at which  \eqn{MF_{x}} has to be estimated. 
 #' If NULL, the latest time point of the experiment is used.
 #' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
@@ -71,7 +72,7 @@
 #' 
 MFx.survFit <- function(object,
                         profile,
-                        x_MFx = 10,
+                        x_MFx = 50,
                         time_MFx = NULL,
                         mcmc_size = 1000,
                         MFx_max = 1000,
@@ -125,6 +126,7 @@ MFx.survFit <- function(object,
   }
   
   ls_out = list(Multiplication_factor = MFx_test,
+                x_MFx = x_MFx,
                 time_MFx = time_MFx,
                 initial_x_MFx = median_backgroundMortality_Conc0,
                 theoretical_x_MFx = x_MFx_out,
