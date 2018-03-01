@@ -45,6 +45,7 @@ plot.MFx <- function(x,
                      ylab = "Survival rate \n median and 95 CI",
                      main = NULL,
                      log_scale = FALSE,
+                     ncol = 3,
                      ...){
   
   # definition of xlab and check x_variable
@@ -56,40 +57,43 @@ plot.MFx <- function(x,
     } else stop("the argument 'x_variable' must be 'MFx' or 'Time'. The default is 'MFx'.")
   }
   
-  if(is.null(main)){
-    main <- paste("Multiplication Factor MF is", 
-                  round(x$optimal_MFx$MFx, digits = 3))
-  } 
   
-  # Load data frame from x
+  MFx_plt <- ggplot() + theme_minimal() +
+    theme(legend.position = "top",
+          legend.title = element_blank())+
+    scale_y_continuous(limits = c(0,1)) 
+  
   if(x_variable == "MFx"){
     
-    df_MFx <- x$df_MFx
+    if(is.null(main)){
+      main <- paste("Multiplication Factor curve - at x=", x$x_MFx, " and time", x$time_MFx)
+    } 
     
-    legend.point = data.frame(
-      x.pts = rep(x$optimal_MFx$MFx, 3),
-      y.pts = c(x$optimal_MFx$q50, x$optimal_MFx$qinf95, x$optimal_MFx$qsup95),
-      pts.leg = c(paste("median: ", round(x$optimal_MFx$q50,digits = 2)),
-                  paste("quantile 2.5%: ", round(x$optimal_MFx$qinf95, digits = 2)),
-                  paste("quantile 97.5%: ", round(x$optimal_MFx$qsup95, digits = 2)))
-    )
+    MFx_plt <- MFx_plt +
+      scale_color_manual(values=c("orange", "black", "black")) +
+      labs(title = main,
+           x = xlab,
+           y = ylab) +
+      geom_linerange(data = x$df_doseResponse,
+                     aes(x = MFx, ymin = qinf95, ymax = qsup95),
+                     color = "grey60") +
+      geom_point(data = x$df_doseResponse,
+                  aes(x = MFx, y = q50), color = "orange") 
     
-    
-    MFx_plt <- ggplot() + theme_bw() +
-      labs(title = main) +
-      scale_x_continuous(name = xlab) +
-      scale_y_continuous(name = ylab, limits = c(0,1)) +
-      # Initial prediction:
-      geom_ribbon(data = df_MFx,
-                  aes(x = MFx, ymin = qinf95, ymax = qsup95),
-                  fill = "lightgrey") +
-      geom_line(data = df_MFx,
-                aes(x = MFx, y = q50), color = "orange") +
-      geom_vline(xintercept = x$optimal_MFx$MFx, col="grey70", linetype=2) +
-      geom_point(data = legend.point,
-                 aes(x = x.pts, y=y.pts,
-                     color= pts.leg)) +
-      scale_color_manual(values=c("orange", "black", "black"))
+    if(!is.null(x$x_MFx)){
+      legend.point = data.frame(
+        x.pts = x$df_MFx$MFx[1],
+        y.pts = x$survRate_MFx,
+        pts.leg = paste("median: ", round(x$df_MFx$MFx[1], digits = 3))
+      )
+      
+      
+      MFx_plt <- MFx_plt +
+        geom_hline(yintercept = x$survRate_MFx, col="grey70", linetype=2) +
+        geom_point(data = legend.point,
+                   aes(x = x.pts, y = y.pts, color = pts.leg)) 
+      
+    }
     
     if(log_scale == TRUE){
       MFx_plt <- MFx_plt +
@@ -100,39 +104,72 @@ plot.MFx <- function(x,
   
   if(x_variable == "Time"){
     
-    initial_prediction <- dplyr::filter(x$df_ls_predict, MFx == 1)
-    final_prediction <- dplyr::filter(x$df_ls_predict, MFx == x$optimal_MFx$MFx)
-    
-    y_arrow <- dplyr::filter(initial_prediction, time == x$time_MFx)$q50
-    yend_arrow <- dplyr::filter(final_prediction, time == x$time_MFx)$q50
-    
     # Plot
-    MFx_plt <- ggplot() + theme_bw() +
-      labs(title = main) +
-      scale_x_continuous(name = xlab) +
-      scale_y_continuous(name = ylab, limits = c(0,1)) +
-      # Initial prediction:
-      geom_ribbon(data = initial_prediction,
-                  aes(x = time, ymin = qinf95, ymax = qsup95),
-                  fill = "grey80", alpha = 0.4) +
-      geom_line(data = initial_prediction,
-                aes(x = time, y = q50),
-                col="orange", size = 0.3) +
-      # Final prediction:
-      geom_ribbon(data = final_prediction,
-                  aes(x = time, ymin = qinf95, ymax = qsup95),
-                  fill = "grey30", alpha = 0.4) +
-      geom_line(data = final_prediction,
-                aes(x = time, y = q50),
-                col="orange", size = 1) +
-      geom_segment(aes(x = x$time_MFx, y = y_arrow,
-                       xend = x$time_MFx, yend =  yend_arrow),
-                   arrow = arrow(length = unit(0.2,"cm")))
+    if(is.null(main))  main <- paste("Multiplication Factor curve along time") 
     
+    MFx = x$MFx_tested
+    
+    k <- 1:length(x$ls_predict)
+    #
+    # Make a dataframe with quantile of all generated time series
+    #
+    ls_predict_quantile <- lapply(k, function(kit){
+      df_quantile <- x$ls_predict[[kit]]$df_quantile
+      df_quantile$MFx <- rep(MFx[[kit]], nrow(x$ls_predict[[kit]]$df_quantile))
+      return(df_quantile)
+    })
+    predict_MFx_quantile <- do.call("rbind", ls_predict_quantile)
+    
+    
+    if(!is.null(x$x_MFx)){
+      
+      initial_predict <- dplyr::filter(predict_MFx_quantile, MFx == 1)
+      final_predict <- dplyr::filter(predict_MFx_quantile, MFx == x$df_MFx$MFx[1])
+      
+      y_arrow <- as.numeric(dplyr::filter(initial_predict, time == x$time_MFx)$q50)
+      yend_arrow <- as.numeric(dplyr::filter(final_predict, time == x$time_MFx)$q50)
+      
+      MFx_plt <- MFx_plt +
+        labs(title = main,
+             x = xlab,
+             y = ylab) +
+        # final predict
+        geom_ribbon(data = final_predict,
+                    aes(x = time, ymin = qinf95, ymax = qsup95),
+                    fill = "grey30", alpha = 0.4) +
+        geom_line(data = final_predict,
+                  aes(x = time, y = q50),
+                  col="orange", size = 1) +
+        # initial predict
+        geom_ribbon(data = initial_predict,
+                    aes(x = time, ymin = qinf95, ymax = qsup95),
+                    fill = "grey60", alpha = 0.4) +
+        geom_line(data = initial_predict,
+                  aes(x = time, y = q50),
+                  col="orange", size = 0.3) +
+        # arrow
+        geom_segment(aes(x = x$time_MFx, y = y_arrow,
+                         xend = x$time_MFx, yend =  yend_arrow),
+                     arrow = arrow(length = unit(0.2,"cm")))
+      
+      }
+    if(is.null(x$x_MFx)){
+      
+      MFx_plt <- MFx_plt +
+        labs(title = main,
+             x = xlab,
+             y = ylab) +
+        geom_ribbon(data = predict_MFx_quantile,
+                    aes(x = time, ymin = qinf95, ymax = qsup95),
+                    fill = "grey30", alpha = 0.4) +
+        geom_line(data = predict_MFx_quantile,
+                  aes(x = time, y = q50),
+                  col="orange", size = 1) +
+        facet_wrap( ~ round(MFx, digits = 2), ncol = ncol)
+    }
   }
   
   
   return(MFx_plt)
   
 }
-
