@@ -1,5 +1,15 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.1.0
+=============
+
+NEW FEATURES
+- add 'MFx' function to compute and plot the Multiplication Factor leading to a
+  reduction of x percent of mortality.
+
+BUG FIXES
+- change the automatized title of the plot of an 'LCx' object.
+
 Version 3.0.0
 =============
 
