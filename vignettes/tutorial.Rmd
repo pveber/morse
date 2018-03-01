@@ -419,7 +419,7 @@ Computing an $MF_x$ is easy with the function `MFx`. It only requires the object
 There is no explicit formulation of $MF_x$ (at least for the GUTS-SD model), so the `accuracy` argument can be used to change the accuracy of the convergence level.
 
 
-```{r, cache=TRUE}
+```{r MFx_compt, cache=TRUE}
 # (1) upload or build a data frame with the exposure profile
 data_4prediction <- data.frame(time = 1:10,
                                conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
@@ -431,14 +431,33 @@ MFx_PRZ_cstSD_4pred <- MFx(object = fit_cstSD, profile = data_4prediction)
 
 Then, we can plot the survival rate with both initial profile, and the initial profile multiplied by the obtained multiplicationf factor.
 
-```{r, cache=TRUE}
+```{r MFx_plot, cache=TRUE}
 # (3) Plot the survival rate with the multiplication factor.
 plot(MFx_PRZ_cstSD_4pred)
 ```
 
+In this specific case the x-axis need to be log-scaled, what is possible by setting the option `log_scale = TRUE`:
+
+```{r MFx_plotLog, cache=TRUE}
+plot(MFx_PRZ_cstSD_4pred, log_scale = TRUE)
+```
+
+To compare the initial survival rate (i.e., a multiplication factor set to 1), and the optimal multiplication factor to obtain a reduction of $x\%$ of survival (provided with argument `x_MFx`), we can use the option `x_variable =  "Time"`
+
+```{r MFx_plotTime, cache=TRUE}
+plot(MFx_PRZ_cstSD_4pred, x_variable =  "Time")
+```
+
+Here is an example with a 10 percent Multiplication Factor:
+
+```{r MFx_x10, cache=TRUE}
+MFx_PRZ_cstSD_4pred_x10 <- MFx(object = fit_cstSD, profile = data_4prediction, x_MFx = 10)
+plot(MFx_PRZ_cstSD_4pred_x10, log_scale = TRUE)
+```
+
 Multiplication factor is also available for the GUTS IT model (option `quiet = TRUE` remove the output):
 
-```{r, cache=TRUE}
+```{r MFx_IT, cache=TRUE}
 # (2) Use the fit on constant exposure propiconazole with model IT. No computing of 
 MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, profile = data_4prediction, time_MFx = 4, quiet = TRUE)
 
