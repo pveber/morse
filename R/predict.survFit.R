@@ -107,10 +107,13 @@ predict.survFit <- function(object,
   mctot = do.call("rbind", mcmc.samples)
   kd = 10^mctot[, "kd_log10"]
   
-  hb <- ifelse(hb_value == TRUE, 10^mctot[, "hb_log10"], rep(0, nrow(mctot)))
-
+  if(hb_value == TRUE){
+    hb <- 10^mctot[, "hb_log10"]
+  } else if(hb == FALSE){
+    hb <- rep(0, nrow(mctot))
+  }
+ 
   k = 1:length(unique_replicate)
-  
   
   if(model_type == "SD"){
     kk <- 10^mctot[, "kk_log10"]
@@ -216,8 +219,8 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
 # @return A matrix generate with coda.samples() function
 #
 
-Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta)
-{
+Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta){
+  
   time.prec = dplyr::lag(time, 1) ; time.prec[1] = time[1] #   time[1] = tprec[1]
   diff.int = (exp(time %*% t(kd)) * Cw + exp(time.prec %*% t(kd)) * Cw )/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
   
