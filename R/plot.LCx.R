@@ -89,9 +89,7 @@ and/or other 'X'."))
         
         scale_color_manual(values=c("orange", "black", "black"))
     }
-    
-  LCx_plt 
-  
+
   return(LCx_plt)
   
 }
