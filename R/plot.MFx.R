@@ -28,7 +28,7 @@
 #' out_SD <- survFit(dataset, model_type = "SD")
 #' 
 #' # (4) estimate MF50 at time 4
-#' MFx_SD <- MFx(out_SD, x_MFx = 50, time_MFx = 4)
+#' MFx_SD <- MFx(out_SD, X = 50, time_MFx = 4)
 #' 
 #' # (5) plot the object of class 'MFx'
 #' plot(MFx_SD)
@@ -66,7 +66,7 @@ plot.MFx <- function(x,
   if(x_variable == "MFx"){
     
     if(is.null(main)){
-      main <- paste("Multiplication Factor curve - at x=", x$x_MFx, " and time", x$time_MFx)
+      main <- paste("Multiplication Factor response curve at time", x$time_MFx)
     } 
     
     MFx_plt <- MFx_plt +
@@ -74,22 +74,26 @@ plot.MFx <- function(x,
       labs(title = main,
            x = xlab,
            y = ylab) +
-      geom_linerange(data = x$df_doseResponse,
+      geom_ribbon(data = x$df_doseResponse,
                      aes(x = MFx, ymin = qinf95, ymax = qsup95),
-                     color = "grey60") +
+                     fill = "grey70", alpha = 0.4) +
+      geom_line(data = x$df_doseResponse,
+                 aes(x = MFx, y = q50), color = "orange") +
       geom_point(data = x$df_doseResponse,
                   aes(x = MFx, y = q50), color = "orange") 
     
-    if(!is.null(x$x_MFx)){
+    if(!is.null(x$X_prop_provided)){
       legend.point = data.frame(
-        x.pts = x$df_MFx$MFx[1],
-        y.pts = x$survRate_MFx,
-        pts.leg = paste("median: ", round(x$df_MFx$MFx[1], digits = 3))
+        x.pts = x$df_MFx$MFx,
+        y.pts = rep(x$X_prop, 3),
+        pts.leg = c(paste("median: ", round(x$df_MFx$MFx[1],digits = 2)),
+                    paste("quantile 2.5%: ", round(x$df_MFx$MFx[2],digits = 2)),
+                    paste("quantile 97.5%: ", round(x$df_MFx$MFx[3],digits = 2)))
       )
       
       
       MFx_plt <- MFx_plt +
-        geom_hline(yintercept = x$survRate_MFx, col="grey70", linetype=2) +
+        geom_hline(yintercept = x$X_prop, col="grey70", linetype=2) +
         geom_point(data = legend.point,
                    aes(x = x.pts, y = y.pts, color = pts.leg)) 
       
@@ -105,7 +109,7 @@ plot.MFx <- function(x,
   if(x_variable == "Time"){
     
     # Plot
-    if(is.null(main))  main <- paste("Multiplication Factor curve along time") 
+    if(is.null(main))  main <- paste("Survival over time. Multiplication Factor of", x$X_prop_provided, "percent") 
     
     MFx = x$MFx_tested
     
@@ -121,7 +125,7 @@ plot.MFx <- function(x,
     predict_MFx_quantile <- do.call("rbind", ls_predict_quantile)
     
     
-    if(!is.null(x$x_MFx)){
+    if(!is.null(x$X_prop_provided)){
       
       initial_predict <- dplyr::filter(predict_MFx_quantile, MFx == 1)
       final_predict <- dplyr::filter(predict_MFx_quantile, MFx == x$df_MFx$MFx[1])
@@ -153,7 +157,7 @@ plot.MFx <- function(x,
                      arrow = arrow(length = unit(0.2,"cm")))
       
       }
-    if(is.null(x$x_MFx)){
+    if(is.null(x$X_prop_provided)){
       
       MFx_plt <- MFx_plt +
         labs(title = main,

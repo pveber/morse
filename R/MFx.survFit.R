@@ -16,17 +16,17 @@
 #'   
 #' 
 #' @param object An object of class \code{survFit}
-#' @param profile A dataframe with two columns \code{time} and \code{conc}.
-#' @param x_MFx Percentage of survival reduction (e.g., \eqn{50} for \eqn{MF_{50}},
-#'  \eqn{10} for \eqn{MF_{10}}, ...). The default is 50. 
+#' @param data_predict A dataframe with two columns \code{time} and \code{conc}.
+#' @param X Percentage of survival change (e.g., \eqn{50} for survival decrease of 50\%
+#'  , or \eqn{-50} for survival increase of 50\%).The default is 50. 
 #'  Only time series computed during the adaptation using a binary search in
 #'  \eqn{O(log n)} are returned. However, if \code{NULL}, all time series
 #'  computed from the vector \code{MFx_range} are returned.
 #' @param time_MFx A number giving the time at which  \eqn{MF_{x}} has to be estimated. 
 #' If NULL, the latest time point of the experiment is used.
 #' @param MFx_range A vector from which lower and upper bound of the range of the
-#'  multiplication factor \code{MFx} are generated. The default is a vector \code{c(1, 1000)}.
-#' If argument \code{x_MFx} is \code{NULL}, then all the time series generated with
+#'  multiplication factor \code{MFx} are generated. The default is a vector \code{c(0, 1000)}.
+#' If argument \code{X} is \code{NULL}, then all the time series generated with
 #' \code{MFx_range} are returned.
 #' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation. The default is 1000.
@@ -41,11 +41,11 @@
 #'
 #' @return The function returns an object of class \code{MFx}, which is a list
 #'  with the following information:
-#' \item{x_MFx}{A number giving the percentage of reduction in survival.}
+#' \item{X_prop_provided}{A number giving the percentage of reduction in survival.}
 #' \item{time_MFx}{A number giving the time at which  \eqn{MF_{x}} has to be
 #'  estimated as provided in arguments or if NULL, the latest time point of the
 #'   experiment is used.}
-#' \item{survRate_MFx}{Survival rate for \code{x_MFx} percent of reduction of the median 
+#' \item{X_prop}{Survival rate for \code{X} percent of reduction of the median 
 #' background mortality.}
 #' \item{df_MFx}{A \code{data.frame} with quantiles (median, 2.5\% and 97.5\%)
 #'  of \eqn{MF_{X}} at time \code{time_MFx} for \eqn{X}\% of mortality reduction.}
@@ -74,55 +74,54 @@
 #' data_4prediction <- data.frame(time = 1:10, conc = c(0,0.5,3,3,0,0,0.5,3,1.5,0))
 #' 
 #' # (5) estimate MF10 at time 4
-#' MFx(out_SD, x_MFx = 30, time_MFx = 4)
+#' MFx(out_SD, X = 30, time_MFx = 4)
 #' }
 #' 
 #' 
 #' @export
 #' 
 MFx.survFit <- function(object,
-                        profile,
-                        x_MFx = 50,
+                        data_predict,
+                        X = 50,
                         time_MFx = NULL,
-                        MFx_range = c(1,1000),
+                        MFx_range = c(0,1000),
                         mcmc_size = 1000,
                         hb_value = TRUE,
                         spaghetti = FALSE,
                         accuracy = 0.01,
                         quiet = FALSE, ...){
   
-  ## Analyse profile data.frame
-  if(!all(colnames(profile) %in% c("conc", "time")) || ncol(profile) != 2){
-    stop("The argument 'profile' is a dataframe with two columns 'time' and 'conc'.")
+  ## Analyse data_predict data.frame
+  if(!all(colnames(data_predict) %in% c("conc", "time")) || ncol(data_predict) != 2){
+    stop("The argument 'data_predict' is a dataframe with two columns 'time' and 'conc'.")
   }
   
   ## Check time_MFx
-  if(is.null(time_MFx))  time_MFx = max(profile$time)
+  if(is.null(time_MFx))  time_MFx = max(data_predict$time)
 
-  if(!(time_MFx %in% profile$time)){
+  if(!(time_MFx %in% data_predict$time)){
     stop("Please provide a 'time_MFx' corresponding to a time-point at which concentration is provided.
             Interpolation of concentration is too specific to be automatized.")
   }
   
-  ls_profile <- list()
+  ls_data_predict <- list()
   ls_predict <- list()
   
-  if(!is.null(x_MFx)){
+  if(!is.null(X)){
     
-  ls_profile[[1]] <- profile
-  ls_profile[[1]]$replicate <- rep("predict_MFx_1", nrow(profile))
+  ls_data_predict[[1]] <- data_predict
+  ls_data_predict[[1]]$replicate <- rep("predict_MFx_1", nrow(data_predict))
   
   ls_predict[[1]] <- predict( object = object,
-                              data_predict = ls_profile[[1]],
+                              data_predict = ls_data_predict[[1]],
                               spaghetti = spaghetti,
                               mcmc_size = mcmc_size,
                               hb_value = hb_value)
 
-  
   filter_time_MFx = dplyr::filter(ls_predict[[1]]$df_quantile, time == time_MFx)
 
   median_Mortality_test <- filter_time_MFx$q50
-  theoretical_x_MFx <- (100 - x_MFx) / 100 * filter_time_MFx$q50 # Necessary to compared with accuracy
+  theoretical_X <- (100 - X) / 100 * filter_time_MFx$q50 # Necessary to compared with accuracy
 
     #
     # binary search of MFx in O(log n)
@@ -130,18 +129,19 @@ MFx.survFit <- function(object,
     i = 1
     MFx = 1
     MFx_min = min(MFx_range)
+    MFx_max = max(MFx_range)
     MFx_test = max(MFx_range)
     
-    while(abs(theoretical_x_MFx - median_Mortality_test) > accuracy){
+    while(abs(theoretical_X - median_Mortality_test) > accuracy){
     
       MFx = c(MFx, MFx_test)
         
-      ls_profile[[i+1]] <- profile
-      ls_profile[[i+1]]$conc <- MFx_test * profile$conc
-      ls_profile[[i+1]]$replicate <- rep(paste0("predict_MFx_", MFx_test), nrow(profile))
+      ls_data_predict[[i+1]] <- data_predict
+      ls_data_predict[[i+1]]$conc <- MFx_test * data_predict$conc
+      ls_data_predict[[i+1]]$replicate <- rep(paste0("predict_MFx_", MFx_test), nrow(data_predict))
       
       ls_predict[[i+1]] <- predict(object = object,
-                                  data_predict = ls_profile[[i+1]],
+                                  data_predict = ls_data_predict[[i+1]],
                                   spaghetti = spaghetti,
                                   mcmc_size = mcmc_size,
                                   hb_value = hb_value)
@@ -151,38 +151,38 @@ MFx.survFit <- function(object,
 
       
       if(quiet == FALSE){
-        cat(i,"accuracy:", abs(theoretical_x_MFx - median_Mortality_test), " with multiplication factor:",  MFx_test, "\n")
+        cat(i,"accuracy:", abs(theoretical_X - median_Mortality_test), " with multiplication factor:",  MFx_test, "\n")
       }
       
       i = i + 1
-      if(theoretical_x_MFx - median_Mortality_test < 0){
+      if(theoretical_X - median_Mortality_test < 0){
         MFx_min = MFx_test
         MFx_test = MFx_test + (MFx_max - MFx_min)/2
       }
-      if(theoretical_x_MFx - median_Mortality_test > 0){
+      if(theoretical_X - median_Mortality_test > 0){
         MFx_max = MFx_test
         MFx_test = MFx_test - (MFx_max - MFx_min)/2
       }
     }
     k <- 1:length(MFx)
   }
-  if(is.null(x_MFx)){
+  if(is.null(X)){
     median_Mortality_test = NULL # to return in the final object
     
     MFx = MFx_range
     
     k <- 1:length(MFx_range)
 
-    ls_profile <- lapply(k, function(kit){
-      profil_test <- profile
-      profil_test$conc <- MFx[kit] * profile$conc
-      profil_test$replicate <- rep(paste0("predict_MFx_", MFx[kit]), nrow(profile))
+    ls_data_predict <- lapply(k, function(kit){
+      profil_test <- data_predict
+      profil_test$conc <- MFx[kit] * data_predict$conc
+      profil_test$replicate <- rep(paste0("predict_MFx_", MFx[kit]), nrow(data_predict))
       return(profil_test)
     })
     
     ls_predict <- lapply(k, function(kit){
       predict(object = object,
-              data_predict = ls_profile[[kit]],
+              data_predict = ls_data_predict[[kit]],
               spaghetti = spaghetti,
               mcmc_size = mcmc_size,
               hb_value = hb_value)
@@ -206,20 +206,35 @@ MFx.survFit <- function(object,
   df_doseResponse <- dplyr::filter(predict_MFx_quantile, time == time_MFx)
 
   #
-  # Compute table with the optimal MFx obtained if x_MFx != NULL
+  # Compute table with the optimal MFx obtained if X != NULL
   #
-  if(!is.null(x_MFx)){
-    MFx_q50 = ifelse(!is.null(x_MFx), df_doseResponse$MFx[nrow(df_doseResponse)], NULL)
+  if(!is.null(X)){
+    MFx_q50 = ifelse(!is.null(X), df_doseResponse$MFx[nrow(df_doseResponse)], NULL)
+    
+    # Compute MFx q95:
+    pts_MFx <- pointsMFx(df_doseResponse, median_Mortality_test)
+    MFx_qinf95 <- pts_MFx$MFx_qinf95
+    MFx_qsup95 <- pts_MFx$MFx_qsup95
+    
+    # Return dataframe of quantiles MFx
+    
     df_MFx <- data.frame(quantile = c("median", "quantile 2.5%", "quantile 97.5%"),
-                         MFx = c(MFx_q50, NA, NA))
+                         MFx = c(MFx_q50, MFx_qinf95, MFx_qsup95))
   } else{
     df_MFx <- data.frame(quantile = c("median", "quantile 2.5%", "quantile 97.5%"),
                          MFx = c(NA, NA, NA))
   }
   
-  ls_out = list(x_MFx = x_MFx,
+  warning("This is not an error message:
+Just take into account that only median of MFx as been estimated with a binary
+search using the 'accuracy' argument. The 95% Credible Interval is linearly
+interpolated from computed points. To improve the accuracy of the 95% CI, you
+can use X = NULL, and computed time series around the median MFx, with the
+          vector `MFx_range`.")
+  
+  ls_out = list(X_prop_provided = X,
                 time_MFx = time_MFx,
-                survRate_MFx = median_Mortality_test,
+                X_prop = median_Mortality_test,
                 df_MFx = df_MFx,
                 df_doseResponse = df_doseResponse, # return MFx at specific time
                 MFx_tested = MFx,
@@ -228,4 +243,48 @@ MFx.survFit <- function(object,
   class(ls_out) = c("list", "MFx")
   
   return(ls_out)
+}
+
+
+# points for LCx
+# 
+
+pointsMFx <- function(df_dose, X_prop){
+  
+  if(min(df_dose$qinf95) < X_prop & X_prop < max(df_dose$qinf95)){
+    df.qinf95 <- select(df_dose, c(MFx, qinf95))%>%
+      dplyr::add_row(qinf95 = X_prop)%>%
+      dplyr::arrange(qinf95)%>%
+      dplyr::mutate(MFx = na.approx(MFx, qinf95, na.rm = FALSE))%>%
+      dplyr::filter(qinf95 == X_prop)
+    
+    MFx_qinf95 <- df.qinf95$MFx
+    
+  } else {
+    MFx_qinf95 <- NA
+    
+    warning(paste("No 95%inf for survival rate of", X_prop ,
+                  " in the range of multiplication factors under consideration: [",
+                  min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
+  }
+  
+  if(min(df_dose$qsup95) < X_prop & X_prop < max(df_dose$qsup95)){
+    df.qsup95 <- select(df_dose, c(MFx,qsup95)) %>%
+      add_row(qsup95 = X_prop) %>%
+      arrange(qsup95) %>%
+      mutate(MFx = na.approx(MFx,qsup95, na.rm = FALSE)) %>%
+      filter(qsup95 == X_prop)
+    
+    MFx_qsup95 <- df.qsup95$MFx
+    
+  } else {
+    
+    MFx_qsup95 <- NA
+    warning(paste("No 95%sup for survival rate of", X_prop,
+                  " in the range of multiplication factors under consideration: [",
+                  min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
+  }
+  
+  return(list(MFx_qinf95 = MFx_qinf95,
+              MFx_qsup95 = MFx_qsup95))
 }
