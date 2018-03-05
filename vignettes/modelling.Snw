@@ -122,20 +122,20 @@ describe now.
 
 
 \begin{table}
+\caption{Parameters and symbols used for GUTS-SD and GUTS-IT models. Alternative symbols are used within pubications (see for instance \cite{jager2011, delignette2017}). The unit $[D]$ refers to unit of actual damage, $n.d$ for non dimensional. For GUTS-IT model, we assume a log-logistic distributions, but other distributions are occasionally used \cite{albert2016}.}
 \label{tab:parameters}
-\caption{Parameters and symbols used for GUTS-SD and GUTS-IT models. Alternative symbols are used within pubications (see for instance \cite{jager2011, delignette2017}). The unit $[D]$ refers to unit of actual damage, $n.d$ for non dimensional. For GUTS-IT model, we assume a log-logistic distributions, but other distribution are occasionally use \cite{albert2016}.}
 \begin{tabular}{p{6.5cm} c c c c}
 Parameters & Symbols & Alternative symbols & Units & Models \\
 \hline
 Background hazard rate & $h_b$ & $m_0$ & $\text{time}^{-1}$ & SD and IT\\
 %
-Dominant toxicokinetic rate & $k_d$ & $k_e$ & $\text{time}^{-1}$ & SD and IT \\
+Dominant toxicokinetic rate constant & $k_d$ & $k_e$ & $\text{time}^{-1}$ & SD and IT \\
 %
 Threshold for effects & $\z$ & $\mbox{\it NEC}$, $z$ & $[D]$ & SD \\
 %
-Killing rate & $b_w$ & $k_s$, $k_k$ & $[D]^{-1}.\text{time}^{-1}$ & SD \\
+Killing rate constant & $b_w$ & $k_s$, $k_k$ & $[D]^{-1}.\text{time}^{-1}$ & SD \\
 %
-Median of the threshold effect distribution & $m_i$ & $\alpha$ & $[D]$ & IT \\
+Median of the threshold effect distribution & $m_w$ & $\alpha$ & $[D]$ & IT \\
 %
 Shape of the threshold effect distribution & $\beta$ & - & n.d. & IT \\
 %
@@ -150,8 +150,8 @@ distribution:
 $$
 N_i^k \sim \mathcal{B}(n_i^{k-1}, f_i(t_{k-1}, t_k))
 $$
-where $f$ is the conditional probability of survival at time $t_k$
-given survival at time $t_{k-1}$. Denoting $S_i(t)$ the probability
+where $f_i$ is the conditional probability of survival at time $t_k$
+given survival at time $t_{k-1}$ under concentration $c_i(t)$. Denoting $S_i(t)$ the probability
 of survival at time $t$, we have:
 $$
 f_i(t_{k-1}, t_k) = \frac{S_i(t_k)}{S_i(t_{k-1})}
@@ -170,7 +170,7 @@ organism) $\Cint_i(t)$. More precisely:
 $$
 h_i(t) = b_w \max(\Cint_i(t) - \z, 0) + h_b
 $$
-where (see table \ref{tab:parameters}):
+where (see Table \ref{tab:parameters}):
 \begin{itemize}
 \item $b_w$ is the \emph{killing rate} and expressed in
   concentration$^{-1}$.time$^{-1}$ ;
@@ -188,8 +188,8 @@ concentration, following:
 \label{eq:dynInternalConc}
 \end{equation}
 
-We caal parameter $k_d$ of Eq.~\eqref{eq:dynInternalConc} the 
-``dominant rate'' (expressed in time$^{-1}$). It
+We call parameter $k_d$ of Eq.~\eqref{eq:dynInternalConc} the 
+``dominant rate constant'' (expressed in time$^{-1}$). It
 represents the speed at which the internal concentration in
 contaminant converges to the external concentration. The model could
 be equivalently written using an internal damage instead of an
@@ -197,9 +197,9 @@ internal concentration as a dose metric~\cite{jager2011}.
 
 \bigskip
 
-If we denote $f(\z)$ the probability distribution of the no effect concentration threshold, $\z$, then the survival function is given by:
+If we denote $f_z(\z)$ the probability distribution of the no effect concentration threshold, $\z$, then the survival function is given by:
 \begin{equation}
-S(t) = \int_0^t S_i(t) f(\z) \mbox{d} \z = \int \exp \left( \int_0^t - h_i(u)\mbox{d} u \right) f(\z) \mbox{d} \z 
+S(t) = \int_0^t S_i(t) f_z(\z) \mbox{d} \z = \int \exp \left( \int_0^t - h_i(u)\mbox{d} u \right) f_z(\z) \mbox{d} \z 
 \end{equation}
 
 Then, the calculation of $S(t)$ depends on the model of survival, GUTS-SD or GUTS-IT~\cite{jager2011}:
@@ -207,20 +207,20 @@ Then, the calculation of $S(t)$ depends on the model of survival, GUTS-SD or GUT
 \paragraph{GUTS-SD} In GUTS-SD, all organisms are assumed to have the same internal concentration 
 threshold (denoted $\z$), and, once exceeded, the instantaneous probability 
 to die increases linearly with the internal concentration.
-In this situation, $f(\z)$ is a Dirac delta distribution, and the survival rate is given by Eq.~\eqref{eq:survivaldef}. 
+In this situation, $f_z(\z)$ is a Dirac delta distribution, and the survival rate is given by Eq.~\eqref{eq:survivaldef}. 
 
 \paragraph{GUTS-IT} In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
 exceeded for one organism, this organism dies immediately.
 In other words, the killing rate is infinitely high (e.g. $k_k = + \infty$), and the survival rate is given by:
 $$
-S_i(t) = e^{-h_b t} \int_{\max\limits_{0<\tau <t}(\Cint_i(\tau))}^{+\infty} f(\z) \mbox{d} \z = e^{-h_b t}(1- F(\max\limits_{0<\tau<t} \Cint_i(\tau)))
+S_i(t) = e^{-h_b t} \int_{\max\limits_{0<\tau <t}(\Cint_i(\tau))}^{+\infty} f_z(\z) \mbox{d} \z = e^{-h_b t}(1- F_z(\max\limits_{0<\tau<t} \Cint_i(\tau)))
 $$
-where $F$ denotes the cumulative distribution function of $f$.
+where $F_z$ denotes the cumulative distribution function of $f_z$.
 
 \bigskip
 
 Here, the exposure concentration $c_i(t)$ is not supposed constant.
-In the case of time variable exposure concentration, we use an Euler ODE integrator to solve the models GUTS-SD and GUTS-IT.
+In the case of time variable exposure concentration, we use an midpoint ODE integrator (also known as modified Euler, or Runge-Kutta 2) to solve models GUTS-SD and GUTS-IT.
 When the exposure concentration is constant, then, explicit formulation of integrated equations are used. We present them in the next subsection.
 
 \subsubsection{For constant concentration exposure}
@@ -259,21 +259,21 @@ estimated using Bayesian inference. The choice of priors is defined hereafter.
 With constant concentration, Eq.~\ref{eq:cint} provides that $\Cint_i(t)$ is an increasing function, meaning that:
 
 $$
-\max\limits{0 < \tau < t} (\Cint_i(\tau)) = c_i(1 - e^{-k_d t})
+\max\limits_{0 < \tau < t} (\Cint_i(\tau)) = c_i(1 - e^{-k_d t})
 $$
 
-Therefore, assuming a log-logistic distribution for $f$ yields:
+Therefore, assuming a log-logistic distribution for $f_z$ yields:
 
 $$
-S_i(t) = \exp(- h_b t) \left( 1 - \frac{1}{1+ \left( \frac{c_i(1-\exp(-k_d t ))}{m_i} \right)^{- \beta}} \right)
+S_i(t) = \exp(- h_b t) \left( 1 - \frac{1}{1+ \left( \frac{c_i(1-\exp(-k_d t ))}{m_w} \right)^{- \beta}} \right)
 $$
 
-where $m_i>0$ is the scale parameter (and also the median) and $\beta>0$ is the shape parameter of the log-logistic distribution.  
+where $m_w>0$ is the scale parameter (and also the median) and $\beta>0$ is the shape parameter of the log-logistic distribution.  
 
 \subsubsection{Inference}
 
 Posterior distributions for all parameters $h_b$, $b_w$, $k_d$, $\z$,
-$m_i$ and $\beta$ are computed with JAGS~\cite{rjags2016}.
+$m_w$ and $\beta$ are computed with JAGS~\cite{rjags2016}.
 We set prior distributions on those
 parameters based on the actual experimental design used in a
 toxicity test.
@@ -294,7 +294,7 @@ With this choice, $\theta^{\min}$ and $\theta^{\max}$ correspond to the
 \item $\z^{\min} = \min_{i, c_i \neq 0} c_i$  and $\z^{\max} = \max_i c_i$,
   which amounts to say that $\z$ is most probably contained in the
   range of experimentally tested concentrations ;
-\item similarly, $m_i^{\min} = \min_{i, c_i \neq 0} c_i$  and $m_i^{\max} = \max_i c_i$ ;
+\item similarly, $m_w^{\min} = \min_{i, c_i \neq 0} c_i$  and $m_w^{\max} = \max_i c_i$ ;
 \item for background mortality rate $h_b$, we assume a maximum value
   corresponding to situations where half the indivuals are lost at the
   first observation time in the control (time $t_1$), that is:
@@ -461,8 +461,8 @@ dispersion parameter $\omega$, we assume that:
 $$
 F_{ij} \sim gamma\left( \frac{f(c_i;\theta)}{\omega}, \frac{1}{\omega} \right)
 $$
-Note that a gamma distribution of parameters $m_i$ and $\beta$ has
-mean $\frac{m_i}{\beta}$ and variance $\frac{m_i}{\beta^2}$,
+Note that a gamma distribution of parameters $\alpha$ and $\beta$ has
+mean $\frac{\alpha}{\beta}$ and variance $\frac{\alpha}{\beta^2}$,
 that is here $f(c_i;\theta)$ and $\omega f(c_i;\theta)$
 respectively. Hence $\omega$ can be considered as an overdispersion
 parameter (the greater its value, the greater the inter-replicate
