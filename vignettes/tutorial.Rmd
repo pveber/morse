@@ -406,26 +406,52 @@ LCx(fit_varIT, X = 50, time_LCx = 4, conc_range = c(0,200)) %>% plot()
 LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
 ```
 
+## Prediction
+
+GUTS models can be used to simulate the survival of the organisms using any exposure patterns, using the
+calibration done with the function `survFit` from observed data.
+The function of prediction is called `predict`and returns an object of class `survFitPredict`.
+
+
+```{r predict, cache=TRUE}
+# (1) upload or build a data frame with the exposure profile
+# argument `replicate` is used to provide several profiles of exposure
+data_4prediction <- data.frame(time = c(1:10, 1:10),
+                               conc = c(c(21,19,18,23,20,14,25,8,13,5),
+                                        c(0,0,40,0,0,0,40,0,0,0)),
+                               replicate = c(rep("random", 10), rep("pulse", 10)))
+
+# (2) Use the fit on constant exposure eropiconazole with model SD (see previously)
+predict_PRZ_cstSD_4pred <- predict(object = fit_cstSD, data_predict = data_4prediction)
+```
+
+Then, from a `survFitPredict`, there is the function `plot`:
+
+```{r predictPlot, cache=TRUE}
+# (3) Plot the predicted survival rate over the new exposure profiles.
+plot(predict_PRZ_cstSD_4pred)
+```
+
 ## Multiplication factors: a 'margin of safety'
 
-GUTS models can be used to simulate the survival of the organisms using the field exposure patterns. Hopefully, this real exposure profile does not result in any related mortality, but a critical question is to know how far the exposure profile is from adverse effect, that is a "margin of safety".
+Using predictions functions, GUTS models can be used to simulate the survival of the organisms exposed to an observed exposure pattern. Hopefully, in general this real exposure profile does not result in any related mortality, but a critical question is to know how far the exposure profile is from adverse effect, that is a "margin of safety".
 
 This idea is then to multiply the concentration in the real profile by a "multiplication factor", denoted $MF_x$, resulting in $x\%$ (classically $10\%$ or $50\%$) of additional death at a specified time (for instance, at the end of the exposure period ).
 
 The multiplication factor $MF_x$ then informs the "margin of safety", used to assess if the risk is considered acceptable or not.
 
-Computing an $MF_x$ is easy with the function `MFx`. It only requires the object `survFit` and the exposure profile, argument `profile` in the function. The chosen percentage of survival reduction is specified with argument `x_MFx`, the default is $10$, and the chosen time-point can be specified with `time_MFx`, by default the maximal time-point in the dataset is used. 
+Computing an $MF_x$ is easy with the function `MFx`. It only requires the object `survFit` and the exposure profile, argument `data_predict` in the function. The chosen percentage of survival reduction is specified with argument `X`, the default is $10$, and the chosen time-point can be specified with `time_MFx`, by default the maximal time-point in the dataset is used. 
 
 There is no explicit formulation of $MF_x$ (at least for the GUTS-SD model), so the `accuracy` argument can be used to change the accuracy of the convergence level.
 
 
 ```{r MFx_compt, cache=TRUE}
 # (1) upload or build a data frame with the exposure profile
-data_4prediction <- data.frame(time = 1:10,
-                               conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
+data_4MFx <- data.frame(time = 1:10,
+                        conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
 
 # (2) Use the fit on constant exposure eropiconazole with model SD (see previously)
-MFx_PRZ_cstSD_4pred <- MFx(object = fit_cstSD, profile = data_4prediction)
+MFx_PRZ_cstSD_4MFx <- MFx(object = fit_cstSD, data_predict = data_4MFx)
 # As the computing can be long, the function print the `accuracy` for each step of tested multiplication factor.
 ```
 
@@ -433,36 +459,44 @@ Then, we can plot the survival rate with both initial profile, and the initial p
 
 ```{r MFx_plot, cache=TRUE}
 # (3) Plot the survival rate with the multiplication factor.
-plot(MFx_PRZ_cstSD_4pred)
+plot(MFx_PRZ_cstSD_4MFx)
 ```
 
 In this specific case the x-axis need to be log-scaled, what is possible by setting the option `log_scale = TRUE`:
 
 ```{r MFx_plotLog, cache=TRUE}
-plot(MFx_PRZ_cstSD_4pred, log_scale = TRUE)
+plot(MFx_PRZ_cstSD_4MFx, log_scale = TRUE)
 ```
 
-To compare the initial survival rate (i.e., a multiplication factor set to 1), and the optimal multiplication factor to obtain a reduction of $x\%$ of survival (provided with argument `x_MFx`), we can use the option `x_variable =  "Time"`
+To compare the initial survival rate (i.e., a multiplication factor set to 1), and the optimal multiplication factor to obtain a reduction of $x\%$ of survival (provided with argument `X`), we can use the option `x_variable =  "Time"`
 
 ```{r MFx_plotTime, cache=TRUE}
-plot(MFx_PRZ_cstSD_4pred, x_variable =  "Time")
+# option 'x_variable' allow to vizualize difference of survival with and without multiplication factor.
+plot(MFx_PRZ_cstSD_4MFx, x_variable =  "Time")
 ```
 
 Here is an example with a 10 percent Multiplication Factor:
 
 ```{r MFx_x10, cache=TRUE}
-MFx_PRZ_cstSD_4pred_x10 <- MFx(object = fit_cstSD, profile = data_4prediction, x_MFx = 10)
-plot(MFx_PRZ_cstSD_4pred_x10, log_scale = TRUE)
+MFx_PRZ_cstSD_4MFx_x10 <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = 10)
+plot(MFx_PRZ_cstSD_4MFx_x10, log_scale = TRUE)
 ```
 
 Multiplication factor is also available for the GUTS IT model (option `quiet = TRUE` remove the output):
 
 ```{r MFx_IT, cache=TRUE}
 # (2) Use the fit on constant exposure propiconazole with model IT. No computing of 
-MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, profile = data_4prediction, time_MFx = 4, quiet = TRUE)
+MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, data_predict = data_4MFx, time_MFx = 4, quiet = TRUE)
 
 # (3) Plot the survival rate with the multiplication factor.
-plot(MFx_PRZ_cstIT_4pred)
+plot(MFx_PRZ_cstIT_4pred, log_scale = TRUE)
+```
+
+
+```{r MFx_ITplot, cache=TRUE}
+MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, X=10, hb_value = FALSE, data_predict = data_4MFx, time_MFx = 4)
+
+plot(MFx_PRZ_cstIT_4pred, log_scale = TRUE)
 ```
 
 
