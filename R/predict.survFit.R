@@ -109,7 +109,7 @@ predict.survFit <- function(object,
   
   if(hb_value == TRUE){
     hb <- 10^mctot[, "hb_log10"]
-  } else if(hb == FALSE){
+  } else if(hb_value == FALSE){
     hb <- rep(0, nrow(mctot))
   }
  
