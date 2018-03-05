@@ -20,7 +20,7 @@
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
 #' @param main A main title for the plot.
-#' @param spaghetti if \code{TRUE}, draws a set of survival curves using
+#' @param spaghetti If \code{TRUE}, draws a set of survival curves using
 #' parameters drawn from the posterior distribution
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
 #' one plot instead of one plot per concentration.
@@ -106,7 +106,7 @@ plot.survFitPredict <- function(x,
     plt <- plt + 
       geom_ribbon(data = df_prediction,
                   aes(x = time, ymin = qinf95,ymax = qsup95, group = replicate),
-                  fill = "grey30", alpha = 0.4)
+                  fill = "grey70", alpha = 0.4)
   }
   
   # Prediction
