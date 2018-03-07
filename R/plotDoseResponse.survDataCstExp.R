@@ -57,16 +57,16 @@
 #' @importFrom stats aggregate
 #'
 #' @export
-plotDoseResponse.survData <- function(x,
-                                      xlab = "Concentration",
-                                      ylab = "Survival rate",
-                                      main = NULL,
-                                      target.time = NULL,
-                                      style = "ggplot",
-                                      log.scale = FALSE,
-                                      remove.someLabels = FALSE,
-                                      addlegend = TRUE,
-                                      ...) {
+plotDoseResponse.survDataCstExp <- function(x,
+                                            xlab = "Concentration",
+                                            ylab = "Survival rate",
+                                            main = NULL,
+                                            target.time = NULL,
+                                            style = "ggplot",
+                                            log.scale = FALSE,
+                                            remove.someLabels = FALSE,
+                                            addlegend = TRUE,
+                                            ...) {
   if (is.null(target.time)) target.time <- max(x$time)
   
   if (!target.time %in% x$time || target.time == 0)
