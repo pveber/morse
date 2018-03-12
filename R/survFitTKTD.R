@@ -175,7 +175,12 @@ survTKTDPARAMS <- function(mcmc) {
 #' \item{n.thin}{a numerical value corresponding to the thinning interval}
 #' \item{jags.data}{a list of data passed to the JAGS model}
 #' 
-#' @references Bedaux, J., Kooijman, SALM (1994) Statistical analysis of toxicity tests,
+#' @references
+#' Delignette-Muller ML, Ruiz P and Veber P (2017).
+#' \emph{Robust fit of toxicokinetic−toxicodynamic models using prior knowledge contained in the design of survival toxicity tests.}
+#' \url{http://dx.doi.org/10.1021/acs.est.6b05326}
+#'
+#' Bedaux, J., Kooijman, SALM (1994) Statistical analysis of toxicity tests,
 #' based on hazard modeling, \emph{Environmental and Ecological Statistics}, 1,
 #' 303-314.
 #' 

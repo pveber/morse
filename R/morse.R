@@ -63,9 +63,13 @@
 #' @seealso \code{\link[rjags]{rjags}},
 #' \code{\link[ggplot2]{ggplot2}}
 #' 
-#' @references 
-#' Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
-#' (2014) \emph{Statistical handling of reproduction data for exposure-response
+#' @references
+#' Delignette-Muller ML, Ruiz P and Veber P (2017).
+#' \emph{Robust fit of toxicokinetic−toxicodynamic models using prior knowledge contained in the design of survival toxicity tests.}
+#' \url{http://dx.doi.org/10.1021/acs.est.6b05326}
+#'
+#' Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S. (2014)
+#' \emph{Statistical handling of reproduction data for exposure-response
 #' modelling}.
 #' \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
 #' 
