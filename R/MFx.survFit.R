@@ -111,9 +111,7 @@ MFx.survFit <- function(object,
   
   ls_data_predict <- list()
   ls_predict <- list()
-  
-  if(!is.null(X)){
-    
+
   ls_data_predict[[1]] <- data_predict
   ls_data_predict[[1]]$replicate <- rep("predict_MFx_1", nrow(data_predict))
   
@@ -128,57 +126,96 @@ MFx.survFit <- function(object,
   median_Mortality_test <- filter_time_MFx$q50
   theoretical_X <- (100 - X) / 100 * filter_time_MFx$q50 # Necessary to compared with accuracy
 
-    #
-    # binary search of MFx in O(log n)
-    #
-    i = 1
-    MFx = 1
-    MFx_min = min(MFx_range)
-    MFx_max = max(MFx_range)
-    MFx_test = max(MFx_range)
+  if(!is.null(X)){
+    binarySearch_MFx_q50 <- binarySearch_MFx(object = object,
+                                             spaghetti = spaghetti,
+                                             mcmc_size = mcmc_size,
+                                             hb_value = hb_value,
+                                             MFx_range = MFx_range,
+                                             time_MFx = time_MFx,
+                                             theoretical_X = theoretical_X,
+                                             value_mortality_test = median_Mortality_test,
+                                             accuracy = accuracy,
+                                             data_predict = data_predict,
+                                             ls_data_predict = ls_data_predict,
+                                             ls_predict = ls_predict,
+                                             quiet = quiet,
+                                             quantile = "q50",
+                                             threshold_iter = threshold_iter) # "q50", "qinf95", "qsup95"
+    binarySearch_MFx_qinf95 <- binarySearch_MFx(object = object,
+                                                spaghetti = spaghetti,
+                                                mcmc_size = mcmc_size,
+                                                hb_value = hb_value,
+                                                MFx_range = MFx_range,
+                                                time_MFx = time_MFx,
+                                               theoretical_X = theoretical_X,
+                                               value_mortality_test = filter_time_MFx$qinf95,
+                                               accuracy = accuracy,
+                                               data_predict = data_predict,
+                                               ls_data_predict = ls_data_predict,
+                                               ls_predict = ls_predict,
+                                               quiet = quiet,
+                                               quantile = "qinf95",
+                                               threshold_iter = threshold_iter) # "q50", "qinf95", "qsup95"
+    binarySearch_MFx_qsup95 <- binarySearch_MFx(object = object,
+                                                spaghetti = spaghetti,
+                                                mcmc_size = mcmc_size,
+                                                hb_value = hb_value,
+                                                MFx_range = MFx_range,
+                                                time_MFx = time_MFx,
+                                               theoretical_X = theoretical_X,
+                                               value_mortality_test = filter_time_MFx$qsup95,
+                                               accuracy = accuracy,
+                                               data_predict = data_predict,
+                                               ls_data_predict = ls_data_predict,
+                                               ls_predict = ls_predict,
+                                               quiet = quiet,
+                                               quantile = "qsup95",
+                                               threshold_iter = threshold_iter) # "q50", "qinf95", "qsup95"
     
-    while(abs(theoretical_X - median_Mortality_test) > accuracy){
+    #
+    # Make a dataframe with quantile of all generated time series
+    #
     
-      MFx = c(MFx, MFx_test)
-        
-      ls_data_predict[[i+1]] <- data_predict
-      ls_data_predict[[i+1]]$conc <- MFx_test * data_predict$conc
-      ls_data_predict[[i+1]]$replicate <- rep(paste0("predict_MFx_", MFx_test), nrow(data_predict))
-      
-      ls_predict[[i+1]] <- predict(object = object,
-                                  data_predict = ls_data_predict[[i+1]],
-                                  spaghetti = spaghetti,
-                                  mcmc_size = mcmc_size,
-                                  hb_value = hb_value)
-      
-      filter_time_MFx = dplyr::filter(ls_predict[[i+1]]$df_quantile, time == time_MFx)
-      median_Mortality_test = filter_time_MFx$q50
-
-      
-      if(quiet == FALSE){
-        cat(i,"accuracy:", abs(theoretical_X - median_Mortality_test), " with multiplication factor:",  MFx_test, "\n")
-      }
-      
-      i = i + 1
-      if(theoretical_X - median_Mortality_test < 0){
-        MFx_min = MFx_test
-        MFx_test = MFx_test + (MFx_max - MFx_min)/2
-      }
-      if(theoretical_X - median_Mortality_test > 0){
-        MFx_max = MFx_test
-        MFx_test = MFx_test - (MFx_max - MFx_min)/2
-      }
-      if(i > threshold_iter){
-        MFx_test <- NULL
-        stop("number of iteration reached the threshold number of iteration.")
-      }
-    }
-    k <- 1:length(MFx)
+    ls_predict_quantile_q50 <- lapply(binarySearch_MFx_q50$k, function(kit){
+      df_quantile <- binarySearch_MFx_q50$ls_predict[[kit]]$df_quantile
+      df_quantile$MFx <- rep(binarySearch_MFx_q50$MFx[[kit]], nrow(binarySearch_MFx_q50$ls_predict[[kit]]$df_quantile))
+      return(df_quantile)
+    })
+    ls_predict_quantile_qinf95 <- lapply(binarySearch_MFx_qinf95$k, function(kit){
+      df_quantile <- binarySearch_MFx_qinf95$ls_predict[[kit]]$df_quantile
+      df_quantile$MFx <- rep(binarySearch_MFx_qinf95$MFx[[kit]], nrow(binarySearch_MFx_qinf95$ls_predict[[kit]]$df_quantile))
+      return(df_quantile)
+    })
+    ls_predict_quantile_qsup95 <- lapply(binarySearch_MFx_qsup95$k, function(kit){
+      df_quantile <- binarySearch_MFx_qsup95$ls_predict[[kit]]$df_quantile
+      df_quantile$MFx <- rep(binarySearch_MFx_qsup95$MFx[[kit]], nrow(binarySearch_MFx_qsup95$ls_predict[[kit]]$df_quantile))
+      return(df_quantile)
+    })
+    
+    predict_MFx_quantile_q50 <- do.call("rbind", ls_predict_quantile_q50)
+    predict_MFx_quantile_qinf95 <- do.call("rbind", ls_predict_quantile_qinf95)
+    predict_MFx_quantile_qsup95 <- do.call("rbind", ls_predict_quantile_qsup95)
+    #
+    # doseResponse dataframe at specific time_MFx
+    #
+    df_dose_q50 <- dplyr::filter(predict_MFx_quantile_q50, time == time_MFx)
+    df_dose_q50$id = rep("q50", nrow(df_dose_q50))
+    df_dose_qinf95 <- dplyr::filter(predict_MFx_quantile_qinf95, time == time_MFx)
+    df_dose_qinf95$id = rep("qinf95", nrow(df_dose_qinf95))
+    df_dose_qsup95 <- dplyr::filter(predict_MFx_quantile_qsup95, time == time_MFx)
+    df_dose_qsup95$id = rep("qsup95", nrow(df_dose_qsup95))
+    
+    ## Additional element to return
+    df_dose <- do.call("rbind", list(df_dose_q50, df_dose_qinf95, df_dose_qsup95))
+    MFx <- binarySearch_MFx_q50$MFx
+    ls_predict <- binarySearch_MFx_q50$ls_predict
+    
   }
   if(is.null(X)){
-    median_Mortality_test = NULL # to return in the final object
+    theoretical_X = NULL # to return in the final object
     
-    MFx = MFx_range
+    MFx <- MFx_range
     
     k <- 1:length(MFx_range)
 
@@ -197,34 +234,34 @@ MFx.survFit <- function(object,
               hb_value = hb_value)
     })
     
+    #
+    # Make a dataframe with quantile of all generated time series
+    #
+    
+    ls_predict_quantile <- lapply(k, function(kit){
+      df_quantile <- ls_predict[[kit]]$df_quantile
+      df_quantile$MFx <- rep(MFx[[kit]], nrow(ls_predict[[kit]]$df_quantile))
+      return(df_quantile)
+    })
+    predict_MFx_quantile <- do.call("rbind", ls_predict_quantile)
+    
+    df_dose <- dplyr::filter(predict_MFx_quantile, time == time_MFx)
+    
   }
   
-  #
-  # Make a dataframe with quantile of all generated time series
-  #
-  ls_predict_quantile <- lapply(k, function(kit){
-    df_quantile <- ls_predict[[kit]]$df_quantile
-    df_quantile$MFx <- rep(MFx[[kit]], nrow(ls_predict[[kit]]$df_quantile))
-    return(df_quantile)
-  })
-  predict_MFx_quantile <- do.call("rbind", ls_predict_quantile)
-  
-  #
-  # doseResponse dataframe at specific time_MFx
-  #
-  df_dose <- dplyr::filter(predict_MFx_quantile, time == time_MFx)
-
   #
   # Compute table with the optimal MFx obtained if X != NULL
   #
   if(!is.null(X)){
-    MFx_q50 = ifelse(!is.null(X), df_dose$MFx[nrow(df_dose)], NULL)
     
+    MFx_q50 = df_dose_q50$MFx[nrow(df_dose_q50)]
+    MFx_qinf95 = df_dose_qinf95$MFx[nrow(df_dose_qinf95)]
+    MFx_qsup95 = df_dose_qsup95$MFx[nrow(df_dose_qsup95)]
     # Compute MFx q95:
-    pts_MFx <- pointsMFx(df_dose, median_Mortality_test)
-    MFx_qinf95 <- pts_MFx$MFx_qinf95
-    MFx_qsup95 <- pts_MFx$MFx_qsup95
-    
+    # pts_MFx <- pointsMFx(df_dose, median_Mortality_test)
+    # MFx_qinf95 <- pts_MFx$MFx_qinf95
+    # MFx_qsup95 <- pts_MFx$MFx_qsup95
+    # 
     # Return dataframe of quantiles MFx
     
     df_MFx <- data.frame(quantile = c("median", "quantile 2.5%", "quantile 97.5%"),
@@ -234,14 +271,13 @@ MFx.survFit <- function(object,
                          MFx = c(NA, NA, NA))
   }
   
-  warning("This is not an error message:
-Just take into account that only median of MFx as been estimated with a binary
-search using the 'accuracy' argument. The 95% Credible Interval is linearly
-interpolated from computed points. To improve the accuracy of the 95% CI, you
-can use X = NULL, and computed time series around the median MFx, with the
-          vector `MFx_range`.")
+# warning("This is not an error message:
+# Just take into account that MFx as been estimated with a binary
+# search using the 'accuracy' argument. To improve the shape of the curve, you
+# can use X = NULL, and computed time series around the median MFx, with the
+#           vector `MFx_range`.")
   
-  ls_out = list(X_prop = median_Mortality_test,
+  ls_out = list(X_prop = theoretical_X,
                 X_prop_provided = X/100,
                 time_MFx = time_MFx,
                 df_MFx = df_MFx,
@@ -257,43 +293,134 @@ can use X = NULL, and computed time series around the median MFx, with the
 
 # points for LCx
 # 
+# 
+# pointsMFx <- function(df_dose, X_prop){
+#   
+#   if(min(df_dose$qinf95) < X_prop & X_prop < max(df_dose$qinf95)){
+#     df.qinf95 <- select(df_dose, c(MFx, qinf95))%>%
+#       dplyr::add_row(qinf95 = X_prop)%>%
+#       dplyr::arrange(qinf95)%>%
+#       dplyr::mutate(MFx = na.approx(MFx, qinf95, na.rm = FALSE))%>%
+#       dplyr::filter(qinf95 == X_prop)
+#     
+#     MFx_qinf95 <- df.qinf95$MFx
+#     
+#   } else {
+#     MFx_qinf95 <- NA
+#     
+#     warning(paste("No 95%inf for survival rate of", X_prop ,
+#                   " in the range of multiplication factors under consideration: [",
+#                   min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
+#   }
+#   
+#   if(min(df_dose$qsup95) < X_prop & X_prop < max(df_dose$qsup95)){
+#     df.qsup95 <- select(df_dose, c(MFx,qsup95)) %>%
+#       add_row(qsup95 = X_prop) %>%
+#       arrange(qsup95) %>%
+#       mutate(MFx = na.approx(MFx,qsup95, na.rm = FALSE)) %>%
+#       filter(qsup95 == X_prop)
+#     
+#     MFx_qsup95 <- df.qsup95$MFx
+#     
+#   } else {
+#     
+#     MFx_qsup95 <- NA
+#     warning(paste("No 95%sup for survival rate of", X_prop,
+#                   " in the range of multiplication factors under consideration: [",
+#                   min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
+#   }
+#   
+#   return(list(MFx_qinf95 = MFx_qinf95,
+#               MFx_qsup95 = MFx_qsup95))
+# }
 
-pointsMFx <- function(df_dose, X_prop){
-  
-  if(min(df_dose$qinf95) < X_prop & X_prop < max(df_dose$qinf95)){
-    df.qinf95 <- select(df_dose, c(MFx, qinf95))%>%
-      dplyr::add_row(qinf95 = X_prop)%>%
-      dplyr::arrange(qinf95)%>%
-      dplyr::mutate(MFx = na.approx(MFx, qinf95, na.rm = FALSE))%>%
-      dplyr::filter(qinf95 == X_prop)
+
+
+##########################
+#
+#
+#
+
+#
+# binary search of MFx in O(log n)
+#
+
+binarySearch_MFx <- function(object,
+                             spaghetti,
+                             mcmc_size,
+                             hb_value,
+                             MFx_range,
+                             time_MFx,
+                             theoretical_X,
+                             value_mortality_test,
+                             accuracy,
+                             data_predict,
+                             ls_data_predict,
+                             ls_predict,
+                             quiet,
+                             quantile, # "q50", "qinf95", "qsup95"
+                             threshold_iter
+                             ){
+    #
+    # binary search of MFx in O(log n)
+    #
+    i = 1
+    MFx = 1
+    MFx_min = min(MFx_range)
+    MFx_max = max(MFx_range)
+    MFx_test = max(MFx_range)
     
-    MFx_qinf95 <- df.qinf95$MFx
+    while(abs(theoretical_X - value_mortality_test) > accuracy){
+      
+      MFx = c(MFx, MFx_test)
+      
+      ls_data_predict[[i+1]] <- data_predict
+      ls_data_predict[[i+1]]$conc <- MFx_test * data_predict$conc
+      ls_data_predict[[i+1]]$replicate <- rep(paste0("predict_MFx_", MFx_test), nrow(data_predict))
+      
+      ls_predict[[i+1]] <- predict(object = object,
+                                   data_predict = ls_data_predict[[i+1]],
+                                   spaghetti = spaghetti,
+                                   mcmc_size = mcmc_size,
+                                   hb_value = hb_value)
+      
+      filter_time_MFx = dplyr::filter(ls_predict[[i+1]]$df_quantile, time == time_MFx)
+      if(quantile == "q50"){ value_mortality_test = filter_time_MFx$q50 }
+      if(quantile == "qinf95"){ value_mortality_test = filter_time_MFx$qinf95 }
+      if(quantile == "qsup95"){ value_mortality_test = filter_time_MFx$qsup95 }
+      
+      if(quiet == FALSE){
+        cat(quantile, i,"accuracy:", abs(theoretical_X - value_mortality_test), " with multiplication factor:",  MFx_test, "\n")
+      }
+      
+      i = i + 1
+      if(theoretical_X - value_mortality_test < 0){
+        MFx_min = MFx_test
+        MFx_test = MFx_test + (MFx_max - MFx_min)/2
+      }
+      if(theoretical_X - value_mortality_test > 0){
+        MFx_max = MFx_test
+        MFx_test = MFx_test - (MFx_max - MFx_min)/2
+      }
+      if(MFx_test == max(MFx_range)){
+        MFx_test <- NULL
+        warning(paste("For", quantile, "The multiplication factor is over the bound of", max(MFx_range)))
+        break
+      }
+      if(i > threshold_iter){
+        MFx_test <- NULL
+        warning(paste("For", quantile, "the number of iteration reached the threshold number of iteration."))
+        break
+      }
+    }
+    k <- 1:length(MFx)
     
-  } else {
-    MFx_qinf95 <- NA
-    
-    warning(paste("No 95%inf for survival rate of", X_prop ,
-                  " in the range of multiplication factors under consideration: [",
-                  min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
+    return(list(k = k,
+                MFx = MFx,
+                ls_predict = ls_predict,
+                ls_data_predict = ls_data_predict))
   }
   
-  if(min(df_dose$qsup95) < X_prop & X_prop < max(df_dose$qsup95)){
-    df.qsup95 <- select(df_dose, c(MFx,qsup95)) %>%
-      add_row(qsup95 = X_prop) %>%
-      arrange(qsup95) %>%
-      mutate(MFx = na.approx(MFx,qsup95, na.rm = FALSE)) %>%
-      filter(qsup95 == X_prop)
-    
-    MFx_qsup95 <- df.qsup95$MFx
-    
-  } else {
-    
-    MFx_qsup95 <- NA
-    warning(paste("No 95%sup for survival rate of", X_prop,
-                  " in the range of multiplication factors under consideration: [",
-                  min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
-  }
   
-  return(list(MFx_qinf95 = MFx_qinf95,
-              MFx_qsup95 = MFx_qsup95))
-}
+  
+  
