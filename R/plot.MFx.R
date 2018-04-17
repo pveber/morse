@@ -66,7 +66,7 @@ plot.MFx <- function(x,
   if(x_variable == "MFx"){
     
     if(is.null(main)){
-      main <- paste("Multiplication Factor response curve: MF",  x$X_prop_provided*100, "at time", x$time_MFx)
+      main <- paste("Multiplication Factor for MF",  x$X_prop_provided*100, "% at time", x$time_MFx)
     } 
     
     MFx_plt <- MFx_plt +
