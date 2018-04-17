@@ -1,4 +1,4 @@
-#' Predict the Multiplication Factor leading to \eqn{x}\% of reduction in survival
+#' Predict the Multiplication Factor leading to x\% of reduction in survival
 #' at a specific time.
 #' 
 #' Predict  the x\% Multiplication Factor.
