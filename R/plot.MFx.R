@@ -66,7 +66,7 @@ plot.MFx <- function(x,
   if(x_variable == "MFx"){
     
     if(is.null(main)){
-      main <- paste("Multiplication Factor response curve at time", x$time_MFx)
+      main <- paste("Multiplication Factor response curve: MF",  x$X_prop_provided*100, "at time", x$time_MFx)
     } 
     
     MFx_plt <- MFx_plt +
@@ -74,15 +74,19 @@ plot.MFx <- function(x,
       labs(title = main,
            x = xlab,
            y = ylab) +
-      geom_ribbon(data = x$df_doseResponse,
-                     aes(x = MFx, ymin = qinf95, ymax = qsup95),
-                     fill = "grey70", alpha = 0.4) +
-      geom_line(data = x$df_doseResponse,
-                 aes(x = MFx, y = q50), color = "orange") +
-      geom_point(data = x$df_doseResponse,
-                  aes(x = MFx, y = q50), color = "orange") 
+      geom_ribbon(data = x$df_dose,
+                  aes(x = MFx, ymin = qinf95, ymax = qsup95),
+                     fill = "lightgrey") +
+      geom_point(data = dplyr::filter(x$df_dose, id == "q50"),
+                  aes(x = MFx, y = q50), color = "orange", shape = 4)  +
+      geom_point(data = dplyr::filter(x$df_dose, id == "qinf95"),
+                 aes(x = MFx, y = qinf95), color = "grey", shape = 4)  +
+      geom_point(data = dplyr::filter(x$df_dose, id == "qsup95"),
+                 aes(x = MFx, y = qsup95), color = "grey", shape = 4) +
+      geom_line(data = x$df_dose,
+                aes(x = MFx, y = q50), color = "orange")
     
-    if(!is.null(x$X_prop_provided)){
+    if(!is.null(x$X_prop)){
       legend.point = data.frame(
         x.pts = x$df_MFx$MFx,
         y.pts = rep(x$X_prop, 3),
@@ -97,8 +101,13 @@ plot.MFx <- function(x,
         geom_point(data = legend.point,
                    aes(x = x.pts, y = y.pts, color = pts.leg)) 
       
-    }
-    
+      warning("This is not an error message:
+Just take into account that MFx as been estimated with a binary
+search using the 'accuracy' argument. Cross point indicated the
+position of evaluated time series. To improve the shape of the curve, you 
+can use X = NULL, and computed time series around the median MFx, with the
+          vector `MFx_range`.")
+      }
     if(log_scale == TRUE){
       MFx_plt <- MFx_plt +
         scale_x_log10()
@@ -109,7 +118,7 @@ plot.MFx <- function(x,
   if(x_variable == "Time"){
     
     # Plot
-    if(is.null(main))  main <- paste("Survival over time. Multiplication Factor of", x$X_prop_provided, "percent") 
+    if(is.null(main))  main <- paste("Survival over time. Multiplication Factor of", x$X_prop_provided*100, "percent") 
     
     MFx = x$MFx_tested
     
@@ -125,7 +134,7 @@ plot.MFx <- function(x,
     predict_MFx_quantile <- do.call("rbind", ls_predict_quantile)
     
     
-    if(!is.null(x$X_prop_provided)){
+    if(!is.null(x$X_prop)){
       
       initial_predict <- dplyr::filter(predict_MFx_quantile, MFx == 1)
       final_predict <- dplyr::filter(predict_MFx_quantile, MFx == x$df_MFx$MFx[1])
@@ -157,7 +166,7 @@ plot.MFx <- function(x,
                      arrow = arrow(length = unit(0.2,"cm")))
       
       }
-    if(is.null(x$X_prop_provided)){
+    if(is.null(x$X_prop)){
       
       MFx_plt <- MFx_plt +
         labs(title = main,
