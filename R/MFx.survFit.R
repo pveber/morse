@@ -1,18 +1,21 @@
-#' Predict \eqn{x}\% Multiplication Factor at any specified time point for 
+#' Predict x\% Multiplication Factor at any specified time point for 
 #' a \code{survFit} object.
 #' 
-#' The function \code{MFx}, \eqn{x}\% Multiplication Factor (\eqn{MF_x}), is use to compute
-#'  the factor of multiplication required to kill \eqn{x}\% of the members of a tested population
-#'  after a specified test duration (\code{time_MFx}) (default is the maximum
+#' The function \code{MFx}, x\% Multiplication Factor (\eqn{MF_x}), is used to compute
+#'  the multiplication factor required to reduce by x\% the survival rate at a
+#'  specified test duration (\code{time_MFx}) (default is the maximum
 #'  time point of the experiment).
 #'  
-#'  Mathematical definition of \eqn{x}\% Multiplication Factor at time \eqn{t},
-#'  denoted \eqn{MF(x,t)}, is:
+#'  Mathematical definition of \eqn{x}\% Multiplication Factor at time \eqn{t}
+#'  (at the end of a time series \eqn{T = \{0, \dots, t\}}),
+#'  denoted \eqn{MF(x,t)}, is given by:
 #'  
-#'  \eqn{S(MF(x,t) * C_w(\tau), t) = S( C_w(\tau), t)*(1- x/100)},
+#'  \eqn{S(MF(x,t) * C_w(\tau \in T), t) = S( C_w(\tau \in T), t)*(1- x/100)},
 #'  
-#'  where \eqn{S(MF(x,t)* C_w(\tau), t)} is the survival rate at concentration
-#'  \eqn{MF(x,t)* C_w(\tau)} at time \eqn{t}.
+#'  where \eqn{C_w(\tau \in T)} is the initial exposure profile without
+#'  multiplication factor. And so the expression \eqn{S(MF(x,t)* C_w(\tau \in T), t)}
+#'   is the survival rate after an exposure profile
+#'    \eqn{MF(x,t)* C_w(\tau \in T)} at time \eqn{t}.
 #'   
 #' 
 #' @param object An object of class \code{survFit}
@@ -37,21 +40,21 @@
 #' parameters drawn from the posterior distribution.
 #' @param accuracy Accuracy of the multiplication factor. The default is 0.01.
 #' @param quiet If \code{FALSE}, print the evolution of accuracy.
+#' @param threshold_iter Threshold number of iteration.
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{MFx}, which is a list
 #'  with the following information:
-#' \item{X_prop_provided}{A number giving the percentage of reduction in survival.}
+#'  \item{X_prop}{Survival rate for \code{X} percent of reduction of the initial median 
+#' survival rate at time \code{time_MFx}.}
+#' \item{X_prop_provided}{A number giving the proportion of reduction in survival.}
 #' \item{time_MFx}{A number giving the time at which  \eqn{MF_{x}} has to be
 #'  estimated as provided in arguments or if NULL, the latest time point of the
 #'   experiment is used.}
-#' \item{X_prop}{Survival rate for \code{X} percent of reduction of the median 
-#' background mortality.}
 #' \item{df_MFx}{A \code{data.frame} with quantiles (median, 2.5\% and 97.5\%)
-#'  of \eqn{MF_{X}} at time \code{time_MFx} for \eqn{X}\% of mortality reduction.}
-#' \item{df_doseResponse}{A \code{data.frame} with quantiles (median, 2.5\% and 97.5\%)
-#'  of survival rate along the computed multiplication factor and at the specific
-#'   time \code{time_MFx}.}
+#'  of \eqn{MF_{X}} at time \code{time_MFx} for x\% of mortality reduction.}
+#' \item{df_dose}{A \code{data.frame} with quantiles (median, 2.5\% and 97.5\%)
+#'  of survival rate along the computed multiplication factor and at time \code{time_MFx}.}
 #' \item{MFx_tested}{A vector of all multiplication factor computed.} 
 #' \item{ls_predict}{A list of all object of class \code{survFitPredict} obtained
 #' from computing survival rate for every profiles build from the vector of
@@ -74,7 +77,7 @@
 #' data_4prediction <- data.frame(time = 1:10, conc = c(0,0.5,3,3,0,0,0.5,3,1.5,0))
 #' 
 #' # (5) estimate MF10 at time 4
-#' MFx(out_SD, X = 30, time_MFx = 4)
+#' MFx(out_SD, data_predict = data_4prediction , X = 30, time_MFx = 4)
 #' }
 #' 
 #' 
@@ -89,7 +92,9 @@ MFx.survFit <- function(object,
                         hb_value = TRUE,
                         spaghetti = FALSE,
                         accuracy = 0.01,
-                        quiet = FALSE, ...){
+                        quiet = FALSE,
+                        threshold_iter = 100,
+                        ...){
   
   ## Analyse data_predict data.frame
   if(!all(colnames(data_predict) %in% c("conc", "time")) || ncol(data_predict) != 2){
@@ -163,6 +168,10 @@ MFx.survFit <- function(object,
         MFx_max = MFx_test
         MFx_test = MFx_test - (MFx_max - MFx_min)/2
       }
+      if(i > threshold_iter){
+        MFx_test <- NULL
+        stop("number of iteration reached the threshold number of iteration.")
+      }
     }
     k <- 1:length(MFx)
   }
@@ -203,16 +212,16 @@ MFx.survFit <- function(object,
   #
   # doseResponse dataframe at specific time_MFx
   #
-  df_doseResponse <- dplyr::filter(predict_MFx_quantile, time == time_MFx)
+  df_dose <- dplyr::filter(predict_MFx_quantile, time == time_MFx)
 
   #
   # Compute table with the optimal MFx obtained if X != NULL
   #
   if(!is.null(X)){
-    MFx_q50 = ifelse(!is.null(X), df_doseResponse$MFx[nrow(df_doseResponse)], NULL)
+    MFx_q50 = ifelse(!is.null(X), df_dose$MFx[nrow(df_dose)], NULL)
     
     # Compute MFx q95:
-    pts_MFx <- pointsMFx(df_doseResponse, median_Mortality_test)
+    pts_MFx <- pointsMFx(df_dose, median_Mortality_test)
     MFx_qinf95 <- pts_MFx$MFx_qinf95
     MFx_qsup95 <- pts_MFx$MFx_qsup95
     
@@ -232,11 +241,11 @@ interpolated from computed points. To improve the accuracy of the 95% CI, you
 can use X = NULL, and computed time series around the median MFx, with the
           vector `MFx_range`.")
   
-  ls_out = list(X_prop_provided = X,
+  ls_out = list(X_prop = median_Mortality_test,
+                X_prop_provided = X/100,
                 time_MFx = time_MFx,
-                X_prop = median_Mortality_test,
                 df_MFx = df_MFx,
-                df_doseResponse = df_doseResponse, # return MFx at specific time
+                df_dose = df_dose, # return MFx at specific time
                 MFx_tested = MFx,
                 ls_predict = ls_predict)
   
