@@ -90,9 +90,6 @@ plot.survFitVarExp <- function(x,
   
   plt <- ggplot() +
       theme_minimal() +
-      theme(legend.position ="top",
-            strip.background = element_rect(fill="grey90", color = "white"),
-            strip.text = element_text(colour = "black")) +
       scale_x_continuous(name = xlab) +
       scale_y_continuous(name = ylab,
                          limits = c(0,1)) +
@@ -126,7 +123,7 @@ plot.survFitVarExp <- function(x,
     plt <- plt + 
       geom_ribbon(data = df_prediction,
                   aes(x = time, ymin = qinf95,ymax = qsup95, group = replicate),
-                  fill = "grey30", alpha = 0.4)
+                  fill = "lightgrey", alpha = 0.4)
   }
   
   # Prediction
