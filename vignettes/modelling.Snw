@@ -108,7 +108,7 @@ t_m$ and $t_0 = 0$), thus providing a collection $D = {(c_i, t_k,
   n_i^k)}_{i,k}$ of experiments.
 In 'morse', we propose two
 Toxicokinetic-Toxicodynamic (TKTD) models belonging to
-the General Unified Threshold model for Survival (GUTS)~\cite{jager2011}.
+the General Unified Threshold model for Survival (GUTS)~\cite{jager2011, Jager2018GUTSbook}.
 One is known as the \emph{reduced stochastic death} model~\cite{nyman2012} or
 GUTS-SD and the other is the \emph{reduced organism tolerance} model or GUTS-IT, which we
 describe now.
@@ -122,7 +122,7 @@ describe now.
 
 
 \begin{table}
-\caption{Parameters and symbols used for GUTS-SD and GUTS-IT models. Alternative symbols are used within pubications (see for instance \cite{jager2011, delignette2017}). The unit $[D]$ refers to unit of actual damage, $n.d$ for non dimensional. For GUTS-IT model, we assume a log-logistic distributions, but other distributions are occasionally used \cite{albert2016}.}
+\caption{Parameters and symbols used for GUTS-SD and GUTS-IT models. Alternative symbols are used within pubications (see for instance \cite{jager2011, delignette2017, Jager2018GUTSbook}). The unit $[D]$ refers to unit of actual damage, $n.d$ for non dimensional. For GUTS-IT model, we assume a log-logistic distributions, but other distributions are occasionally used \cite{albert2016}.}
 \label{tab:parameters}
 \begin{tabular}{p{6.5cm} c c c c}
 Parameters & Symbols & Alternative symbols & Units & Models \\
