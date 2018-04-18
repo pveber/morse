@@ -38,7 +38,9 @@
 plot.LCx <- function(x,
                      xlab = "Concentration",
                      ylab = "Survival rate \n median and 95 CI",
-                     main = NULL, ...){
+                     main = NULL,
+                     subtitle = NULL,
+                     ...){
   
   df_dose <- x$df_dose
   df_LCx <- x$df_LCx
@@ -72,6 +74,7 @@ and/or other 'X'."))
           legend.title = element_blank())+
     scale_y_continuous(limits = c(0,1)) +
     labs(title = main,
+         subtitle = subtitle,
          x = xlab,
          y = ylab) +
     geom_ribbon(data = df_dose,
