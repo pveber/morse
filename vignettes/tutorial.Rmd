@@ -45,7 +45,7 @@ The data from a survival toxicity test should be gathered in a `data.frame` with
 specific layout. This is documented in the paragraph on `survData` in the
 reference manual, and you can also inspect one of the datasets provided in
 the package (e.g., `cadmium2`). First, we load the dataset and use the function
-`survDataCheck` to check that it has the expected layout:
+`survDataCheck()` to check that it has the expected layout:
 
 ```{r step1TT, cache=TRUE}
 data(cadmium2)
@@ -58,7 +58,7 @@ The output `## No message` just informs that the dataset is well-formed.
 
 The class `survData` corresponds to \emph{validated} survival data and is the
 basic layout used for the subsequent operations. Note that if the
-call to `survDataCheck` reports no error (i.e., `## No message`), it is guaranteed that `survData`
+call to `survDataCheck()` reports no error (i.e., `## No message`), it is guaranteed that `survData`
 will not fail.
 
 ```{r step2TT, cache=TRUE}
@@ -68,7 +68,7 @@ head(dat)
 
 ## Step 3: visualize your dataset
 
-The function `plot` can be used to plot the number of surviving individuals
+The function `plot()` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
 
 ```{r step3TT, cache=TRUE}
@@ -93,14 +93,14 @@ plot(dat, concentration = 124, addlegend = TRUE,
 
 We can also plot the survival rate, at a given time-point, as a function of 
 concentration, with binomial confidence intervals around the data. This is 
-achieved by using function `plotDoseResponse` and by fixing the option 
+achieved by using function `plotDoseResponse()` and by fixing the option 
 `target.time` (default is the end of the experiment).
 
 ```{r, cache=TRUE}
 plotDoseResponse(dat, target.time = 21, addlegend = TRUE)
 ```
 
-Function `summary` provides some descriptive statistics on the experimental design.
+Function `summary()` provides some descriptive statistics on the experimental design.
 
 ```{r, cache=TRUE}
 summary(dat)
@@ -113,7 +113,7 @@ describe the relationship between the concentration in chemical compound and sur
 at the target time. Our model assumes this latter is a log-logistic function of
 the former, from which the package delivers estimates of the parameters.
 Once we have estimated the parameters, we can then calculate the $LC_x$ values
-for any $x$. All this work is performed by the `survFitTT` function, which requires
+for any $x$. All this work is performed by the `survFitTT()` function, which requires
 a `survData` object as input and the levels of $LC_x$ we want:
 
 ```{r step4TT, results="hide", cache=TRUE}
@@ -127,7 +127,7 @@ parameters as a posterior[^1] distribution, which quantifies the uncertainty on
 their true value. For the parameters of the models, as well as for the $LC_x$
 values, we report the median (as the point estimated value) and the 2.5 \% and 97.5 \%
 quantiles of the posterior (as a measure of uncertainty, a.k.a. credible
-intervals). They can be obtained by using the `summary` method:
+intervals). They can be obtained by using the `summary()` method:
 
 
 ```{r step4TTsummary, cache=TRUE}
@@ -165,7 +165,7 @@ plot(fit, log.scale = TRUE, style = "generic", adddata = TRUE, addlegend = TRUE)
 ```
 
 
-Note that `survFitTT` will warn you if the estimated $LC_{x}$ lie outside the
+Note that `survFitTT()` will warn you if the estimated $LC_{x}$ lie outside the
 range of tested concentrations, as in the following example:
 
 ```{r wrongTT, results="hide", cache=TRUE}
@@ -207,16 +207,19 @@ as an interval where we expect 95% of the dots to be in average. The
 intervals are represented in green if they overlap with the line $Y=X$,
 and in red otherwise.
 
-# Survival analysis using a toxico-kinetic toxico-dynamic (TK-TD) model
+# Survival analysis using a toxicokinetic-toxicodynamic (TKTD) model: GUTS
 
-The steps for a TK-TD data analysis are absolutely analogous to what we
-described for the analysis at target time. Here the goal is to estimate the relationship
-between chemical compound concentration, time and survival rate.
+The steps for a TKTD data analysis are absolutely analogous to what we
+described for the analysis at target time.
+Here the goal is to estimate the relationship
+between chemical compound concentration, time and survival rate using the GUTS models.
+GUTS, for General Unified Threshold models of Survival, is a TKTD models generalising most of existing mechanistic models for survival description.
+For details about GUTS models, see the vignette [theory under modelling approaches](modelling.pdf), and the included references.
 
-## TK-TD model with constant exposure concentrations
+## GUTS model with constant exposure concentrations
 
 Here is a typical session to analyse concentration-dependent time-course data
-using the so-called ["Stochastic Death" (SD) model](modelling.pdf):
+using the so-called "Stochastic Death" (SD) model:
 
 ```{r TKTDcst, cache=TRUE}
 # (1) load dataset
@@ -235,23 +238,23 @@ plot(dat, pool.replicate = FALSE)
 summary(dat)
 ```
 
-### TK-TD model "SD"
+### GUTS model "SD"
 
 To fit the *Stochastic Death* model, we have to specify the `model_type` as `"SD"`:
 
 ```{r fitcstSD, cache=TRUE, echo=TRUE}
-# (6) fit the TK-TD model SD
+# (6) fit the TKTD model SD
 fit_cstSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
 
-Then, the `summary` function provides parameters estimates as medians and 95\% credible intervals.
+Then, the `summary()` function provides parameters estimates as medians and 95\% credible intervals.
 
 ```{r, cache=TRUE}
 # (7) summary of parameters estimates
 summary(fit_cstSD)
 ```
 
-The `plot` function provides a representation of the fitting for each replicates
+The `plot()` function provides a representation of the fitting for each replicates
 
 ```{r, cache=TRUE}
 plot(fit_cstSD)
@@ -263,13 +266,13 @@ Original data can be added by using the option `adddata = TRUE`
 plot(fit_cstSD, adddata = TRUE)
 ```
 
-A posterior predictive check is also possible using function `ppc`:
+A posterior predictive check is also possible using function `ppc()`:
 
 ```{r, cache=TRUE}
 ppc(fit_cstSD)
 ```
 
-Compared to the target time analysis, TK-TD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the dataset is used.
+Compared to the target time analysis, TKTD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the dataset is used.
 
 ```{r cstSDLCx, cache=TRUE}
 # LC50 at the maximum time-point:
@@ -290,9 +293,9 @@ LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
 ```
 
 
-### TK-TD model "IT"
+### GUTS model "IT"
 
-The *Individual Tolerance* (IT) model is a variant of TK-TD survival
+The *Individual Tolerance* (IT) model is a variant of TKTD survival
 analysis. It can also be used with `morse` as demonstrated hereafter. For the *IT* model, we have to specify the `model_type` as `"IT"`:
 
 ```{r fitcstIT, echo=TRUE, cache=TRUE}
@@ -327,7 +330,7 @@ LCx(fit_cstIT, X = 50, time_LCx = 2) %>% plot()
 LCx(fit_cstIT, X = 30, time_LCx = 15) %>% plot()
 ```
 
-## TK-TD model under time-variable exposure concentration
+## GUTS model under time-variable exposure concentration
 
 Here is a typical session fitting an SD or an IT model for a dataset
 under time-variable exposure scenario.
@@ -349,10 +352,10 @@ plot(dat)
 summary(dat)
 ```
 
-### TK-TD model "SD"
+### GUTS model "SD"
 
 ```{r fitvarSD, echo=TRUE, cache=TRUE}
-# (6) fit the TK-TD model SD
+# (6) fit the TKTD model SD
 fit_varSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
 
@@ -378,10 +381,10 @@ plot(LCx_varSD)
 LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
 ```
 
-### TK-TD model "IT"
+### GUTS model "IT"
 
 ```{r fitvarIT, echo=TRUE, cache=TRUE}
-# fit a TK-TD model IT
+# fit a TKTD model IT
 fit_varIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
 
@@ -408,39 +411,52 @@ LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
 
 ## Prediction
 
-GUTS models can be used to simulate the survival of the organisms using any exposure patterns, using the
-calibration done with the function `survFit` from observed data.
-The function of prediction is called `predict`and returns an object of class `survFitPredict`.
+GUTS models can be used to simulate the survival of the organisms under any exposure pattern, using the
+calibration done with  function `survFit()` from observed data.
+The function for prediction is called `predict()` and returns an object of class `survFitPredict`.
 
 
 ```{r predict, cache=TRUE}
 # (1) upload or build a data frame with the exposure profile
 # argument `replicate` is used to provide several profiles of exposure
 data_4prediction <- data.frame(time = c(1:10, 1:10),
-                               conc = c(c(21,19,18,23,20,14,25,8,13,5),
-                                        c(0,0,40,0,0,0,40,0,0,0)),
-                               replicate = c(rep("random", 10), rep("pulse", 10)))
+                               conc = c(c(0,0,40,0,0,0,40,0,0,0),
+                                        c(21,19,18,23,20,14,25,8,13,5)),
+                               replicate = c(rep("pulse", 10), rep("random", 10)))
 
-# (2) Use the fit on constant exposure eropiconazole with model SD (see previously)
+# (2) Use the fit on constant exposure propiconazole with model SD (see previously)
 predict_PRZ_cstSD_4pred <- predict(object = fit_cstSD, data_predict = data_4prediction)
 ```
 
-Then, from a `survFitPredict`, there is the function `plot`:
+From an object `survFitPredict`, results can ben plotted with function `plot()`:
 
 ```{r predictPlot, cache=TRUE}
-# (3) Plot the predicted survival rate over the new exposure profiles.
+# (3) Plot the predicted survival rate under the new exposure profiles.
 plot(predict_PRZ_cstSD_4pred)
 ```
 
+### Removing background mortality in prediction 
+
+While the model has been estimated using the background mortalityt parameter `hb`, it can be interesting to see the prediction without it.
+This is possible with the argument `hb_value`. If `TRUE`, the background mortality is taken into account, and if `FALSE`, the background mortality is set to $0$ in the prediction.
+
+```{r hb_value, cache=TRUE}
+# Use the same data set profile to predict without 'hb'
+predict_PRZ_cstSD_4pred_hbOUT <- predict(object = fit_cstSD, data_predict = data_4prediction, hb_value = FALSE)
+# Plot the prediction:
+plot(predict_PRZ_cstSD_4pred_hbOUT)
+```
+
+
 ## Multiplication factors: a 'margin of safety'
 
-Using predictions functions, GUTS models can be used to simulate the survival of the organisms exposed to an observed exposure pattern. Hopefully, in general this real exposure profile does not result in any related mortality, but a critical question is to know how far the exposure profile is from adverse effect, that is a "margin of safety".
+Using prediction functions, GUTS models can be used to simulate the survival rate of organisms exposed to a given exposure pattern. Hopefully, in general this realistic exposure profile does not result in any related mortality, but a critical question is to know how far the exposure profile is from adverse effect, that is a "margin of safety".
 
-This idea is then to multiply the concentration in the real profile by a "multiplication factor", denoted $MF_x$, resulting in $x\%$ (classically $10\%$ or $50\%$) of additional death at a specified time (for instance, at the end of the exposure period ).
+This idea is then to multiply the concentration in the realistic profile by a "multiplication factor", denoted $MF_x$, resulting in $x\%$ (classically $10\%$ or $50\%$) of additional death at a specified time (by default, at the end of the exposure period).
 
-The multiplication factor $MF_x$ then informs the "margin of safety", used to assess if the risk is considered acceptable or not.
+The multiplication factor $MF_x$ then informs the "margin of safety" that could be used to assess if the risk is considered acceptable or not.
 
-Computing an $MF_x$ is easy with the function `MFx`. It only requires the object `survFit` and the exposure profile, argument `data_predict` in the function. The chosen percentage of survival reduction is specified with argument `X`, the default is $10$, and the chosen time-point can be specified with `time_MFx`, by default the maximal time-point in the dataset is used. 
+Computing an $MF_x$ is easy with function `MFx()`. It only requires object `survFit` and the exposure profile, argument `data_predict` in the function. The chosen percentage of survival reduction is specified with argument `X`, the default is $50$, and the chosen time-point can be specified with `time_MFx`, by default the maximal time-point in the dataset is used. 
 
 There is no explicit formulation of $MF_x$ (at least for the GUTS-SD model), so the `accuracy` argument can be used to change the accuracy of the convergence level.
 
@@ -452,35 +468,55 @@ data_4MFx <- data.frame(time = 1:10,
 
 # (2) Use the fit on constant exposure eropiconazole with model SD (see previously)
 MFx_PRZ_cstSD_4MFx <- MFx(object = fit_cstSD, data_predict = data_4MFx)
-# As the computing can be long, the function print the `accuracy` for each step of tested multiplication factor.
 ```
+
+As the computing can be long, the function print the `accuracy` for each step of tested multiplication factor.
 
 Then, we can plot the survival rate with both initial profile, and the initial profile multiplied by the obtained multiplicationf factor.
 
 ```{r MFx_plot, cache=TRUE}
-# (3) Plot the survival rate with the multiplication factor.
+# (3) Plot the survival rate versus multiplication factors.
 plot(MFx_PRZ_cstSD_4MFx)
 ```
 
-In this specific case the x-axis need to be log-scaled, what is possible by setting the option `log_scale = TRUE`:
+In this specific case, the x-axis needs to be log-scaled, what is possible by setting option `log_scale = TRUE`:
 
 ```{r MFx_plotLog, cache=TRUE}
 plot(MFx_PRZ_cstSD_4MFx, log_scale = TRUE)
 ```
 
-To compare the initial survival rate (i.e., a multiplication factor set to 1), and the optimal multiplication factor to obtain a reduction of $x\%$ of survival (provided with argument `X`), we can use the option `x_variable =  "Time"`
+To compare the initial survival rate (corresponding to a multiplication factor set to 1) with the survival rate at the asked multiplication factor leading to a reduction of $x\%$ of survival (provided with argument `X`), we can use option `x_variable =  "Time"`.
 
 ```{r MFx_plotTime, cache=TRUE}
-# option 'x_variable' allow to vizualize difference of survival with and without multiplication factor.
+# option 'x_variable' allow to vizualize difference in survival rate with and without multiplication factor.
+# (4) Plot the survival rate versus time
 plot(MFx_PRZ_cstSD_4MFx, x_variable =  "Time")
 ```
 
-Here is an example with a 10 percent Multiplication Factor:
+What is provided with the function `plot()` is direclty accessible within the obect of class `MFx`. For instance, to have access to the median and $95\%$ of returned `MFx`, we simply extract the element `df_MFx` wich is the following `data.frame`:
+
+```{r, cache=TRUE}
+MFx_PRZ_cstSD_4MFx$df_MFx
+```
+
+### Changing the level of multiplication factor
+
+Here is an other example with a 10 percent Multiplication Factor:
 
 ```{r MFx_x10, cache=TRUE}
 MFx_PRZ_cstSD_4MFx_x10 <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = 10)
+```
+
+The `warning messages` are just saying that the quantile at $2.5\%$ was not possible to compute. You can see this in the object `df_MFx` include in `MFx_PRZ_cstSD_4MFx_x10`. The reason of this impossibility is obvious when you plot the multiplication Factor-rseponse curve:
+
+```{r MFx_x10_plot, cache=TRUE}
 plot(MFx_PRZ_cstSD_4MFx_x10, log_scale = TRUE)
 ```
+
+After the `plot()` function, you have the following message: `Warning message: Removed 1 rows containing missing values (geom_point).`
+This message come from the use of `ggplot()` function (see the `ggplot2` package) as an echo of the warning message about the messing point at $2.5\%$ that has not been computed.
+
+### Changing the default time of multiplication factor assessment
 
 Multiplication factor is also available for the GUTS IT model (option `quiet = TRUE` remove the output):
 
@@ -488,15 +524,45 @@ Multiplication factor is also available for the GUTS IT model (option `quiet = T
 # (2) Use the fit on constant exposure propiconazole with model IT. No computing of 
 MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, data_predict = data_4MFx, time_MFx = 4, quiet = TRUE)
 
-# (3) Plot the survival rate with the multiplication factor.
+# (3) Plot the survival rate versus multiplication factors.
 plot(MFx_PRZ_cstIT_4pred, log_scale = TRUE)
 ```
 
+This last example set a reduction of $10\%$ of the survival rate, remove the
+background mortality by setting `hb_value = FALSE` and is computed at time `time_MFx = 4`.
 
 ```{r MFx_ITplot, cache=TRUE}
-MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, X=10, hb_value = FALSE, data_predict = data_4MFx, time_MFx = 4)
+MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, X=10, hb_value = FALSE, data_predict = data_4MFx, time_MFx = 4, quiet = TRUE)
 
 plot(MFx_PRZ_cstIT_4pred, log_scale = TRUE)
+
+plot(MFx_PRZ_cstIT_4pred, x_variable =  "Time")
+```
+
+### Computing a range of multiplication factors
+
+Once we have obtained the desire multiplication factor inducing the $x\%$ reduction of the survival rate, it can be relevant to explore the sentivity of this parameter by exploring survival rate over a range of multiplication factor. This is possible by setting argument `X = NULL` and providing a range of wanted multiplication factor, for instance `MFx_range = c()` in our first example.
+
+```{r MFx_range, cache=TRUE}
+MFx_PRZ_cstSD_4pred_range <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = NULL, MFx_range = 1:6)
+```
+
+The associated plot if given by:
+
+```{r, cache=TRUE}
+plot(MFx_PRZ_cstSD_4pred_range)
+```
+
+And the argument `x_variable = "Time"` return all computed time series:
+
+```{r, cache=TRUE}
+plot(MFx_PRZ_cstSD_4pred_range, x_variable = "Time")
+```
+
+To select a specific time series, we can use the element `ls_predict` wich is a list of object of class `survFitPredict` to wich a plot is defined.
+
+```{r, cache=TRUE}
+plot(MFx_PRZ_cstSD_4pred_range$ls_predict[[4]])
 ```
 
 
@@ -553,7 +619,7 @@ signification can be found in the [modelling vignette](modelling.pdf).
 For reproduction analyses, we compare one model which neglects the inter-individual
 variability (named "Poisson") and another one which takes it into account
 (named "gamma Poisson"). You can choose either one or the other with the option `stoc.part`.
-Setting this option to `"bestfit"`, you let `reproFitTT` decides which models fits the
+Setting this option to `"bestfit"`, you let `reproFitTT()` decides which models fits the
 data best. The corresponding choice can be seen by calling the `summary` function:
 
 ```{r, cache=TRUE}
