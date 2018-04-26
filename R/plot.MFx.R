@@ -77,16 +77,21 @@ plot.MFx <- function(x,
       geom_ribbon(data = x$df_dose,
                   aes(x = MFx, ymin = qinf95, ymax = qsup95),
                      fill = "lightgrey") +
-      geom_point(data = dplyr::filter(x$df_dose, id == "q50"),
-                  aes(x = MFx, y = q50), color = "orange", shape = 4)  +
-      geom_point(data = dplyr::filter(x$df_dose, id == "qinf95"),
-                 aes(x = MFx, y = qinf95), color = "grey", shape = 4)  +
-      geom_point(data = dplyr::filter(x$df_dose, id == "qsup95"),
-                 aes(x = MFx, y = qsup95), color = "grey", shape = 4) +
+      geom_point(data = x$df_dose,
+                 aes(x = MFx, y = q50), color = "orange", shape = 4) +
       geom_line(data = x$df_dose,
                 aes(x = MFx, y = q50), color = "orange")
     
     if(!is.null(x$X_prop)){
+      
+      MFx_plt <- MFx_plt +
+        geom_point(data = dplyr::filter(x$df_dose, id == "q50"),
+                   aes(x = MFx, y = q50), color = "orange", shape = 4)  +
+        geom_point(data = dplyr::filter(x$df_dose, id == "qinf95"),
+                   aes(x = MFx, y = qinf95), color = "grey", shape = 4)  +
+        geom_point(data = dplyr::filter(x$df_dose, id == "qsup95"),
+                   aes(x = MFx, y = qsup95), color = "grey", shape = 4)
+      
       legend.point = data.frame(
         x.pts = x$df_MFx$MFx,
         y.pts = rep(x$X_prop, 3),
