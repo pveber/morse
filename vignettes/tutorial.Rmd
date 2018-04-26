@@ -561,13 +561,14 @@ MFx_PRZ_cstSD_4pred_range <- MFx(object = fit_cstSD, data_predict = data_4MFx, X
 
 The associated plot if given by:
 
-```{r, cache=TRUE}
+```{r plt_MFx_range, cache=TRUE}
+# Plot survivial rate versus the range of multiplication factor.
 plot(MFx_PRZ_cstSD_4pred_range)
 ```
 
 And the argument `x_variable = "Time"` return all computed time series:
 
-```{r, cache=TRUE}
+```{r plt_MFx_range_Time, cache=TRUE}
 # Plot Survival rate as function of time.
 plot(MFx_PRZ_cstSD_4pred_range, x_variable = "Time")
 ```
