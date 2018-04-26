@@ -24,6 +24,7 @@
 #' parameters drawn from the posterior distribution
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
 #' one plot instead of one plot per concentration.
+#' @param adddata if \code{TRUE}, adds the observed data to the plot
 #' @param mcmc_size A numerical value refering by default to the size of the mcmc in object \code{survFitPredict}.
 #'  This option is specific to \code{survFitPredict} objects for which computing time may be long.
 #'  \code{mcmc_size} can be used to reduce the number of mcmc samples in order to speed up
@@ -67,19 +68,16 @@ plot.survFitPredict <- function(x,
                                main = NULL,
                                spaghetti = FALSE,
                                one.plot = FALSE,
+                               adddata = FALSE,
                                mcmc_size = NULL,
                                ...) {
 
   df_prediction <-  x$df_quantile
   df_spaghetti <-  x$df_spaghetti
-  
   # Plot
   
   plt <- ggplot() +
     theme_minimal() +
-    theme(legend.position ="top",
-          strip.background = element_rect(fill="grey90", color = "white"),
-          strip.text = element_text(colour = "black")) +
     scale_x_continuous(name = xlab) +
     scale_y_continuous(name = ylab,
                        limits = c(0,1)) +
@@ -94,7 +92,7 @@ plot.survFitPredict <- function(x,
     plt <- plt +
       geom_line(data = df_spaghetti_gather,
                 aes(x = time, y = survRate_value, group = interaction(survRate_key, replicate)),
-                alpha = 0.02) +
+                alpha = 0.2) +
       geom_line(data = df_prediction,
                 aes(x = time, y= qinf95, group = replicate),
                 color = "orange", linetype = 2) +
