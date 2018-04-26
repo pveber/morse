@@ -13,6 +13,8 @@
 #'  the computation.
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param ratio_no.NA A numeric between 0 and 1 standing for the proportion of non-NA values
+#'  required to compute quantile. The default is \eqn{0.95}.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
@@ -45,6 +47,7 @@ predict.survFit <- function(object,
                             spaghetti = FALSE,
                             mcmc_size = NULL,
                             hb_value = TRUE,
+                            ratio_no.NA = 0.95,
                             ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
               # arguments should be named the same when declaring a
@@ -54,7 +57,7 @@ predict.survFit <- function(object,
   mcmc <- x$mcmc
   model_type <- x$model_type
   extend_time <- 100
-  
+
   if(is.null(data_predict)){
     if("survFitVarExp" %in% class(x)){
       x_interpolate = data.frame(
@@ -119,7 +122,7 @@ predict.survFit <- function(object,
     kk <- 10^mctot[, "kk_log10"]
     z <- 10^mctot[, "z_log10"]
     
-    dtheo = lapply(k, function(kit) { # Pour chaque replicat
+    dtheo = lapply(k, function(kit) { # For each replicate
       Surv.SD_Cext(Cw = ls_conc[[kit]],
                    time = ls_time[[kit]],
                    kk=kk,
@@ -134,7 +137,7 @@ predict.survFit <- function(object,
     alpha <- 10^mctot[, "alpha_log10"]
     beta <- 10^mctot[, "beta_log10"]
     
-    dtheo = lapply(k, function(kit) { # Pour chaque replicat
+    dtheo = lapply(k, function(kit) { # For each replicate
       Surv.IT_Cext (Cw = ls_conc[[kit]],
                     time = ls_time[[kit]],
                     kd = kd,
@@ -145,16 +148,25 @@ predict.survFit <- function(object,
     
   }
   
-  #transpose
+  # Transpose
   dtheo <- do.call("rbind", lapply(dtheo, t))
+  
+  # replace NA by 0
+  #dtheo[is.na(dtheo)] <- 0
   
   df_quantile = dplyr::data_frame(
     time = df$time,
     conc = df$conc,
     replicate = df$replicate,
-    q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
-    qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
-    qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+    # q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
+    # qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
+    # qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+    # q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = FALSE),
+    # qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = FALSE),
+    # qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = FALSE)
+    q50 = apply(dtheo, 1, quantile_fun, probs = 0.5, ratio_no.NA = ratio_no.NA),
+    qinf95 = apply(dtheo, 1, quantile_fun, probs = 0.025, ratio_no.NA = ratio_no.NA),
+    qsup95 = apply(dtheo, 1, quantile_fun, probs = 0.975, ratio_no.NA = ratio_no.NA)
   )
   
   if(spaghetti == TRUE){
@@ -175,6 +187,16 @@ predict.survFit <- function(object,
   
 }
 
+# Function quantile design to return NA when the number of X is too low
+#
+quantile_fun <- function(x, probs = 0.50, ratio_no.NA = 0.95){
+  if ((length(x) - sum(is.na(x))) < ratio_no.NA*length(x)){
+    return(NA)
+  } else {
+    return(quantile(x, probs = probs, na.rm = TRUE))
+  }
+}
+
 # Survival function for "IT" model with external concentration changing with time
 #
 # @param Cw A scalar of external concentration
@@ -193,7 +215,7 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   time.prec = dplyr::lag(time, 1) ; time.prec[1] = time[1] #   time[1] = tprec[1]
   diff.int = (exp(time %*% t(kd)) * Cw + exp(time.prec %*% t(kd)) * Cw )/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
   
-  D = kd * exp(-kd %*% t(time)) * t(apply(diff.int,2,cumsum))
+  D = kd * exp(-kd %*% t(time)) * t(apply(diff.int, 2, cumsum))
   
   lambda = kk * pmax(D-z,0) + hb # the pmax function is important here for elementwise maximum with 0 and D[i,j]-z ATTENTION: pmax(0,D) != pmax(D,0)
   
@@ -262,4 +284,3 @@ predict_interpolate <- function(x, extend_time = 100){
   
   return(x_interpolate)
 }
-
