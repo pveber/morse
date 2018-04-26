@@ -460,13 +460,12 @@ Computing an $MF_x$ is easy with function `MFx()`. It only requires object `surv
 
 There is no explicit formulation of $MF_x$ (at least for the GUTS-SD model), so the `accuracy` argument can be used to change the accuracy of the convergence level.
 
-
 ```{r MFx_compt, cache=TRUE}
 # (1) upload or build a data frame with the exposure profile
 data_4MFx <- data.frame(time = 1:10,
                         conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
 
-# (2) Use the fit on constant exposure eropiconazole with model SD (see previously)
+# (2) Use the fit on constant exposure propiconazole with model SD (see previously)
 MFx_PRZ_cstSD_4MFx <- MFx(object = fit_cstSD, data_predict = data_4MFx)
 ```
 
@@ -475,13 +474,14 @@ As the computing can be long, the function print the `accuracy` for each step of
 Then, we can plot the survival rate with both initial profile, and the initial profile multiplied by the obtained multiplicationf factor.
 
 ```{r MFx_plot, cache=TRUE}
-# (3) Plot the survival rate versus multiplication factors.
+# (3) Plot the survival rate as function of the multiplication factors.
 plot(MFx_PRZ_cstSD_4MFx)
 ```
 
 In this specific case, the x-axis needs to be log-scaled, what is possible by setting option `log_scale = TRUE`:
 
 ```{r MFx_plotLog, cache=TRUE}
+# (3 bis) Plot the survival rate as function of the multiplication factors in log-scale.
 plot(MFx_PRZ_cstSD_4MFx, log_scale = TRUE)
 ```
 
@@ -489,7 +489,7 @@ To compare the initial survival rate (corresponding to a multiplication factor s
 
 ```{r MFx_plotTime, cache=TRUE}
 # option 'x_variable' allow to vizualize difference in survival rate with and without multiplication factor.
-# (4) Plot the survival rate versus time
+# (4) Plot the survival rate versus time. Control (MFx = 1) and Optimal MFx.
 plot(MFx_PRZ_cstSD_4MFx, x_variable =  "Time")
 ```
 
@@ -504,17 +504,20 @@ MFx_PRZ_cstSD_4MFx$df_MFx
 Here is an other example with a 10 percent Multiplication Factor:
 
 ```{r MFx_x10, cache=TRUE}
+# (2 bis) fit on constant exposure propiconazole with model SD (see previously)
 MFx_PRZ_cstSD_4MFx_x10 <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = 10)
 ```
 
 The `warning messages` are just saying that the quantile at $2.5\%$ was not possible to compute. You can see this in the object `df_MFx` include in `MFx_PRZ_cstSD_4MFx_x10`. The reason of this impossibility is obvious when you plot the multiplication Factor-rseponse curve:
 
 ```{r MFx_x10_plot, cache=TRUE}
+# Plot with log scale
 plot(MFx_PRZ_cstSD_4MFx_x10, log_scale = TRUE)
 ```
 
 So then, you can reduce the threshold of iteration as:
 ```{r MFx_x100_threshold, cache=TRUE}
+# (2 ter) fit on constant exposure propiconazole with model SD (see previously)
 MFx_PRZ_cstSD_4MFx_x10_thresh20 <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = 10, threshold_iter = 20)
 plot(MFx_PRZ_cstSD_4MFx_x10_thresh20, log_scale = TRUE) 
 ```
@@ -528,7 +531,7 @@ This message come from the use of `ggplot()` function (see the `ggplot2` package
 Multiplication factor is also available for the GUTS IT model (option `quiet = TRUE` remove the output):
 
 ```{r MFx_IT, cache=TRUE}
-# (2) Use the fit on constant exposure propiconazole with model IT. No computing of 
+# (2) Use the fit on constant exposure propiconazole with model IT. No print of run messages.
 MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, data_predict = data_4MFx, time_MFx = 4, quiet = TRUE)
 
 # (3) Plot the survival rate versus multiplication factors.
@@ -539,6 +542,7 @@ This last example set a reduction of $10\%$ of the survival rate, remove the
 background mortality by setting `hb_value = FALSE` and is computed at time `time_MFx = 4`.
 
 ```{r MFx_ITplot, cache=TRUE}
+# (2) Use the fit on constant exposure propiconazole with model IT. No print of run messages.
 MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, X=10, hb_value = FALSE, data_predict = data_4MFx, time_MFx = 4, quiet = TRUE)
 
 plot(MFx_PRZ_cstIT_4pred, log_scale = TRUE)
@@ -551,6 +555,7 @@ plot(MFx_PRZ_cstIT_4pred, x_variable =  "Time")
 Once we have obtained the desire multiplication factor inducing the $x\%$ reduction of the survival rate, it can be relevant to explore the sentivity of this parameter by exploring survival rate over a range of multiplication factor. This is possible by setting argument `X = NULL` and providing a range of wanted multiplication factor, for instance `MFx_range = c()` in our first example.
 
 ```{r MFx_range, cache=TRUE}
+# Use the fit on constant exposure propiconazole with model SD.
 MFx_PRZ_cstSD_4pred_range <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = NULL, MFx_range = 1:6)
 ```
 
@@ -563,12 +568,14 @@ plot(MFx_PRZ_cstSD_4pred_range)
 And the argument `x_variable = "Time"` return all computed time series:
 
 ```{r, cache=TRUE}
+# Plot Survival rate as function of time.
 plot(MFx_PRZ_cstSD_4pred_range, x_variable = "Time")
 ```
 
 To select a specific time series, we can use the element `ls_predict` wich is a list of object of class `survFitPredict` to wich a plot is defined.
 
 ```{r, cache=TRUE}
+# Plot a specific time series.
 plot(MFx_PRZ_cstSD_4pred_range$ls_predict[[4]])
 ```
 
