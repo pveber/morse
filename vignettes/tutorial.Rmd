@@ -513,6 +513,13 @@ The `warning messages` are just saying that the quantile at $2.5\%$ was not poss
 plot(MFx_PRZ_cstSD_4MFx_x10, log_scale = TRUE)
 ```
 
+So then, you can reduce the threshold of iteration as:
+```{r MFx_x100_threshold, cache=TRUE}
+MFx_PRZ_cstSD_4MFx_x10_thresh20 <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = 10, threshold_iter = 20)
+plot(MFx_PRZ_cstSD_4MFx_x10_thresh20, log_scale = TRUE) 
+```
+
+
 After the `plot()` function, you have the following message: `Warning message: Removed 1 rows containing missing values (geom_point).`
 This message come from the use of `ggplot()` function (see the `ggplot2` package) as an echo of the warning message about the messing point at $2.5\%$ that has not been computed.
 
