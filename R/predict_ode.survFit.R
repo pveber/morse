@@ -207,6 +207,7 @@ SurvSD_ode <- function(Cw, time, kk, kd, z, hb, mcmc_size = NULL, interpolate_le
   parms  <- list( kd = kd,
                   kk = kk,
                   z = z,
+                  hb = hb,
                   mcmc_size = mcmc_size)
   
   ## Start values for steady state
@@ -241,7 +242,7 @@ model_SD <- function(t, State, parms, input)  {
     H = State[(mcmc_size+1):(2*mcmc_size)] 
     
     dD <- kd * (C - D)     # internal concentration
-    dH <- kk * max(D - z,0) # risk function
+    dH <- kk * max(D - z,0) + hb # risk function
     
     res <- c(dD, dH)
     list(res, signal = import)
@@ -300,7 +301,7 @@ SurvIT_ode <- function(Cw, time, kd, hb, alpha, beta, mcmc_size = NULL, interpol
   D <- t(mat_4cast)
   D.max <- t(apply(D,1,cummax))
   
-  S <- 1-plogis(log(D.max),location=log(parms$alpha),scale=1/parms$beta)
+  S <- exp(-hb %*% t(time)) * (1-plogis(log(D.max),location=log(parms$alpha),scale=1/parms$beta) )
   dtheo <- t(S)
   
   
