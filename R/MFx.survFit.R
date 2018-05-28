@@ -1,9 +1,11 @@
 #' Predict x\% Multiplication Factor at any specified time point for 
 #' a \code{survFit} object.
 #' 
-#' The function \code{MFx}, x\% Multiplication Factor (\eqn{MF_x}), is used to compute
-#'  the multiplication factor required to reduce by x\% the survival rate at a
-#'  specified test duration (\code{time_MFx}) (default is the maximum
+#' The function \code{MFx}, \eqn{x}\% Multiplication Factor at time \eqn{t}, (\eqn{MF(x,t)}),
+#' is used to compute the multiplication factor
+#' applied to the concentration exposure profile in order to
+#' reduce by \eqn{x}\% (argument \code{X}) the survival rate at a
+#'  specified test duration \eqn{t} (argument \code{time_MFx}) (default is the maximum
 #'  time point of the experiment).
 #'  
 #'  Mathematical definition of \eqn{x}\% Multiplication Factor at time \eqn{t}
@@ -23,15 +25,15 @@
 #' @param X Percentage of survival change (e.g., \eqn{50} for survival decrease of 50\%
 #'  , or \eqn{-50} for survival increase of 50\%).The default is 50. 
 #'  Only time series computed during the adaptation using a binary search in
-#'  \eqn{O(log n)} are returned. However, if \code{NULL}, all time series
+#'  \eqn{O(log(n))} are returned. However, if \code{NULL}, all time series
 #'  computed from the vector \code{MFx_range} are returned.
-#' @param time_MFx A number giving the time at which  \eqn{MF_{x}} has to be estimated. 
-#' If NULL, the latest time point of the experiment is used.
+#' @param time_MFx A number giving the time at which  \eqn{MF(x,t)} has to be estimated. 
+#' If NULL, the latest time point of the profile is used.
 #' @param MFx_range A vector from which lower and upper bound of the range of the
 #'  multiplication factor \code{MFx} are generated. The default is a vector \code{c(0, 1000)}.
 #' If argument \code{X} is \code{NULL}, then all the time series generated with
 #' \code{MFx_range} are returned.
-#' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
+#' @param mcmc_size Can be used to reduce the number of MCMC samples in order to speed up
 #'  the computation. The default is 1000.
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into
 #'  account from the posterior.
@@ -48,17 +50,17 @@
 #'  \item{X_prop}{Survival rate for \code{X} percent of reduction of the initial median 
 #' survival rate at time \code{time_MFx}.}
 #' \item{X_prop_provided}{A number giving the proportion of reduction in survival.}
-#' \item{time_MFx}{A number giving the time at which  \eqn{MF_{x}} has to be
+#' \item{time_MFx}{A number giving the time at which  \eqn{MF(x,t)} has to be
 #'  estimated as provided in arguments or if NULL, the latest time point of the
-#'   experiment is used.}
+#'   profile is used.}
 #' \item{df_MFx}{A \code{data.frame} with quantiles (median, 2.5\% and 97.5\%)
-#'  of \eqn{MF_{X}} at time \code{time_MFx} for x\% of mortality reduction.}
+#'  of \eqn{MF(x,t)} at time \eqn{t}, \code{time_MFx}, for \eqn{x}\% of survival reduction.}
 #' \item{df_dose}{A \code{data.frame} with quantiles (median, 2.5\% and 97.5\%)
 #'  of survival rate along the computed multiplication factor and at time \code{time_MFx}.}
-#' \item{MFx_tested}{A vector of all multiplication factor computed.} 
+#' \item{MFx_tested}{A vector of all multiplication factors computed.} 
 #' \item{ls_predict}{A list of all object of class \code{survFitPredict} obtained
 #' from computing survival rate for every profiles build from the vector of
-#' multiplication factor \code{MFx_tested}.}
+#' multiplication factors \code{MFx_tested}.}
 #' 
 #'    
 #' @examples 
@@ -76,8 +78,8 @@
 #' # (4) data to predict
 #' data_4prediction <- data.frame(time = 1:10, conc = c(0,0.5,3,3,0,0,0.5,3,1.5,0))
 #' 
-#' # (5) estimate MF10 at time 4
-#' MFx(out_SD, data_predict = data_4prediction , X = 30, time_MFx = 4)
+#' # (5) estimate MF for 30% reduction of survival at time 4
+#' MFx_SD_10.4 <- MFx(out_SD, data_predict = data_4prediction , X = 30, time_MFx = 4)
 #' }
 #' 
 #' 
