@@ -1,7 +1,8 @@
 #' Plotting method for \code{MFx} objects
 #'
 #' This is the generic \code{plot} S3 method for the
-#' \\code{MFx} class. It plots the survival rate as a function of concentration.
+#' \code{MFx} class. It plots the survival rate as a function of
+#' the multiplication factor applied or as a function of time.
 #'
 #'
 #' @param x An object of class \code{MFx}.
@@ -27,11 +28,20 @@
 #' # (3) Run the survFit function with model_type SD (or IT)
 #' out_SD <- survFit(dataset, model_type = "SD")
 #' 
-#' # (4) estimate MF50 at time 4
-#' MFx_SD <- MFx(out_SD, X = 50, time_MFx = 4)
+#'# (4) data to predict
+#' data_4prediction <- data.frame(time = 1:10, conc = c(0,0.5,3,3,0,0,0.5,3,1.5,0))
 #' 
-#' # (5) plot the object of class 'MFx'
-#' plot(MFx_SD)
+#' # (5) estimate MF for 30% reduction of survival at time 4
+#' MFx_SD_10.4 <- MFx(out_SD, data_predict = data_4prediction , X = 30, time_MFx = 4)
+#' 
+#' # (6) plot the object of class 'MFx'
+#' plot(MFx_SD_10.4)
+#' 
+#' # (6bis) plot with log-scale of x-axis
+#' plot(MFx_SD_10.4, log_scale = TRUE)
+#' 
+#' # (6ter) plot with "Time" as the x-axis
+#' plot(MFx_SD_10.4, x_variable = "Time") 
 #' }
 #'
 #' @export
@@ -39,7 +49,6 @@
 #'
 #'
 plot.MFx <- function(x,
-                     spaghetti = FALSE,
                      x_variable = "MFx", # other option is "Time"
                      xlab = NULL,
                      ylab = "Survival rate \n median and 95 CI",
@@ -124,6 +133,7 @@ can use X = NULL, and computed time series around the median MFx, with the
     
     # Plot
     if(is.null(main))  main <- paste("Survival over time. Multiplication Factor of", x$X_prop_provided*100, "percent") 
+    if(is.null(x$X_prop))  main <- paste("Survival over time") 
     
     MFx = x$MFx_tested
     
