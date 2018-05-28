@@ -42,6 +42,12 @@
 #' 
 #' # (6ter) plot with "Time" as the x-axis
 #' plot(MFx_SD_10.4, x_variable = "Time") 
+#' 
+#' # (7) plot when X = NULL and along a MFx_range from 5 to 10:
+#' MFx_SD_range <- MFx(out_SD, data_predict = data_4prediction ,
+#'                     X = NULL, time_MFx = 4, MFx_range = seq(5, 10, length.out = 50))
+#' plot(MFx_SD_range)
+#' plot(MFx_SD_range, x_variable = "Time", ncol = 10)
 #' }
 #'
 #' @export
@@ -77,6 +83,7 @@ plot.MFx <- function(x,
     if(is.null(main)){
       main <- paste("Multiplication Factor for MF",  x$X_prop_provided*100, "% at time", x$time_MFx)
     } 
+    if(is.null(x$X_prop))  main <- paste("Survival over [", min(x$MFx_tested), ",", max(x$MFx_tested), "] MF range at time", x$time_MFx) 
     
     MFx_plt <- MFx_plt +
       scale_color_manual(values=c("orange", "black", "black")) +
