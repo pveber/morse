@@ -5,7 +5,7 @@ Version 3.1.0
 
 NEW FEATURES
 - add 'MFx' function to compute the Multiplication Factor leading to a
-  reduction of x percent of mortality. Return an object of class 'MFx'.
+  reduction of x percent of survival. Return an object of class 'MFx'.
 - add 'plot.MFx' function to plot object of class 'MFx'.
 
 BUG FIXES
@@ -23,7 +23,7 @@ NEW FEATURES
 
 BUG FIXES
 - change the require dataset for survData and reproData: replicates are unique for each time-serie all over concentration profiles
-- change the struture of all datasets included to satisfy that all replicates are unique for each time-serie all over concentration profiles.
+- change the structure of all datasets included to satisfy that all replicates are unique for each time-serie all over concentration profiles.
 
 Version 2.2.0
 =============
