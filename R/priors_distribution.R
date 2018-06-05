@@ -1,7 +1,7 @@
 #' Density distribution of priors.
 #' 
-#' Return a \class{data.frame} with priors density distribution of parameters used in
-#' \class{object}.
+#' Return a \code{data.frame} with priors density distribution of parameters used in
+#' \code{object}.
 #' 
 #' When the \code{object} is of class \code{survFit}, see \link[=priors_distribution.survFit]{priors_distribution.survFit}
 #' 
@@ -14,10 +14,10 @@ priors_distribution <- function(object, ...){
   UseMethod("priors_distribution")
 }
 
-#' Density distribution of priors from a \class{survFit} object.
+#' Density distribution of priors from a \code{survFit} object.
 #' 
-#' Return a \class{data.frame} with priors distribution of parameters used in
-#' \class{object}.
+#' Return a \code{data.frame} with priors distribution of parameters used in
+#' \code{object}.
 #' 
 #' @param object An object of class \code{survFit}.
 #' @param size_sample Size of the random generation of the distribution.
