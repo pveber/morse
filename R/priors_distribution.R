@@ -1,4 +1,35 @@
-priors_distribution <- function(object, size_sample = 1e3){
+#' Density distribution of priors.
+#' 
+#' Return a \class{data.frame} with priors density distribution of parameters used in
+#' \class{object}.
+#' 
+#' When the \code{object} is of class \code{survFit}, see \link[=priors_distribution.survFit]{priors_distribution.survFit}
+#' 
+#' @param object An object used to select a method
+#' @param \dots Further arguments to be passed to generic methods
+#' 
+#' @export
+#' 
+priors_distribution <- function(object, ...){
+  UseMethod("priors_distribution")
+}
+
+#' Density distribution of priors from a \class{survFit} object.
+#' 
+#' Return a \class{data.frame} with priors distribution of parameters used in
+#' \class{object}.
+#' 
+#' @param object An object of class \code{survFit}.
+#' @param size_sample Size of the random generation of the distribution.
+#' Default is \code{1e3}.
+#' @param \dots Further arguments to be passed to generic methods.
+#' 
+#' @importFrom stats rnorm runif
+#' 
+#' @export
+#' 
+
+priors_distribution.survFit <- function(object, size_sample = 1e3, ...){
   
   param <- object$jags.data
   
