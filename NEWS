@@ -4,6 +4,7 @@ Version 3.1.0
 =============
 
 NEW FEATURES
+- add 'priors_distribution' function to easly returned the distribution of priors.
 - add 'MFx' function to compute the Multiplication Factor leading to a
   reduction of x percent of survival. Return an object of class 'MFx'.
 - add 'plot.MFx' function to plot object of class 'MFx'.
