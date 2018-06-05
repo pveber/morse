@@ -20,7 +20,7 @@
 #'    \eqn{MF(x,t)* C_w(\tau \in T)} at time \eqn{t}.
 #'   
 #' 
-#' @param object An object of class \code{survFit}
+#' @param object An object of class \code{survFit}.
 #' @param data_predict A dataframe with two columns \code{time} and \code{conc}.
 #' @param X Percentage of survival change (e.g., \eqn{50} for survival decrease of 50\%
 #'  , or \eqn{-50} for survival increase of 50\%).The default is 50. 

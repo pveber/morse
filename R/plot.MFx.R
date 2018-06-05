@@ -12,6 +12,8 @@
 #' argument \code{x_variable}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate median and 95 CI}.
 #' @param main A main title for the plot.
+#' @param log_scale If \code{TRUE}, the x-axis is log-scaled. Default is \code{FALSE}.
+#' @param ncol An interger for the number of columns when several panels are plotted.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot

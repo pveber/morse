@@ -8,6 +8,7 @@
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Concentration}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate median and 95 CI}.
 #' @param main A main title for the plot.
+#' @param subtitle A subtitle for the plot
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
