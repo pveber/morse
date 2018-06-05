@@ -3,7 +3,7 @@
 #' Plots posterior predictive check for \code{reproFitTT}, \code{survFitTT},
 #'  \code{survFitTKTD}, \code{survFitCstExp} and \code{survFitVarExp} objects.
 #' 
-#' Depending on the class of the object \code{x} see their link. 
+#' Depending on the class of the object \code{x} see their links. 
 #' for class \code{reproFitTT}: \link[=ppc.reproFitTT]{ppc.reproFitTT} ;  
 #' for class \code{survFitTT}: \link[=ppc.survFitTT]{ppc.survFitTT} ; 
 #' for class \code{survFitTKTD}: \link[=ppc.survFitTKTD]{ppc.survFitTKTD} ;
