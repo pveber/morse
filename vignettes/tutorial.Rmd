@@ -272,27 +272,6 @@ A posterior predictive check is also possible using function `ppc()`:
 ppc(fit_cstSD)
 ```
 
-Compared to the target time analysis, TKTD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the dataset is used.
-
-```{r cstSDLCx, cache=TRUE}
-# LC50 at the maximum time-point:
-LCx_cstSD <- LCx(fit_cstSD, X = 50)
-plot(LCx_cstSD)
-
-# LC50 at time = 2
-LCx(fit_cstSD, X = 50, time_LCx = 2) %>% plot()
-## Note the use of the pipe operator, `%>%`, which is a powerful tool for clearly expressing a sequence of multiple operations.
-## For more information on pipes, see: http://r4ds.had.co.nz/pipes.html
-```
-
-Warning messages are returned when the range of concentrations is not appropriated for one or more LCx calculation(s). 
-
-```{r}
-# LC50 at time = 15
-LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
-```
-
-
 ### GUTS model "IT"
 
 The *Individual Tolerance* (IT) model is a variant of TKTD survival
@@ -316,18 +295,6 @@ plot(fit_cstIT, adddata= TRUE)
 
 ```{r, cache=TRUE}
 ppc(fit_cstIT)
-```
-
-```{r cstITLCx, cache=TRUE}
-# LC50 at the maximum time-point:
-LCx_cstIT <- LCx(fit_cstIT, X = 50)
-plot(LCx_cstIT)
-
-# LC50 at time = 2
-LCx(fit_cstIT, X = 50, time_LCx = 2) %>% plot()
-
-# LC30 at time = 15
-LCx(fit_cstIT, X = 30, time_LCx = 15) %>% plot()
 ```
 
 ## GUTS model under time-variable exposure concentration
@@ -372,14 +339,6 @@ plot(fit_varSD)
 ppc(fit_varSD)
 ```
 
-```{r varSDLCx, cache=TRUE}
-# LC50 at time = 4
-LCx_varSD <- LCx(fit_varSD, X = 50, time_LCx = 4, conc_range = c(0,100))
-plot(LCx_varSD)
-
-# LC50 at time = 30
-LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
-```
 
 ### GUTS model "IT"
 
@@ -399,14 +358,6 @@ plot(fit_varIT)
 
 ```{r, cache=TRUE}
 ppc(fit_varIT)
-```
-
-```{r varITLCx, cache=TRUE}
-# LC50 at time = 4
-LCx(fit_varIT, X = 50, time_LCx = 4, conc_range = c(0,200)) %>% plot()
-
-# LC50 at time = 30
-LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
 ```
 
 ## Prediction
@@ -447,6 +398,58 @@ predict_PRZ_cstSD_4pred_hbOUT <- predict(object = fit_cstSD, data_predict = data
 plot(predict_PRZ_cstSD_4pred_hbOUT)
 ```
 
+## Lethal concentration
+
+Compared to the target time analysis, TKTD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the dataset is used.
+
+```{r cstSDLCx}
+# LC50 at the maximum time-point:
+LCx_cstSD <- LCx(fit_cstSD, X = 50)
+plot(LCx_cstSD)
+
+# LC50 at time = 2
+LCx(fit_cstSD, X = 50, time_LCx = 2) %>% plot()
+## Note the use of the pipe operator, `%>%`, which is a powerful tool for clearly expressing a sequence of multiple operations.
+## For more information on pipes, see: http://r4ds.had.co.nz/pipes.html
+```
+
+Warning messages are returned when the range of concentrations is not appropriated for one or more LCx calculation(s). 
+
+```{r cstSDLCx_3015}
+# LC50 at time = 15
+LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
+```
+
+
+```{r cstITLCx}
+# LC50 at the maximum time-point:
+LCx_cstIT <- LCx(fit_cstIT, X = 50)
+plot(LCx_cstIT)
+
+# LC50 at time = 2
+LCx(fit_cstIT, X = 50, time_LCx = 2) %>% plot()
+
+# LC30 at time = 15
+LCx(fit_cstIT, X = 30, time_LCx = 15) %>% plot()
+```
+
+```{r varSDLCx}
+# LC50 at time = 4
+LCx_varSD <- LCx(fit_varSD, X = 50, time_LCx = 4, conc_range = c(0,100))
+plot(LCx_varSD)
+
+# LC50 at time = 30
+LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
+```
+
+
+```{r varITLCx}
+# LC50 at time = 4
+LCx(fit_varIT, X = 50, time_LCx = 4, conc_range = c(0,200)) %>% plot()
+
+# LC50 at time = 30
+LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
+```
 
 ## Multiplication factors: a 'margin of safety'
 
