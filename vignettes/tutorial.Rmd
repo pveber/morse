@@ -19,7 +19,7 @@ knitr::opts_chunk$set(fig.width = 7,
 ```
 
 
-```{r, echo=FALSE, results='hide'}
+```{r, echo=FALSE, results='hide', message=FALSE}
 library(morse)
 library(dplyr)
 ```
