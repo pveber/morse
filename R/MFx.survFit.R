@@ -410,12 +410,12 @@ binarySearch_MFx <- function(object,
       }
       if(MFx_test == max(MFx_range)){
         MFx_test <- NULL
-        warning(paste("For", quantile, "The multiplication factor is over the bound of", max(MFx_range)))
+        warning(paste("For", quantile, ", the multiplication factor is over the bound of", max(MFx_range)))
         break
       }
       if(i > threshold_iter){
         MFx_test <- NULL
-        warning(paste("For", quantile, "the number of iteration reached the threshold number of iteration."))
+        warning(paste("For", quantile, ", the number of iterations reached the threshold number of iterations of", threshold_iter))
         break
       }
     }
