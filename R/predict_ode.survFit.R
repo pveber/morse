@@ -226,26 +226,24 @@ SurvSD_ode <- function(Cw, time, kk, kd, z, hb, mcmc_size = NULL, interpolate_le
     select(contains("H"),-c(time,signal)) %>%
     as.matrix()
   
-  S <- exp(-t(mat_4cast_H))
-  dtheo = t(S)
+  dtheo <- exp(- out[, grep("H", colnames(out))] )
   
-  return(S)
+  return(dtheo)
 }
 
 model_SD <- function(t, State, parms, input)  {
   with(as.list(c(parms, State)), {
     
-    import = input(t)
-    C = rep(import, length = mcmc_size)
+    conc_ext = input(t)
     
     D = State[1:mcmc_size]
     H = State[(mcmc_size+1):(2*mcmc_size)] 
     
-    dD <- kd * (C - D)     # internal concentration
-    dH <- kk * max(D - z,0) + hb # risk function
+    dD <- kd * (conc_ext - D)     # internal concentration
+    dH <- kk * pmax(D - z, 0) + hb # risk function
     
     res <- c(dD, dH)
-    list(res, signal = import)
+    list(res, signal = conc_ext)
   })
 }
 
@@ -293,33 +291,26 @@ SurvIT_ode <- function(Cw, time, kd, hb, alpha, beta, mcmc_size = NULL, interpol
              parms,
              input = sigimp)
   
-  mat_4cast <- out %>%
-    as.data.frame() %>%
-    select(-c(time,signal)) %>%
-    as.matrix()
+  D <- out[, grep("D", colnames(out))]
+  cumMax_D <- apply(D, 2, cummax)
+  thresholdIT <- t(1 / (1 + (t(cumMax_D) / parms$alpha)^(-parms$beta)))
   
-  D <- t(mat_4cast)
-  D.max <- t(apply(D,1,cummax))
-  
-  S <- exp(-hb %*% t(time)) * (1-plogis(log(D.max),location=log(parms$alpha),scale=1/parms$beta) )
-  dtheo <- t(S)
-  
-  
-  return(S)
+  dtheo <- (1 - thresholdIT) * exp(times %*% t(-parms$hb))
+
+  return(dtheo)
   
 }
 
 model_IT <- function(t, State, parms, input) {
   with(as.list(c(parms, State)), {
     
-    import <- input(t)
-    C = rep(import, length = mcmc_size)
-    
+    conc_ext <- input(t)
+
     D = State[1:mcmc_size]
     
-    dD <- kd*(C - D)    # internal concentration
+    dD <- kd*(conc_ext - D)    # internal damage
     
-    list(dD = dD, signal = import)
+    list(dD = dD, signal = conc_ext)
     
   })
 }
