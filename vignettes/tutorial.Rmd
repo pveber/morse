@@ -451,7 +451,7 @@ LCx(fit_varIT, X = 50, time_LCx = 4, conc_range = c(0,200)) %>% plot()
 LCx(fit_varIT, X = 50, time_LCx = 30, conc_range = c(0,100)) %>% plot()
 ```
 
-## Multiplication factors: a 'margin of safety'
+## Multiplication factors: 'margin of safety'
 
 Using prediction functions, GUTS models can be used to simulate the survival rate of organisms exposed to a given exposure pattern.
 In general, this realistic exposure profile does not result in any related mortality, but a critical question is to know how far the exposure profile is from adverse effect, that is a "margin of safety".
