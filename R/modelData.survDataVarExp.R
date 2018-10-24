@@ -1,21 +1,21 @@
-# Create a dataset to analyse a \code{survDataVarExp} object
-#
-# @param x An object of class \code{survData}
-# @param model_type TK-TD GUTS model type ('SD' or 'IT')
-# @param extend_time Number of for each replicate used for linear 
-# interpolation (comprise between time to compute and fitting accuracy) 
-# 
-# @examples 
-# 
-# # (1) Load the data
-# data("propiconazole_pulse_exposure")
-# 
-# # (2) Create an object 'survData'
-# dataset <- survData(propiconazole_pulse_exposure)
-# 
-# # (3) Create the list of object to be pass in JAGS
-# modelData(dataset, model_type = "IT")
-#
+#' Create a dataset to analyse a \code{survDataVarExp} object
+#'
+#' @param x An object of class \code{survData}
+#' @param model_type TK-TD GUTS model type ('SD' or 'IT')
+#' @param extend_time Number of for each replicate used for linear 
+#' interpolation (comprise between time to compute and fitting accuracy) 
+#' 
+#' @examples 
+#' 
+#' # (1) Load the data
+#' data("propiconazole_pulse_exposure")
+#' 
+#' # (2) Create an object 'survData'
+#' dataset <- survData(propiconazole_pulse_exposure)
+#' 
+#' # (3) Create the list of object to be pass in JAGS
+#' modelData(dataset, model_type = "IT")
+#'
 modelData.survDataVarExp <- function(x,
                                      model_type = NULL,
                                      extend_time = 100, ...){
