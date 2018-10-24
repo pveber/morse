@@ -172,15 +172,16 @@ predict_Nsurv.survFit <- function(object,
   # Computing Nsurv
   
   df_mcmc <- as_data_frame(do.call("rbind", x$mcmc))
-  colnames_df_mcmc <- colnames(df_mcmc)
-  if("Nsurv_sim" %in% colnames_df_mcmc &
-     "Nsurv_ppc" %in% colnames_df_mcmc){
+  NsurvPred_valid <- select(df_mcmc, contains("Nsurv_sim"))
+  NsurvPred_check <- select(df_mcmc, contains("Nsurv_ppc"))
+  
+  if(is.null(data_predict) &
+     # The following condition are always true for survFit done after morse v3.2.0 !
+     ncol(NsurvPred_valid) > 0 &
+     ncol(NsurvPred_check) > 0){
     
-    NsurvPred_valid <- select(df_mcmc, contains("Nsurv_sim"))
-    NsurvPred_check <- select(df_mcmc, contains("Nsurv_ppc"))
-
-    df_quantile <- as_data_frame(NsurvPred) %>%
-      mutate(time = data_predict$time,
+    df_quantile <- data.frame(
+             time = data_predict$time,
              conc = data_predict$conc,
              replicate = data_predict$replicate,
              Nsurv = data_predict$Nsurv,
@@ -189,9 +190,7 @@ predict_Nsurv.survFit <- function(object,
              Nsurv_qsup95_check = apply(NsurvPred_check, 1, quantile, probs = 0.975, na.rm = TRUE),
              Nsurv_q50_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.5, na.rm = TRUE),
              Nsurv_qinf95_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.025, na.rm = TRUE),
-             Nsurv_qsup95_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.975, na.rm = TRUE),
-             Nsurv_min_valid = apply(NsurvPred_valid, 1, min, na.rm = TRUE),
-             Nsurv_max_valid = apply(NsurvPred_valid, 1, max, na.rm = TRUE))
+             Nsurv_qsup95_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.975, na.rm = TRUE))
     
   } else{
       # --------------------
@@ -252,9 +251,7 @@ predict_Nsurv.survFit <- function(object,
                              Nsurv_qsup95_check = apply(NsurvPred_check, 1, quantile, probs = 0.975, na.rm = TRUE),
                              Nsurv_q50_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.5, na.rm = TRUE),
                              Nsurv_qinf95_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.025, na.rm = TRUE),
-                             Nsurv_qsup95_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.975, na.rm = TRUE),
-                             Nsurv_min_valid = apply(NsurvPred_valid, 1, min, na.rm = TRUE),
-                             Nsurv_max_valid = apply(NsurvPred_valid, 1, max, na.rm = TRUE))
+                             Nsurv_qsup95_valid = apply(NsurvPred_valid, 1, quantile, probs = 0.975, na.rm = TRUE))
       
       } 
 
@@ -272,7 +269,7 @@ predict_Nsurv.survFit <- function(object,
   return_object <- list(df_quantile = df_quantile,
                         df_spaghetti = df_spaghetti)
   
-  class(return_object) <- c(class(return_object), "survFitPredict", "survFitPredict_Nsurv")
+  class(return_object) <- c(class(return_object), "survFitPredict_Nsurv")
   
   return(return_object)
   
