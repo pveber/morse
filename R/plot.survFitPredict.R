@@ -68,14 +68,13 @@ plot.survFitPredict <- function(x,
                                main = NULL,
                                spaghetti = FALSE,
                                one.plot = FALSE,
-                               adddata = FALSE,
                                mcmc_size = NULL,
                                ...) {
 
   df_prediction <-  x$df_quantile
   df_spaghetti <-  x$df_spaghetti
+
   # Plot
-  
   plt <- ggplot() +
     theme_minimal() +
     scale_x_continuous(name = xlab) +
@@ -106,13 +105,12 @@ plot.survFitPredict <- function(x,
                   aes(x = time, ymin = qinf95,ymax = qsup95, group = replicate),
                   fill = "grey70", alpha = 0.4)
   }
-  
   # Prediction
   plt <- plt +
     geom_line(data = df_prediction,
               aes(x = time, y = q50, group = replicate),
               col="orange", size = 1)
-  
+
   # facetting
   if(one.plot == FALSE){
     plt <- plt + facet_wrap(~ replicate)
