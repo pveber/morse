@@ -60,7 +60,7 @@ plot.survFitCstExp <- function(x,
                          concentration = NULL,
                          spaghetti = FALSE,
                          one.plot = FALSE,
-                         adddata = FALSE,
+                         adddata = TRUE,
                          addlegend = FALSE,
                          style = "ggplot", ...) {
   
