@@ -134,15 +134,14 @@ survFit.survDataCstExp <- function(data,
   if(model_type == "SD"){
     ### Determine sampling parameters
     parameters_sampling <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
-    parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10", "psurv")
+    parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
 
     file_to_use <- jags_TKTD_cstSD
 
   } else if(model_type == "IT"){
     ### Determine sampling parameters
     parameters_sampling <- c("kd_log10", "hb_log10", "alpha_log10", "beta_log10")
-    
-    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv")
+    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
 
     file_to_use <- jags_TKTD_cstIT
   }

@@ -143,7 +143,7 @@ survFit.survDataVarExp <- function(data,
   if(model_type == "SD"){
     ### Determine sampling parameters
     parameters_sampling <- c("kd_log10", "hb_log10", "z_log10", "kk_log10")
-    parameters <- c("kd_log10", "hb_log10", "z_log10", "kk_log10", "psurv", "Nsurv_ppc")
+    parameters <- c("kd_log10", "hb_log10", "z_log10", "kk_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
     
     jags.data_fit$time = NULL # remove jags.data_fit$time for varSD model
     
@@ -152,9 +152,10 @@ survFit.survDataVarExp <- function(data,
   } else if(model_type == "IT"){
     ### Determine sampling parameters
     parameters_sampling <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10")
-    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv", "Nsurv_ppc")
+    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
     
     file_to_use <- jags_TKTD_varIT
+
   }
 
   model <- survLoadModel(model.program = file_to_use,

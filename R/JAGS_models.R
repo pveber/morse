@@ -34,7 +34,17 @@ jags_TKTD_cstSD <-
       tref[i] <- max(tprec[i], tz[i])
       psurv[i] <- exp(-hb * (time[i] - tprec[i]) + ifelse(time[i] > tz[i], -kk * ((conc[i] - z) * (time[i] - tref[i]) + conc[i]/kd * ( exp(-kd * time[i]) - exp(-kd * tref[i]))), 0))
      
-      Nsurv[i] ~ dbin(psurv[i] , Nprec[i])
+      Nsurv[i] ~ dbin(psurv[i], Nprec[i])
+
+ ## ---------------------- generated data 
+ 
+      Nsurv_ppc[i] ~ dbin(psurv[i] , Nprec[i])
+
+    }
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1], Nprec[1])
+  for( i in 2:n_data){
+    Nsurv_sim[i] ~ dbin(psurv[i], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 
 }"
@@ -81,6 +91,15 @@ model {
     
     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
+ ## ---------------------- generated data 
+ 
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+
+  }
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
+  for( i in 2:n_data){
+    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 
 }"
@@ -136,15 +155,20 @@ jags_TKTD_varSD <-
 
     H[replicate_ID[i], time_ID_red[i]]  <- H_int[replicate_ID[i], time_ID_long_red[i]]
 
-    psurv[i] = exp( - H[replicate_ID[i], time_ID_red[i]])
+    psurv[i] <- exp( - H[replicate_ID[i], time_ID_red[i]])
 
     Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
 
  ## ---------------------- generated data 
  
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i]) 
- 
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
   } 
+
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
+  for( i in 2:n_data_red){
+    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+  }
  
 }"
 
@@ -203,14 +227,13 @@ jags_TKTD_varIT <-"model {
 
   ## ---------------------- generated data 
  
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i]) 
- 
+    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
   } 
  
-  # ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue). 
-  # Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1]) 
-  # for( i in 2:n_data_red){ 
-  #   Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1])) 
-  # }
+  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
+  for( i in 2:n_data_red){
+    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+  }
 
 }"
