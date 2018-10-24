@@ -136,8 +136,13 @@ jags_TKTD_varSD <-
   for( i in 1:n_data_long){
 
     ###-------------- midpoint method
-
-    conc_midpoint[replicate_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
+    # --- log(a + b) = log(a * (1 + b/a)) = log a + log(1 + b/a)
+    #   conc_long_noNull[i] <- ifelse(conc_long[i] == 0, 1e-15, conc_long[i])
+    #   log_conc_midpoint[replicate_ID_long[i], time_ID_long[i]] <- kd * time_long[i] + log(conc_long_noNull[i] )
+    # + log( 1 + exp(kd*(tprec_long[i] - time_long[i]))*(concprec_long[i] / conc_long_noNull[i]))
+    #   conc_midpoint[replicate_ID_long[i], time_ID_long[i]] <- exp(log_conc_midpoint[replicate_ID_long[i], time_ID_long[i]])* (time_long[i] - tprec_long[i]) / 2
+  
+    conc_midpoint[replicate_ID_long[i], time_ID_long[i]] <- (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
     * concprec_long[i]) / 2 * (time_long[i] - tprec_long[i])
 
     D_int[replicate_ID_long[i], time_ID_long[i]] <- kd * exp(-kd * time_long[i]) *
@@ -157,17 +162,25 @@ jags_TKTD_varSD <-
 
     psurv[i] <- exp( - H[replicate_ID[i], time_ID_red[i]])
 
-    Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+    # positivity psurv[i_prec[i]] for division
+    psurv_prec[i] <- ifelse(psurv[i_prec[i]] > 0, psurv[i_prec[i]], 1e-10)
+    # Ensure 0 < ratio psurv < 1 (JAGS does not support p=1!)
+    ratio[i] <- ifelse(psurv[i]/psurv_prec[i] < 1, 
+                        ifelse(psurv[i]/psurv_prec[i] > 0, psurv[i]/psurv_prec[i], 1e-10),
+                       1-1e-10)
+
+    Nsurv[i] ~ dbin(ratio[i] , Nprec[i])
 
  ## ---------------------- generated data 
  
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+    Nsurv_ppc[i] ~ dbin(ratio[i] , Nprec[i])
   } 
 
-  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  # initialization is required to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  # also for ifelse, both are evaluated.
   Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
   for( i in 2:n_data_red){
-    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+    Nsurv_sim[i] ~ dbin(ratio[i], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
  
 }"
@@ -204,6 +217,12 @@ jags_TKTD_varIT <-"model {
 
     ###------------ midpoint method
 
+    # --- log(a + b) = log(a * (1 + b/a)) = log a + log(1 + b/a)
+    # conc_long_noNull[i] <- ifelse(conc_long[i] == 0, 1e-15, conc_long[i])
+    # log_diff.int[replicate_ID_long[i], time_ID_long[i]] <- kd * time_long[i] + log(conc_long_noNull[i] )
+    # + log( 1 + exp(kd*(tprec_long[i] - time_long[i]))*(concprec_long[i] / conc_long_noNull[i]))
+    # diff.int[replicate_ID_long[i], time_ID_long[i]] <- exp(log_diff.int[replicate_ID_long[i], time_ID_long[i]])* (time_long[i] - tprec_long[i]) / 2
+
     diff.int[replicate_ID_long[i], time_ID_long[i]] <-  (exp(kd * time_long[i]) * conc_long[i] + exp(kd * tprec_long[i])
     * concprec_long[i]) / 2 * (time_long[i] - tprec_long[i])
 
@@ -222,18 +241,26 @@ jags_TKTD_varIT <-"model {
 
     psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
 
-    Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+    # positivity psurv[i_prec[i]] for division
+    psurv_prec[i] <- ifelse(psurv[i_prec[i]] > 0, psurv[i_prec[i]], 1e-10)
+    # Ensure 0 < ratio psurv < 1 (JAGS does not support p=1!)
+    ratio[i] <- ifelse(psurv[i]/psurv_prec[i] < 1, 
+                        ifelse(psurv[i]/psurv_prec[i] > 0, psurv[i]/psurv_prec[i], 1e-10),
+                       1-1e-10)
+
+    Nsurv[i] ~ dbin(ratio[i] , Nprec[i])
 
 
   ## ---------------------- generated data 
  
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+    Nsurv_ppc[i] ~ dbin(ratio[i] , Nprec[i])
   } 
  
-  ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  # initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
+  # also for ifelse, both are evaluated.
   Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
   for( i in 2:n_data_red){
-    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+    Nsurv_sim[i] ~ dbin(ratio[i] , ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 
 }"
