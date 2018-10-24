@@ -53,6 +53,7 @@ modelData.survDataCstExp <- function(x, model_type = NULL){
   }
   if(model_type == "SD"){
     dataList$tprec <- x_dev$tprec
+    dataList$i_prec <- x_dev$i_prec
   }
   
   ##
