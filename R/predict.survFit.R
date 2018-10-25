@@ -212,7 +212,11 @@ quantile_fun <- function(x, probs = 0.50, ratio_no.NA = 0.95){
 Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   
   time.prec = dplyr::lag(time, 1) ; time.prec[1] = time[1] #   time[1] = tprec[1]
-  diff.int = (exp(time %*% t(kd)) * Cw + exp(time.prec %*% t(kd)) * Cw )/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
+  
+  # Using log transfomration: log(a+b) = log(a) + log(1+b/a) may prevent the numerical issues raised by exponential
+  diff.int = (exp(time %*% t(kd)) + exp(time.prec %*% t(kd)) )*Cw/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
+  #log_diff.int = time %*% t(kd) + log(1 + exp((time.prec - time) %*% t(kd)))
+  #diff.int = exp(log_diff.int) * Cw / 2 * (time - time.prec)
   
   D = kd * exp(-kd %*% t(time)) * t(apply(diff.int, 2, cumsum))
   
@@ -243,7 +247,11 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
 Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta){
   
   time.prec = dplyr::lag(time, 1) ; time.prec[1] = time[1] #   time[1] = tprec[1]
+  
+  # Using the log transfomration: log(a+b) = log(a) + log(1+b/a) may prevent the numerical issue by exponential
   diff.int = (exp(time %*% t(kd)) * Cw + exp(time.prec %*% t(kd)) * Cw )/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
+  #log_diff.int = time %*% t(kd) + log(1 + exp((time.prec - time) %*% t(kd)))
+  #diff.int = exp(log_diff.int) * Cw / 2 * (time-time.prec)
   
   D <- kd * exp(-kd %*% t(time)) * t(apply(diff.int,2,cumsum))
   
