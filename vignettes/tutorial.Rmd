@@ -405,10 +405,10 @@ plot(predict_PRZ_cstSD_4pred_hbOUT)
 Once fitting is done, we can compute posteriors vs. priors distribution with the function `plot_prior_post()` as follow:
 
 ```{r PLOTpriors_post, cache=TRUE}
-# plot_prior_post(fit_cstSD)
-# plot_prior_post(fit_cstIT)
-# plot_prior_post(fit_varSD)
-# plot_prior_post(fit_varIT)
+plot_prior_post(fit_cstSD)
+plot_prior_post(fit_cstIT)
+plot_prior_post(fit_varSD)
+plot_prior_post(fit_varIT)
 ```
 
 
