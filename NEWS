@@ -14,6 +14,7 @@ object
 - add 'plot.survFitPredict_Nsurv' function to plot 'survFitPredict_Nsurv' object
 - add 'Nsurv_ppc' and 'Nsurv_sim' in 'mcmc' object within 'survFit' class objects
 - Modif JAGS models to ensure probability use for binomial distribution is <1 (JAGS does not work with p=1)
+- add option to remove background mortality, 'hb_value' TRUE/FALSE, in 'survFit' methods
 
 Version 3.1.1
 =============
