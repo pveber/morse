@@ -130,7 +130,10 @@ predict_Nsurv.survFit <- function(object,
   kd = 10^mctot[, "kd_log10"]
   
   if(hb_value == TRUE){
-    hb <- 10^mctot[, "hb_log10"]
+    # "hb" is not in survFit object of morse <v3.2.0
+    if("hb" %in% colnames(mctot)){
+      hb <- mctot[, "hb"]  
+    } else{ hb <- 10^mctot[, "hb_log10"] }
   } else if(hb_value == FALSE){
     hb <- rep(0, nrow(mctot))
   }

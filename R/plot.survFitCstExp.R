@@ -156,7 +156,10 @@ survFitPlotCITKTD_CstExp <- function(x) {
   # prameters
   mctot <- do.call("rbind", x$mcmc)
   kd <- 10^mctot[, "kd_log10"]
-  hb <- 10^mctot[, "hb_log10"]
+  # "hb" is not in survFit object of morse <v3.2.0
+  if("hb" %in% colnames(mctot)){
+    hb <- mctot[, "hb"]
+  } else{ hb <- 10^mctot[, "hb_log10"] }
   
   # all theorical
   k <- 1:length(concobs)

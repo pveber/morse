@@ -109,9 +109,12 @@ predict.survFit <- function(object,
   
   mctot = do.call("rbind", mcmc.samples)
   kd = 10^mctot[, "kd_log10"]
-  
+
   if(hb_value == TRUE){
-    hb <- 10^mctot[, "hb_log10"]
+    # "hb" is not in survFit object of morse <v3.2.0
+    if("hb" %in% colnames(mctot)){
+      hb <- mctot[, "hb"]  
+    } else{ hb <- 10^mctot[, "hb_log10"] }
   } else if(hb_value == FALSE){
     hb <- rep(0, nrow(mctot))
   }
@@ -138,14 +141,13 @@ predict.survFit <- function(object,
     beta <- 10^mctot[, "beta_log10"]
     
     dtheo = lapply(k, function(kit) { # For each replicate
-      Surv.IT_Cext (Cw = ls_conc[[kit]],
+      Surv.IT_Cext(Cw = ls_conc[[kit]],
                     time = ls_time[[kit]],
                     kd = kd,
                     hb = hb,
                     alpha = alpha,
                     beta = beta)
     })
-    
   }
   
   # Transpose
@@ -161,9 +163,6 @@ predict.survFit <- function(object,
     # q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
     # qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
     # qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
-    # q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = FALSE),
-    # qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = FALSE),
-    # qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = FALSE)
     q50 = apply(dtheo, 1, quantile_fun, probs = 0.5, ratio_no.NA = ratio_no.NA),
     qinf95 = apply(dtheo, 1, quantile_fun, probs = 0.025, ratio_no.NA = ratio_no.NA),
     qsup95 = apply(dtheo, 1, quantile_fun, probs = 0.975, ratio_no.NA = ratio_no.NA)
@@ -180,7 +179,7 @@ predict.survFit <- function(object,
   
   return_object <- list(df_quantile = df_quantile,
                         df_spaghetti = df_spaghetti)
-    
+  
   class(return_object) <- c(class(return_object), "survFitPredict")
 
   return(return_object)
@@ -197,7 +196,7 @@ quantile_fun <- function(x, probs = 0.50, ratio_no.NA = 0.95){
   }
 }
 
-# Survival function for "IT" model with external concentration changing with time
+# Survival function for "SD" model with external concentration changing with time
 #
 # @param Cw A scalar of external concentration
 # @param time A vector of time
@@ -284,3 +283,5 @@ predict_interpolate <- function(x, extend_time = 100){
   
   return(x_interpolate)
 }
+
+

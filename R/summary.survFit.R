@@ -36,6 +36,11 @@
 summary.survFit <- function(object, quiet = FALSE, ...) {
   
   param <- object$jags.data
+  if("hb" %in% object$estim.par[, "parameters"]){
+    hb_value = TRUE
+  } else{
+    hb_value = FALSE
+  }
   
   # kd
   kd_log10 <- qnorm(p = c(0.5, 0.025, 0.975),
@@ -46,11 +51,13 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
   
   
   # hb
-  hb_log10 <- qnorm(p = c(0.5, 0.025, 0.975),
-                   mean = param$hb_meanlog10,
-                   sd = param$hb_sdlog10)
-  
-  hb <- 10^hb_log10
+  if(hb_value == TRUE){
+    hb_log10 <- qnorm(p = c(0.5, 0.025, 0.975),
+                      mean = param$hb_meanlog10,
+                      sd = param$hb_sdlog10)
+    
+    hb <- 10^hb_log10
+  } 
   
   if(object$model_type == "SD"){
     
@@ -68,10 +75,17 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
     
     z <- 10^z_log10
     
-    res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
-                      median = c(kd[1], hb[1], z[1], kk[1]),
-                      Q2.5 = c(kd[2], hb[2], z[2], kk[2]),
-                      Q97.5 = c(kd[3], hb[3], z[3], kk[3]))
+    if(hb_value == TRUE){
+      res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
+                        median = c(kd[1], hb[1], z[1], kk[1]),
+                        Q2.5 = c(kd[2], hb[2], z[2], kk[2]),
+                        Q97.5 = c(kd[3], hb[3], z[3], kk[3]))
+    } else{
+      res <- data.frame(parameters = c("kd", "z", "kk"),
+                        median = c(kd[1], z[1], kk[1]),
+                        Q2.5 = c(kd[2], z[2], kk[2]),
+                        Q97.5 = c(kd[3], z[3], kk[3]))
+    }
     
   }
   if(object$model_type == "IT"){
@@ -90,10 +104,17 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
     
     beta <- 10^beta_log10
     
-    res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
-                      median = c(kd[1], hb[1], alpha[1], beta[1]),
-                      Q2.5 = c(kd[2], hb[2], alpha[2], beta[2]),
-                      Q97.5 = c(kd[3], hb[3], alpha[3], beta[3]))
+    if(hb_value == TRUE){
+      res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
+                        median = c(kd[1], hb[1], alpha[1], beta[1]),
+                        Q2.5 = c(kd[2], hb[2], alpha[2], beta[2]),
+                        Q97.5 = c(kd[3], hb[3], alpha[3], beta[3]))
+    } else{
+      res <- data.frame(parameters = c("kd", "alpha", "beta"),
+                        median = c(kd[1], alpha[1], beta[1]),
+                        Q2.5 = c(kd[2], alpha[2], beta[2]),
+                        Q97.5 = c(kd[3], alpha[3], beta[3]))
+    }
     
   }
   

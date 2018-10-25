@@ -38,6 +38,8 @@
 #' the Deviance Information Criterion (DIC) with the \code{rjags} package
 #' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
 #'  (see function \code{\link[rjags]{dic.samples}})
+#' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
+#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}. 
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{survFitVarExp}, which is
@@ -102,6 +104,7 @@ survFit.survDataVarExp <- function(data,
                                  limit.sampling = TRUE,
                                  dic.compute = FALSE,
                                  dic.type = "pD",
+                                 hb_value = TRUE,
                                  ...){
   
   ##
@@ -141,19 +144,35 @@ survFit.survDataVarExp <- function(data,
   ##
   
   if(model_type == "SD"){
-    ### Determine sampling parameters
-    parameters_sampling <- c("kd_log10", "hb_log10", "z_log10", "kk_log10")
-    parameters <- c("kd_log10", "hb_log10", "z_log10", "kk_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
     
     jags.data_fit$time = NULL # remove jags.data_fit$time for varSD model
     
+    if(hb_value == TRUE){
+      ### Determine sampling parameters
+      jags.data_fit$hb_value = 1
+      parameters_sampling <- c("kd_log10", "hb_log10", "z_log10", "kk_log10")
+      parameters <- c("kd_log10", "hb_log10", "z_log10", "kk_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    } else{
+      ### Determine sampling parameters
+      jags.data_fit$hb_value = 0
+      parameters_sampling <- c("kd_log10", "z_log10", "kk_log10")
+      parameters <- c("kd_log10", "z_log10", "kk_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    }
     file_to_use <- jags_TKTD_varSD
+    
       
   } else if(model_type == "IT"){
     ### Determine sampling parameters
-    parameters_sampling <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10")
-    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
     
+    if(hb_value == TRUE){
+      jags.data_fit$hb_value = 1
+      parameters_sampling <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10")
+      parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    } else{
+      jags.data_fit$hb_value = 0
+      parameters_sampling <- c("kd_log10","alpha_log10", "beta_log10")
+      parameters <- c("kd_log10","alpha_log10", "beta_log10", "psurv", "hb", "Nsurv_ppc", "Nsurv_sim")
+    }
     file_to_use <- jags_TKTD_varIT
 
   }
@@ -203,7 +222,7 @@ survFit.survDataVarExp <- function(data,
   ## Cheking posterior range with data from experimental design:
   ##
   
-  estim.par <- survFit_TKTD_params(mcmc, model_type = model_type)
+  estim.par <- survFit_TKTD_params(mcmc, model_type = model_type, hb_value = hb_value)
   
   warnings <- msgTableCreate()
   
@@ -217,17 +236,19 @@ survFit.survDataVarExp <- function(data,
     warning(msg, call. = FALSE)
   }
   
-  if (filter(estim.par, parameters == "hb")$Q2.5 < priorsData$hb_min){
-    ## store warning in warnings table
-    msg <- "The estimation of the natural instantaneous mortality rate (model 
+  if(hb_value == TRUE){
+    if (filter(estim.par, parameters == "hb")$Q2.5 < priorsData$hb_min){
+      ## store warning in warnings table
+      msg <- "The estimation of the natural instantaneous mortality rate (model 
     parameter hb) lies outside the range used to define its prior distribution 
     which indicates that this rate is very low and so difficult to estimate 
     from this experiment !"
-    warnings <- msgTableAdd(warnings, "hb_outRange", msg)
-    ## print the message
-    warning(msg, call. = FALSE)
+      warnings <- msgTableAdd(warnings, "hb_outRange", msg)
+      ## print the message
+      warning(msg, call. = FALSE)
+    }
   }
-  
+
   ### for SD model
   if(model_type == "SD"){
     if (filter(estim.par, parameters == "kk")$Q97.5 > priorsData$kk_max){
@@ -306,7 +327,6 @@ survFit.survDataVarExp <- function(data,
               transformed.data = transformed.data,
               original.data = data)
   
-
   class(OUT) <- c("survFitVarExp","survFit")
   return(OUT)
 }

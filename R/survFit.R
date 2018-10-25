@@ -156,7 +156,7 @@ priors_survData <- function(x, model_type = NULL){
 #
 #############################################################################
   
-survFit_TKTD_params <- function(mcmc, model_type) {
+survFit_TKTD_params <- function(mcmc, model_type, hb_value = TRUE) {
     # create the table of posterior estimated parameters
     # for the survival analyses
     # INPUT:
@@ -173,9 +173,11 @@ survFit_TKTD_params <- function(mcmc, model_type) {
     kd_inf95 <- 10^res.M$quantiles["kd_log10", "2.5%"]
     kd_sup95 <- 10^res.M$quantiles["kd_log10", "97.5%"]
     
-    hb <- 10^res.M$quantiles["hb_log10", "50%"]
-    hb_inf95 <- 10^res.M$quantiles["hb_log10", "2.5%"]
-    hb_sup95 <- 10^res.M$quantiles["hb_log10", "97.5%"]
+    if(hb_value == TRUE){
+      hb <- 10^res.M$quantiles["hb_log10", "50%"]
+      hb_inf95 <- 10^res.M$quantiles["hb_log10", "2.5%"]
+      hb_sup95 <- 10^res.M$quantiles["hb_log10", "97.5%"]
+    }
     
     if(model_type == "SD"){
       kk <- 10^res.M$quantiles["kk_log10", "50%"]
@@ -186,10 +188,17 @@ survFit_TKTD_params <- function(mcmc, model_type) {
       z_inf95 <- 10^res.M$quantiles["z_log10", "2.5%"]
       z_sup95 <- 10^res.M$quantiles["z_log10", "97.5%"]
       
-      res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
-                        median = c(kd, hb, z, kk),
-                        Q2.5 = c(kd_inf95, hb_inf95, z_inf95, kk_inf95),
-                        Q97.5 = c(kd_sup95, hb_sup95, z_sup95, kk_sup95))
+      if(hb_value == TRUE){
+        res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
+                          median = c(kd, hb, z, kk),
+                          Q2.5 = c(kd_inf95, hb_inf95, z_inf95, kk_inf95),
+                          Q97.5 = c(kd_sup95, hb_sup95, z_sup95, kk_sup95))
+      } else{
+        res <- data.frame(parameters = c("kd", "z", "kk"),
+                          median = c(kd, z, kk),
+                          Q2.5 = c(kd_inf95, z_inf95, kk_inf95),
+                          Q97.5 = c(kd_sup95, z_sup95, kk_sup95))
+      }
       
     } else if (model_type == "IT"){
       alpha <- 10^res.M$quantiles["alpha_log10", "50%"]
@@ -200,10 +209,17 @@ survFit_TKTD_params <- function(mcmc, model_type) {
       beta_inf95 <- 10^res.M$quantiles["beta_log10", "2.5%"]
       beta_sup95 <- 10^res.M$quantiles["beta_log10", "97.5%"]
       
-      res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
-                        median = c(kd, hb, alpha, beta),
-                        Q2.5 = c(kd_inf95, hb_inf95, alpha_inf95, beta_inf95),
-                        Q97.5 = c(kd_sup95, hb_sup95, alpha_sup95, beta_sup95))
+      if(hb_value == TRUE){
+        res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
+                          median = c(kd, hb, alpha, beta),
+                          Q2.5 = c(kd_inf95, hb_inf95, alpha_inf95, beta_inf95),
+                          Q97.5 = c(kd_sup95, hb_sup95, alpha_sup95, beta_sup95))
+      } else{
+        res <- data.frame(parameters = c("kd", "alpha", "beta"),
+                          median = c(kd, alpha, beta),
+                          Q2.5 = c(kd_inf95, alpha_inf95, beta_inf95),
+                          Q97.5 = c(kd_sup95, alpha_sup95, beta_sup95))
+      }
     } else {
       stop("please, provide the 'model_type': 'IT' or 'SD'")
     }

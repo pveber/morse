@@ -17,7 +17,7 @@ jags_TKTD_cstSD <-
 
     ##-------------------- parameter transformation
     kd <- 10**kd_log10
-    hb <- 10**hb_log10
+    hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
     kk <- 10**kk_log10
     z  <- 10**z_log10
 
@@ -32,8 +32,12 @@ jags_TKTD_cstSD <-
       xcor[i] <- ifelse(conc[i] > 0, conc[i], 10)
 
       tref[i] <- max(tprec[i], tz[i])
-      psurv[i] <- exp(-hb * (time[i] - tprec[i]) + ifelse(time[i] > tz[i], -kk * ((conc[i] - z) * (time[i] - tref[i]) + conc[i]/kd * ( exp(-kd * time[i]) - exp(-kd * tref[i]))), 0))
-     
+      psurv_pred[i] <- exp(-hb * (time[i] - tprec[i]) + ifelse(time[i] > tz[i], -kk * ((conc[i] - z) * (time[i] - tref[i]) + conc[i]/kd * ( exp(-kd * time[i]) - exp(-kd * tref[i]))), 0))
+
+      # 0 < psurv < 1
+      psurv[i] <- ifelse(psurv_pred[i] >= 1, 1-1e-10,
+                    ifelse(psurv_pred[i] <= 0 , 1e-10, psurv_pred[i]))
+
       Nsurv[i] ~ dbin(psurv[i], Nprec[i])
 
  ## ---------------------- generated data 
@@ -72,8 +76,7 @@ model {
   ##---------------------------------------- parameter transformation
 
   kd <- 10**kd_log10
-  hb <- 10**hb_log10
-
+  hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
   alpha <- 10**alpha_log10
   beta <- 10**beta_log10
 
@@ -87,19 +90,28 @@ model {
 
     F[i]  <- D_max[replicate_ID[i], time_ID[i]]**beta / ( D_max[replicate_ID[i], time_ID[i]]**beta + alpha**beta )
 
-    psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
+    psurv_pred[i] <-  exp(-hb * time[i]) * (1- F[i])
     
-    Nsurv[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+    # positivity psurv[i] for division
+    psurv[i] <- ifelse(psurv_pred[i] > 0, psurv_pred[i], 1e-10)
+    # Ensure 0 < ratio psurv < 1 (JAGS does not support p=1!)
+    ratio_pred[i] <- psurv[i]/psurv[i_prec[i]]
+    ratio[i] <- ifelse(ratio_pred[i] < 1, 
+                        ifelse( ratio_pred[i] > 0,  ratio_pred[i], 1e-10),
+                      1-1e-10)    
+
+
+    Nsurv[i] ~ dbin(ratio[i] , Nprec[i])
 
  ## ---------------------- generated data 
  
-    Nsurv_ppc[i] ~ dbin(psurv[i]/psurv[i_prec[i]] , Nprec[i])
+    Nsurv_ppc[i] ~ dbin(ratio[i] , Nprec[i])
 
   }
   ### initialization is requires to use 'Nsurv_sim[i-1]' require in JAGS language (avoid auto-loop issue).
   Nsurv_sim[1] ~ dbin(psurv[1]/psurv[1], Nprec[1])
   for( i in 2:n_data){
-    Nsurv_sim[i] ~ dbin(psurv[i]/psurv[i_prec[i]], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
+    Nsurv_sim[i] ~ dbin(ratio[i], ifelse( i == i_prec[i], Nprec[i], Nsurv_sim[i-1]))
   }
 
 }"
@@ -127,7 +139,7 @@ jags_TKTD_varSD <-
 
   ##----- parameter transformation
   kd <- 10**kd_log10
-  hb <- 10**hb_log10
+  hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
   kk <- 10**kk_log10
   z  <- 10**z_log10
 
@@ -160,14 +172,15 @@ jags_TKTD_varSD <-
 
     H[replicate_ID[i], time_ID_red[i]]  <- H_int[replicate_ID[i], time_ID_long_red[i]]
 
-    psurv[i] <- exp( - H[replicate_ID[i], time_ID_red[i]])
+    psurv_pred[i] <- exp( - H[replicate_ID[i], time_ID_red[i]])
 
-    # positivity psurv[i_prec[i]] for division
-    psurv_prec[i] <- ifelse(psurv[i_prec[i]] > 0, psurv[i_prec[i]], 1e-10)
+    # positivity psurv[i] for division
+    psurv[i] <- ifelse(psurv_pred[i] > 0, psurv_pred[i], 1e-10)
     # Ensure 0 < ratio psurv < 1 (JAGS does not support p=1!)
-    ratio[i] <- ifelse(psurv[i]/psurv_prec[i] < 1, 
-                        ifelse(psurv[i]/psurv_prec[i] > 0, psurv[i]/psurv_prec[i], 1e-10),
-                       1-1e-10)
+    ratio_pred[i] <- psurv[i]/psurv[i_prec[i]]
+    ratio[i] <- ifelse(ratio_pred[i] < 1, 
+                        ifelse( ratio_pred[i] > 0,  ratio_pred[i], 1e-10),
+                      1-1e-10)    
 
     Nsurv[i] ~ dbin(ratio[i] , Nprec[i])
 
@@ -206,8 +219,7 @@ jags_TKTD_varIT <-"model {
   #------------------------------------------ parameter transformation
 
   kd <- 10**kd_log10
-  hb <- 10**hb_log10
-
+  hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
   alpha <- 10**alpha_log10
   beta <- 10**beta_log10
 
@@ -239,14 +251,15 @@ jags_TKTD_varIT <-"model {
 
     F[i]  <- D_max[replicate_ID[i], time_ID_red[i]]**beta / ( D_max[replicate_ID[i], time_ID_red[i]]**beta + alpha**beta )
 
-    psurv[i] <-  exp(-hb * time[i]) * (1- F[i])
+    psurv_pred[i] <-  exp(-hb * time[i]) * (1- F[i])
 
-    # positivity psurv[i_prec[i]] for division
-    psurv_prec[i] <- ifelse(psurv[i_prec[i]] > 0, psurv[i_prec[i]], 1e-10)
+    # positivity psurv[i] for division
+    psurv[i] <- ifelse(psurv_pred[i] > 0, psurv_pred[i], 1e-10)
     # Ensure 0 < ratio psurv < 1 (JAGS does not support p=1!)
-    ratio[i] <- ifelse(psurv[i]/psurv_prec[i] < 1, 
-                        ifelse(psurv[i]/psurv_prec[i] > 0, psurv[i]/psurv_prec[i], 1e-10),
-                       1-1e-10)
+    ratio_pred[i] <- psurv[i]/psurv[i_prec[i]]
+    ratio[i] <- ifelse(ratio_pred[i] < 1, 
+                        ifelse( ratio_pred[i] > 0,  ratio_pred[i], 1e-10),
+                      1-1e-10)
 
     Nsurv[i] ~ dbin(ratio[i] , Nprec[i])
 
