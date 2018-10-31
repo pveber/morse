@@ -3,8 +3,10 @@
 #' This is the generic \code{summary} S3 method for the \code{survFit} class.
 #' It shows the quantiles of priors and posteriors on parameters.
 #'
-#' @param object an object of class \code{survFit}
-#' @param quiet when \code{TRUE}, does not print
+#' @param object An object of class \code{survFit}.
+#' @param quiet When \code{TRUE}, does not print.
+#' @param EFSA_name If \code{TRUE}, replace actual terminology by
+#'  the one used in EFSA PPR Scientific Opinion.
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @return The function returns a list with the following information:
@@ -33,10 +35,33 @@
 #' @export
 #' 
 
-summary.survFit <- function(object, quiet = FALSE, ...) {
+summary.survFit <- function(object,
+                            quiet = FALSE,
+                            EFSA_name = FALSE,
+                            ...) {
+  
+  estim_parameters <- object$estim.par
+  
+  if(EFSA_name == TRUE){
+    parameters_SD_HBon = c("kD", "hb", "zw", "bw")
+    parameters_SD_HBoff = c("kD", "zw", "bw")
+    parameters_IT_HBon = c("kD", "hb", "mw", "beta")
+    parameters_IT_HBoff = c("kD", "mw", "beta")
+    
+    estim_parameters$parameters <- gsub("kd","kD", estim_parameters$parameters)
+    estim_parameters$parameters <- gsub("kk","bw", estim_parameters$parameters)
+    estim_parameters$parameters <- gsub("z","zw", estim_parameters$parameters)
+    estim_parameters$parameters <- gsub("alpha","bw", estim_parameters$parameters)
+    
+  } else{
+    parameters_SD_HBon = c("kd", "hb", "z", "kk")
+    parameters_SD_HBoff = c("kd", "z", "kk")
+    parameters_IT_HBon = c("kd", "hb", "alpha", "beta")
+    parameters_IT_HBoff = c("kd", "alpha", "beta")
+  }
   
   param <- object$jags.data
-  if("hb" %in% object$estim.par[, "parameters"]){
+  if("hb" %in% estim_parameters[, "parameters"]){
     hb_value = TRUE
   } else{
     hb_value = FALSE
@@ -76,12 +101,12 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
     z <- 10^z_log10
     
     if(hb_value == TRUE){
-      res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
+      res <- data.frame(parameters = parameters_SD_HBon,
                         median = c(kd[1], hb[1], z[1], kk[1]),
                         Q2.5 = c(kd[2], hb[2], z[2], kk[2]),
                         Q97.5 = c(kd[3], hb[3], z[3], kk[3]))
     } else{
-      res <- data.frame(parameters = c("kd", "z", "kk"),
+      res <- data.frame(parameters = parameters_SD_HBoff,
                         median = c(kd[1], z[1], kk[1]),
                         Q2.5 = c(kd[2], z[2], kk[2]),
                         Q97.5 = c(kd[3], z[3], kk[3]))
@@ -105,12 +130,12 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
     beta <- 10^beta_log10
     
     if(hb_value == TRUE){
-      res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
+      res <- data.frame(parameters = parameters_IT_HBon,
                         median = c(kd[1], hb[1], alpha[1], beta[1]),
                         Q2.5 = c(kd[2], hb[2], alpha[2], beta[2]),
                         Q97.5 = c(kd[3], hb[3], alpha[3], beta[3]))
     } else{
-      res <- data.frame(parameters = c("kd", "alpha", "beta"),
+      res <- data.frame(parameters = parameters_IT_HBoff,
                         median = c(kd[1], alpha[1], beta[1]),
                         Q2.5 = c(kd[2], alpha[2], beta[2]),
                         Q97.5 = c(kd[3], alpha[3], beta[3]))
@@ -122,7 +147,7 @@ summary.survFit <- function(object, quiet = FALSE, ...) {
   ans1 <- format(data.frame(res), scientific = TRUE, digits = 4)
   
   # quantiles of estimated model parameters
-  ans2 <- format(object$estim.par, scientific = TRUE, digits = 4)
+  ans2 <- format(estim_parameters, scientific = TRUE, digits = 4)
   
   # print
   if (! quiet) {

@@ -22,6 +22,8 @@ priors_distribution <- function(object, ...){
 #' @param object An object of class \code{survFit}.
 #' @param size_sample Size of the random generation of the distribution.
 #' Default is \code{1e3}.
+#' @param EFSA_name If \code{TRUE}, replace actual terminology by
+#'  the one used in EFSA PPR Scientific Opinion.
 #' @param \dots Further arguments to be passed to generic methods.
 #' 
 #' @importFrom stats rnorm runif
@@ -29,7 +31,9 @@ priors_distribution <- function(object, ...){
 #' @export
 #' 
 
-priors_distribution.survFit <- function(object, size_sample = 1e3, ...){
+priors_distribution.survFit <- function(object,
+                                        size_sample = 1e3,
+                                        EFSA_name = FALSE, ...){
   
   param <- object$jags.data
   
@@ -129,5 +133,33 @@ priors_distribution.survFit <- function(object, size_sample = 1e3, ...){
     df$beta_log10 = beta_log10
   }
 
+  if(EFSA_name == TRUE){
+    if(object$model_type == "IT"){
+      dplyr::rename(df,
+                    kD = kd,
+                    kD_log10 = kd_log10,
+                    mw = alpha,
+                    mw_log10 = alpha_log10)
+    }
+    if(object$model_type == "SD"){
+      df <- dplyr::rename(df,
+                    kD = kd,
+                    kD_log10 = kd_log10,
+                    bw = kk,
+                    bw_log10 = kk_log10,
+                    zw = z,
+                    zw_log10 = z_log10)
+    }
+    if(object$model_type == "PROPER"){
+      df <- dplyr::rename(df,
+                    kD = kd,
+                    kD_log10 = kd_log10,
+                    bw = kk,
+                    bw_log10 = kk_log10,
+                    mw = alpha,
+                    mw_log10 = alpha_log10)
+    }
+  }
+  
   return(df)
 }
