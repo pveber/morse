@@ -30,8 +30,8 @@ predict_Nsurv_check.survFitPredict_Nsurv <- function(object, ...){
            ppc_matching_valid = ifelse(Nsurv_qinf95_valid > Nsurv | Nsurv_qsup95_valid < Nsurv, 0, 1),
            rmse_id = (Nsurv - Nsurv_q50_valid)^2)
   
-  percent_ppc_check <- sum(df_ppc$ppc_matching_check) / nrow(df_ppc) * 100
-  percent_ppc_valid <- sum(df_ppc$ppc_matching_valid) / nrow(df_ppc) * 100
+  percent_ppc_graphic <- sum(df_ppc$ppc_matching_check) / nrow(df_ppc) * 100
+  percent_ppc_timeserie <- sum(df_ppc$ppc_matching_valid) / nrow(df_ppc) * 100
   
   # --- NRMSE
   nrmse <- mean(df_ppc$rmse_id) / mean(df_ppc$Nsurv)
@@ -45,18 +45,15 @@ predict_Nsurv_check.survFitPredict_Nsurv <- function(object, ...){
   df_sppe <- df_ppc %>%
     select(Nsurv, time, Nsurv_q50_valid, Nsurv_q50_check, replicate, time) %>%
     group_by(replicate) %>%
-    arrange(time) %>%
-    mutate(sppe_check = (last(Nsurv) - last(Nsurv_q50_check)) / first(Nsurv) * 100,
-           sppe_valid = (last(Nsurv) - last(Nsurv_q50_valid)) / first(Nsurv) * 100 )
+    arrange(replicate,time) %>%
+    summarise(SPPE = (last(Nsurv) - last(Nsurv_q50_valid)) / first(Nsurv) * 100 )
+    # summarise(sppe_check = (last(Nsurv) - last(Nsurv_q50_check)) / first(Nsurv) * 100,
+    #           sppe_valid = (last(Nsurv) - last(Nsurv_q50_valid)) / first(Nsurv) * 100 )
+
   
-  sppe_check_mean <- mean(df_sppe$sppe_check)
-  sppe_valid_mean <- mean(df_sppe$sppe_valid)
-  
-  return( list(percent_ppc_check = percent_ppc_check,
-               percent_ppc_valid = percent_ppc_valid,
-               nrmse = nrmse,
-               sppe_check_mean = sppe_check_mean,
-               sppe_valid_mean = sppe_valid_mean)
+  return( list(Percent_PPC = percent_ppc_timeserie,
+               NRMSE = nrmse,
+               SPPE = as.data.frame(df_sppe))
   )
   
 }
