@@ -3,6 +3,9 @@
 #' This is the generic \code{ppc} S3 method for the \code{survFitPredict_Nsurv} class. It
 #' plots the predicted values along with 95\% credible intervals
 #' versus the observed values for \code{survFit} objects.
+#' 
+#' For \code{survFitPredict_Nsurv} object, PPC is based on times series simulated
+#' for each replicate. In addition
 #'
 #' The black points show the observed number of survivors (on \eqn{X}-axis)
 #'  against the corresponding predicted
@@ -21,29 +24,32 @@
 ppc.survFitPredict_Nsurv <- function(x,
                               xlab = "Observed nb of survivors",
                               ylab = "Predicted nb of survivors",
-                              main = NULL, ...) {
+                              main = NULL,
+                              ...) {
   
   
   ### add color range "in" or "out"
   df_plt <- x$df_quantile %>%
-    mutate(col_range = ifelse(Nsurv_qinf95_check > Nsurv | Nsurv_qsup95_check < Nsurv, "out", "in"))
+    mutate(col_range = ifelse(Nsurv_qinf95_valid > Nsurv | Nsurv_qsup95_valid < Nsurv, "out", "in"))
 
   ppc_plt <- df_plt %>%
     ggplot() + theme_bw() +
     theme(legend.position="none") +
-    # expand_limits(x = 0, y = 0) +
+    expand_limits(x = 0, y = 0) +
     scale_colour_manual(values = c("green", "red")) +
     scale_x_continuous(name = xlab) +
     scale_y_continuous(name = ylab) +
     geom_abline(slope = 1) +
+    geom_abline(slope = rep(1, 2 ), intercept = c(-12.5, 12.5), linetype = "dashed") +
+    geom_abline(slope = rep(1, 2 ), intercept = c(-25, 25), linetype = "dotted") +
     geom_linerange(aes(x = Nsurv,
-                       ymin = Nsurv_qinf95_check,
-                       ymax = Nsurv_qsup95_check ,
+                       ymin = Nsurv_qinf95_valid,
+                       ymax = Nsurv_qsup95_valid ,
                        group = replicate,
                        color = col_range),
                    position = position_dodge(width=0.5)) +
     geom_point(aes(x = Nsurv,
-                   y = Nsurv_q50_check,
+                   y = Nsurv_q50_valid,
                    group = replicate ),
                position = position_dodge(width=0.5))
   
