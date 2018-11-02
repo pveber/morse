@@ -152,20 +152,21 @@ predict.survFit <- function(object,
   
   # Transpose
   dtheo <- do.call("rbind", lapply(dtheo, t))
-  
   # replace NA by 0
-  #dtheo[is.na(dtheo)] <- 0
+  if(any(is.na(dtheo))){
+    stop("There is NA produced. \n You should try the function 'predict_ode()' which is much more robust but longer to compute.")
+  }
   
   df_quantile = dplyr::data_frame(
     time = df$time,
     conc = df$conc,
     replicate = df$replicate,
-    # q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
-    # qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
-    # qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
-    q50 = apply(dtheo, 1, quantile_fun, probs = 0.5, ratio_no.NA = ratio_no.NA),
-    qinf95 = apply(dtheo, 1, quantile_fun, probs = 0.025, ratio_no.NA = ratio_no.NA),
-    qsup95 = apply(dtheo, 1, quantile_fun, probs = 0.975, ratio_no.NA = ratio_no.NA)
+    q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
+    qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
+    qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+    # q50 = apply(dtheo, 1, quantile_fun, probs = 0.5, ratio_no.NA = ratio_no.NA),
+    # qinf95 = apply(dtheo, 1, quantile_fun, probs = 0.025, ratio_no.NA = ratio_no.NA),
+    # qsup95 = apply(dtheo, 1, quantile_fun, probs = 0.975, ratio_no.NA = ratio_no.NA)
   )
   
   if(spaghetti == TRUE){
@@ -189,8 +190,10 @@ predict.survFit <- function(object,
 # Function quantile design to return NA when the number of X is too low
 #
 quantile_fun <- function(x, probs = 0.50, ratio_no.NA = 0.95){
-  if ((length(x) - sum(is.na(x))) < ratio_no.NA*length(x)){
-    return(NA)
+  if (sum(is.na(x)) >=1){
+    warning("There is NA produced.
+            You should try the function 'predict_ode()' which is much more robust but longer to compute.")
+    #return(NA)
   } else {
     return(quantile(x, probs = probs, na.rm = TRUE))
   }
