@@ -386,6 +386,24 @@ From an object `survFitPredict`, results can ben plotted with function `plot()`:
 plot(predict_PRZ_cstSD_4pred)
 ```
 
+### Robust ODE solver with `deSolve`
+
+At appear that with some extreme data set, the fast way we use to compute prediction return `NA` data, due to numerical error (e.g. number greater or lower than $10^{300}$ or $10^{-300}$).
+
+When this issue happen, the function `predict()` return an error, with the message providing the way to use the robust implementation with ODE solver provided by `deSolve`.
+
+This way is implemented through the use of the function `predict_ode()`. Robustness goes often with longer time to compute. Time to compute can be long, so we use by default MCMC chain size of 1000 independent iterations.
+
+```{r predict_ode, cache=TRUE}
+predict_PRZ_cstSD_4pred_ode <- predict_ode(object = fit_cstSD, data_predict = data_4prediction)
+```
+
+This new object `predict_PRZ_cstSD_4pred_ode` is a `survFitPredict`object and so it has exactly the same properties as an object returned by a `predict()`function. See for instance, with the plot:
+
+```{r predict_ode_plot, cache=TRUE}
+plot(predict_PRZ_cstSD_4pred_ode)
+```
+
 ### Removing background mortality in prediction 
 
 While the model has been estimated using the background mortality parameter `hb`, it can be interesting to see the prediction without it.
@@ -425,7 +443,7 @@ Quote from EFSA Scientific Opinion: *The PPC compares the predicted median numbe
 NRMSE = \frac{RMSE}{\overline{Y}} = \frac{1}{\overline{Y}} \sqrt{\frac{1}{n} \sum_{i=1}{n} (Y_{obs,i} - Y_{pred,i})}
 \]
 
-** Normalised Root Mean Square Error NRMSE**
+**Normalised Root Mean Square Error NRMSE**
 
 Quote from EFSA Scientific Opinion:  [NRMSE criterion] *is also based on the expectation that predicted and observed survival numbers matches the 1:1 line in a scatter plot. The criterion is based on the classical root-mean-square error (RMSE), used to aggregate the magnitudes of the errors in predictions for various time-points into a single measure of predictive power. In order to provide a criterion expressed as a percentage, it is suggested using a normalised RMSE by the mean of the observations.*
 
@@ -482,6 +500,28 @@ ppc(predict_Nsurv_PRZ_SD_cstTOcst)
 ppc(predict_Nsurv_PRZ_SD_varTOcst)
 ppc(predict_Nsurv_PRZ_SD_cstTOcst)
 ppc(predict_Nsurv_PRZ_SD_varTOvar)
+```
+
+#### Additional options for EFSA user
+
+Following the naming of paramater in the EFSA Scientific Opinion (2018), which differes from our naming of parameters, we add an option to be in agreement with EFSA.
+
+Several names of parameters are used in the TKTD GUTS models. The 'R-package' `morse`, and more specifically since the GUTS implementation, several name of parameters have been used.
+
+For stability reason of algorithms and package, we do not change parameters name in implemented algorithms. However, we added argument `EFSA_name` to use EFSA naming in the `summary()` functions, and in the functions `priors_distribution()` providing the distributions of priors (note: distributions of posteriors are obtained with `$mcmc` element of a `survFit`object) and `plot_prior_post()` plotting priors distributions versus posteriors distributions.
+
+For instance:
+
+```{r nameEFSA_SD, cache=TRUE}
+summary(fit_cstSD, EFSA_name = TRUE)
+priors_distribution(fit_cstSD, EFSA_name = TRUE)
+plot_prior_post(fit_cstSD, EFSA_name = TRUE)
+```
+
+```{r nameEFSA_IT, cache=TRUE}
+summary(fit_cstIT, EFSA_name = TRUE)
+priors_distribution(fit_cstIT, EFSA_name = TRUE)
+plot_prior_post(fit_cstIT, EFSA_name = TRUE)
 ```
 
 ## Lethal concentration
