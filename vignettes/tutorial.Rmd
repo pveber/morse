@@ -464,7 +464,7 @@ Then, using object produce with the function `predict_Nsurv()` we can compute *P
 ```{r checkNsurvPRED, cache=TRUE}
 predict_Nsurv_check(predict_Nsurv_PRZ_SD_cstTOcst)
 predict_Nsurv_check(predict_Nsurv_PRZ_SD_varTOcst)
-predict_Nsurv_check(predict_Nsurv_PRZ_SD_cstTOcst)
+predict_Nsurv_check(predict_Nsurv_PRZ_SD_cstTOvar)
 predict_Nsurv_check(predict_Nsurv_PRZ_SD_varTOvar)
 ```
 
