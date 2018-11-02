@@ -3,9 +3,12 @@
 Version 3.2.0
 =============
 
+BUG FIXES
+- Change default value for argument 'adddata' in function 'plot' as TRUE
+
 NEW FEATURES
-- add 'predict_Nsurv' function to compute prediction for the number of survivors
-- add 'predict_Nsurv_check' function to compute criteria to check model
+- add 'predict_Nsurv' function to compute prediction for the number of survivors.
+- add 'predict_Nsurv_check' function to compute criteria to check model.
 performance: (i) percentage of observation within the 95% credible interval of
 prediction drawn from posterior, (ii) the Normalised Root Mean Square Error
 (NRMSE) and (iii) the Survival-Probability Prediction Error (SPPE).
@@ -13,9 +16,10 @@ prediction drawn from posterior, (ii) the Normalised Root Mean Square Error
 object
 - add 'plot.survFitPredict_Nsurv' function to plot 'survFitPredict_Nsurv' object
 - add 'Nsurv_ppc' and 'Nsurv_sim' in 'mcmc' object within 'survFit' class objects
-- Modif JAGS models to ensure probability use for binomial distribution is <1 (JAGS does not work with p=1)
-- add option to remove background mortality, 'hb_value' TRUE/FALSE, in 'survFit' methods
-- add 'predict_ode' function to include deSolve package for ode integration for prediction  
+- Modif JAGS models to ensure probability use for binomial distribution is <1 (JAGS does not work with p=1).
+- add option to remove background mortality, 'hb_value' TRUE/FALSE, in 'survFit' methods.
+- add 'predict_ode' function to include deSolve package for ode integration for prediction.
+- add option 'EFSA_name' in function 'summary', 'plot_prior_posterior' and 'priors_distribution' to adapt parameter name of GUTS model to EFSA Scientific Opinion (doi: 10.2903/j.efsa.2018.5377) naming.
 
 Version 3.1.1
 =============
@@ -53,8 +57,7 @@ Version 2.2.0
 =============
 
 NEW FEATURES
-- add the 'survFitTKTD' function to analyse 'survData' object with a time-exposure-
-  -response model.
+- add the 'survFitTKTD' function to analyse 'survData' object with a time-exposur response model.
 - add the S3 'plot', 'print', 'summary' and 'ppc' methods for the 'survFitTKTD'
   class.
 - add two survival datasets : dichromate and propiconazole.
