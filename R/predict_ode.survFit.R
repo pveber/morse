@@ -1,4 +1,19 @@
 #' Predict method for \code{survFit} objects
+#' 
+#' This is a method to replace function \code{predict} used on \code{survFit}
+#' object when computing issue happen. \code{predict_ode} use the \code{deSolve}
+#' library to improve robustness. However, time to compute longer.
+#' 
+#' 
+#' @param object an object used to select a method \code{ppc}
+#' @param \dots Further arguments to be passed to generic methods
+#' 
+#' @export
+predict_ode <- function(object, ...){
+  UseMethod("predict_ode")
+}
+
+#' Predict method for \code{survFit} objects
 #'
 #' This is the generic \code{predict} S3 method for the \code{survFit} class.
 #' It provides simulation for "SD" or "IT" models under constant or time-variable exposure.
@@ -10,10 +25,13 @@
 #' @param spaghetti If \code{TRUE}, return a set of survival curves using
 #' parameters drawn from the posterior distribution.
 #' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
-#'  the computation.
+#'  the computation. \code{mcmc_size} is the number of selected iterations for one chain. Default
+#'  is 1000. If all MCMC is wanted, set argument to \code{NULL}.
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
-#' @param \dots Further arguments to be passed to generic methods
+#' @param interpolate_length Length of the time sequence for which output is wanted.
+#' @param interpolate_method The interpolation method for concentration. See pacakge deSolve for details.
+#' Default is \code{linear}.
 #' 
 #' @examples 
 #'
@@ -33,7 +51,7 @@
 #'                                replicate= rep("predict", 10))
 #'
 #' # (5) Predict on a new dataset
-#' predict_out <- predict(object = out, data_predict = data_4prediction, spaghetti = TRUE)
+#' predict_out <- predict_ode(object = out, data_predict = data_4prediction, mcmc_size = 1000, spaghetti = TRUE)
 #'
 #' }
 #' 
@@ -46,9 +64,8 @@ predict_ode.survFit <- function(object,
                                 spaghetti = FALSE,
                                 mcmc_size = NULL,
                                 hb_value = TRUE,
-                                interpolate_length = NULL,
+                                interpolate_length = 100,
                                 interpolate_method = "linear",
-                                na.rm = TRUE,
                                 ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
   # arguments should be named the same when declaring a
@@ -96,9 +113,9 @@ predict_ode.survFit <- function(object,
   }
   
   mctot = do.call("rbind", mcmc.samples)
-  if(is.null(mcmc_size)){
-    mcmc_size = nrow(mctot)
-  }
+  #if(is.null(mcmc_size)){
+  mcmc_size = nrow(mctot)
+  #}
   
   kd = 10^mctot[, "kd_log10"]
   
@@ -117,6 +134,7 @@ predict_ode.survFit <- function(object,
     dtheo = lapply(k, function(kit) { # For each replicate
       SurvSD_ode(Cw = ls_conc[[kit]],
                  time = ls_time[[kit]],
+                 replicate = unique_replicate[kit],
                  kk=kk,
                  kd=kd,
                  hb=hb,
@@ -135,6 +153,7 @@ predict_ode.survFit <- function(object,
     dtheo = lapply(k, function(kit) { # For each replicate
       SurvIT_ode(Cw = ls_conc[[kit]],
                  time = ls_time[[kit]],
+                 replicate = unique_replicate[kit],
                  kd = kd,
                  hb = hb,
                  alpha = alpha,
@@ -147,25 +166,13 @@ predict_ode.survFit <- function(object,
   }
   
   # Transpose
-  dtheo <- do.call("rbind", lapply(dtheo, t))
+  df_theo <- do.call("rbind", dtheo)
   
-  df_quantile = dplyr::data_frame(
-    time = df$time,
-    conc = df$conc,
-    replicate = df$replicate,
-    q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = na.rm),
-    qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = na.rm),
-    qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = na.rm)
-  )
+  df_quantile = select(df_theo, time, conc, replicate, q50, qinf95, qsup95)
   
   if(spaghetti == TRUE){
-    random_column <- sample(1:ncol(dtheo), size = round(10/100 * ncol(dtheo)))
-    df_spaghetti <- as_data_frame(dtheo[, random_column]) %>%
-      mutate(time = df$time,
-             conc = df$conc,
-             replicate = df$replicate)
+    df_spaghetti <- df_theo
   } else df_spaghetti <- NULL
-  
   
   return_object <- list(df_quantile = df_quantile,
                         df_spaghetti = df_spaghetti)
@@ -189,7 +196,7 @@ predict_ode.survFit <- function(object,
 # @return A matrix generate with coda.samples() function
 #
 
-SurvSD_ode <- function(Cw, time, kk, kd, z, hb, mcmc_size = NULL, interpolate_length = NULL, interpolate_method = "linear"){
+SurvSD_ode <- function(Cw, time, replicate, kk, kd, z, hb, mcmc_size = 1000, interpolate_length = NULL, interpolate_method = "linear"){
   
   ## external signal with several rectangle impulses
   signal <- data.frame(times = time, 
@@ -220,13 +227,27 @@ SurvSD_ode <- function(Cw, time, kk, kd, z, hb, mcmc_size = NULL, interpolate_le
              func = model_SD,
              parms,
              input = sigimp)
-  
-  mat_4cast_H = out %>%
-    as.data.frame() %>%
-    select(contains("H"),-c(time,signal)) %>%
-    as.matrix()
-  
+
   dtheo <- exp(- out[, grep("H", colnames(out))] )
+  
+  # Manage vector case
+  if(mcmc_size == 1){
+    q50 = dtheo
+    qinf95 = dtheo
+    qsup95 = dtheo
+  } else{
+    q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE)
+    qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE)
+    qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+  }
+  
+  dtheo <- as.data.frame(dtheo) %>%
+    mutate(time = out[, "time"],
+           conc = out[, "signal"],
+           replicate = rep(replicate, nrow(out)),
+           q50 = q50,
+           qinf95 = qinf95,
+           qsup95 = qsup95)
   
   return(dtheo)
 }
@@ -247,6 +268,7 @@ model_SD <- function(t, State, parms, input)  {
   })
 }
 
+
 # Survival function for "IT" model with external concentration changing with time
 #
 # @param Cw A scalar of external concentration
@@ -260,7 +282,7 @@ model_SD <- function(t, State, parms, input)  {
 # @return A matrix generate with coda.samples() function
 #
 
-SurvIT_ode <- function(Cw, time, kd, hb, alpha, beta, mcmc_size = NULL, interpolate_length = NULL, interpolate_method = "linear"){
+SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NULL, interpolate_length = NULL, interpolate_method = "linear"){
   
   ## external signal with several rectangle impulses
   signal <- data.frame(times = time, 
@@ -281,8 +303,7 @@ SurvIT_ode <- function(Cw, time, kd, hb, alpha, beta, mcmc_size = NULL, interpol
                   mcmc_size = mcmc_size)
   
   ## Start values for steady state
-  xstart <- c(D = rep(0, mcmc_size),
-              H = rep(0, mcmc_size))
+  xstart <- c(D = rep(0, mcmc_size))
   
   ## Solve model
   out <- ode(y = xstart,
@@ -295,7 +316,26 @@ SurvIT_ode <- function(Cw, time, kd, hb, alpha, beta, mcmc_size = NULL, interpol
   cumMax_D <- apply(D, 2, cummax)
   thresholdIT <- t(1 / (1 + (t(cumMax_D) / parms$alpha)^(-parms$beta)))
   
-  dtheo <- (1 - thresholdIT) * exp(times %*% t(-parms$hb))
+  dtheo <- (1 - thresholdIT) * exp(times %*% t(-hb))
+
+  # Manage vector case
+  if(mcmc_size == 1){
+    q50 = dtheo
+    qinf95 = dtheo
+    qsup95 = dtheo
+  } else{
+    q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE)
+    qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE)
+    qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+  }
+  
+  dtheo <- as.data.frame(dtheo) %>%
+    mutate(time = out[, "time"],
+            conc = out[, "signal"],
+            replicate = rep(replicate, nrow(out)),
+            q50 = q50,
+            qinf95 = qinf95,
+            qsup95 = qsup95)
 
   return(dtheo)
   
@@ -314,3 +354,20 @@ model_IT <- function(t, State, parms, input) {
     
   })
 }
+
+
+### 
+# predict_interpolate_ode <- function(x, extend_time = 100){
+#   
+#   ## data.frame with time
+#   
+#   df_MinMax <- x %>%
+#     dplyr::group_by(replicate) %>%
+#     dplyr::summarise(min_time = min(time, na.rm = TRUE),
+#                      max_time = max(time, na.rm = TRUE)) %>%
+#     dplyr::group_by(replicate) %>%
+#     # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
+#     dplyr::do(data_frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
+# 
+#   return(df_MinMax)
+# }
