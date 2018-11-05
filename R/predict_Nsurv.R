@@ -3,7 +3,7 @@
 #' It provides simulation for "SD" or "IT" models under
 #' constant or time-variable exposure.
 #' 
-#' @param x an object used to select a method
+#' @param object an object used to select a method
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @export
@@ -27,6 +27,21 @@ predict_Nsurv <- function(object, ...){
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
 #' @param \dots Further arguments to be passed to generic methods
+#' 
+#' 
+#' @return The function returns an object of class \code{survFitPredict_Nsurv}, which is
+#' a list with the two following \code{data.frame}:
+#' \item{df_quantile}{A \code{data.frame} with 10 columns, \code{time}, \code{conc}, \code{replicate},
+#' \code{Nsurv} (observed number of survivors) and other columns with median and 95\% credible interval
+#' of the number of survivors computed with 2 different way refers as \code{check} and \code{valid} 
+#' \code{Nsurv_q50_check}, \code{Nsurv_qinf95_check},
+#' \code{Nsurv_qsup95_check}, \code{Nsurv_q50_valid}, \code{Nsurv_qinf95_valid},
+#' \code{Nsurv_qsup95_valid}. \code{_check} means the number of survivor at time \eqn{t} is estimated using the observed number
+#' of survivor at time \eqn{t-1}, while \code{_valid} means the number of survivor estimated at time
+#' \eqn{t} is based on the estimated number of survivor at time \eqn{t-1}.}
+#' \item{df_spaghetti}{NULL if arguement \code{spaghetti = FALSE}. With \code{spaghetti = TRUE}, it returns a
+#' dataframe with all simulation based on MCMC parameters return from a \code{survFit} object.}
+#' 
 #' 
 #' @examples 
 #'

@@ -80,88 +80,89 @@ load(file = "fit/survFit_cstSD_Mal.rda")
 load(file = "fit/survFit_cstIT_Mal.rda")
 load(file = "fit/survFit_varSD_Mal.rda")
 load(file = "fit/survFit_varIT_Mal.rda")
+
 ### Car
-# predict_cstSD_to_cst_Car <- predict(survFit_cstSD_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
-# predict_varSD_to_var_Car <- predict(survFit_varSD_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
-# predict_cstSD_to_var_Car <- predict(survFit_cstSD_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
-# predict_varSD_to_cst_Car <- predict(survFit_varSD_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
-# 
-# predict_cstIT_to_cst_Car <- predict(survFit_cstIT_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
-# predict_varIT_to_var_Car <- predict(survFit_varIT_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
-# predict_cstIT_to_var_Car <- predict(survFit_cstIT_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
-# predict_varIT_to_cst_Car <- predict(survFit_varIT_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
-# 
-# save(predict_cstSD_to_cst_Car, file = "predict_cstSD_to_cst_Car.rda")
-# save(predict_varSD_to_var_Car, file = "predict_varSD_to_var_Car.rda")
-# save(predict_cstSD_to_var_Car, file = "predict_cstSD_to_var_Car.rda")
-# save(predict_varSD_to_cst_Car, file = "predict_varSD_to_cst_Car.rda")
-# 
-# save(predict_cstIT_to_cst_Car, file = "predict_cstIT_to_cst_Car.rda")
-# save(predict_varIT_to_var_Car, file = "predict_varIT_to_var_Car.rda")
-# save(predict_cstIT_to_var_Car, file = "predict_cstIT_to_var_Car.rda")
-# save(predict_varIT_to_cst_Car, file = "predict_varIT_to_cst_Car.rda")
-# ### Cyp
-# predict_cstSD_to_cst_Cyp <- predict(survFit_cstSD_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
-# predict_varSD_to_var_Cyp <- predict(survFit_varSD_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
-# predict_cstSD_to_var_Cyp <- predict(survFit_cstSD_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
-# predict_varSD_to_cst_Cyp <- predict(survFit_varSD_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
-# 
-# predict_cstIT_to_cst_Cyp <- predict(survFit_cstIT_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
-# predict_varIT_to_var_Cyp <- predict(survFit_varIT_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
-# predict_cstIT_to_var_Cyp <- predict(survFit_cstIT_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
-# predict_varIT_to_cst_Cyp <- predict(survFit_varIT_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
-# 
-# save(predict_cstSD_to_cst_Cyp, file = "predict_cstSD_to_cst_Cyp.rda")
-# save(predict_varSD_to_var_Cyp, file = "predict_varSD_to_var_Cyp.rda")
-# save(predict_cstSD_to_var_Cyp, file = "predict_cstSD_to_var_Cyp.rda")
-# save(predict_varSD_to_cst_Cyp, file = "predict_varSD_to_cst_Cyp.rda")
-# 
-# save(predict_cstIT_to_cst_Cyp, file = "predict_cstIT_to_cst_Cyp.rda")
-# save(predict_varIT_to_var_Cyp, file = "predict_varIT_to_var_Cyp.rda")
-# save(predict_cstIT_to_var_Cyp, file = "predict_cstIT_to_var_Cyp.rda")
-# save(predict_varIT_to_cst_Cyp, file = "predict_varIT_to_cst_Cyp.rda")
-# 
-# ### Mal
-# predict_cstSD_to_cst_Mal <- predict(survFit_cstSD_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
-# predict_varSD_to_var_Mal <- predict(survFit_varSD_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
-# predict_cstSD_to_var_Mal <- predict(survFit_cstSD_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
-# predict_varSD_to_cst_Mal <- predict(survFit_varSD_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
-# 
-# predict_cstIT_to_cst_Mal <- predict(survFit_cstIT_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
-# predict_varIT_to_var_Mal <- predict(survFit_varIT_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
-# predict_cstIT_to_var_Mal <- predict(survFit_cstIT_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
-# predict_varIT_to_cst_Mal <- predict(survFit_varIT_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
-# 
-# save(predict_cstSD_to_cst_Mal, file = "predict_cstSD_to_cst_Mal.rda")
-# save(predict_varSD_to_var_Mal, file = "predict_varSD_to_var_Mal.rda")
-# save(predict_cstSD_to_var_Mal, file = "predict_cstSD_to_var_Mal.rda")
-# save(predict_varSD_to_cst_Mal, file = "predict_varSD_to_cst_Mal.rda")
-# 
-# save(predict_cstIT_to_cst_Mal, file = "predict_cstIT_to_cst_Mal.rda")
-# save(predict_varIT_to_var_Mal, file = "predict_varIT_to_var_Mal.rda")
-# save(predict_cstIT_to_var_Mal, file = "predict_cstIT_to_var_Mal.rda")
-# save(predict_varIT_to_cst_Mal, file = "predict_varIT_to_cst_Mal.rda")
-# 
-# ### Dim
-# predict_cstSD_to_cst_Dim <- predict(survFit_cstSD_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
-# predict_varSD_to_var_Dim <- predict(survFit_varSD_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
-# predict_cstSD_to_var_Dim <- predict(survFit_cstSD_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
-# predict_varSD_to_cst_Dim <- predict(survFit_varSD_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
-# 
-# predict_cstIT_to_cst_Dim <- predict(survFit_cstIT_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
-# predict_varIT_to_var_Dim <- predict(survFit_varIT_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
-# predict_cstIT_to_var_Dim <- predict(survFit_cstIT_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
-# predict_varIT_to_cst_Dim <- predict(survFit_varIT_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
-# 
-# save(predict_cstSD_to_cst_Dim, file = "predict_cstSD_to_cst_Dim.rda")
-# save(predict_varSD_to_var_Dim, file = "predict_varSD_to_var_Dim.rda")
-# save(predict_cstSD_to_var_Dim, file = "predict_cstSD_to_var_Dim.rda")
-# save(predict_varSD_to_cst_Dim, file = "predict_varSD_to_cst_Dim.rda")
-# 
-# save(predict_cstIT_to_cst_Dim, file = "predict_cstIT_to_cst_Dim.rda")
-# save(predict_varIT_to_var_Dim, file = "predict_varIT_to_var_Dim.rda")
-# save(predict_cstIT_to_var_Dim, file = "predict_cstIT_to_var_Dim.rda")
-# save(predict_varIT_to_cst_Dim, file = "predict_varIT_to_cst_Dim.rda")
+predict_cstSD_to_cst_Car <- predict(survFit_cstSD_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
+predict_varSD_to_var_Car <- predict(survFit_varSD_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
+predict_cstSD_to_var_Car <- predict(survFit_cstSD_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
+predict_varSD_to_cst_Car <- predict(survFit_varSD_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
+
+predict_cstIT_to_cst_Car <- predict(survFit_cstIT_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
+predict_varIT_to_var_Car <- predict(survFit_varIT_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
+predict_cstIT_to_var_Car <- predict(survFit_cstIT_Car, data_predict = Car_var, check_to_Nsurv = TRUE)
+predict_varIT_to_cst_Car <- predict(survFit_varIT_Car, data_predict = Car_cst, check_to_Nsurv = TRUE)
+
+save(predict_cstSD_to_cst_Car, file = "predict_cstSD_to_cst_Car.rda")
+save(predict_varSD_to_var_Car, file = "predict_varSD_to_var_Car.rda")
+save(predict_cstSD_to_var_Car, file = "predict_cstSD_to_var_Car.rda")
+save(predict_varSD_to_cst_Car, file = "predict_varSD_to_cst_Car.rda")
+
+save(predict_cstIT_to_cst_Car, file = "predict_cstIT_to_cst_Car.rda")
+save(predict_varIT_to_var_Car, file = "predict_varIT_to_var_Car.rda")
+save(predict_cstIT_to_var_Car, file = "predict_cstIT_to_var_Car.rda")
+save(predict_varIT_to_cst_Car, file = "predict_varIT_to_cst_Car.rda")
+### Cyp
+predict_cstSD_to_cst_Cyp <- predict(survFit_cstSD_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
+predict_varSD_to_var_Cyp <- predict(survFit_varSD_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
+predict_cstSD_to_var_Cyp <- predict(survFit_cstSD_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
+predict_varSD_to_cst_Cyp <- predict(survFit_varSD_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
+
+predict_cstIT_to_cst_Cyp <- predict(survFit_cstIT_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
+predict_varIT_to_var_Cyp <- predict(survFit_varIT_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
+predict_cstIT_to_var_Cyp <- predict(survFit_cstIT_Cyp, data_predict = Cyp_var, check_to_Nsurv = TRUE)
+predict_varIT_to_cst_Cyp <- predict(survFit_varIT_Cyp, data_predict = Cyp_cst, check_to_Nsurv = TRUE)
+
+save(predict_cstSD_to_cst_Cyp, file = "predict_cstSD_to_cst_Cyp.rda")
+save(predict_varSD_to_var_Cyp, file = "predict_varSD_to_var_Cyp.rda")
+save(predict_cstSD_to_var_Cyp, file = "predict_cstSD_to_var_Cyp.rda")
+save(predict_varSD_to_cst_Cyp, file = "predict_varSD_to_cst_Cyp.rda")
+
+save(predict_cstIT_to_cst_Cyp, file = "predict_cstIT_to_cst_Cyp.rda")
+save(predict_varIT_to_var_Cyp, file = "predict_varIT_to_var_Cyp.rda")
+save(predict_cstIT_to_var_Cyp, file = "predict_cstIT_to_var_Cyp.rda")
+save(predict_varIT_to_cst_Cyp, file = "predict_varIT_to_cst_Cyp.rda")
+
+### Mal
+predict_cstSD_to_cst_Mal <- predict(survFit_cstSD_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
+predict_varSD_to_var_Mal <- predict(survFit_varSD_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
+predict_cstSD_to_var_Mal <- predict(survFit_cstSD_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
+predict_varSD_to_cst_Mal <- predict(survFit_varSD_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
+
+predict_cstIT_to_cst_Mal <- predict(survFit_cstIT_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
+predict_varIT_to_var_Mal <- predict(survFit_varIT_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
+predict_cstIT_to_var_Mal <- predict(survFit_cstIT_Mal, data_predict = Mal_var, check_to_Nsurv = TRUE)
+predict_varIT_to_cst_Mal <- predict(survFit_varIT_Mal, data_predict = Mal_cst, check_to_Nsurv = TRUE)
+
+save(predict_cstSD_to_cst_Mal, file = "predict_cstSD_to_cst_Mal.rda")
+save(predict_varSD_to_var_Mal, file = "predict_varSD_to_var_Mal.rda")
+save(predict_cstSD_to_var_Mal, file = "predict_cstSD_to_var_Mal.rda")
+save(predict_varSD_to_cst_Mal, file = "predict_varSD_to_cst_Mal.rda")
+
+save(predict_cstIT_to_cst_Mal, file = "predict_cstIT_to_cst_Mal.rda")
+save(predict_varIT_to_var_Mal, file = "predict_varIT_to_var_Mal.rda")
+save(predict_cstIT_to_var_Mal, file = "predict_cstIT_to_var_Mal.rda")
+save(predict_varIT_to_cst_Mal, file = "predict_varIT_to_cst_Mal.rda")
+
+### Dim
+predict_cstSD_to_cst_Dim <- predict(survFit_cstSD_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
+predict_varSD_to_var_Dim <- predict(survFit_varSD_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
+predict_cstSD_to_var_Dim <- predict(survFit_cstSD_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
+predict_varSD_to_cst_Dim <- predict(survFit_varSD_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
+
+predict_cstIT_to_cst_Dim <- predict(survFit_cstIT_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
+predict_varIT_to_var_Dim <- predict(survFit_varIT_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
+predict_cstIT_to_var_Dim <- predict(survFit_cstIT_Dim, data_predict = Dim_var, check_to_Nsurv = TRUE)
+predict_varIT_to_cst_Dim <- predict(survFit_varIT_Dim, data_predict = Dim_cst, check_to_Nsurv = TRUE)
+
+save(predict_cstSD_to_cst_Dim, file = "predict_cstSD_to_cst_Dim.rda")
+save(predict_varSD_to_var_Dim, file = "predict_varSD_to_var_Dim.rda")
+save(predict_cstSD_to_var_Dim, file = "predict_cstSD_to_var_Dim.rda")
+save(predict_varSD_to_cst_Dim, file = "predict_varSD_to_cst_Dim.rda")
+
+save(predict_cstIT_to_cst_Dim, file = "predict_cstIT_to_cst_Dim.rda")
+save(predict_varIT_to_var_Dim, file = "predict_varIT_to_var_Dim.rda")
+save(predict_cstIT_to_var_Dim, file = "predict_cstIT_to_var_Dim.rda")
+save(predict_varIT_to_cst_Dim, file = "predict_varIT_to_cst_Dim.rda")
 
 load(file = "predict_cstSD_to_cst_Car.rda")
 load(file = "predict_varSD_to_var_Car.rda")
@@ -198,88 +199,3 @@ load(file = "predict_cstIT_to_cst_Dim.rda")
 load(file = "predict_varIT_to_var_Dim.rda")
 load(file = "predict_cstIT_to_var_Dim.rda")
 load(file = "predict_varIT_to_cst_Dim.rda")
-
-# --- NRMSE SD
-predict_cstSD_to_cst_Car$ls_check_on_Nsurv$nrmse
-predict_cstSD_to_cst_Cyp$ls_check_on_Nsurv$nrmse
-predict_cstSD_to_cst_Dim$ls_check_on_Nsurv$nrmse
-predict_cstSD_to_cst_Mal$ls_check_on_Nsurv$nrmse
-
-predict_varSD_to_var_Car$ls_check_on_Nsurv$nrmse
-predict_varSD_to_var_Cyp$ls_check_on_Nsurv$nrmse
-predict_varSD_to_var_Dim$ls_check_on_Nsurv$nrmse
-predict_varSD_to_var_Mal$ls_check_on_Nsurv$nrmse
-
-predict_cstSD_to_var_Car$ls_check_on_Nsurv$nrmse
-predict_cstSD_to_var_Cyp$ls_check_on_Nsurv$nrmse
-predict_cstSD_to_var_Dim$ls_check_on_Nsurv$nrmse
-predict_cstSD_to_var_Mal$ls_check_on_Nsurv$nrmse
-
-predict_varSD_to_cst_Car$ls_check_on_Nsurv$nrmse
-predict_varSD_to_cst_Cyp$ls_check_on_Nsurv$nrmse
-predict_varSD_to_cst_Dim$ls_check_on_Nsurv$nrmse
-predict_varSD_to_cst_Mal$ls_check_on_Nsurv$nrmse
-
-# --- NRMSE IT
-predict_cstIT_to_cst_Car$ls_check_on_Nsurv$nrmse
-predict_cstIT_to_cst_Cyp$ls_check_on_Nsurv$nrmse
-predict_cstIT_to_cst_Dim$ls_check_on_Nsurv$nrmse
-predict_cstIT_to_cst_Malt$ls_check_on_Nsurv$nrmse
-
-predict_varIT_to_var_Car$ls_check_on_Nsurv$nrmse
-predict_varIT_to_var_Cyp$ls_check_on_Nsurv$nrmse
-predict_varIT_to_var_Dim$ls_check_on_Nsurv$nrmse
-predict_varIT_to_var_Mal$ls_check_on_Nsurv$nrmse
-
-predict_cstIT_to_var_Car$ls_check_on_Nsurv$nrmse
-predict_cstIT_to_var_Cyp$ls_check_on_Nsurv$nrmse
-predict_cstIT_to_var_Dim$ls_check_on_Nsurv$nrmse
-predict_cstIT_to_var_Mal$ls_check_on_Nsurv$nrmse
-
-predict_varIT_to_cst_Car$ls_check_on_Nsurv$nrmse
-predict_varIT_to_cst_Cyp$ls_check_on_Nsurv$nrmse
-predict_varIT_to_cst_Dim$ls_check_on_Nsurv$nrmse
-predict_varIT_to_cst_Mal$ls_check_on_Nsurv$nrmse
-
-# --- PPC SD
-predict_cstSD_to_cst_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_cstSD_to_cst_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_cstSD_to_cst_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_cstSD_to_cst_Malt$ls_check_on_Nsurv$percent_ppc_check
-
-predict_varSD_to_var_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_varSD_to_var_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_varSD_to_var_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_varSD_to_var_Mal$ls_check_on_Nsurv$percent_ppc_check
-
-predict_cstSD_to_var_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_cstSD_to_var_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_cstSD_to_var_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_cstSD_to_var_Mal$ls_check_on_Nsurv$percent_ppc_check
-
-predict_varSD_to_cst_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_varSD_to_cst_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_varSD_to_cst_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_varSD_to_cst_Mal$ls_check_on_Nsurv$percent_ppc_check
-
-# --- PPC IT
-predict_cstIT_to_cst_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_cstIT_to_cst_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_cstIT_to_cst_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_cstIT_to_cst_Malt$ls_check_on_Nsurv$percent_ppc_check
-
-predict_varIT_to_var_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_varIT_to_var_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_varIT_to_var_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_varIT_to_var_Mal$ls_check_on_Nsurv$percent_ppc_check
-
-predict_cstIT_to_var_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_cstIT_to_var_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_cstIT_to_var_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_cstIT_to_var_Mal$ls_check_on_Nsurv$percent_ppc_check
-
-predict_varIT_to_cst_Car$ls_check_on_Nsurv$percent_ppc_check
-predict_varIT_to_cst_Cyp$ls_check_on_Nsurv$percent_ppc_check
-predict_varIT_to_cst_Dim$ls_check_on_Nsurv$percent_ppc_check
-predict_varIT_to_cst_Mal$ls_check_on_Nsurv$percent_ppc_check
-

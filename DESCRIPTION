@@ -5,6 +5,7 @@ Version: 3.2.0
 Author:
     Virgile Baudrot [aut],
     Sandrine Charles [aut],
+    Benoit Goussen [ctb],
     Marie Laure Delignette-Muller [aut],
     Wandrille Duchemin [ctb],
     Guillaume Kon-Kam-King [ctb],
@@ -22,6 +23,7 @@ Depends:
 SystemRequirements: JAGS (>= 4.0.0) (see http://mcmc-jags.sourceforge.net)
 Imports:
     coda,
+    deSolve,
     dplyr,
     epitools,
     graphics,

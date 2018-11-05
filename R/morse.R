@@ -3,12 +3,15 @@
 #' Provides tools for the analysis of survival/reproduction
 #' toxicity test data in quantitative environmental risk assessment. It can be
 #' used to explore/visualize experimental data, and to get estimates
-#' of \eqn{LC_{x}} (\eqn{X}\% Lethal Concentration) or
+#' of \eqn{LC_{x}} (\eqn{X}\% Lethal Concentration) or,
 #' \eqn{EC_{x}} (\eqn{X}\% Effective Concentration) by fitting exposure-response
 #' curves. The \eqn{LC_{x}}, \eqn{EC_{x}} and parameters of the curve are
 #' provided along with an indication of the uncertainty of the estimation.
 #' \code{morse} can also be used to get an estimation of the \eqn{NEC} (No Effect Concentration)
-#' by fitting a Toxico-Kinetic Toxico-Dynamic (TK-TD) model.
+#' by fitting a Toxico-Kinetic Toxico-Dynamic (TK-TD) model (GUTS: General Unified Threshold
+#' model of Survival). Within the TKTD-GUTS approach, \eqn{LC(x,t)}, \eqn{EC(x,t)} and \eqn{MF(x,t)}
+#' (\eqn{X}\% Multiplication Factors aka Lethal Profiles) can be explored in proportion \eqn{x} and 
+#' time \eqn{t}.
 #'
 #' Estimation procedures in \code{morse} can be used without a deep knowledge of
 #' their underlying probabilistic model or inference methods. Rather, they
@@ -26,6 +29,8 @@
 #' \item plot a dataset
 #' \item fit a model on a dataset and output the expected estimates
 #' \item check goodness of fit with posterior preditive check plot (ppc)
+#' \item plot \eqn{LC(x,t)} and \eqn{MF(x,t)} for GUTS models
+#' \item compute goodness-of-fit measures (PPC percent, NRMSE and SPPE) for GUTS
 #' }
 #' Those steps are presented in more details in the "Tutorial" vignette, while
 #' a more formal description of the estimation procedures are provided in the
@@ -44,7 +49,7 @@
 #' described in the tutorial vignette.
 #'
 #' \tabular{ll}{ Package: \tab morse\cr Type: \tab Package\cr Version: \tab
-#' 3.0.0\cr Date: \tab 2017-09-15\cr License: \tab GPL (>=2)\cr }
+#' 3.2.0\cr Date: \tab 2018-11-15\cr License: \tab GPL (>=2)\cr }
 #'
 #' @name morse-package
 #' @aliases morse-package morse
@@ -64,9 +69,8 @@
 #' \code{\link[ggplot2]{ggplot2}}
 #' 
 #' @references 
-#' Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S.
-#' (2014) \emph{Statistical handling of reproduction data for exposure-response
-#' modelling}.
+#' Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S. (2014)
+#' \emph{Statistical handling of reproduction data for exposure-response modelling}.
 #' \url{http://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
 #' 
 #' Forfait-Dubuc, C., Charles, S., Billoir, E. and Delignette-Muller, M.L. (2012)
@@ -74,11 +78,18 @@
 #' \url{https://doi.org/10.1007/s10646-012-0860-0}
 #'
 #' Plummer, M. (2013) \emph{JAGS Version 4.0.0 user manual}.
-#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}.
-#' @keywords package
+#' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
+#' 
+#' Delignette-Muller, M. L., Ruiz, P. and Veber, P. (2017)
+#' \emph{Robust Fit of Toxicokinetic--Toxicodynamic Models Using Prior Knowledge Contained in the Design of Survival Toxicity Tests}
+#' \url{https://pubs.acs.org/doi/abs/10.1021/acs.est.6b05326}
 #'
-#'
+#' Baudrot, V., Preux, S., Ducrot, V., Pavé, A. and Charles, S. (2018)
+#' \emph{New insights to compare and choose TKTD models for survival based on an inter-laboratory study for \emph{Lymnaea stagnalis} exposed to Cd}.
+#' \url{https://pubs.acs.org/doi/abs/10.1021/acs.est.7b05464}.
+#' 
 NULL
+
 
 #' Reproduction and survival datasets for \emph{Daphnia magna} exposed to
 #' cadmium during 21 days
