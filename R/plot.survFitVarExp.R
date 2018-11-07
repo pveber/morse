@@ -36,10 +36,10 @@
 #'  This option is specific to \code{survFitVarExp} objects for which computing time may be long.
 #'  \code{mcmc_size} can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation.
-#'@param scales Shape the scale of axis. Default is \code{"fixed"}, but can be \code{"free"}, or free
+#' @param scales Shape the scale of axis. Default is \code{"fixed"}, but can be \code{"free"}, or free
 #' in only one dimension \code{"free_x"}, \code{"free_y"}. (See \code{ggplot2} documentation
 #'  for more details.)
-#'  
+#' @param addConfInt If \code{TRUE}, add a \eqn{95\%} confidence interval on observed data from a binomial test
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @keywords plot
@@ -80,6 +80,7 @@ plot.survFitVarExp <- function(x,
                                adddata = TRUE,
                                mcmc_size = NULL,
                                scales = "fixed",
+                               addConfInt = TRUE,
                                ...) {
   
   
@@ -88,10 +89,11 @@ plot.survFitVarExp <- function(x,
   df_prediction <-  df_predictTotal$df_quantile
   df_spaghetti <-  df_predictTotal$df_spaghetti
   
-  df_observation <- filter(x$original.data, !is.na(Nsurv))
+  df_observation <- filter(x$original.data, !is.na(Nsurv)) %>%
+    group_by(replicate) %>%
+    mutate(Ninit = max(Nsurv))
   
   # Plot
-  
   plt <- ggplot() +
       theme_minimal() +
       scale_x_continuous(name = xlab) +
@@ -104,6 +106,21 @@ plot.survFitVarExp <- function(x,
     plt <- plt +
       geom_point(data = df_observation,
                aes(x = time, y = Nsurv/Ninit, group = replicate))
+  }
+  if(addConfInt == TRUE){
+    # create confidente interval on observed data
+    ci <- apply(df_observation, 1, function(x) {
+      binom.test(as.numeric(x["Nsurv"]), as.numeric(x["Ninit"]))$conf.int
+    })
+    conf.int <- as.data.frame(t(ci))
+    df_observation$conf_int_qinf95 <- conf.int[, 1]
+    df_observation$conf_int_qsup95 <- conf.int[, 2]
+    
+    plt <- plt +
+      geom_segment(data = df_observation,
+                   aes(x = time, xend = time,
+                       y = conf_int_qinf95, yend = conf_int_qsup95, group = replicate))
+    
   }
   
   # spaghetti
