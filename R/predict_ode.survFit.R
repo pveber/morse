@@ -32,6 +32,7 @@ predict_ode <- function(object, ...){
 #' @param interpolate_length Length of the time sequence for which output is wanted.
 #' @param interpolate_method The interpolation method for concentration. See pacakge deSolve for details.
 #' Default is \code{linear}.
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
 #'
@@ -51,11 +52,13 @@ predict_ode <- function(object, ...){
 #'                                replicate= rep("predict", 10))
 #'
 #' # (5) Predict on a new dataset
-#' predict_out <- predict_ode(object = out, data_predict = data_4prediction, mcmc_size = 1000, spaghetti = TRUE)
+#' predict_out <- predict_ode(object = out, data_predict = data_4prediction,
+#'                            mcmc_size = 1000, spaghetti = TRUE)
 #'
 #' }
 #' 
 #' @import deSolve
+#' @importFrom stats approxfun
 #' 
 #' @export
 #'
@@ -202,7 +205,7 @@ SurvSD_ode <- function(Cw, time, replicate, kk, kd, z, hb, mcmc_size = 1000, int
   signal <- data.frame(times = time, 
                        import = Cw)
   
-  sigimp <- approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
+  sigimp <- stats::approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
   
   if(!is.null(interpolate_length)){
     times <- seq(min(time), max(time), length = interpolate_length)
@@ -288,7 +291,7 @@ SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NUL
   signal <- data.frame(times = time, 
                        import = Cw)
   
-  sigimp <- approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
+  sigimp <- stats::approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
   
   if(!is.null(interpolate_length)){
     times <- seq(min(time), max(time), length = interpolate_length)

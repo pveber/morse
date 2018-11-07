@@ -74,7 +74,6 @@ predict_Nsurv.survFit <- function(object,
                             spaghetti = FALSE,
                             mcmc_size = NULL,
                             hb_value = TRUE,
-                            ratio_no.NA = 0.95,
                             ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
   # arguments should be named the same when declaring a
@@ -85,6 +84,8 @@ predict_Nsurv.survFit <- function(object,
     warning("Please provide a column 'Nsurv' in the 'data_predict' argument to have
               prediction on the Number of survivor.")
   }
+  
+  message("Note that computing can be quite long (several minutes).")
   
   # Initialisation
   mcmc <- x$mcmc
