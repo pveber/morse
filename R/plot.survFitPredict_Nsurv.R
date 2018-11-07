@@ -24,7 +24,6 @@
 #' parameters drawn from the posterior distribution
 #' @param one.plot if \code{TRUE}, draws all the estimated curves in
 #' one plot instead of one plot per concentration.
-#' @param adddata if \code{TRUE}, adds the observed data to the plot
 #' @param mcmc_size A numerical value refering by default to the size of the mcmc in object \code{survFitPredict}.
 #'  This option is specific to \code{survFitPredict} objects for which computing time may be long.
 #'  \code{mcmc_size} can be used to reduce the number of mcmc samples in order to speed up

@@ -20,6 +20,7 @@ predict_Nsurv_check <- function(object, ...){
 #' Square Error (NRMSE) and the Survival Probability Prediction Error (SPPE)
 #'
 #' @param object an object of class \code{survFitPredict_Nsurv}
+#' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @return The function return a list with three items:
 #' \item{Percent_PPC}{The criterion compares the predicted median numbers 
@@ -31,7 +32,7 @@ predict_Nsurv_check <- function(object, ...){
 #'  used to aggregate the magnitudes of the errors in predictions for various time-points
 #'  into a single measure of predictive power. In order to provide a criterion expressed
 #'   as a percentage, NRMSE is the normalised RMSE by the mean of the observations.}
-#' \item{SPPE}{The SPPE indicator is negative (between \eqn{0} and \eqn{-100\%) for an 
+#' \item{SPPE}{The SPPE indicator is negative (between \eqn{0} and \eqn{-100\%} for an 
 #' underestimation of effects, and positive (between \eqn{0} and \eqn{100}) for an 
 #' overestimation of effects. An SPPE value of \eqn{0} means an exact prediction
 #'  of the observed survival probability at the end of the experiment.}
@@ -49,7 +50,7 @@ predict_Nsurv_check.survFitPredict_Nsurv <- function(object, ...){
   percent_ppc_timeserie <- sum(df_ppc$ppc_matching_valid) / nrow(df_ppc) * 100
   
   # --- NRMSE
-  nrmse <- mean(df_ppc$rmse_id) / mean(df_ppc$Nsurv)
+  nrmse <- mean(df_ppc$rmse_id) / mean(df_ppc$Nsurv) * 100
   ## version with distribution
   # rmse <- (jags.data$Nsurv - t(df_sim))^2
   # y_mean <- mean(jags.data$Nsurv)
