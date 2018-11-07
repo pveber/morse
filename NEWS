@@ -20,6 +20,7 @@ object
 - add option to remove background mortality, 'hb_value' TRUE/FALSE, in 'survFit' methods.
 - add 'predict_ode' function to include deSolve package for ode integration for prediction.
 - add option 'EFSA_name' in function 'summary', 'plot_prior_posterior' and 'priors_distribution' to adapt parameter name of GUTS model to EFSA Scientific Opinion (doi: 10.2903/j.efsa.2018.5377) naming.
+- add binomial credible interval of observation in plot for 'survFitVarExp' object
 
 Version 3.1.1
 =============
