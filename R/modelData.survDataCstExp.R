@@ -3,16 +3,6 @@
 #' @param x An object of class \code{survData}
 #' @param model_type TK-TD GUTS model type ('SD' or 'IT')
 #'
-#' @examples 
-#' 
-#' # (1) Load the data
-#' data("propiconazole")
-#' 
-#' # (2) Create an object 'survData'
-#' dataset <- survData(propiconazole)
-#' 
-#' # (3) Create the list of object to be pass in JAGS
-#' modelData(dataset, model_type = "IT")
 #'
 modelData.survDataCstExp <- function(x, model_type = NULL){
   
