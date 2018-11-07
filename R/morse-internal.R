@@ -8,8 +8,10 @@ if(getRversion() >= "2.15.1")  utils::globalVariables(c(
   "psurv", "concentration", ".", "time_ID", "i_row", "nbrReplicate_ConcTime",
   "time_ID_red", "x.pts", "y.pts", "pts.leg", "survRate_key", "survRate_value",
   "Nsurv_qinf95", "Nsurv_qsup95", "col_range", "Nsurv_q50", "Nprec", "decrease",
-  "time_ID_long"
-))
+  "time_ID_long", "Nsurv_key", "Nsurv_value", "Nsurv_qinf95_valid", "Nsurv_qsup95_valid",
+  "Nsurv_q50_valid","Nsurv_qinf95_check", "Nsurv_qsup95_check","Nsurv_q50_check",
+  "conf_int_qinf95", "conf_int_qsup95", "kd_log10", "alpha_log10",
+  "kk_log10", "z_log10", "parameters", "density"))
 
 
 # Generates a character string vector from a data.frame using its
