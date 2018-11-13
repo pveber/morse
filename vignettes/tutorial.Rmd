@@ -25,26 +25,26 @@ library(dplyr)
 ```
 
 The package `morse` is devoted to the analysis of data from standard toxicity
-tests. It provides a simple workflow to explore/visualize a dataset, and
+tests. It provides a simple workflow to explore/visualize a data set, and
 compute estimations of risk assessment indicators. This document illustrates
 a typical use of `morse` on survival and reproduction data, which can be followed
-step-by-step to analyze new datasets.
+step-by-step to analyze new data sets.
 
 # Survival data analysis at target time (TT)
 
 The following example shows all the steps to perform survival analysis on
 standard toxicity test data and to produce estimated values of the $LC_x$.
-We will use a dataset of the library named `cadmium2`, which contains both
+We will use a data set of the library named `cadmium2`, which contains both
 survival and reproduction data from a chronic laboratory toxicity test. In this
 experiment, snails were exposed to six concentrations of a metal contaminant
 (cadmium) during 56 days.
 
-## Step 1: check the structure and the dataset integrity
+## Step 1: check the structure and the data set integrity
 
 The data from a survival toxicity test should be gathered in a `data.frame` with a
 specific layout. This is documented in the paragraph on `survData` in the
-reference manual, and you can also inspect one of the datasets provided in
-the package (e.g., `cadmium2`). First, we load the dataset and use the function
+reference manual, and you can also inspect one of the data sets provided in
+the package (e.g., `cadmium2`). First, we load the data set and use the function
 `survDataCheck()` to check that it has the expected layout:
 
 ```{r step1TT, cache=TRUE}
@@ -52,7 +52,7 @@ data(cadmium2)
 survDataCheck(cadmium2)
 ```
 
-The output `## No message` just informs that the dataset is well-formed.
+The output `## No message` just informs that the data set is well-formed.
 
 ## Step 2: create a `survData` object
 
@@ -66,7 +66,7 @@ dat <- survData(cadmium2)
 head(dat)
 ```
 
-## Step 3: visualize your dataset
+## Step 3: visualize your data set
 
 The function `plot()` can be used to plot the number of surviving individuals
 as a function of time for all concentrations and replicates.
@@ -80,7 +80,7 @@ Two graphical styles are available, `"generic"` for standard `R` plots or
 `"ggplot"` to call package `ggplot2` (default). If argument `pool.replicate`
 is `TRUE`, datapoints at a given time-point and a given concentration are pooled
 and only the mean number of survivors is plotted. To observe the full
-dataset, we set this option to `FALSE`.
+data set, we set this option to `FALSE`.
 
 By fixing the concentration at a (tested) value, we can visualize one subplot
 in particular:
@@ -222,10 +222,10 @@ Here is a typical session to analyse concentration-dependent time-course data
 using the so-called "Stochastic Death" (SD) model:
 
 ```{r TKTDcst, cache=TRUE}
-# (1) load dataset
+# (1) load data set
 data(propiconazole)
 
-# (2) check structure and integrity of the dataset
+# (2) check structure and integrity of the data set
 survDataCheck(propiconazole)
 
 # (3) create a `survData` object
@@ -315,14 +315,14 @@ ppc(fit_cstIT)
 
 ## GUTS model under time-variable exposure concentration
 
-Here is a typical session fitting an SD or an IT model for a dataset
+Here is a typical session fitting an SD or an IT model for a data set
 under time-variable exposure scenario.
 
 ```{r TKTDvar, cache=TRUE}
-# (1) load dataset
+# (1) load data set
 data("propiconazole_pulse_exposure")
 
-# (2) check structure and integrity of the dataset
+# (2) check structure and integrity of the data set
 survDataCheck(propiconazole_pulse_exposure)
 
 # (3) create a `survData` object
@@ -494,7 +494,7 @@ predict_Nsurv_PRZ_SD_varTOvar <- predict_Nsurv(fit_varSD, propiconazole_pulse_ex
 
 Then, using object produce with the function `predict_Nsurv()` we can compute *PPC*, *NRMSE* and *SPPE* for all models. 
 
-```{r checkNsurvPRED, cache=TRUE}
+```{r checkNsurvPRED_2, cache=TRUE}
 predict_Nsurv_check(predict_Nsurv_PRZ_SD_cstTOvar)
 ```
 
@@ -538,7 +538,7 @@ plot_prior_post(fit_cstIT, EFSA_name = TRUE)
 
 ## Lethal concentration
 
-Compared to the target time analysis, TKTD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the dataset is used.
+Compared to the target time analysis, TKTD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the data set is used.
 
 ```{r cstSDLCx, cache=TRUE}
 # LC50 at the maximum time-point:
@@ -598,7 +598,7 @@ This idea is then to multiply the concentration in the realistic exposure profil
 
 The multiplication factor $MF_x$ then informs the "margin of safety" that could be used to assess if the risk should be considered as acceptable or not.
 
-Computing an $MF_x$ is easy with function `MFx()`. It only requires object `survFit` and the exposure profile, argument `data_predict` in the function. The chosen percentage of survival reduction is specified with argument `X`, the default is $50$, and the chosen time-point can be specified with `time_MFx`, by default the maximal time-point in the dataset is used. 
+Computing an $MF_x$ is easy with function `MFx()`. It only requires object `survFit` and the exposure profile, argument `data_predict` in the function. The chosen percentage of survival reduction is specified with argument `X`, the default is $50$, and the chosen time-point can be specified with `time_MFx`, by default the maximal time-point in the data set is used. 
 
 There is no explicit formulation of $MF_x$ (at least for the GUTS-SD model), so the `accuracy` argument can be used to change the accuracy of the convergence level.
 
@@ -734,10 +734,10 @@ between the chemical compound concentration and the reproduction rate per indivi
 
 Here is a typical session:
 ```{r, cache=TRUE}
-# (1) load dataset
+# (1) load data set
 data(cadmium2)
 
-# (2) check structure and integrity of the dataset
+# (2) check structure and integrity of the data set
 reproDataCheck(cadmium2)
 
 # (3) create a `reproData` object
@@ -792,8 +792,8 @@ parameter called `omega`, which quantifies the inter-individual variability
 
 ## Reproduction data and survival functions
 
-In `morse`, reproduction datasets are a special case of survival datasets: a
-reproduction dataset includes the same information as in a survival dataset plus
+In `morse`, reproduction data sets are a special case of survival data sets: a
+reproduction data set includes the same information as in a survival data set plus
 the information on reproduction outputs. For that reason, the S3 class `reproData`
 inherits from the class `survData`, which means that any operation on a `survData`
 object is legal on a `reproData` object. In particular, in order to use the plot function
