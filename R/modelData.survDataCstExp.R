@@ -1,7 +1,7 @@
-#' Create a dataset to analyse a \code{survDataCstExp} object
+#' Create a data set to analyse a \code{survDataCstExp} object.
 #'
 #' @param x An object of class \code{survData}
-#' @param model_type TK-TD GUTS model type ('SD' or 'IT')
+#' @param model_type TKTD GUTS model type ('SD' or 'IT')
 #'
 #'
 modelData.survDataCstExp <- function(x, model_type = NULL){

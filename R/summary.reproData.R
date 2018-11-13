@@ -1,7 +1,7 @@
 #' Summary of \code{reproData} object
 #' 
 #' This is the generic \code{summary} S3 method for the \code{reproData} class.
-#' It provides information about the structure of the dataset and the experimental
+#' It provides information about the structure of the data set and the experimental
 #' design.
 #' 
 #' @param object an object of class \code{reproData}
@@ -19,7 +19,7 @@
 #' # (2) Create a reproData object
 #' cadmium1 <- reproData(cadmium1)
 #' 
-#' # (3) Summarize the dataset
+#' # (3) Summarize the data set
 #' summary(cadmium1)
 #' 
 #' @keywords summary

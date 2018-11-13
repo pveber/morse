@@ -2,12 +2,11 @@
 #'
 #' This is the generic \code{ppc} S3 method for the \code{survFitPredict_Nsurv} class. It
 #' plots the predicted values along with 95\% credible intervals
-#' versus the observed values for \code{survFit} objects.
+#' versus the observed values for \code{survFitPredict_Nsurv} objects.
 #' 
 #' For \code{survFitPredict_Nsurv} object, PPC is based on times series simulated
-#' for each replicate. In addition
-#'
-#' The black points show the observed number of survivors (on \eqn{X}-axis)
+#' for each replicate. In addition, the black points show the observed
+#'  number of survivors (on \eqn{X}-axis)
 #'  against the corresponding predicted
 #' number (\eqn{Y}-axis). Predictions come along with 95\% prediction
 #' intervals, which are depicted in green when they contain the

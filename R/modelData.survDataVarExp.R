@@ -1,7 +1,7 @@
-#' Create a dataset to analyse a \code{survDataVarExp} object
+#' Create a data set to analyse a \code{survDataVarExp} object.
 #'
 #' @param x An object of class \code{survData}
-#' @param model_type TK-TD GUTS model type ('SD' or 'IT')
+#' @param model_type TKTD GUTS model type ('SD' or 'IT')
 #' @param extend_time Number of for each replicate used for linear 
 #' interpolation (comprise between time to compute and fitting accuracy)
 #' @param \dots Further arguments to be passed to generic methods
@@ -44,7 +44,7 @@ modelData.survDataVarExp <- function(x,
   
   modelData <- priorsData$priorsList
   
-  ### reduce dataset: To remove NA in Nsurv column
+  ### reduce data set: To remove NA in Nsurv column
   modelData$time <-  x_reduce$time
   modelData$conc <-  x_reduce$conc
   modelData$replicate <-  x_reduce$replicate
@@ -107,7 +107,7 @@ modelData.survDataVarExp <- function(x,
   
 }
 
-# Create a dataset for survival analysis when the replicate of concentration is variable
+# Create a data set for survival analysis when the replicate of concentration is variable
 #
 # @param x An object of class \code{survData}
 #

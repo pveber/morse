@@ -1,7 +1,7 @@
 #' Summary of \code{survDataVarExp} object
 #' 
 #' The generic \code{summary} S3 method for the \code{survDataVarExp} class provides
-#' information about the structure of the dataset and the experimental design.
+#' information about the structure of the data set and the experimental design.
 #' 
 #' @param object an object of class \code{survDataVarExp}
 #' @param quiet when \code{TRUE}, does not print
@@ -19,7 +19,7 @@
 #' # (2) Create a survDataVarExp object
 #' out <- survData(propiconazole_pulse_exposure)
 #' 
-#' # (3) Summarize the dataset
+#' # (3) Summarize the data set
 #' summary(out)
 #' 
 #' @keywords summary

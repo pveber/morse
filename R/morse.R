@@ -8,9 +8,9 @@
 #' curves. The \eqn{LC_{x}}, \eqn{EC_{x}} and parameters of the curve are
 #' provided along with an indication of the uncertainty of the estimation.
 #' \code{morse} can also be used to get an estimation of the \eqn{NEC} (No Effect Concentration)
-#' by fitting a Toxico-Kinetic Toxico-Dynamic (TK-TD) model (GUTS: General Unified Threshold
+#' by fitting a Toxico-Kinetic Toxico-Dynamic (TKTD) model (GUTS: General Unified Threshold
 #' model of Survival). Within the TKTD-GUTS approach, \eqn{LC(x,t)}, \eqn{EC(x,t)} and \eqn{MF(x,t)}
-#' (\eqn{X}\% Multiplication Factors aka Lethal Profiles) can be explored in proportion \eqn{x} and 
+#' (\eqn{x}\% Multiplication Factors aka Lethal Profiles) can be explored in proportion \eqn{x} and 
 #' time \eqn{t}.
 #'
 #' Estimation procedures in \code{morse} can be used without a deep knowledge of
@@ -24,14 +24,20 @@
 #' \code{surv} (resp. \code{repro}) prefix. \code{morse} provides a similar
 #' workflow in both cases:
 #' \enumerate{
-#' \item create and validate a dataset
-#' \item explore a dataset
-#' \item plot a dataset
-#' \item fit a model on a dataset and output the expected estimates
+#' \item create and validate a data set
+#' \item explore a data set
+#' \item plot a data set
+#' \item fit a model on a data set and output the expected estimates
 #' \item check goodness of fit with posterior preditive check plot (ppc)
-#' \item plot \eqn{LC(x,t)} and \eqn{MF(x,t)} for GUTS models
-#' \item compute goodness-of-fit measures (PPC percent, NRMSE and SPPE) for GUTS
 #' }
+#' 
+#' More specifically, for survival data handles with TKTD `GUTS` model, \code{morse}
+#' provides:
+#' \enumerate{
+#' \item plot \eqn{LC(x,t)} and \eqn{MF(x,t)}.
+#' \item compute goodness-of-fit measures (PPC percent, NRMSE and SPPE)
+#' }
+#' 
 #' Those steps are presented in more details in the "Tutorial" vignette, while
 #' a more formal description of the estimation procedures are provided in the
 #' vignette called "Models in \code{morse} package". Please refer to these documents
@@ -59,6 +65,7 @@
 #' Sandrine Charles <sandrine.charles@@univ-lyon1.fr>,
 #' Marie Laure Delignette-Muller <marielaure.delignettemuller@@vetagro-sup.fr>,
 #' Wandrille Duchemin <wandrille.duchemin@@insa-lyon.fr>,
+#' Benoit Goussen <Benoit.Goussen@@ibacon.com>,
 #' Guillaume Kon-Kam-king <guillaume.kon-kam-king@@univ-lyon1.fr>,
 #' Christelle Lopes <christelle.lopes@@univ-lyon1.fr>,
 #' Philippe Ruiz <philippe.ruiz@@univ-lyon1.fr>,
@@ -75,7 +82,7 @@
 #' 
 #' Forfait-Dubuc, C., Charles, S., Billoir, E. and Delignette-Muller, M.L. (2012)
 #' \emph{Survival data analyses in ecotoxicology: critical effect concentrations, methods and models. What should we use?}
-#' \url{https://doi.org/10.1007/s10646-012-0860-0}
+#' \url{https://doi.org/10.1007/s10646-012-0860-0}.
 #'
 #' Plummer, M. (2013) \emph{JAGS Version 4.0.0 user manual}.
 #' \url{http://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
@@ -88,13 +95,17 @@
 #' \emph{New insights to compare and choose TKTD models for survival based on an inter-laboratory study for \emph{Lymnaea stagnalis} exposed to Cd}.
 #' \url{https://pubs.acs.org/doi/abs/10.1021/acs.est.7b05464}.
 #' 
+#' EFSA PPR Scientific Opinion (2018)
+#' \emph{Scientific Opinion on the state of the art of Toxicokinetic/Toxicodynamic (TKTD) effect models for regulatory risk assessment of pesticides for aquatic organisms}
+#' \url{https://www.efsa.europa.eu/en/efsajournal/pub/5377}.
+#' 
 NULL
 
 
-#' Reproduction and survival datasets for \emph{Daphnia magna} exposed to
+#' Reproduction and survival data sets for \emph{Daphnia magna} exposed to
 #' cadmium during 21 days
 #'
-#' Reproduction and survival datasets of chronic laboratory toxicity tests with
+#' Reproduction and survival data sets of chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to five concentrations
 #' of cadmium during 21 days. Five concentrations were
 #' tested, with four replicates per concentration. Each replicate contained 10
@@ -122,16 +133,16 @@ NULL
 #' Comparison of toxicity tests with different exposure time patterns: The added
 #' value of dynamic modelling in predictive ecotoxicology, \emph{Ecotoxicology
 #' and Environmental Safety}, 75, 80-86.
-#' @keywords dataset
+#' @keywords data set
 NULL
 
 
 
 
-#' Reproduction and survival datasets for \emph{Lymnaea stagnalis} exposed to cadmium during 28
+#' Reproduction and survival data sets for \emph{Lymnaea stagnalis} exposed to cadmium during 28
 #' days
 #'
-#' Reproduction and survival datasets of chronic laboratory toxicity tests with
+#' Reproduction and survival data sets of chronic laboratory toxicity tests with
 #' snails (\emph{Lymnaea stagnalis}) exposed to six concentrations of cadmium
 #' during 28 days. Six concentrations were tested, with six replicates per
 #' concentration. Each replicate contained five organisms. Reproduction and
@@ -169,16 +180,16 @@ NULL
 #' Optimizing the design of a reproduction toxicity test with the pond snail Lymnaea stagnalis,
 #' \emph{Regulatory Toxicology and Pharmacology}, vol. 81 pp.47-56.
 #' 
-#' @keywords dataset
+#' @keywords data set
 NULL
 
 
 
 
-#' Reproduction and survival datasets for \emph{Daphnia magna} exposed to
+#' Reproduction and survival data sets for \emph{Daphnia magna} exposed to
 #' chlordan during 21 days
 #'
-#' Reproduction and survival datasets of chronic laboratory toxicity tests with
+#' Reproduction and survival data sets of chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to six concentrations
 #' of one organochlorine insecticide (chlordan) during 21 days. Six concentrations were
 #' tested, with 10 replicates per concentration. Each replicate contained one
@@ -202,16 +213,16 @@ NULL
 #' @references Manar, R., Bessi, H. and Vasseur, P. (2009) Reproductive effects
 #' and bioaccumulation of chlordan in Daphnia magna, \emph{Environmental
 #' Toxicology and Chemistry}, 28, 2150-2159.
-#' @keywords dataset
+#' @keywords data set
 NULL
 
 
 
 
-#' Reproduction and survival datasets for \emph{Daphnia magna} exposed to
+#' Reproduction and survival data sets for \emph{Daphnia magna} exposed to
 #' copper during 21 days
 #'
-#' Reproduction and survival datasets of chronic laboratory toxicity tests with
+#' Reproduction and survival data sets of chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to five concentrations
 #' of copper during 21 days. Five concentrations were
 #' tested, with three replicates per concentration. Each replicate contained 20
@@ -235,16 +246,16 @@ NULL
 #' @references Billoir, E., Delignette-Muller, M.L., Pery, A.R.R. and
 #' Charles, S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
-#' @keywords dataset
+#' @keywords data set
 NULL
 
 
 
 
-#' Survival dataset for \emph{Daphnia magna} exposed to dichromate
+#' Survival data set for \emph{Daphnia magna} exposed to dichromate
 #' during 21 days
 #'
-#' Survival dataset of chronic laboratory toxicity tests with
+#' Survival data set of chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to six concentrations
 #' of one oxidizing agent (potassium dichromate) during 21 days. Six
 #' concentrations were tested with one replicate of 50 organisms per concentration.
@@ -266,15 +277,15 @@ NULL
 #' @references Bedaux, J., Kooijman, SALM (1994) Statistical analysis of toxicity tests,
 #' based on hazard modeling, \emph{Environmental and Ecological Statistics}, 1,
 #' 303-314.
-#' @keywords dataset
+#' @keywords data set
 NULL
 
 
 
-#' Survival dataset for \emph{Gammarus pulex} exposed to propiconazole
+#' Survival data set for \emph{Gammarus pulex} exposed to propiconazole
 #' during four days
 #'
-#' Survival dataset of chronic laboratory toxicity tests with
+#' Survival data set of chronic laboratory toxicity tests with
 #' \emph{Gammarus pulex} freshwater invertebrate exposed to eight concentrations
 #' of one fungicide (propiconazole) during four days. Eight
 #' concentrations were tested with two replicates of 10 organisms per concentration.
@@ -299,15 +310,15 @@ NULL
 #' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
 #'
-#' @keywords dataset
+#' @keywords data set
 NULL
 
 
-#' Survival dataset for \emph{Gammarus pulex} exposed to propiconazole
+#' Survival data set for \emph{Gammarus pulex} exposed to propiconazole
 #' during 10 days with time-variable
 #' exposure concentration (non-standard pulsed toxicity experiments)
 #'
-#' Survival dataset of laboratory toxicity tests with \emph{Gammarus pulex}
+#' Survival data set of laboratory toxicity tests with \emph{Gammarus pulex}
 #' freshwater invertebrates exposed to several profiles of concentrations
 #' (time-variable concentration for each time series)
 #' of one fungicide (propiconazole) during 10 days.
@@ -330,14 +341,14 @@ NULL
 #' propiconazole: model assumptions, calibration data requirements and predictive
 #' power, \emph{Ecotoxicology}, (21), 1828-1840.
 #'
-#' @keywords dataset
+#' @keywords data set
 NULL
 
 
-#' Reproduction and survival datasets for \emph{Daphnia magna} exposed to zinc
+#' Reproduction and survival data sets for \emph{Daphnia magna} exposed to zinc
 #' during 21 days
 #'
-#' Reproduction and survival datasets of a chronic laboratory toxicity tests with
+#' Reproduction and survival data sets of a chronic laboratory toxicity tests with
 #' \emph{Daphnia magna} freshwater invertebrate exposed to four concentrations
 #' of zinc during 21 days. Four concentrations were
 #' tested with three replicates per concentration. Each replicate contained 20
@@ -361,5 +372,5 @@ NULL
 #' @references Billoir, E.,Delignette-Muller, M.L., Pery, A.R.R. and
 #' Charles S. (2008) A Bayesian Approach to Analyzing Ecotoxicological Data,
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
-#' @keywords dataset
+#' @keywords data set
 NULL

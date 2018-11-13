@@ -5,13 +5,18 @@
 #'
 #' @param object An object of class \code{survFit}.
 #' @param quiet When \code{TRUE}, does not print.
-#' @param EFSA_name If \code{TRUE}, replace actual terminology by
-#'  the one used in EFSA PPR Scientific Opinion.
+#' @param EFSA_name If \code{TRUE}, the current terminology by
+#'  the one used in the recent EFSA PPR Scientific Opinion (2018).
 #' @param \dots Further arguments to be passed to generic methods.
 #'
 #' @return The function returns a list with the following information:
 #' \item{Qpriors}{quantiles of the model priors}
 #' \item{Qposteriors}{quantiles of the model posteriors}
+#' 
+#' @references 
+#' EFSA PPR Scientific Opinion (2018)
+#' \emph{Scientific Opinion on the state of the art of Toxicokinetic/Toxicodynamic (TKTD) effect models for regulatory risk assessment of pesticides for aquatic organisms}
+#' \url{https://www.efsa.europa.eu/en/efsajournal/pub/5377}.
 #'
 #' @examples
 #' # (1) Load the data

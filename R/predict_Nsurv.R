@@ -1,6 +1,6 @@
 #' \code{Predict_Nsurv} method for \code{survFit} objects
 #' 
-#' It provides simulation for "SD" or "IT" models under
+#' It provides the simulated number of survivors for "SD" or "IT" models under
 #' constant or time-variable exposure.
 #' 
 #' @param object an object used to select a method
@@ -13,11 +13,11 @@ predict_Nsurv <- function(object, ...){
 
 #' \code{Predict_Nsurv} method for \code{survFit} objects
 #'
-#' It provides simulation for "SD" or "IT" models under constant or
+#' It provides the simulated number of survivors for "SD" or "IT" models under constant or
 #' time-variable exposure.
 #'
 #' @param object An object of class \code{survFit}
-#' @param data_predict A dataframe with three columns \code{time}, \code{conc}, \code{replicate},
+#' @param data_predict A dataframe with four columns \code{time}, \code{conc}, \code{replicate},
 #' and \code{Nsurv}  used for prediction. If \code{NULL}, prediction is based on \code{x} object of 
 #'  class \code{survFit} used for fitting.
 #' @param spaghetti If \code{TRUE}, return a set of survival curves using
@@ -31,16 +31,20 @@ predict_Nsurv <- function(object, ...){
 #' 
 #' @return The function returns an object of class \code{survFitPredict_Nsurv}, which is
 #' a list with the two following \code{data.frame}:
-#' \item{df_quantile}{A \code{data.frame} with 10 columns, \code{time}, \code{conc}, \code{replicate},
-#' \code{Nsurv} (observed number of survivors) and other columns with median and 95\% credible interval
-#' of the number of survivors computed with 2 different way refers as \code{check} and \code{valid} 
+#' \item{df_quantile}{A \code{data.frame} with 10 columns, \code{time}, \code{conc},
+#' \code{replicate}, \code{Nsurv} (observed number of survivors)
+#'  and other columns with median and 95\% credible interval
+#' of the number of survivors computed with 2 different way 
+#' refers as \code{check} and \code{valid}:  
 #' \code{Nsurv_q50_check}, \code{Nsurv_qinf95_check},
 #' \code{Nsurv_qsup95_check}, \code{Nsurv_q50_valid}, \code{Nsurv_qinf95_valid},
-#' \code{Nsurv_qsup95_valid}. \code{_check} means the number of survivor at time \eqn{t} is estimated using the observed number
-#' of survivor at time \eqn{t-1}, while \code{_valid} means the number of survivor estimated at time
-#' \eqn{t} is based on the estimated number of survivor at time \eqn{t-1}.}
+#' \code{Nsurv_qsup95_valid}. The \code{_check} refers to the number of survivors
+#' at time \eqn{t} predicted using the observed number
+#' of survivors at time \eqn{t-1},
+#' while the \code{_valid} refers to the number of survivors predicted at time
+#' \eqn{t} based on the predicted number of survivors at time \eqn{t-1}.}
 #' \item{df_spaghetti}{NULL if arguement \code{spaghetti = FALSE}. With \code{spaghetti = TRUE}, it returns a
-#' dataframe with all simulation based on MCMC parameters return from a \code{survFit} object.}
+#' dataframe with all simulations based on MCMC parameters from a \code{survFit} object.}
 #' 
 #' 
 #' @examples 
@@ -61,7 +65,7 @@ predict_Nsurv <- function(object, ...){
 #'                                replicate= rep("predict", 10),
 #'                                Nsurv = c(20,20,17,16,15,15,15,14,13,12))
 #'
-#' # (5) Predict Nsurv on a new dataset
+#' # (5) Predict Nsurv on a new data set
 #' predict_out <- predict_Nsurv(object = out, data_predict = data_4prediction, spaghetti = TRUE)
 #'
 #' }

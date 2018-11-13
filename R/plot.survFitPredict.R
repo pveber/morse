@@ -1,15 +1,13 @@
 #' Plotting method for \code{survFitPredict} objects
 #'
 #' This is the generic \code{plot} S3 method for the
-#' \code{survFitPredict}.  It plots the fit obtained for each
-#' concentration of chemical compound in the provided dataset.
+#' \code{survFitPredict}.  It plots the predicted survival rate for each
+#' concentration of the chemical compound in the provided dataset.
 #'
-#' The fitted curves represent the \strong{estimated survival rate} as a function
+#' The fitted curves represent the \strong{predicted survival rate} as a function
 #' of time for each concentration.
-#' The black dots depict the \strong{observed survival
-#' rate} at each time point.
-#' The function plots both 95\% binomial credible intervals for the estimated survival
-#' rate.
+#' The function plots both the 95\% credible band and the predicted survival
+#' rate over time.
 #' If \code{spaghetti = TRUE}, the credible intervals are represented by two
 #' dotted lines limiting the credible band, and a spaghetti plot is added to this band.
 #' This spaghetti plot consists of the representation of simulated curves using parameter values

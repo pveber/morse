@@ -1,6 +1,6 @@
 #' Density distribution of priors.
 #' 
-#' Return a \code{data.frame} with priors density distribution of parameters used in
+#' Return a \code{data.frame} with prior density distributions of parameters used in
 #' \code{object}.
 #' 
 #' When the \code{object} is of class \code{survFit}, see \link[=priors_distribution.survFit]{priors_distribution.survFit}
@@ -22,9 +22,14 @@ priors_distribution <- function(object, ...){
 #' @param object An object of class \code{survFit}.
 #' @param size_sample Size of the random generation of the distribution.
 #' Default is \code{1e3}.
-#' @param EFSA_name If \code{TRUE}, replace actual terminology by
-#'  the one used in EFSA PPR Scientific Opinion.
+#' @param EFSA_name If \code{TRUE}, replace the current terminology by
+#'  the one used in the recent EFSA PPR Scientific Opinion (2018).
 #' @param \dots Further arguments to be passed to generic methods.
+#' 
+#' @references
+#' EFSA PPR Scientific Opinion (2018)
+#' \emph{Scientific Opinion on the state of the art of Toxicokinetic/Toxicodynamic (TKTD) effect models for regulatory risk assessment of pesticides for aquatic organisms}
+#' \url{https://www.efsa.europa.eu/en/efsajournal/pub/5377}.
 #' 
 #' @importFrom stats rnorm runif
 #' 

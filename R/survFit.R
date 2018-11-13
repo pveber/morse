@@ -15,12 +15,12 @@ survFit <- function(data, ...){
 #
 ################################################################################
 
-#' Create a list of scalars giving priors to use in Bayesian modelling
+#' Create a list of scalars giving priors to use in Bayesian inference.
 #'
 #' @param x An object of class \code{survData}
 #' @param model_type TKTD model type ('SD' or 'IT')
 #' 
-#' @return A list for parameterization of priors for Bayesian modeling with JAGS
+#' @return A list for parameterization of priors for Bayesian inference with JAGS.
 #'
 #' @examples 
 #' 

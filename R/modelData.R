@@ -1,9 +1,9 @@
-#' Create a list giving data to use in Bayesian modelling
+#' Create a list giving data to use in Bayesian inference.
 #' 
 #' @param x An object of class \code{survData}
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @return A list for parameterization of priors for Bayesian modelling
+#' @return A list for parameterization of priors for Bayesian inference.
 #' 
 #' @importFrom dplyr group_indices_
 #' 
