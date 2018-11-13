@@ -444,7 +444,7 @@ predict_PRZ_cstSD_4pred_hbOUT <- predict(object = fit_cstSD, data_predict = data
 plot(predict_PRZ_cstSD_4pred_hbOUT)
 ```
 
-## Goodness-of-fit: EFSA recommendations
+## Validation criteria: EFSA recommendations
 
 Following EFSA recommendations, the next functions compute qualitative and quantitative model performance criteria suitable for GUTS, and TKTD modelling in general: the percentage of observations within the 95% credible interval of the Posterior Prediction Check (PPC), the Normalised Root Mean Square Error (NRMSE) and the Survival-Probability Prediction Error (SPPE).
 
