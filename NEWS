@@ -1,5 +1,15 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.2.1
+=============
+
+DOC ISSUES FIXES
+- changes in the vignette 'Tutorial'.
+- changes in the Reference manual 'morse.pdf'.
+
+NEW FEATURES
+- Details NRMSE and PPC for each time-series (i.e., replicates)
+
 Version 3.2.0
 =============
 
