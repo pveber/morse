@@ -19,12 +19,13 @@ before_install:
 
 script: 
  - |
-   travis_wait 90 R CMD build .
-   travis_wait 90 R CMD check morse*tar.gz
+   travis_wait 20 R CMD build .
+   travis_wait 120 R CMD check morse*tar.gz
 
 
 r_packages:
  - coda
+ - deSolve
  - dplyr
  - epitools
  - ggplot2
