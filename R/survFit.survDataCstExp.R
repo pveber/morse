@@ -112,10 +112,13 @@ survFit.survDataCstExp <- function(data,
   if(is.null(model_type) || ! (model_type %in% c("SD","IT"))) {
     stop("You need to specify a 'model_type' among 'SD' or 'IT'")
   }
-
   ### check number of sample for the diagnostic procedure
   if (n.chains < 2) {
     stop('2 or more parallel chains required')
+  }
+  ### warning message when hb_value = NULL
+  if(!is.null(hb_value)){
+    warning("This is not an error message: the parameter 'hb' is fixed to 0. This means that the correlation between 'hb' and other parameters is ignored.")
   }
 
   ##

@@ -1,5 +1,11 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.2.2
+=============
+
+OTHER CHANGES
+- add warning message in 'survFit' function when 'hb_value' is fixed.
+
 Version 3.2.1
 =============
 
