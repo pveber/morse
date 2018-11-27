@@ -24,18 +24,18 @@ predict_Nsurv_check <- function(object, ...){
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @return The function return a list with three items:
-#' \item{PPC}{The criterion compares the predicted median numbers 
+#' \item{PPC}{The criterion, in percent, compares the predicted median numbers 
 #' of survivors associated to their uncertainty limits with the observed numbers
 #' of survivors. Based on experience, PPC resulting in less than \eqn{50\%} of the
 #' observations within the uncertainty limits indicate poor model performance. A fit of
 #' \eqn{100\%} may hide too large uncertainties of prediction (so covering all data).}
 #' \item{PPC_global}{percentage of PPC for the whole data set by gathering replicates.}
-#' \item{NRMSE}{The criterion is based on the classical root-mean-square error (RMSE),
+#' \item{NRMSE}{The criterion, in percent, is based on the classical root-mean-square error (RMSE),
 #'  used to aggregate the magnitudes of the errors in predictions for various time-points
 #'  into a single measure of predictive power. In order to provide a criterion expressed
 #'   as a percentage, NRMSE is the normalised RMSE by the mean of the observations.}
 #'  \item{NRMSE_global}{NRMSE for the whole data set by gathering replicates.}
-#' \item{SPPE}{The SPPE indicator is negative (between \eqn{0} and \eqn{-100\%}) for an 
+#' \item{SPPE}{The SPPE indicator, in percent, is negative (between \eqn{0} and \eqn{-100\%}) for an 
 #' underestimation of effects, and positive (between \eqn{0} and \eqn{100}) for an 
 #' overestimation of effects. An SPPE value of \eqn{0} means an exact prediction
 #'  of the observed survival probability at the end of the exposure profile.}
@@ -86,11 +86,11 @@ predict_Nsurv_check.survFitPredict_Nsurv <- function(object, ...){
     #           sppe_valid = (last(Nsurv) - last(Nsurv_q50_valid)) / first(Nsurv) * 100 )
 
   
-  return( list(PPC = as.data.frame(df_ppc),
-               PPC_global = percent_ppc_timeserie,
-               NRMSE = as.data.frame(df_nrmse),
-               NRMSE_global = nrmse,
-               SPPE = as.data.frame(df_sppe))
+  return( list(Percent_PPC = as.data.frame(df_ppc),
+               Percent_PPC_global = percent_ppc_timeserie,
+               Percent_NRMSE = as.data.frame(df_nrmse),
+               Percent_NRMSE_global = nrmse,
+               Percent_SPPE = as.data.frame(df_sppe))
   )
   
 }
