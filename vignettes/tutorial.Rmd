@@ -459,7 +459,7 @@ NRMSE criterion is also based on the expectation that predicted and observed sur
 
 
 \[
-NRMSE = \frac{RMSE}{\overline{Y}} = \frac{1}{\overline{Y}} \sqrt{\frac{1}{n} \sum_{i=1}{n} (Y_{obs,i} - Y_{pred,i})} \times 100
+NRMSE = \frac{RMSE}{\overline{Y}} = \frac{1}{\overline{Y}} \sqrt{\frac{1}{n} \sum_{i=1}^{n} (Y_{obs,i} - Y_{pred,i})^2} \times 100
 \]
 
 **Survival Probability Prediction Error (SPPE)**
