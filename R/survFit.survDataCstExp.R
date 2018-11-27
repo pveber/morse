@@ -85,10 +85,11 @@
 #' plot(out, spaghetti = TRUE , adddata = TRUE)
 #' }
 #'
-#' @export
 #' @import rjags
 #' @importFrom stats update
 #' @importFrom dplyr group_by summarise filter
+#'
+#' @export
 #'
 survFit.survDataCstExp <- function(data,
                                    model_type = NULL,
