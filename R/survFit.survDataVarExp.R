@@ -23,8 +23,6 @@
 #'   (resp.). See the modeling vignette for details.
 #' @param quiet If \code{FALSE}, prints logs and progress bar from
 #'   JAGS.
-#' @param extend_time Number of for each replicate used for linear 
-#' interpolation (comprise between time to compute and fitting accuracy)
 #' @param n.chains A positive integer specifying the number of MCMC chains. The minimum required number 
 #' of chains is 2.
 #' @param n.adapt A positive integer specifying the number of iterations for adaptation. If \code{n.adapt} = 0
@@ -39,7 +37,9 @@
 #' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
 #'  (see function \code{\link[rjags]{dic.samples}})
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
-#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}. 
+#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param extend_time Number of for each replicate used for linear 
+#' interpolation (comprise between time to compute and fitting accuracy)
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{survFitVarExp}, which is
@@ -88,14 +88,12 @@
 #' plot(out, spaghetti = TRUE)
 #' }
 #' 
-#' @export
 #' @import rjags
-#'
-
+#' 
+#' @export
 survFit.survDataVarExp <- function(data,
                                  model_type = NULL,
                                  quiet = FALSE,
-                                 extend_time = 100,
                                  n.chains = 3,
                                  n.adapt = 1000,
                                  n.iter = NULL,
@@ -105,6 +103,7 @@ survFit.survDataVarExp <- function(data,
                                  dic.compute = FALSE,
                                  dic.type = "pD",
                                  hb_value = TRUE,
+                                 extend_time = 100,
                                  ...){
   
   ##
