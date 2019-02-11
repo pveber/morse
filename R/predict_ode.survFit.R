@@ -65,7 +65,7 @@ predict_ode <- function(object, ...){
 predict_ode.survFit <- function(object,
                                 data_predict = NULL,
                                 spaghetti = FALSE,
-                                mcmc_size = NULL,
+                                mcmc_size = 1000,
                                 hb_value = TRUE,
                                 interpolate_length = 100,
                                 interpolate_method = "linear",

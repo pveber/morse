@@ -18,7 +18,7 @@ predict_Nsurv <- function(object, ...){
 #'
 #' @param object An object of class \code{survFit}
 #' @param data_predict A dataframe with four columns \code{time}, \code{conc}, \code{replicate},
-#' and \code{Nsurv}  used for prediction. If \code{NULL}, prediction is based on \code{x} object of 
+#' and \code{Nsurv}  used for prediction. If \code{NULL}, prediction is based on an object of 
 #'  class \code{survFit} used for fitting.
 #' @param spaghetti If \code{TRUE}, return a set of survival curves using
 #' parameters drawn from the posterior distribution.
