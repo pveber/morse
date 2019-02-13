@@ -7,9 +7,10 @@ output:
 self_contained: no
 vignette: >
   %\VignetteIndexEntry{Tutorial}
-  %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
-
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r,include=FALSE, echo=FALSE}
@@ -489,6 +490,22 @@ predict_Nsurv_PRZ_SD_cstTOvar <- predict_Nsurv(fit_cstSD, propiconazole_pulse_ex
 ```{r varTOvar, cache=TRUE}
 predict_Nsurv_PRZ_SD_varTOvar <- predict_Nsurv(fit_varSD, propiconazole_pulse_exposure)
 ```
+
+### Robust implementation with ODE solver `predict_Nsurv_ode`
+
+For the same reason that a `predict_ode` function as been implemented to compute `predict` function using the ODE solver of *deSolve*, a `predict_Nsurv_ode` function as been implemented as equivalent to `predict_Nsurv`. The time to compute is subtentially longer than the original function.
+
+```{r cstTOcstPredict_ODE, cache=TRUE}
+predict_Nsurv_PRZ_SD_cstTOcst_ode <- predict_Nsurv_ode(fit_cstSD, propiconazole)
+```
+
+When both function work well, their results are identical (or highly similar):
+
+```{r cstTOcstPredict_ODE_PLOT, fig.height=2, fig.width=3.5, echo = FALSE, fig.align='center', out.width='.49\\linewidth',fig.show='hold'}
+plot(predict_Nsurv_PRZ_SD_cstTOcst)
+plot(predict_Nsurv_PRZ_SD_cstTOcst_ode)
+```
+
 
 ### Validation criteria
 
