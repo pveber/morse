@@ -357,20 +357,3 @@ model_IT <- function(t, State, parms, input) {
     
   })
 }
-
-
-### 
-# predict_interpolate_ode <- function(x, extend_time = 100){
-#   
-#   ## data.frame with time
-#   
-#   df_MinMax <- x %>%
-#     dplyr::group_by(replicate) %>%
-#     dplyr::summarise(min_time = min(time, na.rm = TRUE),
-#                      max_time = max(time, na.rm = TRUE)) %>%
-#     dplyr::group_by(replicate) %>%
-#     # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
-#     dplyr::do(data_frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
-# 
-#   return(df_MinMax)
-# }

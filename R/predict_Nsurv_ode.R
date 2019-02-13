@@ -23,7 +23,7 @@
 #' 
 #' @export
 #' 
-predict_ode_Nsurv <- function(object,
+predict_Nsurv_ode <- function(object,
                                data_predict,
                                spaghetti,
                                mcmc_size,
@@ -31,7 +31,7 @@ predict_ode_Nsurv <- function(object,
                                interpolate_length,
                                interpolate_method,
                                ...){
-  UseMethod("predict_ode_Nsqurv")
+  UseMethod("predict_Nsurv_ode")
 }
 
 #' @import deSolve
@@ -39,7 +39,7 @@ predict_ode_Nsurv <- function(object,
 #' 
 #' @export
 #'
-predict_ode_Nsurv.survFit <- function(object,
+predict_Nsurv_ode.survFit <- function(object,
                                   data_predict = NULL,
                                   spaghetti = FALSE,
                                   mcmc_size = 1000,
@@ -61,7 +61,7 @@ predict_ode_Nsurv.survFit <- function(object,
   # Initialisation
   mcmc <- x$mcmc
   model_type <- x$model_type
-  extend_time <- 100
+  extend_time <- interpolate_length
   
   if(is.null(data_predict)){
     if("survFitVarExp" %in% class(x)){
@@ -103,7 +103,6 @@ predict_ode_Nsurv.survFit <- function(object,
   }
   
   # ------- Computing
-  
   mcmc.samples = mcmc
   
   if(!is.null(mcmc_size)){
@@ -114,6 +113,8 @@ predict_ode_Nsurv.survFit <- function(object,
   }
   
   mctot = do.call("rbind", mcmc.samples)
+  mcmc_size = nrow(mctot)
+  
   kd = 10^mctot[, "kd_log10"]
   
   if(hb_value == TRUE){
@@ -140,7 +141,7 @@ predict_ode_Nsurv.survFit <- function(object,
                  hb=hb,
                  z=z,
                  mcmc_size = mcmc_size,
-                 interpolate_length = interpolate_length,
+                 interpolate_length = NULL,
                  interpolate_method = interpolate_method)
     })
     
@@ -159,12 +160,12 @@ predict_ode_Nsurv.survFit <- function(object,
                  alpha = alpha,
                  beta = beta,
                  mcmc_size = mcmc_size,
-                 interpolate_length = interpolate_length,
+                 interpolate_length = NULL,
                  interpolate_method = interpolate_method)
     })
   }
   # Transpose
-  dtheo <- do.call("rbind", dtheo)
+  df_theo <- do.call("rbind", dtheo)
   # dtheo <- do.call("rbind", lapply(dtheo, t))
   
   # Computing Nsurv
@@ -191,8 +192,9 @@ predict_ode_Nsurv.survFit <- function(object,
     
   } else{
     # --------------------
-    
-    df_psurv <- as_data_frame(dtheo) %>%
+
+    df_psurv <- as_data_frame(df_theo) %>%
+      select(-conc) %>%
       mutate(time = df$time,
              replicate = df$replicate)
     
@@ -205,9 +207,10 @@ predict_ode_Nsurv.survFit <- function(object,
              iter_prec = ifelse(time == min(time), iter, lag(iter))) %>%
       ungroup()
     
-    
     mat_psurv <- df_filter %>%
-      select(contains("V"), - Nsurv)
+      select(- c("time", "conc", "replicate",
+                 "q50", "qinf95", "qsup95", 
+                 "Nsurv", "Nprec", "iter", "iter_prec"))
     
     ncol_NsurvPred <- ncol(mat_psurv)
     NsurvPred_check <- matrix(ncol = ncol_NsurvPred, nrow = nrow(mat_psurv))
