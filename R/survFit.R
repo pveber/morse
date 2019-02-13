@@ -42,9 +42,6 @@
 #'  (see function \code{\link[rjags]{dic.samples}})
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}. 
-#' @param extend_time Only available for variable exposure profile, that is an
-#' object of class \code{survDataVarExp}. It is the number of for each replicate
-#' used for linear interpolation (comprise between time to compute and fitting accuracy)
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples
@@ -98,7 +95,6 @@
 survFit <- function(data,
                     model_type,
                     quiet,
-                    extend_time,
                     n.chains,
                     n.adapt,
                     n.iter,
