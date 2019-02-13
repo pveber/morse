@@ -118,8 +118,9 @@ survFit.survDataCstExp <- function(data,
     stop('2 or more parallel chains required')
   }
   ### warning message when hb_value = NULL
-  if(!is.null(hb_value)){
-    warning("This is not an error message: the parameter 'hb' is fixed to 0. This means that the correlation between 'hb' and other parameters is ignored.")
+  if(hb_value==FALSE){
+    warning("This is not an error message: the parameter 'hb' is fixed to 0. This means that the correlation between
+            'hb' and other parameters is ignored.")
   }
 
   ##
