@@ -1,10 +1,13 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+
 Version 3.2.2
 =============
 
 OTHER CHANGES
 - add warning message in 'survFit' function when 'hb_value' is fixed.
+- add function 'predict_Nsurv_ode' function to compute predictive function with
+the ODE solver from deSolve package.
 
 Version 3.2.1
 =============
