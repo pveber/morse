@@ -501,11 +501,14 @@ predict_Nsurv_PRZ_SD_cstTOcst_ode <- predict_Nsurv_ode(fit_cstSD, propiconazole)
 
 When both function work well, their results are identical (or highly similar):
 
-```{r cstTOcstPredict_ODE_PLOT, fig.height=2, fig.width=3.5, echo = FALSE, fig.align='center', out.width='.49\\linewidth',fig.show='hold'}
+```{r cstTOcstPredict_ODE_PLOT, fig.align='center', out.width='.49\\linewidth',fig.show='hold'}
 plot(predict_Nsurv_PRZ_SD_cstTOcst)
 plot(predict_Nsurv_PRZ_SD_cstTOcst_ode)
 ```
 
+```{r cstTOcstPredict_ODE_PLOT1}
+plot(predict_Nsurv_PRZ_SD_cstTOcst_ode)
+```
 
 ### Validation criteria
 
