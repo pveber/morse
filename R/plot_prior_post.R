@@ -36,10 +36,18 @@ plot_prior_post.survFit <- function(x, size_sample = 1e3, EFSA_name = FALSE, ...
 
   mctot <- do.call("rbind", x$mcmc)
   
-  posteriors_distr <- data.frame(
-    kd_log10 = mctot[, "kd_log10"],
-    hb_log10 = mctot[, "hb_log10"]
-  )
+  if(!("hb_log10" %in% colnames(mctot))){
+    posteriors_distr <- data.frame(
+      kd_log10 = mctot[, "kd_log10"]
+    )
+    priors_distr <- dplyr::select(priors_distr, - "hb_log10")
+  } else{
+    posteriors_distr <- data.frame(
+      kd_log10 = mctot[, "kd_log10"],
+      hb_log10 = mctot[, "hb_log10"]
+    )
+  }
+  
   if(x$model_type == "SD"){
     posteriors_distr$z_log10 = mctot[, "z_log10"]
     posteriors_distr$kk_log10 = mctot[, "kk_log10"]
@@ -48,7 +56,7 @@ plot_prior_post.survFit <- function(x, size_sample = 1e3, EFSA_name = FALSE, ...
     posteriors_distr$alpha_log10 = mctot[, "alpha_log10"]
     posteriors_distr$beta_log10 = mctot[, "beta_log10"]
   }
-  
+
   if(EFSA_name == TRUE){
     if(x$model_type == "IT"){
       posteriors_distr <- dplyr::rename(posteriors_distr,
@@ -72,6 +80,7 @@ plot_prior_post.survFit <- function(x, size_sample = 1e3, EFSA_name = FALSE, ...
   
   priors_distr <- priors_distr %>%
     gather(parameters, density)
+ 
   
   posteriors_distr <- posteriors_distr %>%
     gather(parameters, density)
