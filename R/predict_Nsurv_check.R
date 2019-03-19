@@ -52,7 +52,7 @@ predict_Nsurv_check.survFitPredict_Nsurv <- function(object, ...){
   df_global <- object$df_quantile %>%
     mutate(#ppc_matching_check = ifelse(Nsurv_qinf95_check > Nsurv | Nsurv_qsup95_check < Nsurv, 0, 1),
            ppc_matching_valid = ifelse(Nsurv_qinf95_valid > Nsurv | Nsurv_qsup95_valid < Nsurv, 0, 1),
-           rmse_id = (Nsurv - Nsurv_q50_valid)^2)
+           SE_id = (Nsurv - Nsurv_q50_valid)^2)
   
   #percent_ppc_graphic <- sum(df_global$ppc_matching_check) / nrow(df_global) * 100
   
@@ -65,11 +65,11 @@ predict_Nsurv_check.survFitPredict_Nsurv <- function(object, ...){
   
   # --- NRMSE
   df_nrmse <- df_global %>%
-    select(Nsurv, time, Nsurv_q50_valid, Nsurv_q50_check, replicate, rmse_id) %>%
+    select(Nsurv, time, Nsurv_q50_valid, Nsurv_q50_check, replicate, SE_id) %>%
     group_by(replicate) %>%
-    summarise(NRMSE = mean(rmse_id) / mean(Nsurv) * 100)
+    summarise(NRMSE = sqrt(mean(SE_id)) / mean(Nsurv) * 100)
     
-  nrmse <- mean(df_global$rmse_id) / mean(df_global$Nsurv) * 100
+  nrmse <- sqrt(mean(df_global$SE_id)) / mean(df_global$Nsurv) * 100
   ## version with distribution
   # rmse <- (jags.data$Nsurv - t(df_sim))^2
   # y_mean <- mean(jags.data$Nsurv)
