@@ -514,7 +514,7 @@ plot(predict_Nsurv_PRZ_SD_cstTOcst_ode)
 
 Then, using object produce with the function `predict_Nsurv()` we can compute *PPC*, *NRMSE* and *SPPE* for all models. 
 
-```{r checkNsurvPRED_2, cache=TRUE}
+```{r checkNsurvPRED_1, cache=TRUE}
 predict_Nsurv_check(predict_Nsurv_PRZ_SD_cstTOvar)
 ```
 

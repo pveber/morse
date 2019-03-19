@@ -1,5 +1,10 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.2.3
+=============
+
+BUG FIXES
+- SQRT was not applied to NRMSE, so it was a NMSE.
 
 Version 3.2.2
 =============
