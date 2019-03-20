@@ -137,8 +137,6 @@ NULL
 NULL
 
 
-
-
 #' Reproduction and survival data sets for \emph{Lymnaea stagnalis} exposed to cadmium during 28
 #' days
 #'
