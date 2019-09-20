@@ -4,15 +4,15 @@
 #' \code{survFit}.  It plots the fit obtained for each
 #' concentration profile in the original dataset.
 #'
-#' The fitted curves represent the \strong{estimated survival rate} as a function
+#' The fitted curves represent the \strong{estimated survival probability} as a function
 #' of time for each concentration profile.
 #' The black dots depict the \strong{observed survival
-#' rate} at each time point. Note that since our model does not take
+#' probability} at each time point. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
 #' The function plots both 95\% binomial credible intervals for the estimated survival
-#' rate (by default the grey area around the fitted curve) and 95\% binomial confidence
-#' intervals for the observed survival rate (as black segments if
+#' probability (by default the grey area around the fitted curve) and 95\% binomial confidence
+#' intervals for the observed survival probability (as black segments if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two types of  intervals.
@@ -24,7 +24,7 @@
 #'
 #' @param x An object of class \code{survFit}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival probability}.
 #' @param main A main title for the plot.
 #' @param spaghetti if \code{TRUE}, draws a set of survival curves using
 #' parameters drawn from the posterior distribution
@@ -72,7 +72,7 @@
 #'
 plot.survFitVarExp <- function(x,
                                xlab = "Time",
-                               ylab = "Survival rate",
+                               ylab = "Survival probability",
                                main = NULL,
                                spaghetti = FALSE,
                                one.plot = FALSE,

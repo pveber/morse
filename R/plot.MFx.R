@@ -1,7 +1,7 @@
 #' Plotting method for \code{MFx} objects
 #'
 #' This is the generic \code{plot} S3 method for the
-#' \code{MFx} class. It plots the survival rate as a function of
+#' \code{MFx} class. It plots the survival probability as a function of
 #' the multiplication factor applied or as a function of time.
 #'
 #'
@@ -10,7 +10,7 @@
 #'  either \code{"MFx"} or \code{"Time"}. The default is \code{"MFx"}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{NULL} and depend on the
 #' argument \code{x_variable}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate median and 95 CI}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival probability median and 95 CI}.
 #' @param main A main title for the plot.
 #' @param log_scale If \code{TRUE}, the x-axis is log-scaled. Default is \code{FALSE}.
 #' @param ncol An interger for the number of columns when several panels are plotted.
@@ -59,7 +59,7 @@
 plot.MFx <- function(x,
                      x_variable = "MFx", # other option is "Time"
                      xlab = NULL,
-                     ylab = "Survival rate \n median and 95 CI",
+                     ylab = "Survival probability \n median and 95 CI",
                      main = NULL,
                      log_scale = FALSE,
                      ncol = 3,
