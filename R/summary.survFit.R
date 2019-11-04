@@ -56,7 +56,7 @@ summary.survFit <- function(object,
     estim_parameters$parameters <- gsub("kd","kD", estim_parameters$parameters)
     estim_parameters$parameters <- gsub("kk","bw", estim_parameters$parameters)
     estim_parameters$parameters <- gsub("z","zw", estim_parameters$parameters)
-    estim_parameters$parameters <- gsub("alpha","bw", estim_parameters$parameters)
+    estim_parameters$parameters <- gsub("alpha","mw", estim_parameters$parameters)
     
   } else{
     parameters_SD_HBon = c("kd", "hb", "z", "kk")
