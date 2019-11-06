@@ -1,5 +1,18 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.2.6
+=============
+
+TYPO FIX
+- correct 'alpha' in 'mw' in summary of surFit
+
+
+Version 3.2.5
+=============
+
+TYPO FIX
+- change 'survival rate' into 'survival probability' in plots
+
 Version 3.2.4
 =============
 
