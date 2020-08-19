@@ -50,8 +50,8 @@
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid grid.rect gpar
 #' @importFrom graphics plot
-#' @importFrom tibble data_frame
-#' @importFrom tibble as_data_frame
+#' @importFrom tidyr tibble
+#' @importFrom tidyr as_tibble
 #' 
 plot.survFitCstExp <- function(x,
                          xlab = "Time",

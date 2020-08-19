@@ -157,7 +157,7 @@ predict.survFit <- function(object,
     stop("There is NA produced. \n You should try the function 'predict_ode()' which is much more robust but longer to compute.")
   }
   
-  df_quantile = dplyr::data_frame(
+  df_quantile = dplyr::tibble(
     time = df$time,
     conc = df$conc,
     replicate = df$replicate,
@@ -171,7 +171,7 @@ predict.survFit <- function(object,
   
   if(spaghetti == TRUE){
     random_column <- sample(1:ncol(dtheo), size = round(10/100 * ncol(dtheo)))
-    df_spaghetti <- as_data_frame(dtheo[, random_column]) %>%
+    df_spaghetti <- as_tibble(dtheo[, random_column]) %>%
       mutate(time = df$time,
              conc = df$conc,
              replicate = df$replicate)
@@ -282,7 +282,7 @@ predict_interpolate <- function(x, extend_time = 100){
                      max_time = max(time, na.rm = TRUE)) %>%
     dplyr::group_by(replicate) %>%
     # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
-    dplyr::do(data_frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
+    dplyr::do(tibble(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
   
   x_interpolate <- dplyr::full_join(df_MinMax, x,
                                     by = c("replicate", "time")) %>%

@@ -65,7 +65,7 @@ posteriorData <- function(x){
   
   mctot <- do.call("rbind", mcmc)
   
-  df_mctot = as_data_frame(mctot)
+  df_mctot = as_tibble(mctot)
   
   df_psurv = select(df_mctot, contains("psurv"))
   df_ppc = select(df_mctot, contains("Nsurv_ppc"))

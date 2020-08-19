@@ -44,7 +44,7 @@ ppc.survFitVarExp <- function(x,
   jags.data <- x$jags.data
   df_ppc <- posteriorData(x)$df_ppc
   
-  df_plt <- data_frame(Nsurv = jags.data$Nsurv,
+  df_plt <- tibble(Nsurv = jags.data$Nsurv,
                       time = jags.data$time,
                       replicate = jags.data$replicate,
                       Nsurv_q50 = apply(df_ppc, 2, quantile, probs = 0.5, na.rm = TRUE),
@@ -85,7 +85,7 @@ posteriorData <- function(x){
   
   mctot <- do.call("rbind", mcmc)
   
-  df_mctot = as_data_frame(mctot)
+  df_mctot = as_tibble(mctot)
   
   df_psurv = select(df_mctot, contains("psurv"))
   df_ppc = select(df_mctot, contains("Nsurv_ppc"))

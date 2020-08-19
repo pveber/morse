@@ -5,7 +5,6 @@
 #' 
 #' @return A list for parameterization of priors for Bayesian inference.
 #' 
-#' @importFrom dplyr group_indices_
 #' 
 modelData <- function(x, ...){
   UseMethod("modelData")

@@ -24,7 +24,7 @@ modelData.survDataVarExp <- function(x,
   x_reduce <- x_interpolate %>%
     dplyr::filter(!is.na(Nsurv)) %>%
     # Group by replicate to replicate an indice of replicate:
-    dplyr::mutate(replicate_ID = group_indices_(., .dots="replicate")) %>%
+    dplyr::mutate(replicate_ID = group_indices(., .dots="replicate")) %>%
     dplyr::group_by(replicate) %>%
     dplyr::arrange(replicate, time) %>%
     dplyr::mutate( tprec = ifelse( time == 0, time, dplyr::lag(time) ) ) %>%
@@ -123,7 +123,7 @@ survData_interpolate <- function(x, extend_time = 100){
                      max_time = max(time, na.rm = TRUE)) %>%
     dplyr::group_by(replicate) %>%
     # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
-    dplyr::do(data_frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
+    dplyr::do(tibble(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
   
   x_interpolate <- dplyr::full_join(df_MinMax, x,
                                     by = c("replicate", "time")) %>%

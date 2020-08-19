@@ -169,7 +169,7 @@ predict_Nsurv_ode.survFit <- function(object,
   # dtheo <- do.call("rbind", lapply(dtheo, t))
   
   # Computing Nsurv
-  df_mcmc <- as_data_frame(do.call("rbind", x$mcmc))
+  df_mcmc <- as_tibble(do.call("rbind", x$mcmc))
   NsurvPred_valid <- select(df_mcmc, contains("Nsurv_sim"))
   NsurvPred_check <- select(df_mcmc, contains("Nsurv_ppc"))
   
@@ -193,7 +193,7 @@ predict_Nsurv_ode.survFit <- function(object,
   } else{
     # --------------------
 
-    df_psurv <- as_data_frame(df_theo) %>%
+    df_psurv <- as_tibble(df_theo) %>%
       select(-conc) %>%
       mutate(time = df$time,
              replicate = df$replicate)
@@ -257,7 +257,7 @@ predict_Nsurv_ode.survFit <- function(object,
   
   if(spaghetti == TRUE){
     random_column <- sample(1:ncol(NsurvPred_valid), size = round(10/100 * ncol(NsurvPred_valid)))
-    df_spaghetti <- as_data_frame(NsurvPred_valid[, random_column]) %>%
+    df_spaghetti <- as_tibble(NsurvPred_valid[, random_column]) %>%
       mutate(time = data_predict$time,
              conc = data_predict$conc,
              replicate = data_predict$replicate,
