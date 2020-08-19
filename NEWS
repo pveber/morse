@@ -1,11 +1,19 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.2.7
+=============
+
+TYPO FIX
+- add 'hb_valueFIXED' (in survFit) and 'hb_valueFORCED' (in prediction) to fix hb_value when hb_value is FALSE
+
+FIX WARNING MESSAGES
+- fix bug returning warning messages about depecration of "as_data_frame" and "data_frame", replaced respectivelly by "as_tibble" and "tiblle"
+
 Version 3.2.6
 =============
 
 TYPO FIX
 - correct 'alpha' in 'mw' in summary of surFit
-
 
 Version 3.2.5
 =============

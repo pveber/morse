@@ -1,7 +1,7 @@
 Package: morse
 Type: Package
 Title: Modelling Tools for Reproduction and Survival Data in Ecotoxicology
-Version: 3.2.6
+Version: 3.2.7
 Encoding: UTF-8
 Author:
     Virgile Baudrot [aut],
@@ -48,5 +48,5 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 LazyData: true
