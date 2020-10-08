@@ -238,8 +238,8 @@ pointsLCx <- function(df_dose, X_prop){
   }
   
   df_LCx <- data.frame(quantile = c("median", "quantile 2.5%", "quantile 97.5%"),
-                       LCx = c(LCX_q50, LCX_qinf95, LCX_qsup95))
-  
+                       LCx = as.numeric(c(LCX_q50, LCX_qinf95, LCX_qsup95)))
+    # as.numeric is needed here because if all values are NA, LCx has type logical
   return(df_LCx)
   
 }
