@@ -17,7 +17,7 @@ jags_TKTD_cstSD <-
 
     ##-------------------- parameter transformation
     kd <- 10**kd_log10
-    hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
+    hb <- ifelse(hb_value == 0, hb_valueFIXED, 10**hb_log10)
     kk <- 10**kk_log10
     z  <- 10**z_log10
 
@@ -76,7 +76,7 @@ model {
   ##---------------------------------------- parameter transformation
 
   kd <- 10**kd_log10
-  hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
+  hb <- ifelse(hb_value == 0, hb_valueFIXED, 10**hb_log10)
   alpha <- 10**alpha_log10
   beta <- 10**beta_log10
 
@@ -139,7 +139,7 @@ jags_TKTD_varSD <-
 
   ##----- parameter transformation
   kd <- 10**kd_log10
-  hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
+  hb <- ifelse(hb_value == 0, hb_valueFIXED, 10**hb_log10)
   kk <- 10**kk_log10
   z  <- 10**z_log10
 
@@ -219,7 +219,7 @@ jags_TKTD_varIT <-"model {
   #------------------------------------------ parameter transformation
 
   kd <- 10**kd_log10
-  hb <- ifelse(hb_value == 0, 0, 10**hb_log10)
+  hb <- ifelse(hb_value == 0, hb_valueFIXED, 10**hb_log10)
   alpha <- 10**alpha_log10
   beta <- 10**beta_log10
 

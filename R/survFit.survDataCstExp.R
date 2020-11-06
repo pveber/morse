@@ -37,7 +37,9 @@
 #' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
 #' (see function \code{\link[rjags]{dic.samples}})
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
-#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}. 
+#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param  hb_valueFIXED If \code{hb_value} is \code{FALSE}, then \code{hb_valueFiXED} is the value to fix \code{hb}.
+#'   If \code{hb_value} is \code{FALSE} and  \code{hb_valueFiXED} is \code{NA}, then \code{hb} is fixed to \code{0}.
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{survFitCstExp}, which is
@@ -103,6 +105,7 @@ survFit.survDataCstExp <- function(data,
                                    dic.compute = FALSE,
                                    dic.type = "pD",
                                    hb_value = TRUE,
+                                   hb_valueFIXED = NA,
                                    ...){
   
   ##
@@ -119,10 +122,13 @@ survFit.survDataCstExp <- function(data,
   }
   ### warning message when hb_value = NULL
   if(hb_value==FALSE){
-    warning("This is not an error message: the parameter 'hb' is fixed to 0. This means that the correlation between
+    warning("This is not an error message: the parameter 'hb' is fixed. This means that the correlation between
             'hb' and other parameters is ignored.")
+    ## set default hb_valueFIXED
+    if(is.na(hb_valueFIXED)){
+      hb_valueFIXED = 0
+    }
   }
-
   ##
   ## Data and Priors for model
   ##
@@ -139,13 +145,16 @@ survFit.survDataCstExp <- function(data,
   ## Define model
   ##
 
+
   if(model_type == "SD"){
     if(hb_value == TRUE){
       jags.data_fit$hb_value = 1
+      jags.data_fit$hb_valueFIXED = -1 # just to have it in JAGS
       parameters_sampling <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
       parameters <- c("kd_log10", "hb_log10", "kk_log10", "hb", "z_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
     } else{
       jags.data_fit$hb_value = 0
+      jags.data_fit$hb_valueFIXED = hb_valueFIXED
       parameters_sampling <- c("kd_log10", "kk_log10", "z_log10")
       parameters <- c("kd_log10", "kk_log10", "z_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
     }
@@ -156,10 +165,12 @@ survFit.survDataCstExp <- function(data,
     ### Determine sampling parameters
     if(hb_value == TRUE){
       jags.data_fit$hb_value = 1
+      jags.data_fit$hb_valueFIXED = -1 # just to have it in JAGS
       parameters_sampling <- c("kd_log10", "hb_log10", "alpha_log10", "beta_log10")
       parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
     } else{
       jags.data_fit$hb_value = 0
+      jags.data_fit$hb_valueFIXED = hb_valueFIXED
       parameters_sampling <- c("kd_log10", "alpha_log10", "beta_log10")
       parameters <- c("kd_log10","alpha_log10", "beta_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
     }
@@ -317,7 +328,8 @@ survFit.survDataCstExp <- function(data,
               warnings = warnings,
               model_type = model_type,
               transformed.data = transformed.data,
-              original.data = data)
+              original.data = data,
+              hb_valueFIXED = hb_valueFIXED)
 
   class(OUT) <- c("survFitCstExp", "survFit")
   return(OUT)

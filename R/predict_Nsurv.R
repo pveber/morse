@@ -26,6 +26,7 @@ predict_Nsurv <- function(object, ...){
 #'  the computation.
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' 
@@ -78,6 +79,7 @@ predict_Nsurv.survFit <- function(object,
                             spaghetti = FALSE,
                             mcmc_size = NULL,
                             hb_value = TRUE,
+                            hb_valueFORCED = NA,
                             ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
   # arguments should be named the same when declaring a
@@ -155,7 +157,15 @@ predict_Nsurv.survFit <- function(object,
       hb <- mctot[, "hb"]  
     } else{ hb <- 10^mctot[, "hb_log10"] }
   } else if(hb_value == FALSE){
-    hb <- rep(0, nrow(mctot))
+    if(is.na(hb_valueFORCED)){
+      if(is.na(x$hb_valueFIXED)){
+        stop("Please provide value for `hb` using `hb_valueFORCED`.")
+      } else{
+        hb <- rep(x$hb_valueFIXED, nrow(mctot))
+      } 
+    } else{
+      hb <- rep(hb_valueFORCED, nrow(mctot))
+    }
   }
   
   k = 1:length(unique_replicate)

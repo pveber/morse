@@ -41,7 +41,9 @@
 #' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
 #'  (see function \code{\link[rjags]{dic.samples}})
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
-#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}. 
+#' If \code{FALSE}, parameter \code{hb} is set to a fixed value defined by \code{hb_valueFIXED}. The default is \code{TRUE}. 
+#' @param hb_valueFIXED If \code{hb_value} is \code{FALSE}, the argument \code{hb_valueFIXED}
+#'  provides the values of parameter hb. Default is 0.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples
@@ -103,7 +105,9 @@ survFit <- function(data,
                     limit.sampling,
                     dic.compute,
                     dic.type,
-                    hb_value, ...){
+                    hb_value,
+                    hb_valueFIXED,
+                    ...){
   UseMethod("survFit")
 }
 

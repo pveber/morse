@@ -28,10 +28,11 @@ predict_ode <- function(object, ...){
 #'  the computation. \code{mcmc_size} is the number of selected iterations for one chain. Default
 #'  is 1000. If all MCMC is wanted, set argument to \code{NULL}.
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
-#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' If \code{FALSE}, parameter \code{hb} is set to a fixed value. The default is \code{TRUE}.
 #' @param interpolate_length Length of the time sequence for which output is wanted.
 #' @param interpolate_method The interpolation method for concentration. See package \code{deSolve} for details.
 #' Default is \code{linear}.
+#' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
@@ -69,6 +70,7 @@ predict_ode.survFit <- function(object,
                                 hb_value = TRUE,
                                 interpolate_length = 100,
                                 interpolate_method = "linear",
+                                hb_valueFORCED = NA,
                                 ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
   # arguments should be named the same when declaring a
@@ -125,7 +127,15 @@ predict_ode.survFit <- function(object,
   if(hb_value == TRUE){
     hb <- 10^mctot[, "hb_log10"]
   } else if(hb_value == FALSE){
-    hb <- rep(0, nrow(mctot))
+    if(is.na(hb_valueFORCED)){
+      if(is.na(x$hb_valueFIXED)){
+        stop("Please provide value for `hb` using `hb_valueFORCED`.")
+      } else{
+        hb <- rep(x$hb_valueFIXED, nrow(mctot))
+      } 
+    } else{
+      hb <- rep(hb_valueFORCED, nrow(mctot))
+    }
   }
   
   k = 1:length(unique_replicate)

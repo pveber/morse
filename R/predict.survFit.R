@@ -15,6 +15,7 @@
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
 #' @param ratio_no.NA A numeric between 0 and 1 standing for the proportion of non-NA values
 #'  required to compute quantile. The default is \eqn{0.95}.
+#' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
@@ -48,6 +49,7 @@ predict.survFit <- function(object,
                             mcmc_size = NULL,
                             hb_value = TRUE,
                             ratio_no.NA = 0.95,
+                            hb_valueFORCED = NA,
                             ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
               # arguments should be named the same when declaring a
@@ -116,7 +118,15 @@ predict.survFit <- function(object,
       hb <- mctot[, "hb"]  
     } else{ hb <- 10^mctot[, "hb_log10"] }
   } else if(hb_value == FALSE){
-    hb <- rep(0, nrow(mctot))
+    if(is.na(hb_valueFORCED)){
+      if(is.na(x$hb_valueFIXED)){
+        stop("Please provide value for `hb` using `hb_valueFORCED`.")
+      } else{
+        hb <- rep(x$hb_valueFIXED, nrow(mctot))
+      } 
+    } else{
+      hb <- rep(hb_valueFORCED, nrow(mctot))
+    }
   }
  
   k = 1:length(unique_replicate)

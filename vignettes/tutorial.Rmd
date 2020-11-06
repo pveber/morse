@@ -1,5 +1,5 @@
 ---
-title: "morse tutorial"
+title: "Tutorial"
 date: "`r Sys.Date()`"
 output:
   html_vignette:
@@ -282,6 +282,28 @@ A posterior predictive check is also possible using function `ppc()`:
 ppc(fit_cstSD)
 ```
 
+#### Fix background mortality
+
+You can fix the background mortality, parameter `hb`.
+
+```{r fitcstSDFIXhb, cache=TRUE, echo=TRUE, eval=FALSE}
+# fit the TKTD model SD with fixed hb value
+fit_cstSDFIXhb <- survFit(dat, quiet = TRUE, model_type = "SD", hb_value=FALSE, hb_valueFIXED = 2)
+```
+
+In the summary the `hb` is no more return
+
+```{r summarycstSDFIXhb, cache=TRUE, echo=TRUE, eval=FALSE}
+summary(fit_cstSDFIXhb)
+```
+
+To have access to this value, you can simply write:
+
+```{r summarycstSDFIXhb, cache=TRUE, echo=TRUE, eval=FALSE}
+fit_cstSDFIXhb$hb
+```
+
+
 ### GUTS model "IT"
 
 The *Individual Tolerance* (IT) model is a variant of TKTD survival
@@ -290,6 +312,7 @@ analysis. It can also be used with `morse` as demonstrated hereafter. For the *I
 ```{r fitcstIT, echo=TRUE, cache=TRUE, eval=FALSE}
 fit_cstIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
+
 
 We can first get a summary of the estimated parameters:
 
@@ -360,7 +383,6 @@ plot(fit_varSD)
 ppc(fit_varSD)
 ```
 
-
 ### GUTS model "IT"
 
 ```{r fitvarIT, echo=TRUE, cache=TRUE, eval=FALSE}
@@ -404,6 +426,8 @@ data_4prediction <- data.frame(time = c(1:10, 1:10),
 predict_PRZ_cstSD_4pred <- predict(object = fit_cstSD, data_predict = data_4prediction)
 ```
 
+If `NA` are produce an `error` message is returned.
+
 From an object `survFitPredict`, results can ben plotted with function `plot()`:
 
 ```{r predictPlot, cache=TRUE, eval=FALSE}
@@ -440,9 +464,17 @@ This is possible with the argument `hb_value`. If `TRUE`, the background mortali
 
 ```{r hb_value, cache=TRUE, eval=FALSE}
 # Use the same data set profile to predict without 'hb'
-predict_PRZ_cstSD_4pred_hbOUT <- predict(object = fit_cstSD, data_predict = data_4prediction, hb_value = FALSE)
+predict_PRZ_cstSD_4pred_hbOUT <- predict_ode(object = fit_cstSD, data_predict = data_4prediction, hb_value = FALSE, hb_valueFORCED = 0)
 # Plot the prediction:
 plot(predict_PRZ_cstSD_4pred_hbOUT)
+```
+
+
+```{r hb_value, cache=TRUE, eval=FALSE}
+# Use the same data set profile to predict without 'hb'
+predict_PRZ_cstSD_4pred_hbFIX2 <- predict_ode(object = fit_cstSD, data_predict = data_4prediction, hb_value = FALSE, hb_valueFORCED = 2)
+# Plot the prediction:
+plot(predict_PRZ_cstSD_4pred_hbFIX2)
 ```
 
 ## Validation criteria: EFSA recommendations
@@ -628,7 +660,7 @@ data_4MFx <- data.frame(time = 1:10,
                         conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
 
 # (2) Use the fit on constant exposure propiconazole with model SD (see previously)
-MFx_PRZ_cstSD_4MFx <- MFx(object = fit_cstSD, data_predict = data_4MFx)
+MFx_PRZ_cstSD_4MFx <- MFx(object = fit_cstSD, data_predict = data_4MFx, ode = TRUE)
 ```
 
 As the computing time can be long, the function prints the `accuracy` for each step of the tested multiplication factor, for the median and the 95% credible interval.
