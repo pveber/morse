@@ -286,20 +286,20 @@ ppc(fit_cstSD)
 
 You can fix the background mortality, parameter `hb`.
 
-```{r fitcstSDFIXhb, cache=TRUE, echo=TRUE, eval=FALSE}
+```{r fitcstSDFIXhb, cache=TRUE, eval=FALSE}
 # fit the TKTD model SD with fixed hb value
 fit_cstSDFIXhb <- survFit(dat, quiet = TRUE, model_type = "SD", hb_value=FALSE, hb_valueFIXED = 0.2)
 ```
 
 In the summary the `hb` is no more return
 
-```{r summarycstSDFIXhb, cache=TRUE, echo=TRUE, eval=FALSE}
+```{r summarycstSDFIXhbSummary, cache=TRUE, eval=FALSE}
 summary(fit_cstSDFIXhb)
 ```
 
 To have access to this value, you can simply write:
 
-```{r summarycstSDFIXhb, cache=TRUE, echo=TRUE, eval=FALSE}
+```{r summarycstSDFIXhb_PrintVal, cache=TRUE, eval=FALSE}
 fit_cstSDFIXhb$hb
 ```
 
@@ -470,9 +470,10 @@ plot(predict_PRZ_cstSD_4pred_hbOUT)
 ```
 
 
-```{r hb_value, cache=TRUE, eval=FALSE}
+```{r hb_valueFIX2, cache=TRUE, eval=FALSE}
 # Use the same data set profile to predict without 'hb'
-predict_PRZ_cstSD_4pred_hbFIX2 <- predict_ode(object = fit_cstSD, data_predict = data_4prediction, hb_value = FALSE, hb_valueFORCED = 2)
+predict_PRZ_cstSD_4pred_hbFIX2 <- predict_ode(object = fit_cstSD, data_predict = data_4prediction,
+                                              hb_value = FALSE, hb_valueFORCED = 0.2)
 # Plot the prediction:
 plot(predict_PRZ_cstSD_4pred_hbFIX2)
 ```
