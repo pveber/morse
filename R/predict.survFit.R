@@ -164,7 +164,7 @@ predict.survFit <- function(object,
   dtheo <- do.call("rbind", lapply(dtheo, t))
   # replace NA by 0
   if(any(is.na(dtheo))){
-    stop("There is NA produced. \n You should try the function 'predict_ode()' which is much more robust but longer to compute.")
+    warning("There is NA produced. \n You should try the function 'predict_ode()' which is much more robust but longer to compute.")
   }
   
   df_quantile = dplyr::tibble(
