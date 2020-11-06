@@ -43,6 +43,8 @@
 #' @param accuracy Accuracy of the multiplication factor. The default is 0.01.
 #' @param quiet If \code{FALSE}, print the evolution of accuracy.
 #' @param threshold_iter Threshold number of iteration.
+#' @param hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
+#' @param ode IF \code{ode} is \code{TRUE}, algo use predict_ode rather than predict. Default is \code{TRUE}.
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{MFx}, which is a list
@@ -100,6 +102,8 @@ MFx.survFit <- function(object,
                         accuracy = 0.01,
                         quiet = FALSE,
                         threshold_iter = 100,
+                        hb_valueFORCED = 0,
+                        ode=TRUE,
                         ...){
   
   ## Analyse data_predict data.frame
@@ -121,11 +125,23 @@ MFx.survFit <- function(object,
   ls_data_predict[[1]] <- data_predict
   ls_data_predict[[1]]$replicate <- rep("predict_MFx_1", nrow(data_predict))
   
-  ls_predict[[1]] <- predict( object = object,
-                              data_predict = ls_data_predict[[1]],
-                              spaghetti = spaghetti,
-                              mcmc_size = mcmc_size,
-                              hb_value = hb_value)
+  if(ode == TRUE){
+    ls_predict[[1]] <- predict_ode( object = object,
+                                data_predict = ls_data_predict[[1]],
+                                spaghetti = spaghetti,
+                                mcmc_size = mcmc_size,
+                                hb_value = hb_value,
+                                hb_valueFORCED = hb_valueFORCED )
+  } else{
+    ls_predict[[1]] <- predict( object = object,
+                                data_predict = ls_data_predict[[1]],
+                                spaghetti = spaghetti,
+                                mcmc_size = mcmc_size,
+                                hb_value = hb_value,
+                                hb_valueFORCED = hb_valueFORCED )
+  }
+  
+
 
   filter_time_MFx = dplyr::filter(ls_predict[[1]]$df_quantile, time == time_MFx)
 
@@ -147,7 +163,9 @@ MFx.survFit <- function(object,
                                              ls_predict = ls_predict,
                                              quiet = quiet,
                                              quantile = "q50",
-                                             threshold_iter = threshold_iter) # "q50", "qinf95", "qsup95"
+                                             threshold_iter = threshold_iter,
+                                             hb_valueFORCED = hb_valueFORCED,
+                                             ode = ode) # "q50", "qinf95", "qsup95"
     binarySearch_MFx_qinf95 <- binarySearch_MFx(object = object,
                                                 spaghetti = spaghetti,
                                                 mcmc_size = mcmc_size,
@@ -162,7 +180,9 @@ MFx.survFit <- function(object,
                                                ls_predict = ls_predict,
                                                quiet = quiet,
                                                quantile = "qinf95",
-                                               threshold_iter = threshold_iter) # "q50", "qinf95", "qsup95"
+                                               threshold_iter = threshold_iter,
+                                               hb_valueFORCED = hb_valueFORCED,
+                                               ode = ode) # "q50", "qinf95", "qsup95"
     binarySearch_MFx_qsup95 <- binarySearch_MFx(object = object,
                                                 spaghetti = spaghetti,
                                                 mcmc_size = mcmc_size,
@@ -177,7 +197,9 @@ MFx.survFit <- function(object,
                                                ls_predict = ls_predict,
                                                quiet = quiet,
                                                quantile = "qsup95",
-                                               threshold_iter = threshold_iter) # "q50", "qinf95", "qsup95"
+                                               threshold_iter = threshold_iter,
+                                               hb_valueFORCED = hb_valueFORCED,
+                                               ode = ode) # "q50", "qinf95", "qsup95"
     
     #
     # Make a dataframe with quantile of all generated time series
@@ -233,11 +255,22 @@ MFx.survFit <- function(object,
     })
     
     ls_predict <- lapply(k, function(kit){
-      predict(object = object,
-              data_predict = ls_data_predict[[kit]],
-              spaghetti = spaghetti,
-              mcmc_size = mcmc_size,
-              hb_value = hb_value)
+      if(ode == TRUE){
+        predict_ode(object = object,
+                data_predict = ls_data_predict[[kit]],
+                spaghetti = spaghetti,
+                mcmc_size = mcmc_size,
+                hb_value = hb_value,
+                hb_valueFORCED = hb_valueFORCED)
+      } else{
+        predict(object = object,
+                data_predict = ls_data_predict[[kit]],
+                spaghetti = spaghetti,
+                mcmc_size = mcmc_size,
+                hb_value = hb_value,
+                hb_valueFORCED = hb_valueFORCED)
+      }
+
     })
     
     #
@@ -297,49 +330,6 @@ MFx.survFit <- function(object,
 }
 
 
-# points for LCx
-# 
-# 
-# pointsMFx <- function(df_dose, X_prop){
-#   
-#   if(min(df_dose$qinf95) < X_prop & X_prop < max(df_dose$qinf95)){
-#     df.qinf95 <- select(df_dose, c(MFx, qinf95))%>%
-#       dplyr::add_row(qinf95 = X_prop)%>%
-#       dplyr::arrange(qinf95)%>%
-#       dplyr::mutate(MFx = na.approx(MFx, qinf95, na.rm = FALSE))%>%
-#       dplyr::filter(qinf95 == X_prop)
-#     
-#     MFx_qinf95 <- df.qinf95$MFx
-#     
-#   } else {
-#     MFx_qinf95 <- NA
-#     
-#     warning(paste("No 95%inf for survival probability of", X_prop ,
-#                   " in the range of multiplication factors under consideration: [",
-#                   min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
-#   }
-#   
-#   if(min(df_dose$qsup95) < X_prop & X_prop < max(df_dose$qsup95)){
-#     df.qsup95 <- select(df_dose, c(MFx,qsup95)) %>%
-#       add_row(qsup95 = X_prop) %>%
-#       arrange(qsup95) %>%
-#       mutate(MFx = na.approx(MFx,qsup95, na.rm = FALSE)) %>%
-#       filter(qsup95 == X_prop)
-#     
-#     MFx_qsup95 <- df.qsup95$MFx
-#     
-#   } else {
-#     
-#     MFx_qsup95 <- NA
-#     warning(paste("No 95%sup for survival probability of", X_prop,
-#                   " in the range of multiplication factors under consideration: [",
-#                   min(df_dose$MFx), ";", max(df_dose$MFx), "]"))
-#   }
-#   
-#   return(list(MFx_qinf95 = MFx_qinf95,
-#               MFx_qsup95 = MFx_qsup95))
-# }
-
 
 
 ##########################
@@ -365,7 +355,9 @@ binarySearch_MFx <- function(object,
                              ls_predict,
                              quiet,
                              quantile, # "q50", "qinf95", "qsup95"
-                             threshold_iter
+                             threshold_iter,
+                             hb_valueFORCED,
+                             ode
                              ){
     #
     # binary search of MFx in O(log n)
@@ -384,11 +376,22 @@ binarySearch_MFx <- function(object,
       ls_data_predict[[i+1]]$conc <- MFx_test * data_predict$conc
       ls_data_predict[[i+1]]$replicate <- rep(paste0("predict_MFx_", MFx_test), nrow(data_predict))
       
-      ls_predict[[i+1]] <- predict(object = object,
-                                   data_predict = ls_data_predict[[i+1]],
-                                   spaghetti = spaghetti,
-                                   mcmc_size = mcmc_size,
-                                   hb_value = hb_value)
+      if(ode == TRUE){
+        ls_predict[[i+1]] <- predict_ode(object = object,
+                                     data_predict = ls_data_predict[[i+1]],
+                                     spaghetti = spaghetti,
+                                     mcmc_size = mcmc_size,
+                                     hb_value = hb_value,
+                                     hb_valueFORCED = hb_valueFORCED)
+      } else{
+        ls_predict[[i+1]] <- predict(object = object,
+                                     data_predict = ls_data_predict[[i+1]],
+                                     spaghetti = spaghetti,
+                                     mcmc_size = mcmc_size,
+                                     hb_value = hb_value,
+                                     hb_valueFORCED = hb_valueFORCED)
+      }
+      
       
       filter_time_MFx = dplyr::filter(ls_predict[[i+1]]$df_quantile, time == time_MFx)
       if(quantile == "q50"){ value_mortality_test = filter_time_MFx$q50 }
