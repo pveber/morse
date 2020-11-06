@@ -288,7 +288,7 @@ You can fix the background mortality, parameter `hb`.
 
 ```{r fitcstSDFIXhb, cache=TRUE, echo=TRUE, eval=FALSE}
 # fit the TKTD model SD with fixed hb value
-fit_cstSDFIXhb <- survFit(dat, quiet = TRUE, model_type = "SD", hb_value=FALSE, hb_valueFIXED = 2)
+fit_cstSDFIXhb <- survFit(dat, quiet = TRUE, model_type = "SD", hb_value=FALSE, hb_valueFIXED = 0.2)
 ```
 
 In the summary the `hb` is no more return
@@ -775,6 +775,19 @@ To select a specific time series, we can use the element `ls_predict` wich is a 
 ```{r, cache=TRUE, eval=FALSE}
 # Plot a specific time series.
 plot(MFx_PRZ_cstSD_4pred_range$ls_predict[[4]])
+```
+
+### Multiplication factor when `hb` is fixed
+
+When the background mortality `hb`is fixed, the multiplication factor has to be compute like:
+
+```{r MFx_PRZ_cstSD_4MFxFIXhbr, cache=TRUE, eval=FALSE}
+MFx_PRZ_cstSD_4MFxFIXhb <- MFx(object = fit_cstSDFIXhb, data_predict = data_4MFx, ode = FALSE,
+                               hb_value = FALSE, hb_valueFORCED = fit_cstSDFIXhb$hb_valueFIXED)
+```
+
+```{r plotMFx_PRZ_cstSD_4MFxFIXhb, cache=TRUE, eval=FALSE}
+plot(MFx_PRZ_cstSD_4MFxFIXhb)
 ```
 
 
