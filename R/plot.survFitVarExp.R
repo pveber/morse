@@ -143,7 +143,7 @@ plot.survFitVarExp <- function(x,
     plt <- plt + 
       geom_ribbon(data = df_prediction,
                   aes(x = time, ymin = qinf95,ymax = qsup95, group = replicate),
-                  fill = "lightgrey", alpha = 0.4)
+                  fill = "grey", alpha = 0.4)
   }
   
   # Prediction
