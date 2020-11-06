@@ -222,7 +222,7 @@ For details about GUTS models, see the vignette [theory under modelling approach
 Here is a typical session to analyse concentration-dependent time-course data
 using the so-called "Stochastic Death" (SD) model:
 
-```{r TKTDcst, cache=TRUE}
+```{r TKTDcst, cache=TRUE, eval=FALSE}
 # (1) load data set
 data(propiconazole)
 
@@ -243,14 +243,14 @@ summary(dat)
 
 To fit the *Stochastic Death* model, we have to specify the `model_type` as `"SD"`:
 
-```{r fitcstSD, cache=TRUE, echo=TRUE}
+```{r fitcstSD, cache=TRUE, echo=TRUE, eval=FALSE}
 # (6) fit the TKTD model SD
 fit_cstSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
 
 Then, the `summary()` function provides parameters estimates as medians and 95\% credible intervals.
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 # (7) summary of parameters estimates
 summary(fit_cstSD)
 # OR
@@ -259,26 +259,26 @@ fit_cstSD$estim.par
 
 Once fitting is done, we can compute posteriors vs. priors distribution with the function `plot_prior_post()` as follow:
 
-```{r PLOTpriors_post_cstSD, cache=TRUE}
+```{r PLOTpriors_post_cstSD, cache=TRUE, eval=FALSE}
 plot_prior_post(fit_cstSD)
 ```
 
 
 The `plot()` function provides a representation of the fitting for each replicates
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 plot(fit_cstSD)
 ```
 
 Original data can be removed by using the option `adddata = FALSE`
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 plot(fit_cstSD, adddata = FALSE)
 ```
 
 A posterior predictive check is also possible using function `ppc()`:
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 ppc(fit_cstSD)
 ```
 
@@ -287,13 +287,13 @@ ppc(fit_cstSD)
 The *Individual Tolerance* (IT) model is a variant of TKTD survival
 analysis. It can also be used with `morse` as demonstrated hereafter. For the *IT* model, we have to specify the `model_type` as `"IT"`:
 
-```{r fitcstIT, echo=TRUE, cache=TRUE}
+```{r fitcstIT, echo=TRUE, cache=TRUE, eval=FALSE}
 fit_cstIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
 
 We can first get a summary of the estimated parameters:
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 summary(fit_cstIT)
 # OR
 fit_cstIT$estim.par
@@ -301,16 +301,16 @@ fit_cstIT$estim.par
 
 And the plot of posteriors vs. priors distributions:
 
-```{r PLOTpriors_post_cstIT, cache=TRUE}
+```{r PLOTpriors_post_cstIT, cache=TRUE, eval=FALSE}
 plot_prior_post(fit_cstIT)
 ```
 
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 plot(fit_cstIT)
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 ppc(fit_cstIT)
 ```
 
@@ -319,7 +319,7 @@ ppc(fit_cstIT)
 Here is a typical session fitting an SD or an IT model for a data set
 under time-variable exposure scenario.
 
-```{r TKTDvar, cache=TRUE}
+```{r TKTDvar, cache=TRUE, eval=FALSE}
 # (1) load data set
 data("propiconazole_pulse_exposure")
 
@@ -338,50 +338,50 @@ summary(dat)
 
 ### GUTS model "SD"
 
-```{r fitvarSD, echo=TRUE, cache=TRUE}
+```{r fitvarSD, echo=TRUE, cache=TRUE, eval=FALSE}
 # (6) fit the TKTD model SD
 fit_varSD <- survFit(dat, quiet = TRUE, model_type = "SD")
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 # (7) summary of the fit object
 summary(fit_varSD)
 ```
 
-```{r PLOTpriors_post_varSD, cache=TRUE}
+```{r PLOTpriors_post_varSD, cache=TRUE, eval=FALSE}
 plot_prior_post(fit_varSD)
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 plot(fit_varSD)
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 ppc(fit_varSD)
 ```
 
 
 ### GUTS model "IT"
 
-```{r fitvarIT, echo=TRUE, cache=TRUE}
+```{r fitvarIT, echo=TRUE, cache=TRUE, eval=FALSE}
 # fit a TKTD model IT
 fit_varIT <- survFit(dat, quiet = TRUE, model_type = "IT")
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 # (7) summary of the fit object
 summary(fit_varIT)
 ```
 
-```{r PLOTpriors_post_varIT, cache=TRUE}
+```{r PLOTpriors_post_varIT, cache=TRUE, eval=FALSE}
 plot_prior_post(fit_varIT)
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 plot(fit_varIT)
 ```
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 ppc(fit_varIT)
 ```
 
@@ -392,7 +392,7 @@ calibration done with  function `survFit()` from observed data.
 The function for prediction is called `predict()` and returns an object of class `survFitPredict`.
 
 
-```{r predict, cache=TRUE}
+```{r predict, cache=TRUE, eval=FALSE}
 # (1) upload or build a data frame with the exposure profile
 # argument `replicate` is used to provide several profiles of exposure
 data_4prediction <- data.frame(time = c(1:10, 1:10),
@@ -406,7 +406,7 @@ predict_PRZ_cstSD_4pred <- predict(object = fit_cstSD, data_predict = data_4pred
 
 From an object `survFitPredict`, results can ben plotted with function `plot()`:
 
-```{r predictPlot, cache=TRUE}
+```{r predictPlot, cache=TRUE, eval=FALSE}
 # (3) Plot the predicted survival rate under the new exposure profiles.
 plot(predict_PRZ_cstSD_4pred)
 ```
@@ -419,7 +419,7 @@ When this issue happens, the function `predict()` returns an error, with the mes
 
 This way is implemented through the use of the function `predict_ode()`. Robustness goes often with longer time to compute. Time to compute can be long, so we use by default MCMC chain size of 1000 independent iterations.
 
-```{r predict_ode, cache=TRUE}
+```{r predict_ode, cache=TRUE, eval=FALSE}
 predict_PRZ_cstSD_4pred_ode <- predict_ode(object = fit_cstSD, data_predict = data_4prediction)
 ```
 
@@ -429,7 +429,7 @@ Note that since `predict_ode()` can be very long to compute, the `mcmc_size` is 
 
 See for instance, with the plot:
 
-```{r predict_ode_plot, cache=TRUE}
+```{r predict_ode_plot, cache=TRUE, eval=FALSE}
 plot(predict_PRZ_cstSD_4pred_ode)
 ```
 
@@ -438,7 +438,7 @@ plot(predict_PRZ_cstSD_4pred_ode)
 While the model has been estimated using the background mortality parameter `hb`, it can be interesting to see the prediction without it.
 This is possible with the argument `hb_value`. If `TRUE`, the background mortality is taken into account, and if `FALSE`, the background mortality is set to $0$ in the prediction.
 
-```{r hb_value, cache=TRUE}
+```{r hb_value, cache=TRUE, eval=FALSE}
 # Use the same data set profile to predict without 'hb'
 predict_PRZ_cstSD_4pred_hbOUT <- predict(object = fit_cstSD, data_predict = data_4prediction, hb_value = FALSE)
 # Plot the prediction:
@@ -475,19 +475,19 @@ SPPE = \left( \frac{Y_{obs, t_{end}}}{Y_{init}} - \frac{Y_{pred, t_{end}}}{Y_{in
 
 For *NRMSE* and *SPPE*, we need to compute the number of survivors. To do so, we use the function  `predict_Nsurv()` where two arguments are required: the first argument is a `survFit` object, and the other is a data set with four columns (`time`, `conc`, `replicate` and `Nsurv`). Contrary to the function `predict()`, here the column `Nsurv` is necessary. 
 
-```{r cstTOcst, cache=TRUE}
+```{r cstTOcst, cache=TRUE, eval=FALSE}
 predict_Nsurv_PRZ_SD_cstTOcst <- predict_Nsurv(fit_cstSD, propiconazole)
 ```
 
-```{r varTOcst, cache=TRUE}
+```{r varTOcst, cache=TRUE, eval=FALSE}
 predict_Nsurv_PRZ_SD_varTOcst <- predict_Nsurv(fit_varSD, propiconazole)
 ```
 
-```{r cstTOvar, cache=TRUE}
+```{r cstTOvar, cache=TRUE, eval=FALSE}
 predict_Nsurv_PRZ_SD_cstTOvar <- predict_Nsurv(fit_cstSD, propiconazole_pulse_exposure)
 ```
 
-```{r varTOvar, cache=TRUE}
+```{r varTOvar, cache=TRUE, eval=FALSE}
 predict_Nsurv_PRZ_SD_varTOvar <- predict_Nsurv(fit_varSD, propiconazole_pulse_exposure)
 ```
 
@@ -495,18 +495,18 @@ predict_Nsurv_PRZ_SD_varTOvar <- predict_Nsurv(fit_varSD, propiconazole_pulse_ex
 
 For the same reason that a `predict_ode` function as been implemented to compute `predict` function using the ODE solver of *deSolve*, a `predict_Nsurv_ode` function as been implemented as equivalent to `predict_Nsurv`. The time to compute is subtentially longer than the original function.
 
-```{r cstTOcstPredict_ODE, cache=TRUE}
+```{r cstTOcstPredict_ODE, cache=TRUE, eval=FALSE}
 predict_Nsurv_PRZ_SD_cstTOcst_ode <- predict_Nsurv_ode(fit_cstSD, propiconazole)
 ```
 
 When both function work well, their results are identical (or highly similar):
 
-```{r cstTOcstPredict_ODE_PLOT, fig.align='center', out.width='.49\\linewidth',fig.show='hold'}
+```{r cstTOcstPredict_ODE_PLOT, fig.align='center', out.width='.49\\linewidth',fig.show='hold', eval=FALSE}
 plot(predict_Nsurv_PRZ_SD_cstTOcst)
 plot(predict_Nsurv_PRZ_SD_cstTOcst_ode)
 ```
 
-```{r cstTOcstPredict_ODE_PLOT1}
+```{r cstTOcstPredict_ODE_PLOT1, eval=FALSE}
 plot(predict_Nsurv_PRZ_SD_cstTOcst_ode)
 ```
 
@@ -514,13 +514,13 @@ plot(predict_Nsurv_PRZ_SD_cstTOcst_ode)
 
 Then, using object produce with the function `predict_Nsurv()` we can compute *PPC*, *NRMSE* and *SPPE* for all models. 
 
-```{r checkNsurvPRED_1, cache=TRUE}
+```{r checkNsurvPRED_1, cache=TRUE, eval=FALSE}
 predict_Nsurv_check(predict_Nsurv_PRZ_SD_cstTOvar)
 ```
 
 ### Plot and PPC of predict_Nsurv objects
 
-```{r plotPredict_Nsurv, cache=TRUE}
+```{r plotPredict_Nsurv, cache=TRUE, eval=FALSE}
 plot(predict_Nsurv_PRZ_SD_cstTOvar)
 ```
 
@@ -530,7 +530,7 @@ When ploting a PPC for a `survFitPredict_Nsurv` object,
 - A band of dashed lines corresponding to the range of 25% deviation.
 - A band of dotted lines corresponding to the range of 50% deviation.
 
-```{r ppcPredict_Nsurv, cache=TRUE}
+```{r ppcPredict_Nsurv, cache=TRUE, eval=FALSE}
 ppc(predict_Nsurv_PRZ_SD_cstTOvar)
 ```
 
@@ -544,13 +544,13 @@ For stability reason of algorithms and package, we do not change parameters name
 
 For instance:
 
-```{r nameEFSA_SD, cache=TRUE}
+```{r nameEFSA_SD, cache=TRUE, eval=FALSE}
 summary(fit_cstSD, EFSA_name = TRUE)
 head(priors_distribution(fit_cstSD, EFSA_name = TRUE))
 plot_prior_post(fit_cstSD, EFSA_name = TRUE)
 ```
 
-```{r nameEFSA_IT, cache=TRUE}
+```{r nameEFSA_IT, cache=TRUE, eval=FALSE}
 summary(fit_cstIT, EFSA_name = TRUE)
 head(priors_distribution(fit_cstIT, EFSA_name = TRUE))
 plot_prior_post(fit_cstIT, EFSA_name = TRUE)
@@ -560,7 +560,7 @@ plot_prior_post(fit_cstIT, EFSA_name = TRUE)
 
 Compared to the target time analysis, TKTD modelling allows to compute and plot the lethal concentration for any *x* percentage and at any time-point. The chosen time-point can be specified with `time_LCx`, by default the maximal time-point in the data set is used.
 
-```{r cstSDLCx, cache=TRUE}
+```{r cstSDLCx, cache=TRUE, eval=FALSE}
 # LC50 at the maximum time-point:
 LCx_cstSD <- LCx(fit_cstSD, X = 50)
 plot(LCx_cstSD)
@@ -573,13 +573,13 @@ LCx(fit_cstSD, X = 50, time_LCx = 2) %>% plot()
 
 Warning messages are returned when the range of concentrations is not appropriated for one or more LCx calculation(s). 
 
-```{r cstSDLCx_3015}
+```{r cstSDLCx_3015, eval=FALSE}
 # LC50 at time = 15
 LCx(fit_cstSD, X = 50, time_LCx = 15) %>% plot()
 ```
 
 
-```{r cstITLCx}
+```{r cstITLCx, eval=FALSE}
 # LC50 at the maximum time-point:
 LCx_cstIT <- LCx(fit_cstIT, X = 50)
 plot(LCx_cstIT)
@@ -591,7 +591,7 @@ LCx(fit_cstIT, X = 50, time_LCx = 2) %>% plot()
 LCx(fit_cstIT, X = 30, time_LCx = 15) %>% plot()
 ```
 
-```{r varSDLCx}
+```{r varSDLCx, eval=FALSE}
 # LC50 at time = 4
 LCx_varSD <- LCx(fit_varSD, X = 50, time_LCx = 4, conc_range = c(0,100))
 plot(LCx_varSD)
@@ -601,7 +601,7 @@ LCx(fit_varSD, X = 50, time_LCx = 30,  conc_range = c(0,100)) %>% plot()
 ```
 
 
-```{r varITLCx}
+```{r varITLCx, eval=FALSE}
 # LC50 at time = 4
 LCx(fit_varIT, X = 50, time_LCx = 4, conc_range = c(0,200)) %>% plot()
 
@@ -622,7 +622,7 @@ Computing an $MF_x$ is easy with function `MFx()`. It only requires object `surv
 
 There is no explicit formulation of $MF_x$ (at least for the GUTS-SD model), so the `accuracy` argument can be used to change the accuracy of the convergence level.
 
-```{r MFx_compt, cache=TRUE}
+```{r MFx_compt, cache=TRUE, eval=FALSE}
 # (1) upload or build a data frame with the exposure profile
 data_4MFx <- data.frame(time = 1:10,
                         conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
@@ -635,14 +635,14 @@ As the computing time can be long, the function prints the `accuracy` for each s
 
 Then, we can plot the survival rate as a function of the tested multiplication factors. Note that it is a linear interpolation between tested multiplication factor (cross dots on the graph).
 
-```{r MFx_plot, cache=TRUE}
+```{r MFx_plot, cache=TRUE, eval=FALSE}
 # (3) Plot the survival rate as function of the multiplication factors.
 plot(MFx_PRZ_cstSD_4MFx)
 ```
 
 In this specific case, the x-axis needs to be log-scaled, what is possible by setting option `log_scale = TRUE`:
 
-```{r MFx_plotLog, cache=TRUE}
+```{r MFx_plotLog, cache=TRUE, eval=FALSE}
 # (3 bis) Plot the survival rate as function of the multiplication factors in log-scale.
 plot(MFx_PRZ_cstSD_4MFx, log_scale = TRUE)
 ```
@@ -653,14 +653,14 @@ As indicated, the warning message just remind you how multiplication factors and
 To compare the initial survival rate (corresponding to a multiplication factor set to 1) with the survival rate at the asked multiplication factor leading to a reduction of $x\%$ of survival (provided with argument `X`), we can use option `x_variable =  "Time"`.
 The option `x_variable = "Time"` allows to vizualize differences in survival rate with and without the multiplication factor.
 
-```{r MFx_plotTime, cache=TRUE}
+```{r MFx_plotTime, cache=TRUE, eval=FALSE}
 # (4) Plot the survival rate versus time. Control (MFx = 1) and estimated MFx.
 plot(MFx_PRZ_cstSD_4MFx, x_variable =  "Time")
 ```
 
 What is provided with the function `plot()` is direclty accessible within the object of class `MFx`. For instance, to have access to the median and $95\%$ of returned `MFx`, we simply extract the element `df_MFx` which is the following `data.frame`:
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 MFx_PRZ_cstSD_4MFx$df_MFx
 ```
 
@@ -668,20 +668,20 @@ MFx_PRZ_cstSD_4MFx$df_MFx
 
 Here is an other example with a 10 percent Multiplication Factor:
 
-```{r MFx_x10, cache=TRUE}
+```{r MFx_x10, cache=TRUE, eval=FALSE}
 # (2 bis) fit on constant exposure propiconazole with model SD (see previously)
 MFx_PRZ_cstSD_4MFx_x10 <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = 10)
 ```
 
 The `warning messages` are just saying that the quantile at $2.5\%$ was not possible to compute. You can see this in the object `df_MFx` included in `MFx_PRZ_cstSD_4MFx_x10`. The reason of this impossibility is obvious when you plot the multiplication factor-response curve:
 
-```{r MFx_x10_plot, cache=TRUE}
+```{r MFx_x10_plot, cache=TRUE, eval=FALSE}
 # Plot with log scale
 plot(MFx_PRZ_cstSD_4MFx_x10, log_scale = TRUE)
 ```
 
 Then, you can reduce the threshold of iterations as:
-```{r MFx_x100_threshold, cache=TRUE}
+```{r MFx_x100_threshold, cache=TRUE, eval=FALSE}
 # (2 ter) fit on constant exposure propiconazole with model SD (see previously)
 MFx_PRZ_cstSD_4MFx_x10_thresh20 <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = 10, threshold_iter = 20)
 plot(MFx_PRZ_cstSD_4MFx_x10_thresh20, log_scale = TRUE) 
@@ -695,7 +695,7 @@ This message comes from the use of `ggplot()` function (see the `ggplot2` packag
 
 Multiplication factor is also available for the GUTS IT model (option `quiet = TRUE` remove the output):
 
-```{r MFx_IT, cache=TRUE}
+```{r MFx_IT, cache=TRUE, eval=FALSE}
 # (2) Use the fit on constant exposure propiconazole with model IT. No print of run messages.
 MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, data_predict = data_4MFx, time_MFx = 4, quiet = TRUE)
 
@@ -706,7 +706,7 @@ plot(MFx_PRZ_cstIT_4pred, log_scale = TRUE)
 This last example set a reduction of $10\%$ of the survival rate, remove the
 background mortality by setting `hb_value = FALSE` and is computed at time `time_MFx = 4`.
 
-```{r MFx_ITplot, cache=TRUE}
+```{r MFx_ITplot, cache=TRUE, eval=FALSE}
 # (2) Use the fit on constant exposure propiconazole with model IT. No print of run messages.
 MFx_PRZ_cstIT_4pred <- MFx(object = fit_cstIT, X=10, hb_value = FALSE, data_predict = data_4MFx, time_MFx = 4, quiet = TRUE)
 
@@ -719,28 +719,28 @@ plot(MFx_PRZ_cstIT_4pred, x_variable =  "Time")
 
 Once we have obtained the desired multiplication factor inducing the $x\%$ reduction of the survival rate, it can be relevant to explore the sentivity of this parameter by exploring survival rate over a range of multiplication factors. This is possible by setting argument `X = NULL` and providing a range of wanted multiplication factors, for instance `MFx_range = c()` in our first example.
 
-```{r MFx_range, cache=TRUE}
+```{r MFx_range, cache=TRUE, eval=FALSE}
 # Use the fit on constant exposure propiconazole with model SD.
 MFx_PRZ_cstSD_4pred_range <- MFx(object = fit_cstSD, data_predict = data_4MFx, X = NULL, MFx_range = 1:6)
 ```
 
 The associated plot if given by:
 
-```{r plt_MFx_range, cache=TRUE}
+```{r plt_MFx_range, cache=TRUE, eval=FALSE}
 # Plot survival rate versus the range of multiplication factor.
 plot(MFx_PRZ_cstSD_4pred_range)
 ```
 
 And the argument `x_variable = "Time"` returns all computed time series:
 
-```{r plt_MFx_range_Time, cache=TRUE}
+```{r plt_MFx_range_Time, cache=TRUE, eval=FALSE}
 # Plot Survival rate as function of time.
 plot(MFx_PRZ_cstSD_4pred_range, x_variable = "Time")
 ```
 
 To select a specific time series, we can use the element `ls_predict` wich is a list of object of class `survFitPredict` to wich a plot is defined.
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 # Plot a specific time series.
 plot(MFx_PRZ_cstSD_4pred_range$ls_predict[[4]])
 ```
