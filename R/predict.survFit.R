@@ -235,7 +235,7 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   lambda = kk * pmax(D-z,0) + hb # the pmax function is important here for elementwise maximum with 0 and D[i,j]-z ATTENTION: pmax(0,D) != pmax(D,0)
   
   lambda.prec = cbind(lambda[,1], lambda[,1:(ncol(lambda)-1)])
- 
+
   int.lambda =  t(t((lambda + lambda.prec)/2) * (time-time.prec))
   
   S <- exp(-t(apply(int.lambda,1,cumsum)))
