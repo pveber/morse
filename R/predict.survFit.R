@@ -224,8 +224,7 @@ quantile_fun <- function(x, probs = 0.50, ratio_no.NA = 0.95){
 
 Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   
-  time.prec = dplyr::lag(time, 1) ; time.prec[1] = time[1] #   time[1] = tprec[1]
-  
+  time.prec = c(time[1], time[1:(length(time)-1)])
   # Using log transfomration: log(a+b) = log(a) + log(1+b/a) may prevent the numerical issues raised by exponential
   diff.int = (exp(time %*% t(kd)) + exp(time.prec %*% t(kd)) )*Cw/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
   #log_diff.int = time %*% t(kd) + log(1 + exp((time.prec - time) %*% t(kd)))
@@ -235,8 +234,8 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   
   lambda = kk * pmax(D-z,0) + hb # the pmax function is important here for elementwise maximum with 0 and D[i,j]-z ATTENTION: pmax(0,D) != pmax(D,0)
   
-  lambda.prec = dplyr::lag(lambda[1,], 1 ) ; lambda.prec[1] = lambda[1]
-  
+  lambda.prec = cbind(lambda[,1], lambda[,1:(ncol(lambda)-1)])
+
   int.lambda =  t(t((lambda + lambda.prec)/2) * (time-time.prec))
   
   S <- exp(-t(apply(int.lambda,1,cumsum)))
