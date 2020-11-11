@@ -326,7 +326,7 @@ SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NUL
              input = sigimp)
   
   D <- out[, grep("D", colnames(out))]
-  cumMax_D <- apply(D, 2, cummax)
+  cumMax_D <- if(is.null(dim(D))) cummax(D) else apply(D, 2, cummax)
   thresholdIT <- t(1 / (1 + (t(cumMax_D) / parms$alpha)^(-parms$beta)))
   
   dtheo <- (1 - thresholdIT) * exp(times %*% t(-hb))
