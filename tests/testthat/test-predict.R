@@ -47,9 +47,7 @@ test_that("MCMC length one work", {
   alpha=16
   beta=1.9
   mcmc_size=length(kd)
-  interpolate_length = NULL
-  interpolate_method = "linear"
-  
+
   # check No ERROR
   expect_error(morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size), NA)
   expect_error(morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size), NA)
@@ -64,19 +62,14 @@ test_that("MCMC longer than one", {
   Cw=5:2
   time=1:4
   replicate="A"
-  kd=0:2
-  hb=0:2
-  z=0:2
-  kk=0:2
-  alpha=0:2
-  beta=1:3
+  kd=c(0.5,2,1.3)
+  hb=c(0.5,2,1.3)
+  z=c(16,5,2)
+  kk=c(0.5,2,1.3)
+  alpha=c(16,5,2)
+  beta=c(0.5,2,1.3)
   mcmc_size=length(kd)
-  interpolate_length = NULL
-  interpolate_method = "constant"
-  
-  morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size)
-  morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size)          
-  
+
   # check No ERROR
   expect_error(morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size), NA)
   expect_error(morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size), NA)
