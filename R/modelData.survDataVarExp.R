@@ -24,8 +24,9 @@ modelData.survDataVarExp <- function(x,
   x_reduce <- x_interpolate %>%
     dplyr::filter(!is.na(Nsurv)) %>%
     # Group by replicate to replicate an indice of replicate:
-    dplyr::mutate(replicate_ID = group_indices(., .dots="replicate")) %>%
+    # dplyr::mutate(replicate_ID = group_indices(., .dots="replicate")) %>%
     dplyr::group_by(replicate) %>%
+    dplyr::mutate(replicate_ID = cur_group_id()) %>%
     dplyr::arrange(replicate, time) %>%
     dplyr::mutate( tprec = ifelse( time == 0, time, dplyr::lag(time) ) ) %>%
     dplyr::mutate( Nprec = ifelse( time == 0, Nsurv, dplyr::lag(Nsurv) ) ) %>%
@@ -142,7 +143,10 @@ survData_interpolate <- function(x, extend_time = 100){
                   tprec_ID_long = ifelse(time_ID_long==1, time_ID_long,  dplyr::lag(time_ID_long))) %>%
     dplyr::ungroup() %>%
     # Group by replicate to replicate an indice of replicate:
-    dplyr::mutate(replicate_ID_long = group_indices(., .dots="replicate"))
+    dplyr::group_by(replicate)
+    dplyr::mutate(replicate_ID_long = cur_group_id()) %>%
+    dplyr::ungroup()
+    # dplyr::mutate(replicate_ID_long = group_indices(., .dots="replicate"))
   
   return(x_interpolate)
 }
