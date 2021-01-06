@@ -35,4 +35,57 @@ test_that("Surv.SD_Cext", {
   expect_equal( Surv.SD_Cext(Cw, time, kk, kd, z, hb),  matTest,  tolerance=1e-5)
 })
 
+test_that("MCMC length one work", {
+
+  Cw=1:2
+  time=1:2
+  replicate="A"
+  kd=0.5
+  hb=0.2
+  z=16
+  kk=1.9
+  alpha=16
+  beta=1.9
+  mcmc_size=length(kd)
+  interpolate_length = NULL
+  interpolate_method = "linear"
+  
+  # check No ERROR
+  expect_error(morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size), NA)
+  expect_error(morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size), NA)
+  # check No WARNING
+  expect_warning(morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size), NA)
+  expect_warning(morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size), NA)
+  
+})
+
+test_that("MCMC longer than one", {
+  
+  Cw=5:2
+  time=1:4
+  replicate="A"
+  kd=0:2
+  hb=0:2
+  z=0:2
+  kk=0:2
+  alpha=0:2
+  beta=1:3
+  mcmc_size=length(kd)
+  interpolate_length = NULL
+  interpolate_method = "constant"
+  
+  morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size)
+  morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size)          
+  
+  # check No ERROR
+  expect_error(morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size), NA)
+  expect_error(morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size), NA)
+  # check No WARNING
+  expect_warning(morse:::SurvIT_ode(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = mcmc_size), NA)
+  expect_warning(morse:::SurvSD_ode(Cw, time, replicate, kd, hb, z, kk, mcmc_size = mcmc_size), NA)
+  
+})
+
+
+
 

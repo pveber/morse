@@ -284,8 +284,9 @@ model_SD <- function(t, State, parms, input)  {
 
 # Survival function for "IT" model with external concentration changing with time
 #
-# @param Cw A scalar of external concentration
+# @param Cw A vector of external concentration
 # @param time A vector of time
+# @param replicate A scalar of char
 # @param kk a vector of parameter
 # @param kd a vector of parameter
 # @param z a vector of parameter
@@ -298,8 +299,7 @@ model_SD <- function(t, State, parms, input)  {
 SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NULL, interpolate_length = NULL, interpolate_method = "linear"){
   
   ## external signal with several rectangle impulses
-  signal <- data.frame(times = time, 
-                       import = Cw)
+  signal <- data.frame(times = time, import = Cw)
   
   sigimp <- stats::approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
   
@@ -319,11 +319,11 @@ SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NUL
   xstart <- c(D = rep(0, mcmc_size))
   
   ## Solve model
-  out <- ode(y = xstart,
-             times = times,
-             func = model_IT,
-             parms,
-             input = sigimp)
+  out <- deSolve::ode(y = xstart,
+                     times = times,
+                     func = model_IT,
+                     parms,
+                     input = sigimp)
   
   D <- out[, grep("D", colnames(out))]
   cumMax_D <- if(is.null(dim(D))) cummax(D) else apply(D, 2, cummax)
