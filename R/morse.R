@@ -406,3 +406,9 @@ NULL
 #' \emph{Environmental Science & Technology}, 42 (23), 8978-8984.
 #' @keywords data set
 NULL
+
+
+## usethis namespace: start
+#' @useDynLib morse, .registration = TRUE
+## usethis namespace: end
+NULL

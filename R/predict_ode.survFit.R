@@ -209,78 +209,61 @@ predict_ode.survFit <- function(object,
 # @return A matrix generate with coda.samples() function
 #
 
-SurvSD_ode <- function(Cw, time, replicate, kk, kd, z, hb, mcmc_size = 1000, interpolate_length = NULL, interpolate_method = "linear"){
+SurvSD_ode <- function(Cw, time, replicate, kk, kd, z, hb, mcmc_size = 1000, interpolate_length = NULL, interpolate_method=c("linear","constant")) {
+  interpolate_method <- match.arg(interpolate_method)
   
   ## external signal with several rectangle impulses
-  signal <- data.frame(times = time, 
-                       import = Cw)
-  
-  sigimp <- stats::approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
-  
+  signal <- data.frame(times=time,import=Cw)
   if(!is.null(interpolate_length)){
     times <- seq(min(time), max(time), length = interpolate_length)
   } else{
     times <- signal$times
   }
   
-  ## The parameters
-  parms  <- list( kd = kd,
-                  kk = kk,
-                  z = z,
-                  hb = hb,
-                  mcmc_size = mcmc_size)
+  xstart <- c(rep(c(D=0),mcmc_size),rep(c(H=0),mcmc_size))
+  # ordering of parameters required by compiled function
+  parms <- c(mcmc_size,kd,hb,z,kk)
+  # solve model
+  on.exit(.C("gutsredsd_free")) # clean up
+  deSolve::ode(y=xstart,
+               times=times,
+               parms=parms,
+               method="lsoda",
+               dllname="morse",
+               initfunc="gutsredsd_init",
+               func="gutsredsd_func",
+               initforc="gutsredsd_forc",
+               forcings=signal,
+               fcontrol=list(method=interpolate_method,rule=2,ties="ordered"),
+               nout=1
+  ) -> out
   
-  ## Start values for steady state
-  xstart <- c(D = rep(0, mcmc_size),
-              H = rep(0, mcmc_size))
-  
-  ## Solve model
-  out <- ode(y = xstart,
-             times = times,
-             func = model_SD,
-             parms,
-             input = sigimp)
+  dtheo <- exp(-out[,grep("H",colnames(out))])
 
-  dtheo <- exp(- out[, grep("H", colnames(out))] )
-  
   # Manage vector case
   if(mcmc_size == 1){
     q50 = dtheo
     qinf95 = dtheo
     qsup95 = dtheo
   } else{
-    q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE)
-    qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE)
-    qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+    qs <- apply(as.matrix(dtheo), 1, quantile, probs=c(0.5,0.025,0.975), names=FALSE, na.rm=TRUE)
+    q50 = qs[1,]
+    qinf95 = qs[2,]
+    qsup95 = qs[3,]
   }
   
-  dtheo <- as.data.frame(dtheo) %>%
-    mutate(time = out[, "time"],
-           conc = out[, "signal"],
-           replicate = rep(replicate, nrow(out)),
+  dtheo <- as.data.frame(dtheo)
+  names(dtheo) <- paste0("H",seq(1,mcmc_size))
+  dtheo <- dtheo %>%
+    dplyr::mutate(time = times,
+           conc = out[,ncol(out)],
+           replicate = c(replicate),
            q50 = q50,
            qinf95 = qinf95,
            qsup95 = qsup95)
   
   return(dtheo)
 }
-
-model_SD <- function(t, State, parms, input)  {
-  with(as.list(c(parms, State)), {
-    
-    conc_ext = input(t)
-    
-    D = State[1:mcmc_size]
-    H = State[(mcmc_size+1):(2*mcmc_size)] 
-    
-    dD <- kd * (conc_ext - D)     # internal concentration
-    dH <- kk * pmax(D - z, 0) + hb # risk function
-    
-    res <- c(dD, dH)
-    list(res, signal = conc_ext)
-  })
-}
-
 
 # Survival function for "IT" model with external concentration changing with time
 #
@@ -296,13 +279,11 @@ model_SD <- function(t, State, parms, input)  {
 # @return A matrix generate with coda.samples() function
 #
 
-SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NULL, interpolate_length = NULL, interpolate_method = "linear"){
+SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NULL, interpolate_length = NULL, interpolate_method=c("linear","constant")){
+  interpolate_method <- match.arg(interpolate_method)
   
   ## external signal with several rectangle impulses
-  signal <- data.frame(times = time, import = Cw)
-  
-  sigimp <- stats::approxfun(signal$times, signal$import, method = interpolate_method, rule = 2)
-  
+  signal <- data.frame(times=time,import=Cw)
   if(!is.null(interpolate_length)){
     times <- seq(min(time), max(time), length = interpolate_length)
   } else{
@@ -310,24 +291,29 @@ SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NUL
   }
   
   ## The parameters
-  parms  <- list( kd = kd,
-                  alpha = alpha,
-                  beta = beta,
-                  mcmc_size = mcmc_size)
+  parms  <- c(mcmc_size,kd,hb)
   
   ## Start values for steady state
-  xstart <- c(D = rep(0, mcmc_size))
+  xstart <- c(rep(c(D=0),mcmc_size),rep(c(H=0),mcmc_size))
   
   ## Solve model
-  out <- deSolve::ode(y = xstart,
-                     times = times,
-                     func = model_IT,
-                     parms,
-                     input = sigimp)
-  
-  D <- out[, grep("D", colnames(out))]
+  on.exit(.C("gutsredit_free")) # clean up
+  deSolve::ode(y=xstart,
+               times=times,
+               parms=parms,
+               method="lsoda",
+               dllname="morse",
+               initfunc="gutsredit_init",
+               func="gutsredit_func",
+               initforc="gutsredit_forc",
+               forcings=signal,
+               fcontrol=list(method=interpolate_method,rule=2,ties="ordered"),
+               nout=1
+  ) -> out
+
+  D <- out[,grep("D",colnames(out))]
   cumMax_D <- if(is.null(dim(D))) cummax(D) else apply(D, 2, cummax)
-  thresholdIT <- t(1 / (1 + (t(cumMax_D) / parms$alpha)^(-parms$beta)))
+  thresholdIT <- t(1 / (1 + (t(cumMax_D) / alpha)^(-beta)))
   
   dtheo <- (1 - thresholdIT) * exp(times %*% t(-hb))
 
@@ -337,33 +323,22 @@ SurvIT_ode <- function(Cw, time, replicate, kd, hb, alpha, beta, mcmc_size = NUL
     qinf95 = dtheo
     qsup95 = dtheo
   } else{
-    q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE)
-    qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE)
-    qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+    qs <- apply(as.matrix(dtheo), 1, quantile, probs=c(0.5,0.025,0.975), names=FALSE, na.rm=TRUE)
+    q50 = qs[1,]
+    qinf95 = qs[2,]
+    qsup95 = qs[3,]
   }
   
-  dtheo <- as.data.frame(dtheo) %>%
-    mutate(time = out[, "time"],
-            conc = out[, "signal"],
-            replicate = rep(replicate, nrow(out)),
+  dtheo <- as.data.frame(dtheo)
+  names(dtheo) <- paste0("H",seq(1,mcmc_size))
+  dtheo <- dtheo %>%
+    dplyr::mutate(time = out[, "time"],
+            conc = out[,ncol(out)],
+            replicate = c(replicate),
             q50 = q50,
             qinf95 = qinf95,
             qsup95 = qsup95)
 
   return(dtheo)
   
-}
-
-model_IT <- function(t, State, parms, input) {
-  with(as.list(c(parms, State)), {
-    
-    conc_ext <- input(t)
-
-    D = State[1:mcmc_size]
-    
-    dD <- kd*(conc_ext - D)    # internal damage
-    
-    list(dD = dD, signal = conc_ext)
-    
-  })
 }
