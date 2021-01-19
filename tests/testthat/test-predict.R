@@ -80,5 +80,58 @@ test_that("MCMC longer than one", {
 })
 
 
+test_that("predict_ode", {
+  
+  skip_on_cran()
+  
+  data("propiconazole")
+  fit_cstSD <- survFit(survData(propiconazole), quiet = TRUE, model_type = "SD")
+  
+  data_4prediction <- data.frame(time = c(1:10, 1:10),
+                                 conc = c(c(0,0,40,0,0,0,40,0,0,0),
+                                          c(21,19,18,23,20,14,25,8,13,5)),
+                                 replicate = c(rep("pulse", 10), rep("random", 10)))
+  
+  # check No ERROR
+  expect_error(predict_ode(object = fit_cstSD, data_predict = data_4prediction), NA)
 
 
+  data_4MFx <- data.frame(time = 1:10,
+                          conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
+  # check No ERROR
+  expect_error(MFx(object = fit_cstSD, data_predict = data_4MFx, ode = TRUE), NA)
+
+})
+
+
+test_that("predict_Nsurv_ode internal", {
+  
+  skip_on_cran()
+  
+  data("propiconazole")
+  fit_cstSD <- survFit(survData(propiconazole), quiet = TRUE, model_type = "SD")
+  fit_cstIT <- survFit(survData(propiconazole), quiet = TRUE, model_type = "IT")
+  
+  data("FOCUSprofile")  
+  FOCUSprofile$Nsurv = sort(round(runif(nrow(FOCUSprofile), 0, 100)), decreasing = TRUE)
+  
+  # check No ERROR
+  expect_error(predict_Nsurv_ode(object = fit_cstSD, data_predict = FOCUSprofile, mcmc_size = 10, interpolate_length  = 0), NA)
+  expect_error(predict_Nsurv_ode(object = fit_cstIT, data_predict = FOCUSprofile, mcmc_size = 10, interpolate_length  = 0), NA)
+  
+  expect_error(predict_Nsurv_ode(object = fit_cstSD, data_predict = NULL, mcmc_size = 1000, interpolate_length = 10), NA)
+  expect_error(predict_Nsurv(object = fit_cstSD, data_predict = NULL, mcmc_size = 1000, interpolate_length = 10), NA)
+
+  data("propiconazole_pulse_exposure")
+  expect_error(predict_Nsurv_ode(fit_cstSD, propiconazole_pulse_exposure, mcmc_size = NULL, interpolate_length = 0), NA)
+  expect_error(predict_Nsurv_ode(fit_cstSD, propiconazole_pulse_exposure, mcmc_size = NULL, interpolate_length = 0), NA)
+
+})
+
+test_that("predict_interpolate", {
+  
+  data(FOCUSprofile)
+  FC_predInterp = morse:::predict_interpolate(FOCUSprofile,  extend_time = 100)
+  expect_true(nrow(FC_predInterp) == nrow(FOCUSprofile) + 100)
+  
+})
