@@ -65,7 +65,12 @@
 #' 
 #' @export
 #' 
-LCx.survFit <- function(object, X, time_LCx = NULL, conc_range = NULL, npoints = 100, ...){
+LCx.survFit <- function(object,
+                        X,
+                        time_LCx = NULL,
+                        conc_range = NULL,
+                        npoints = 100,
+                        ...){
   
   if(is.null(conc_range)){
     conc_range = seq(0, max(object$jags.data$conc), length.out = npoints)
@@ -182,55 +187,27 @@ Surv_IT_LCx <- function(Cw, time, kd, hb, alpha, beta)
 
 # points for LCx
 # 
-
 pointsLCx <- function(df_dose, X_prop){
   
   if(min(df_dose$q50) < X_prop & X_prop < max(df_dose$q50)){
-    df.q50 = select(df_dose, c(concentration, q50)) %>%
-      add_row(q50 = X_prop) %>%
-      arrange(q50) %>%
-      mutate(concentration = zoo::na.approx(concentration,q50, na.rm=FALSE))%>%
-      filter(q50 == X_prop)
-    
-    LCX_q50 = df.q50$concentration
-    
+    LCX_q50 = approx( df_dose$q50, df_dose$concentration, xout = X_prop, ties = mean)$y
   } else {
     LCX_q50 = NA
-    
     warning(paste("No median for survival probability of", X_prop,
                   " in the range of concentrations under consideration: [",
                   min(df_dose$concentration), ";", max(df_dose$concentration), "]"))
   }
-  
   if(min(df_dose$qinf95) < X_prop & X_prop < max(df_dose$qinf95)){
-    df.qinf95=select(df_dose, c(concentration,qinf95))%>%
-      add_row(qinf95=X_prop)%>%
-      arrange(qinf95)%>%
-      mutate(concentration = na.approx(concentration,qinf95, na.rm=FALSE))%>%
-      filter(qinf95==X_prop)
-    
-    LCX_qinf95 = df.qinf95$concentration
-    
+    LCX_qinf95 = approx( df_dose$qinf95, df_dose$concentration, xout = X_prop, ties = mean)$y
   } else{
     LCX_qinf95 = NA
-    
     warning(paste("No 95%inf for survival probability of", X_prop ,
                   " in the range of concentrations under consideration: [",
                   min(df_dose$concentration), ";", max(df_dose$concentration), "]"))
   }
-  
-  
   if(min(df_dose$qsup95) < X_prop & X_prop < max(df_dose$qsup95)){
-    df.qsup95=select(df_dose, c(concentration,qsup95))%>%
-      add_row(qsup95=X_prop)%>%
-      arrange(qsup95)%>%
-      mutate(concentration = na.approx(concentration,qsup95, na.rm=FALSE))%>%
-      filter(qsup95==X_prop)
-    
-    LCX_qsup95 = df.qsup95$concentration
-    
+    LCX_qsup95 = approx( df_dose$qsup95, df_dose$concentration, xout = X_prop, ties = mean)$y
   } else{
-    
     LCX_qsup95 = NA
     warning(paste("No 95%sup for survival probability of", X_prop,
                   " in the range of concentrations under consideration: [",
@@ -239,9 +216,7 @@ pointsLCx <- function(df_dose, X_prop){
   
   df_LCx <- data.frame(quantile = c("median", "quantile 2.5%", "quantile 97.5%"),
                        LCx = as.numeric(c(LCX_q50, LCX_qinf95, LCX_qsup95)))
-    # as.numeric is needed here because if all values are NA, LCx has type logical
   return(df_LCx)
-  
 }
 
 
