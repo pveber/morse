@@ -292,7 +292,6 @@ predict_interpolate <- function(x, extend_time = 100){
     dplyr::summarise(min_time = min(time, na.rm = TRUE),
                      max_time = max(time, na.rm = TRUE)) %>%
     dplyr::group_by(replicate) %>%
-    # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
     dplyr::do(tibble(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
   
   x_interpolate <- dplyr::full_join(df_MinMax, x,
