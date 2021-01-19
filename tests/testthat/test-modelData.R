@@ -11,7 +11,6 @@ test_that("modelData", {
 
   df_MD_Var <- morse:::survData_interpolate(survData(propiconazole_pulse_exposure))
   expect_length(unique(df_MD_Var$replicate), 4)
-  expect_length(unique(df_MD_Var$replicate_ID), 4)
   
   # time points of the profile are within the time extended
   expect_true(all(propiconazole_pulse_exposure$time %in% df_MD_Var$time))
