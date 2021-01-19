@@ -59,7 +59,10 @@ predict_Nsurv_ode.survFit <- function(object,
             prediction on the Number of survivor.")
   }
   
-  message("Note that computing can be quite long (several minutes).")
+  message("Note that computing can be quite long (several minutes).
+  Tips: To reduce that time you can reduce Number of MCMC chains (default mcmc_size is set to 1000) or
+          change the interpolate_length (default is 100). If you don't need to interpolate new concentration
+          with your data_predict (because you provide all) you can set 'interpolate_length=0'.")
   
   # Initialisation
   mcmc <- x$mcmc
@@ -221,34 +224,42 @@ predict_Nsurv_ode.survFit <- function(object,
     mat_psurv <- df_filter %>%
       select(- c("time", "conc", "replicate",
                  "q50", "qinf95", "qsup95", 
-                 "Nsurv", "Nprec", "iter", "iter_prec"))
+                 "Nsurv", "Nprec", "iter", "iter_prec")) %>%
+      as.matrix()
     
     ncol_NsurvPred <- ncol(mat_psurv)
-    NsurvPred_check <- matrix(ncol = ncol_NsurvPred, nrow = nrow(mat_psurv))
+    nrow_NsurvPred <- nrow(mat_psurv)
+    iter = df_filter$iter
+    iter_prec = df_filter$iter_prec
+    
     NsurvPred_valid <- matrix(ncol = ncol_NsurvPred, nrow = nrow(mat_psurv))
+
+    Nprec <- cbind(df_filter$Nprec)[, rep(1,ncol_NsurvPred)]
     
-    iter <- df_filter$iter
-    iter_prec <- df_filter$iter_prec
-    Nprec <- df_filter$Nprec
+    mat_psurv_prec = matrix(ncol = ncol_NsurvPred, nrow = nrow_NsurvPred)
+    for(i in 1:nrow_NsurvPred){
+      if(iter[i] == iter_prec[i]){
+        mat_psurv_prec[i,] = mat_psurv[i,]
+      } else{
+        mat_psurv_prec[i,] = mat_psurv[i-1,]
+      }
+    }
+    mat_pSurv_ratio = mat_psurv / mat_psurv_prec
     
-    for(i in 1:nrow(mat_psurv)){
-      
-      NsurvPred_check[i, ] = rbinom(ncol_NsurvPred,
-                                    size = rep(Nprec[i], ncol_NsurvPred),
-                                    prob = ifelse(iter[i] == iter_prec[i],
-                                                  rep(1, ncol_NsurvPred),
-                                                  as.numeric(mat_psurv[i,] / mat_psurv[i-1,])))
-      for(j in 1:ncol(mat_psurv)){
-        NsurvPred_valid[i,j] = rbinom(1,
-                                      size = ifelse(iter[i] == iter_prec[i],
-                                                    Nprec[i],
-                                                    NsurvPred_valid[i-1,j]),
-                                      prob = ifelse(iter[i] == iter_prec[i],
-                                                    1,
-                                                    as.numeric(mat_psurv[i,j] / mat_psurv[i-1,j])))
-        
-        # print(paste("row", i, "col", j)
-        
+    NsurvPred_check_vector = rbinom(ncol_NsurvPred*nrow_NsurvPred,
+                                    size = Nprec,
+                                    prob =  mat_pSurv_ratio)
+    NsurvPred_check = matrix(NsurvPred_check_vector, byrow = FALSE, nrow = nrow_NsurvPred)
+    
+
+    NsurvPred_valid[1, ] = rep(Nprec[1], ncol_NsurvPred)
+    for(i in 2:nrow(mat_psurv)){
+      if(iter[i] == iter_prec[i]){
+        NsurvPred_valid[i,] = NsurvPred_check[i,]
+      } else{
+        NsurvPred_valid[i,] = rbinom(ncol_NsurvPred,
+                                     size = NsurvPred_valid[i-1,],
+                                     prob = mat_pSurv_ratio[i,])
       }
     }
     
