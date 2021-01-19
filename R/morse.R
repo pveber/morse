@@ -417,7 +417,8 @@ NULL
 #' @usage data(FOCUSprofile)
 #' @format A data frame with 11641 observations on the following two variables:
 #' \describe{ \item{\code{time}}{A vector of class \code{numeric}.}
-#'  \item{\code{conc}}{A vector of class \code{numeric} with exposure concentrations.} }
+#'  \item{\code{conc}}{A vector of class \code{numeric} with exposure concentrations.} and 
+#'  \item{\code{replicate}}{A vector of class \code{factor}.} }
 #' @keywords data set
 NULL
 
