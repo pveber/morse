@@ -16,6 +16,7 @@
 #' @param ratio_no.NA A numeric between 0 and 1 standing for the proportion of non-NA values
 #'  required to compute quantile. The default is \eqn{0.95}.
 #' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
+#' @param extend_time Length of time points interpolated with variable exposure profiles
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
@@ -50,6 +51,7 @@ predict.survFit <- function(object,
                             hb_value = TRUE,
                             ratio_no.NA = 0.95,
                             hb_valueFORCED = NA,
+                            extend_time = 100,
                             ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
               # arguments should be named the same when declaring a
@@ -58,7 +60,6 @@ predict.survFit <- function(object,
   # Initialisation
   mcmc <- x$mcmc
   model_type <- x$model_type
-  extend_time <- 100
 
   if(is.null(data_predict)){
     if("survFitVarExp" %in% class(x)){
@@ -278,6 +279,7 @@ Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta){
 # Create a dataset for survival analysis when the replicate of concentration is variable
 #
 # @param x An object of class \code{survData}
+# @param extend_time length of time points interpolated with variable exposure profiles
 #
 # @return A dataframe
 #
