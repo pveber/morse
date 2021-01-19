@@ -1,5 +1,18 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.3.0
+=============
+
+NEW SOLVER
+- a new ODE solver has been introduced reducing the time of computation in prediction function ('predict', 'predict_Nsurv' and 'MFx')
+
+NEW NSURV SAMPLER
+- a new sampler of Nsurv is introduced for simulation which speed the functions 'predict_Nsurv' by 30 to 60 times faster!
+
+ADD DATA
+- add FOCUS profile to the data set for testing
+
+
 Version 3.2.7
 =============
 
@@ -13,7 +26,7 @@ Version 3.2.6
 =============
 
 TYPO FIX
-- correct 'alpha' in 'mw' in summary of surFit
+- correct 'alpha' in 'mw' in summary of survFit
 
 Version 3.2.5
 =============
