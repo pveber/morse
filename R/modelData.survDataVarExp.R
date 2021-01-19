@@ -143,7 +143,7 @@ survData_interpolate <- function(x, extend_time = 100){
                   tprec_ID_long = ifelse(time_ID_long==1, time_ID_long,  dplyr::lag(time_ID_long))) %>%
     dplyr::ungroup() %>%
     # Group by replicate to replicate an indice of replicate:
-    dplyr::group_by(replicate)
+    dplyr::group_by(replicate) %>%
     dplyr::mutate(replicate_ID_long = cur_group_id()) %>%
     dplyr::ungroup()
     # dplyr::mutate(replicate_ID_long = group_indices(., .dots="replicate"))

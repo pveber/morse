@@ -116,8 +116,9 @@ addVariable_survDataCstExp <- function(x){
   
   x_dev <- x %>%
     # Add an indice of replicate:
-    dplyr::mutate(replicate_ID = group_indices(., .dots = "replicate")) %>%
+    # dplyr::mutate(replicate_ID = group_indices(., .dots = "replicate")) %>%
     dplyr::group_by(replicate) %>%
+    dplyr::mutate(replicate_ID = cur_group_id()) %>%
     dplyr::arrange(replicate, time) %>%
     dplyr::mutate(tprec = ifelse(time == 0, time, dplyr::lag(time)),
                   Nprec = ifelse( time == 0, Nsurv, dplyr::lag(Nsurv) )) %>%
