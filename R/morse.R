@@ -408,6 +408,19 @@ NULL
 NULL
 
 
+#' A simulated exposure profile with 11641 time points.
+#'
+#' Exposure profile of 11641 time points used for prediction.
+#'
+#' @name FOCUSprofile
+#' @docType data
+#' @usage data(FOCUSprofile)
+#' @format A data frame with 11641 observations on the following two variables:
+#' \describe{ \item{\code{time}}{A vector of class \code{numeric}.}
+#'  \item{\code{conc}}{A vector of class \code{numeric} with exposure concentrations.} }
+#' @keywords data set
+NULL
+
 ## usethis namespace: start
 #' @useDynLib morse, .registration = TRUE
 ## usethis namespace: end
