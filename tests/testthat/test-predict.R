@@ -116,15 +116,15 @@ test_that("predict_Nsurv_ode internal", {
   FOCUSprofile$Nsurv = sort(round(runif(nrow(FOCUSprofile), 0, 100)), decreasing = TRUE)
   
   # check No ERROR
-  expect_error(predict_Nsurv_ode(object = fit_cstSD, data_predict = FOCUSprofile, mcmc_size = 10, interpolate_length  = 0), NA)
-  expect_error(predict_Nsurv_ode(object = fit_cstIT, data_predict = FOCUSprofile, mcmc_size = 10, interpolate_length  = 0), NA)
+  expect_error(predict_Nsurv_ode(object = fit_cstSD, data_predict = FOCUSprofile, mcmc_size = 10, interpolate_length  = NULL), NA)
+  expect_error(predict_Nsurv_ode(object = fit_cstIT, data_predict = FOCUSprofile, mcmc_size = 10, interpolate_length  = NULL), NA)
   
   expect_error(predict_Nsurv_ode(object = fit_cstSD, data_predict = NULL, mcmc_size = 1000, interpolate_length = 10), NA)
   expect_error(predict_Nsurv(object = fit_cstSD, data_predict = NULL, mcmc_size = 1000, interpolate_length = 10), NA)
 
   data("propiconazole_pulse_exposure")
-  expect_error(predict_Nsurv_ode(fit_cstSD, propiconazole_pulse_exposure, mcmc_size = NULL, interpolate_length = 0), NA)
-  expect_error(predict_Nsurv_ode(fit_cstSD, propiconazole_pulse_exposure, mcmc_size = NULL, interpolate_length = 0), NA)
+  expect_error(predict_Nsurv_ode(fit_cstSD, propiconazole_pulse_exposure, mcmc_size = NULL, interpolate_length = NULL), NA)
+  expect_error(predict_Nsurv_ode(fit_cstSD, propiconazole_pulse_exposure, mcmc_size = NULL, interpolate_length = NULL), NA)
 
 })
 
