@@ -19,6 +19,7 @@
 #'   is the survival probability after an exposure profile
 #'    \eqn{MF(x,t)* C_w(\tau \in T)} at time \eqn{t}.
 #'   
+#' @rdname MFx
 #' 
 #' @param object An object of class \code{survFit}.
 #' @param data_predict A dataframe with two columns \code{time} and \code{conc}.
@@ -104,6 +105,8 @@ MFx.survFit <- function(object,
                         threshold_iter = 100,
                         hb_valueFORCED = 0,
                         ode=TRUE,
+                        interpolate_length = NULL,
+                        interpolate_method = "linear",
                         ...){
   
   ## Analyse data_predict data.frame
@@ -131,7 +134,9 @@ MFx.survFit <- function(object,
                                 spaghetti = spaghetti,
                                 mcmc_size = mcmc_size,
                                 hb_value = hb_value,
-                                hb_valueFORCED = hb_valueFORCED )
+                                hb_valueFORCED = hb_valueFORCED,
+                                interpolate_length = interpolate_length,
+                                interpolate_method = interpolate_method)
   } else{
     ls_predict[[1]] <- predict( object = object,
                                 data_predict = ls_data_predict[[1]],
