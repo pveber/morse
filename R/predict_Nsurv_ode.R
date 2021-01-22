@@ -16,10 +16,11 @@
 #'  is 1000. If all MCMC is wanted, set argument to \code{NULL}.
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
+#' @param extend_time Length of time points interpolated with variable exposure profiles.
 #' @param interpolate_length Length of the time sequence for which output is wanted.
 #' @param interpolate_method The interpolation method for concentration. See package \code{deSolve} for details.
 #' Default is \code{linear}.
-#' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @export
@@ -29,9 +30,10 @@ predict_Nsurv_ode <- function(object,
                                spaghetti,
                                mcmc_size,
                                hb_value,
+                               hb_valueFORCED,
+                               extend_time,
                                interpolate_length,
                                interpolate_method,
-                               hb_valueFORCED,
                                ...){
   UseMethod("predict_Nsurv_ode")
 }
@@ -46,9 +48,10 @@ predict_Nsurv_ode.survFit <- function(object,
                                   spaghetti = FALSE,
                                   mcmc_size = 1000,
                                   hb_value = TRUE,
-                                  interpolate_length = 100,
-                                  interpolate_method = "linear",
                                   hb_valueFORCED = NA,
+                                  extend_time = 100,
+                                  interpolate_length = NULL,
+                                  interpolate_method = "linear",
                                   ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
   # arguments should be named the same when declaring a
@@ -60,14 +63,12 @@ predict_Nsurv_ode.survFit <- function(object,
   }
   
   message("Note that computing can be quite long (several minutes).
-  Tips: To reduce that time you can reduce Number of MCMC chains (default mcmc_size is set to 1000) or
-          change the interpolate_length (default is 100). If you don't need to interpolate new concentration
-          with your data_predict (because you provide all) you can set 'interpolate_length=0'.")
+  Tips: To reduce that time you can reduce Number of MCMC chains (default mcmc_size is set to 1000).")
   
   # Initialisation
   mcmc <- x$mcmc
   model_type <- x$model_type
-  extend_time <- interpolate_length
+  extend_time <- extend_time
   
   if(is.null(data_predict)){
     if("survFitVarExp" %in% class(x)){
@@ -155,7 +156,7 @@ predict_Nsurv_ode.survFit <- function(object,
                  hb=hb,
                  z=z,
                  mcmc_size = mcmc_size,
-                 interpolate_length = NULL,
+                 interpolate_length = interpolate_length,
                  interpolate_method = interpolate_method)
     })
     
@@ -174,7 +175,7 @@ predict_Nsurv_ode.survFit <- function(object,
                  alpha = alpha,
                  beta = beta,
                  mcmc_size = mcmc_size,
-                 interpolate_length = NULL,
+                 interpolate_length = interpolate_length,
                  interpolate_method = interpolate_method)
     })
   }

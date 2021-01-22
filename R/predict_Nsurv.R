@@ -27,7 +27,6 @@ predict_Nsurv <- function(object, ...){
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
 #' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
 #' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
-#' @param extend_time Length of time points interpolated with variable exposure profiles.
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' 
@@ -94,9 +93,7 @@ predict_Nsurv.survFit <- function(object,
   }
   
   message("Note that computing can be quite long (several minutes).
-  Tips: To reduce that time you can reduce Number of MCMC chains (default mcmc_size is set to 1000) or
-          change the interpolate_length (default is 100). If you don't need to interpolate new concentration
-          with your data_predict (because you provide all) you can set 'interpolate_length=0'.")
+  Tips: To reduce that time you can reduce Number of MCMC chains (default mcmc_size is set to 1000).")
   
   # Initialisation
   mcmc <- x$mcmc
