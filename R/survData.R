@@ -1,11 +1,11 @@
-#' Creates a dataset for survival analysis
+#' Creates a data set for survival analysis
 #'
 #' This function creates a \code{survData} object from experimental data
 #' provided as a \code{data.frame}. The resulting object
 #' can then be used for plotting and model fitting. It can also be used
 #' to generate \emph{individual-time} estimates.
 #'
-#' Survival datasets can be under either constant or time-variable exposure profile. The
+#' Survival data sets can be under either constant or time-variable exposure profile. The
 #' resulting object, in addition to its \code{survData} class, inherits the
 #' class \code{survDataCstExp} or \code{survDataVarExp} respectively.
 #'
@@ -14,7 +14,7 @@
 #' corresponds to one experimental measurement, that is a number of alive
 #' individuals at a given concentration at a given time point and in a given replicate.
 #'  Note that either the concentration
-#' or the number of alive individuals may be missing. The dataset is inferred
+#' or the number of alive individuals may be missing. The data set is inferred
 #' to be under constant exposure if the concentration is constant for each
 #' replicate and systematically available. The function \code{survData} fails if
 #' \code{x} does not meet the
@@ -44,7 +44,7 @@
 #' 
 #' @examples
 #'
-#' # (1) Load the survival dataset
+#' # (1) Load the survival data set
 #' data(zinc)
 #'
 #' # (2) Create an objet of class 'survData'
@@ -84,12 +84,12 @@ survData <- function(x) {
 #'
 #' @examples
 #'
-#' # (1) Load the survival dataset and test if concentration in replicates is constant
+#' # (1) Load the survival data set and test if concentration in replicates is constant
 #' data("propiconazole")
 #' is_exposure_constant(propiconazole)
 #' is_exposure_constant(survData(propiconazole))
 #'
-#'  # (1) Load the survival dataset and test if concentration in replicates is constant
+#'  # (1) Load the survival data set and test if concentration in replicates is constant
 #' data("propiconazole_pulse_exposure") 
 #' is_exposure_constant(propiconazole_pulse_exposure)
 #' 
@@ -108,7 +108,7 @@ is_exposure_constant <- function(x) {
 
 
 # Computes the effective period of observation in individual days for a
-# survival dataset
+# survival data set
 #
 # @param x an object of class \code{survData}
 # @return a numeric vector
@@ -145,10 +145,10 @@ Ninit <- function(x) {
 }
 
 
-#' Joins a concentration with a survival dataset into an argument for 'survData'
+#' Joins a concentration with a survival data set into an argument for 'survData'
 #' when the concentration varies over time
 #'
-#' This function joins two datasets, one for exposure measurements, the other
+#' This function joins two data sets, one for exposure measurements, the other
 #' for survival measurements, into a single dataframe that can be used
 #' with the \code{survData} function.
 #'
@@ -173,7 +173,7 @@ Ninit <- function(x) {
 #'
 #' @examples
 #'
-#' # (1) Load the two survival datasets
+#' # (1) Load the two survival data sets
 #' data(propiconazole_pulse_exposure)
 #' exposure <- propiconazole_pulse_exposure[,c("replicate", "time", "conc")]
 #' survival <- propiconazole_pulse_exposure[,c("replicate", "time", "Nsurv")]

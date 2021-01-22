@@ -3,6 +3,8 @@
 #' This is the generic \code{predict} S3 method for the \code{survFit} class.
 #' It provides simulation for "SD" or "IT" models under constant or time-variable exposure.
 #'
+#' @rdname predict
+#' 
 #' @param object An object of class \code{survFit}
 #' @param data_predict A dataframe with three columns \code{time}, \code{conc} and \code{replicate}
 #'  used for prediction. If \code{NULL}, prediction is based on \code{x} object of 
@@ -11,6 +13,12 @@
 #' parameters drawn from the posterior distribution.
 #' @param mcmc_size Can be used to reduce the number of mcmc samples in order to speed up
 #'  the computation.
+#' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account from the posterior.
+#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param ratio_no.NA A numeric between 0 and 1 standing for the proportion of non-NA values
+#'  required to compute quantile. The default is \eqn{0.95}.
+#' @param  hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
+#' @param extend_time Length of time points interpolated with variable exposure profiles
 #' @param \dots Further arguments to be passed to generic methods
 #' 
 #' @examples 
@@ -41,7 +49,12 @@
 predict.survFit <- function(object,
                             data_predict = NULL,
                             spaghetti = FALSE,
-                            mcmc_size = NULL, ...) {
+                            mcmc_size = NULL,
+                            hb_value = TRUE,
+                            ratio_no.NA = 0.95,
+                            hb_valueFORCED = NA,
+                            extend_time = 100,
+                            ...) {
   x <- object # Renaming to satisfy CRAN checks on S3 methods
               # arguments should be named the same when declaring a
               # method and its instantiations
@@ -49,8 +62,7 @@ predict.survFit <- function(object,
   # Initialisation
   mcmc <- x$mcmc
   model_type <- x$model_type
-  extend_time <- 100
-  
+
   if(is.null(data_predict)){
     if("survFitVarExp" %in% class(x)){
       x_interpolate = data.frame(
@@ -102,16 +114,31 @@ predict.survFit <- function(object,
   
   mctot = do.call("rbind", mcmc.samples)
   kd = 10^mctot[, "kd_log10"]
-  hb <- 10^mctot[, "hb_log10"]
-  
+
+  if(hb_value == TRUE){
+    # "hb" is not in survFit object of morse <v3.2.0
+    if("hb" %in% colnames(mctot)){
+      hb <- mctot[, "hb"]  
+    } else{ hb <- 10^mctot[, "hb_log10"] }
+  } else if(hb_value == FALSE){
+    if(is.na(hb_valueFORCED)){
+      if(is.na(x$hb_valueFIXED)){
+        stop("Please provide value for `hb` using `hb_valueFORCED`.")
+      } else{
+        hb <- rep(x$hb_valueFIXED, nrow(mctot))
+      } 
+    } else{
+      hb <- rep(hb_valueFORCED, nrow(mctot))
+    }
+  }
+ 
   k = 1:length(unique_replicate)
-  
   
   if(model_type == "SD"){
     kk <- 10^mctot[, "kk_log10"]
     z <- 10^mctot[, "z_log10"]
     
-    dtheo = lapply(k, function(kit) { # Pour chaque replicat
+    dtheo = lapply(k, function(kit) { # For each replicate
       Surv.SD_Cext(Cw = ls_conc[[kit]],
                    time = ls_time[[kit]],
                    kk=kk,
@@ -126,32 +153,38 @@ predict.survFit <- function(object,
     alpha <- 10^mctot[, "alpha_log10"]
     beta <- 10^mctot[, "beta_log10"]
     
-    dtheo = lapply(k, function(kit) { # Pour chaque replicat
-      Surv.IT_Cext (Cw = ls_conc[[kit]],
+    dtheo = lapply(k, function(kit) { # For each replicate
+      Surv.IT_Cext(Cw = ls_conc[[kit]],
                     time = ls_time[[kit]],
                     kd = kd,
                     hb = hb,
                     alpha = alpha,
                     beta = beta)
     })
-    
   }
   
-  #transpose
+  # Transpose
   dtheo <- do.call("rbind", lapply(dtheo, t))
+  # replace NA by 0
+  if(any(is.na(dtheo))){
+    warning("There is NA produced. \n You should try the function 'predict_ode()' which is much more robust but longer to compute.")
+  }
   
-  df_quantile = dplyr::data_frame(
+  df_quantile = dplyr::tibble(
     time = df$time,
     conc = df$conc,
     replicate = df$replicate,
     q50 = apply(dtheo, 1, quantile, probs = 0.5, na.rm = TRUE),
     qinf95 = apply(dtheo, 1, quantile, probs = 0.025, na.rm = TRUE),
     qsup95 = apply(dtheo, 1, quantile, probs = 0.975, na.rm = TRUE)
+    # q50 = apply(dtheo, 1, quantile_fun, probs = 0.5, ratio_no.NA = ratio_no.NA),
+    # qinf95 = apply(dtheo, 1, quantile_fun, probs = 0.025, ratio_no.NA = ratio_no.NA),
+    # qsup95 = apply(dtheo, 1, quantile_fun, probs = 0.975, ratio_no.NA = ratio_no.NA)
   )
   
   if(spaghetti == TRUE){
     random_column <- sample(1:ncol(dtheo), size = round(10/100 * ncol(dtheo)))
-    df_spaghetti <- as_data_frame(dtheo[, random_column]) %>%
+    df_spaghetti <- as_tibble(dtheo[, random_column]) %>%
       mutate(time = df$time,
              conc = df$conc,
              replicate = df$replicate)
@@ -160,14 +193,26 @@ predict.survFit <- function(object,
   
   return_object <- list(df_quantile = df_quantile,
                         df_spaghetti = df_spaghetti)
-    
+  
   class(return_object) <- c(class(return_object), "survFitPredict")
 
   return(return_object)
   
 }
 
-# Survival function for "IT" model with external concentration changing with time
+# Function quantile design to return NA when the number of X is too low
+#
+quantile_fun <- function(x, probs = 0.50, ratio_no.NA = 0.95){
+  if (sum(is.na(x)) >=1){
+    warning("There is NA produced.
+            You should try the function 'predict_ode()' which is much more robust but longer to compute.")
+    #return(NA)
+  } else {
+    return(quantile(x, probs = probs, na.rm = TRUE))
+  }
+}
+
+# Survival function for "SD" model with external concentration changing with time
 #
 # @param Cw A scalar of external concentration
 # @param time A vector of time
@@ -182,15 +227,18 @@ predict.survFit <- function(object,
 
 Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
   
-  time.prec = dplyr::lag(time, 1) ; time.prec[1] = time[1] #   time[1] = tprec[1]
-  diff.int = (exp(time %*% t(kd)) * Cw + exp(time.prec %*% t(kd)) * Cw )/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
+  time.prec = c(time[1], time[1:(length(time)-1)])
+  # Using log transfomration: log(a+b) = log(a) + log(1+b/a) may prevent the numerical issues raised by exponential
+  diff.int = (exp(time %*% t(kd)) + exp(time.prec %*% t(kd)) )*Cw/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
+  #log_diff.int = time %*% t(kd) + log(1 + exp((time.prec - time) %*% t(kd)))
+  #diff.int = exp(log_diff.int) * Cw / 2 * (time - time.prec)
   
-  D = kd * exp(-kd %*% t(time)) * t(apply(diff.int,2,cumsum))
+  D = kd * exp(-kd %*% t(time)) * t(apply(diff.int, 2, cumsum))
   
   lambda = kk * pmax(D-z,0) + hb # the pmax function is important here for elementwise maximum with 0 and D[i,j]-z ATTENTION: pmax(0,D) != pmax(D,0)
   
-  lambda.prec = dplyr::lag(lambda, 1 ) ; lambda.prec[1] = lambda[1]
-  
+  lambda.prec = cbind(lambda[,1], lambda[,1:(ncol(lambda)-1)])
+
   int.lambda =  t(t((lambda + lambda.prec)/2) * (time-time.prec))
   
   S <- exp(-t(apply(int.lambda,1,cumsum)))
@@ -211,10 +259,14 @@ Surv.SD_Cext <- function(Cw, time, kk, kd, z, hb){
 # @return A matrix generate with coda.samples() function
 #
 
-Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta)
-{
+Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta){
+  
   time.prec = dplyr::lag(time, 1) ; time.prec[1] = time[1] #   time[1] = tprec[1]
+  
+  # Using the log transfomration: log(a+b) = log(a) + log(1+b/a) may prevent the numerical issue by exponential
   diff.int = (exp(time %*% t(kd)) * Cw + exp(time.prec %*% t(kd)) * Cw )/2 * (time-time.prec) #OK time[1]-tprec[1] = 0
+  #log_diff.int = time %*% t(kd) + log(1 + exp((time.prec - time) %*% t(kd)))
+  #diff.int = exp(log_diff.int) * Cw / 2 * (time-time.prec)
   
   D <- kd * exp(-kd %*% t(time)) * t(apply(diff.int,2,cumsum))
   
@@ -229,6 +281,7 @@ Surv.IT_Cext <- function(Cw, time, kd, hb, alpha, beta)
 # Create a dataset for survival analysis when the replicate of concentration is variable
 #
 # @param x An object of class \code{survData}
+# @param extend_time length of time points interpolated with variable exposure profiles
 #
 # @return A dataframe
 #
@@ -241,8 +294,7 @@ predict_interpolate <- function(x, extend_time = 100){
     dplyr::summarise(min_time = min(time, na.rm = TRUE),
                      max_time = max(time, na.rm = TRUE)) %>%
     dplyr::group_by(replicate) %>%
-    # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
-    dplyr::do(data_frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
+    dplyr::do(tibble(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
   
   x_interpolate <- dplyr::full_join(df_MinMax, x,
                                     by = c("replicate", "time")) %>%
@@ -254,4 +306,5 @@ predict_interpolate <- function(x, extend_time = 100){
   
   return(x_interpolate)
 }
+
 

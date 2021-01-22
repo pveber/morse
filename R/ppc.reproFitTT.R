@@ -14,6 +14,8 @@
 #' contains each observed value. As replicates are shifted on the \eqn{X}-axis, this
 #' line may be represented by steps.
 #'
+#' @rdname PPC
+#' 
 #' @param x An object of class \code{reproFitTT}
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Observed Cumul. Nbr. of offspring}
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Predicted Cumul. Nbr. of offspring}

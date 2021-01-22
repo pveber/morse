@@ -3,15 +3,15 @@
 #' This is the generic \code{plot} S3 method for the \code{survFitTT} class. It
 #' plots concentration-response fit under target time survival analysis.
 #'
-#' The fitted curve represents the \strong{estimated survival rate} at
+#' The fitted curve represents the \strong{estimated survival probability} at
 #' the target time as a function of the concentration of chemical compound;
 #' When \code{adddata = TRUE} the black dots depict the \strong{observed survival
-#' rate} at each tested concentration. Note that since our model does not take
+#' probability} at each tested concentration. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
 #' The function plots both 95\% credible intervals for the estimated survival
-#' rate (by default the grey area around the fitted curve) and 95\% binomial confidence
-#' intervals for the observed survival rate (as black segments if
+#' probability (by default the grey area around the fitted curve) and 95\% binomial confidence
+#' intervals for the observed survival probability (as black segments if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two intervals.
@@ -23,7 +23,7 @@
 #'
 #' @param x an object of class \code{survFitTT}
 #' @param xlab a label for the \eqn{X}-axis, default is \code{Concentration}
-#' @param ylab a label for the \eqn{Y}-axis, default is \code{Survival rate}
+#' @param ylab a label for the \eqn{Y}-axis, default is \code{Survival probability}
 #' @param main main title for the plot
 #' @param fitcol color of the fitted curve
 #' @param fitlty line type of the fitted curve
@@ -80,7 +80,7 @@
 #' @export
 plot.survFitTT <- function(x,
                            xlab = "Concentration",
-                           ylab = "Survival rate",
+                           ylab = "Survival probability",
                            main = NULL,
                            fitcol = "orange",
                            fitlty = 1,

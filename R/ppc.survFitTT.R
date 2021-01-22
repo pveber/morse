@@ -13,6 +13,8 @@
 #' prediction interval contains each observed value. As replicates are shifted
 #' on the x-axis, this line is represented by steps.
 #'
+#' @rdname PPC
+#'
 #' @param x An object of class \code{survFitTT}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param main main title for the plot

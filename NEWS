@@ -1,5 +1,121 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+Version 3.3.0
+=============
+
+IMPORTANT NOTE
+- This release should mainly work with all objects created with earlier version >3.0.0.
+- However, in version 3.2.7 we introduced 'hb_valueFIXED' (in survFit) and 'hb_valueFORCED' (in prediction) to play with
+background mortality (hb_value). You can still use the functions (as MFx) but make sure to provide good parameters to 
+'hb_valueFIXED' and 'hb_valueFORCED' (see package documentation for details).
+
+NEW SOLVER
+- a new ODE solver has been introduced reducing the time of computation in prediction function ('predict', 'predict_Nsurv' and 'MFx').
+
+NEW NSURV SAMPLER
+- a new sampler for prediction of Nsurv is introduced. The speed of the function 'predict_Nsurv' should be 30 to 60 times faster.
+
+FIX ISSUE 
+- add 'interpolate_length' option to MFx to release the constraint at 100 time points. 
+
+ADD DATA
+- add FOCUS profile to the data set for testing
+
+DOCUMENTATION
+- improve links between documentation of functions (i.e., join documentation of similar functions)
+
+Version 3.2.7
+=============
+
+TYPO FIX
+- add 'hb_valueFIXED' (in survFit) and 'hb_valueFORCED' (in prediction) to fix hb_value when hb_value is FALSE
+
+FIX WARNING MESSAGES
+- fix bug returning warning messages about depecration of "as_data_frame" and "data_frame", replaced respectivelly by "as_tibble" and "tiblle"
+
+Version 3.2.6
+=============
+
+TYPO FIX
+- correct 'alpha' in 'mw' in summary of survFit
+
+Version 3.2.5
+=============
+
+TYPO FIX
+- change 'survival rate' into 'survival probability' in plots
+
+Version 3.2.4
+=============
+
+DOC ISSUES
+- update co-authors
+- fix some typos in documents
+
+Version 3.2.3 (no submitted to CRAN)
+=============
+
+BUG FIXES
+- SQRT was not applied to NRMSE, so it was a NMSE.
+
+Version 3.2.2
+=============
+
+OTHER CHANGES
+- add warning message in 'survFit' function when 'hb_value' is fixed.
+- add function 'predict_Nsurv_ode' function to compute predictive function with
+the ODE solver from deSolve package.
+
+Version 3.2.1
+=============
+
+DOC ISSUES FIXES
+- changes in the vignette 'Tutorial'.
+- changes in the Reference manual 'morse.pdf'.
+
+NEW FEATURES
+- Details NRMSE and PPC for each time-series (i.e., replicates)
+
+Version 3.2.0
+=============
+
+BUG FIXES
+- Change default value for argument 'adddata' in function 'plot' as TRUE
+
+NEW FEATURES
+- add 'predict_Nsurv' function to compute prediction for the number of survivors.
+- add 'predict_Nsurv_check' function to compute criteria to check model.
+performance: (i) percentage of observation within the 95% credible interval of
+prediction drawn from posterior, (ii) the Normalised Root Mean Square Error
+(NRMSE) and (iii) the Survival-Probability Prediction Error (SPPE).
+- add 'ppc.survFitPredict_Nsurv' function to plot ppc for 'survFitPredict_Nsurv'
+object
+- add 'plot.survFitPredict_Nsurv' function to plot 'survFitPredict_Nsurv' object
+- add 'Nsurv_ppc' and 'Nsurv_sim' in 'mcmc' object within 'survFit' class objects
+- Modif JAGS models to ensure probability use for binomial distribution is <1 (JAGS does not work with p=1).
+- add option to remove background mortality, 'hb_value' TRUE/FALSE, in 'survFit' methods.
+- add 'predict_ode' function to include deSolve package for ode integration for prediction.
+- add option 'EFSA_name' in function 'summary', 'plot_prior_posterior' and 'priors_distribution' to adapt parameter name of GUTS model to EFSA Scientific Opinion (doi: 10.2903/j.efsa.2018.5377) naming.
+- add binomial credible interval of observation in plot for 'survFitVarExp' object
+
+Version 3.1.1
+=============
+
+DOC ISSUES FIXES
+- changes in the tutorial vignettes.
+
+Version 3.1.0
+=============
+
+NEW FEATURES
+- add 'priors_distribution' function to easly returned the distribution of priors.
+- add 'MFx' function to compute the Multiplication Factor leading to a
+  reduction of x percent of survival. Return an object of class 'MFx'.
+- add 'plot.MFx' function to plot object of class 'MFx'.
+
+BUG FIXES
+- change the automatized title of the plot of an 'LCx' object.
+
 Version 3.0.0
 =============
 
@@ -12,14 +128,13 @@ NEW FEATURES
 
 BUG FIXES
 - change the require dataset for survData and reproData: replicates are unique for each time-serie all over concentration profiles
-- change the struture of all datasets included to satisfy that all replicates are unique for each time-serie all over concentration profiles.
+- change the structure of all datasets included to satisfy that all replicates are unique for each time-serie all over concentration profiles.
 
 Version 2.2.0
 =============
 
 NEW FEATURES
-- add the 'survFitTKTD' function to analyse 'survData' object with a time-exposure-
-  -response model.
+- add the 'survFitTKTD' function to analyse 'survData' object with a time-exposur response model.
 - add the S3 'plot', 'print', 'summary' and 'ppc' methods for the 'survFitTKTD'
   class.
 - add two survival datasets : dichromate and propiconazole.

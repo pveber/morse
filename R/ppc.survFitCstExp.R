@@ -14,6 +14,8 @@
 #' values are low. That way we ensure green intervals do intersect the
 #' bisecting line.
 #'
+#' @rdname PPC
+#' 
 #' @param x An object of class \code{survFitCstExp}
 #' @param style graphical backend, can be \code{'generic'} or \code{'ggplot'}
 #' @param main main title for the plot
@@ -56,7 +58,11 @@ EvalsurvTKTDPpc_CstExp <- function(x) {
   model_type <- x$model_type
   
   kd <- 10^(tot.mcmc[, "kd_log10"])
-  hb <- 10^(tot.mcmc[, "hb_log10"])
+  # "hb" is not in survFit object of morse <v3.2.0
+  if("hb" %in% colnames(tot.mcmc)){
+    hb <- tot.mcmc[, "hb"]  
+  } else{ hb <- 10^tot.mcmc[, "hb_log10"] }
+
   if(model_type == "SD"){
     z <- 10^(tot.mcmc[, "z_log10"])
     kk <- 10^(tot.mcmc[, "kk_log10"])

@@ -1,21 +1,11 @@
-# Create a dataset to analyse a \code{survDataVarExp} object
-#
-# @param x An object of class \code{survData}
-# @param model_type TK-TD GUTS model type ('SD' or 'IT')
-# @param extend_time Number of for each replicate used for linear 
-# interpolation (comprise between time to compute and fitting accuracy) 
-# 
-# @examples 
-# 
-# # (1) Load the data
-# data("propiconazole_pulse_exposure")
-# 
-# # (2) Create an object 'survData'
-# dataset <- survData(propiconazole_pulse_exposure)
-# 
-# # (3) Create the list of object to be pass in JAGS
-# modelData(dataset, model_type = "IT")
-#
+#' Create a data set to analyse a \code{survDataVarExp} object.
+#'
+#' @param x An object of class \code{survData}
+#' @param model_type TKTD GUTS model type ('SD' or 'IT')
+#' @param extend_time Number of for each replicate used for linear 
+#' interpolation (comprise between time to compute and fitting accuracy)
+#' @param \dots Further arguments to be passed to generic methods
+#' 
 modelData.survDataVarExp <- function(x,
                                      model_type = NULL,
                                      extend_time = 100, ...){
@@ -34,8 +24,9 @@ modelData.survDataVarExp <- function(x,
   x_reduce <- x_interpolate %>%
     dplyr::filter(!is.na(Nsurv)) %>%
     # Group by replicate to replicate an indice of replicate:
-    dplyr::mutate(replicate_ID = group_indices_(., .dots="replicate")) %>%
+    # dplyr::mutate(replicate_ID = group_indices(., .dots="replicate")) %>%
     dplyr::group_by(replicate) %>%
+    dplyr::mutate(replicate_ID = cur_group_id()) %>%
     dplyr::arrange(replicate, time) %>%
     dplyr::mutate( tprec = ifelse( time == 0, time, dplyr::lag(time) ) ) %>%
     dplyr::mutate( Nprec = ifelse( time == 0, Nsurv, dplyr::lag(Nsurv) ) ) %>%
@@ -54,7 +45,7 @@ modelData.survDataVarExp <- function(x,
   
   modelData <- priorsData$priorsList
   
-  ### reduce dataset: To remove NA in Nsurv column
+  ### reduce data set: To remove NA in Nsurv column
   modelData$time <-  x_reduce$time
   modelData$conc <-  x_reduce$conc
   modelData$replicate <-  x_reduce$replicate
@@ -117,7 +108,7 @@ modelData.survDataVarExp <- function(x,
   
 }
 
-# Create a dataset for survival analysis when the replicate of concentration is variable
+# Create a data set for survival analysis when the replicate of concentration is variable
 #
 # @param x An object of class \code{survData}
 #
@@ -133,7 +124,7 @@ survData_interpolate <- function(x, extend_time = 100){
                      max_time = max(time, na.rm = TRUE)) %>%
     dplyr::group_by(replicate) %>%
     # dplyr::do(data.frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
-    dplyr::do(data_frame(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
+    dplyr::do(tibble(replicate = .$replicate, time = seq(.$min_time, .$max_time, length = extend_time)))
   
   x_interpolate <- dplyr::full_join(df_MinMax, x,
                                     by = c("replicate", "time")) %>%
@@ -152,7 +143,10 @@ survData_interpolate <- function(x, extend_time = 100){
                   tprec_ID_long = ifelse(time_ID_long==1, time_ID_long,  dplyr::lag(time_ID_long))) %>%
     dplyr::ungroup() %>%
     # Group by replicate to replicate an indice of replicate:
-    dplyr::mutate(replicate_ID_long = group_indices_(., .dots="replicate"))
+    dplyr::group_by(replicate) %>%
+    dplyr::mutate(replicate_ID_long = cur_group_id()) %>%
+    dplyr::ungroup()
+    # dplyr::mutate(replicate_ID_long = group_indices(., .dots="replicate"))
   
   return(x_interpolate)
 }

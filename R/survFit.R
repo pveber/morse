@@ -1,10 +1,115 @@
-#' Method to fit a model for survival data using Bayesian inference
+#' Fits a TKTD model for survival analysis using Bayesian inference
+#'
+#' This function estimates the parameters of a TKTD model ('SD' or 'IT')
+#' for survival analysis using Bayesian inference. In this model,
+#' the survival rate of individuals is modeled as a function of the chemical compound
+#' concentration with a mechanistic description of the effects on survival over
+#' time.
+#' 
+#' The function \code{survFit} return the parameter estimates of Toxicokinetic-toxicodynamic (TKTD) models
+#' \code{SD} for 'Stochastic Death' or \code{IT} fo 'Individual Tolerance'.
+#' TKTD models, and particularly the General Unified Threshold model of
+#' Survival (GUTS), provide a consistent process-based
+#' framework to analyse both time and concentration dependent datasets.
+#' In GUTS-SD, all organisms are assumed to have the same internal concentration 
+#' threshold (denoted \eqn{z}), and, once exceeded, the instantaneous probability
+#' to die increases linearly with the internal concentration.
+#' In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
+#' exceeded in one individual, this individual dies immediately.
+#' 
+#' 
+#' When class of \code{object} is \code{survDataCstExp}, see \link[=survFit.survDataCstExp]{survFit.survDataCstExp} ;
+#' and for a \code{survDataVarExp}, see \link[=survFit.survDataVarExp]{survFit.survDataVarExp}.
+#'
+#' @rdname survFit
 #'
 #' @param data an object used to select a method 'survFit'
+#' @param model_type can be \code{"SD"} or \code{"IT"} to choose
+#'   between "Stochastic Death" or "Individual Tolerance" models
+#'   (resp.). See the modeling vignette for details.
+#' @param quiet If \code{FALSE}, prints logs and progress bar from
+#'   JAGS.
+#' @param n.chains A positive integer specifying the number of MCMC chains. The minimum required number 
+#' of chains is 2.
+#' @param n.adapt A positive integer specifying the number of iterations for adaptation. If \code{n.adapt} = 0
+#'  then no adaptation takes place.
+#' @param n.iter A positive integer specifying the number of iterations to monitor for each chain.
+#' @param n.warmup A positive integer specifying the number of warmup (aka burnin) iterations per chain. 
+#' @param thin.interval A positive integer specifying the period to monitor.
+#' @param limit.sampling if \code{FALSE} (default is \code{TRUE}), there is no limit to the number of iterations
+#' in MCMC imposed by the \code{raftery.diag} test.
+#' @param dic.compute if \code{TRUE} (default is \code{FALSE}), it generates penalized deviance samples to compute
+#' the Deviance Information Criterion (DIC) with the \code{rjags} package
+#' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
+#'  (see function \code{\link[rjags]{dic.samples}})
+#' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
+#' If \code{FALSE}, parameter \code{hb} is set to a fixed value defined by \code{hb_valueFIXED}. The default is \code{TRUE}. 
+#' @param hb_valueFIXED If \code{hb_value} is \code{FALSE}, the argument \code{hb_valueFIXED}
+#'  provides the values of parameter hb. Default is 0.
 #' @param \dots Further arguments to be passed to generic methods
-
+#' 
+#' @examples
+#'
+#' # (1) Load the survival data
+#' data(propiconazole)
+#'
+#' # (2) Create an object of class "survData"
+#' dataset  <- survData(propiconazole)
+#'
+#' \dontrun{
+#' # (3) Run the survFit function with TKTD model 'SD' or 'IT' 
+#' out <- survFit(dataset , model_type = "SD")
+#'
+#' # (4) Summarize look the estimated parameters
+#' summary(out)
+#'
+#' # (5) Plot the fitted curve
+#' plot(out, adddata = TRUE)
+#'
+#' # (6) Plot the fitted curve with ggplot style and CI as spaghetti
+#' plot(out, spaghetti = TRUE , adddata = TRUE)
+#' }
+#' 
+#' # When the data set include variable exposure profile, time for inference is longer
+#' 
+#' # (1) Load the survival data with variable exposure profile
+#' data("propiconazole_pulse_exposure")
+#'
+#' # (2) Create an object of class "survData"
+#' dataset <- survData(propiconazole_pulse_exposure)
+#'
+#' \dontrun{
+#' # (3) Run the survFit function with TKTD model 'SD' or 'IT' 
+#' out <- survFit(dataset , model_type = "SD")
+#'
+#' # (4) Summarize look the estimated parameters
+#' summary(out)
+#'
+#' # (5) Plot the fitted curve
+#' plot(out, adddata = FALSE)
+#'
+#' # (6) Plot the fitted curve with ggplot style and CI as spaghetti
+#' plot(out, spaghetti = TRUE)
+#' }
+#' 
+#' 
 #' @export
-survFit <- function(data, ...){
+#' 
+#' 
+survFit <- function(data,
+                    model_type,
+                    quiet,
+                    n.chains,
+                    n.adapt,
+                    n.iter,
+                    n.warmup,
+                    thin.interval,
+                    limit.sampling,
+                    dic.compute,
+                    dic.type,
+                    hb_value,
+                    hb_valueFIXED,
+                    ...){
   UseMethod("survFit")
 }
 
@@ -15,12 +120,12 @@ survFit <- function(data, ...){
 #
 ################################################################################
 
-#' Create a list of scalars giving priors to use in Bayesian modelling
+#' Create a list of scalars giving priors to use in Bayesian inference.
 #'
 #' @param x An object of class \code{survData}
 #' @param model_type TKTD model type ('SD' or 'IT')
 #' 
-#' @return A list for parameterization of priors for Bayesian modeling with JAGS
+#' @return A list for parameterization of priors for Bayesian inference with JAGS.
 #'
 #' @examples 
 #' 
@@ -156,7 +261,7 @@ priors_survData <- function(x, model_type = NULL){
 #
 #############################################################################
   
-survFit_TKTD_params <- function(mcmc, model_type) {
+survFit_TKTD_params <- function(mcmc, model_type, hb_value = TRUE) {
     # create the table of posterior estimated parameters
     # for the survival analyses
     # INPUT:
@@ -173,9 +278,11 @@ survFit_TKTD_params <- function(mcmc, model_type) {
     kd_inf95 <- 10^res.M$quantiles["kd_log10", "2.5%"]
     kd_sup95 <- 10^res.M$quantiles["kd_log10", "97.5%"]
     
-    hb <- 10^res.M$quantiles["hb_log10", "50%"]
-    hb_inf95 <- 10^res.M$quantiles["hb_log10", "2.5%"]
-    hb_sup95 <- 10^res.M$quantiles["hb_log10", "97.5%"]
+    if(hb_value == TRUE){
+      hb <- 10^res.M$quantiles["hb_log10", "50%"]
+      hb_inf95 <- 10^res.M$quantiles["hb_log10", "2.5%"]
+      hb_sup95 <- 10^res.M$quantiles["hb_log10", "97.5%"]
+    }
     
     if(model_type == "SD"){
       kk <- 10^res.M$quantiles["kk_log10", "50%"]
@@ -186,10 +293,17 @@ survFit_TKTD_params <- function(mcmc, model_type) {
       z_inf95 <- 10^res.M$quantiles["z_log10", "2.5%"]
       z_sup95 <- 10^res.M$quantiles["z_log10", "97.5%"]
       
-      res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
-                        median = c(kd, hb, z, kk),
-                        Q2.5 = c(kd_inf95, hb_inf95, z_inf95, kk_inf95),
-                        Q97.5 = c(kd_sup95, hb_sup95, z_sup95, kk_sup95))
+      if(hb_value == TRUE){
+        res <- data.frame(parameters = c("kd", "hb", "z", "kk"),
+                          median = c(kd, hb, z, kk),
+                          Q2.5 = c(kd_inf95, hb_inf95, z_inf95, kk_inf95),
+                          Q97.5 = c(kd_sup95, hb_sup95, z_sup95, kk_sup95))
+      } else{
+        res <- data.frame(parameters = c("kd", "z", "kk"),
+                          median = c(kd, z, kk),
+                          Q2.5 = c(kd_inf95, z_inf95, kk_inf95),
+                          Q97.5 = c(kd_sup95, z_sup95, kk_sup95))
+      }
       
     } else if (model_type == "IT"){
       alpha <- 10^res.M$quantiles["alpha_log10", "50%"]
@@ -200,10 +314,17 @@ survFit_TKTD_params <- function(mcmc, model_type) {
       beta_inf95 <- 10^res.M$quantiles["beta_log10", "2.5%"]
       beta_sup95 <- 10^res.M$quantiles["beta_log10", "97.5%"]
       
-      res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
-                        median = c(kd, hb, alpha, beta),
-                        Q2.5 = c(kd_inf95, hb_inf95, alpha_inf95, beta_inf95),
-                        Q97.5 = c(kd_sup95, hb_sup95, alpha_sup95, beta_sup95))
+      if(hb_value == TRUE){
+        res <- data.frame(parameters = c("kd", "hb", "alpha", "beta"),
+                          median = c(kd, hb, alpha, beta),
+                          Q2.5 = c(kd_inf95, hb_inf95, alpha_inf95, beta_inf95),
+                          Q97.5 = c(kd_sup95, hb_sup95, alpha_sup95, beta_sup95))
+      } else{
+        res <- data.frame(parameters = c("kd", "alpha", "beta"),
+                          median = c(kd, alpha, beta),
+                          Q2.5 = c(kd_inf95, alpha_inf95, beta_inf95),
+                          Q97.5 = c(kd_sup95, alpha_sup95, beta_sup95))
+      }
     } else {
       stop("please, provide the 'model_type': 'IT' or 'SD'")
     }

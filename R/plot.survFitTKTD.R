@@ -4,15 +4,15 @@
 #' \code{survFitTKTD}.  It plots the fit obtained for each
 #' concentration of chemical compound in the original dataset.
 #' 
-#' The fitted curves represent the \strong{estimated survival rate} as a function
+#' The fitted curves represent the \strong{estimated survival probablity} as a function
 #' of time for each concentration
 #' When \code{adddata = TRUE} the black dots depict the \strong{observed survival
-#' rate} at each time point. Note that since our model does not take
+#' probablity} at each time point. Note that since our model does not take
 #' inter-replicate variability into consideration, replicates are systematically
 #' pooled in this plot.
 #' The function plots both 95\% credible intervals for the estimated survival
-#' rate (by default the grey area around the fitted curve) and 95\% binomial confidence
-#' intervals for the observed survival rate (as black error bars if
+#' probablity (by default the grey area around the fitted curve) and 95\% binomial confidence
+#' intervals for the observed survival probablity (as black error bars if
 #' \code{adddata = TRUE}).
 #' Both types of intervals are taken at the same level. Typically
 #' a good fit is expected to display a large overlap between the two types of intervals.
@@ -24,7 +24,7 @@
 #' 
 #' @param x An object of class \code{survFitTKTD}.
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Time}.
-#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival rate}.
+#' @param ylab A label for the \eqn{Y}-axis, by default \code{Survival probablity}.
 #' @param main A main title for the plot.
 #' @param concentration A numeric value corresponding to some specific concentration in
 #' \code{data}. If \code{concentration = NULL}, draws a plot for each concentration.
@@ -76,7 +76,7 @@
 #' 
 plot.survFitTKTD <- function(x,
                              xlab = "Time",
-                             ylab = "Survival rate",
+                             ylab = "Survival probablity",
                              main = NULL,
                              concentration = NULL,
                              spaghetti = FALSE,

@@ -30,7 +30,7 @@ to report a problem.
 - Update package description/NAMESPACE
   - under the R interpreter: `roxygen2::roxygenise(".")`
 - Generate documentation
-  - reference manual: `R CMD Rd2pdf .`
+  - reference manual: `R CMD Rd2pdf --output=documentation .`
   - vignettes (using the R interpreter):
     `devtools::document(roclets=c('rd', 'collate', 'namespace', 'vignette'))`
 - Run unit tests

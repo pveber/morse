@@ -1,18 +1,18 @@
 #' Plot dose-response from \code{survData} objects
 #'
 #' This is the generic \code{plotDoseResponse} S3 method for the \code{survData}
-#' class. It plots the survival rate as a function of concentration at a given
+#' class. It plots the survival probability as a function of concentration at a given
 #' target time.
 #' 
-#' The function plots the observed values of the survival rate at a given time point
+#' The function plots the observed values of the survival probability at a given time point
 #' as a function of concentration. The 95 \% binomial confidence interval is added
-#' to each survival rate. It is calculated using function
+#' to each survival probability. It is calculated using function
 #' \code{\link[stats]{binom.test}} from package \code{stats}.
 #' Replicates are systematically pooled in this plot.
 #'
 #' @param x an object of class \code{survData}
 #' @param xlab a label for the \eqn{X}-axis, by default \code{Concentration}
-#' @param ylab a label for the \eqn{Y}-axis, by default \code{Survival rate}
+#' @param ylab a label for the \eqn{Y}-axis, by default \code{Survival probability}
 #' @param main main title for the plot
 #' @param target.time a numeric value corresponding to some observed time in \code{data}
 #' @param style graphical backend, can be \code{'ggplot'} or \code{'generic'}
@@ -59,7 +59,7 @@
 #' @export
 plotDoseResponse.survDataCstExp <- function(x,
                                             xlab = "Concentration",
-                                            ylab = "Survival rate",
+                                            ylab = "Survival probability",
                                             main = NULL,
                                             target.time = NULL,
                                             style = "ggplot",

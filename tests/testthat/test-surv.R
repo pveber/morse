@@ -83,22 +83,22 @@ test_that("survDataCheck", {
 #
 # Test survData_join
 #
-data("propiconazole_pulse_exposure")
-
-test_that("survData_join", {
-  skip_on_cran()
-
-  exposure <- propiconazole_pulse_exposure[,c("replicate", "time", "conc")]
-  survival <- propiconazole_pulse_exposure[,c("replicate", "time", "Nsurv")]
-
-  check_all_datasets("propiconazole_pulse_exposure", survDataCheck)
-
-  survData_join <- survData(survData_join(exposure, survival))
-  survData_origin <- survData(propiconazole_pulse_exposure)
-
-  expect_equal(survData_join, survData_origin)
-
-})
+# data("propiconazole_pulse_exposure")
+# 
+# test_that("survData_join", {
+#   skip_on_cran()
+# 
+#   exposure <- propiconazole_pulse_exposure[,c("replicate", "time", "conc")]
+#   survival <- propiconazole_pulse_exposure[,c("replicate", "time", "Nsurv")]
+# 
+#   check_all_datasets("propiconazole_pulse_exposure", survDataCheck)
+# 
+#   survData_join <- survData(survData_join(exposure, survival))
+#   survData_origin <- survData(propiconazole_pulse_exposure)
+# 
+#   expect_equal(survData_join, survData_origin)
+# 
+# })
 
 
 ## test_that("survData", {

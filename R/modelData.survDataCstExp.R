@@ -1,19 +1,9 @@
-# Create a dataset to analyse a \code{survDataCstExp} object
-#
-# @param x An object of class \code{survData}
-# @param model_type TK-TD GUTS model type ('SD' or 'IT')
-#
-# @examples 
-# 
-# # (1) Load the data
-# data("propiconazole")
-# 
-# # (2) Create an object 'survData'
-# dataset <- survData(propiconazole)
-# 
-# # (3) Create the list of object to be pass in JAGS
-# modelData(dataset, model_type = "IT")
-#
+#' Create a data set to analyse a \code{survDataCstExp} object.
+#'
+#' @param x An object of class \code{survData}
+#' @param model_type TKTD GUTS model type ('SD' or 'IT')
+#'
+#'
 modelData.survDataCstExp <- function(x, model_type = NULL){
   
   ## 1. Gather replicate when there is the same constante concentration
@@ -53,6 +43,7 @@ modelData.survDataCstExp <- function(x, model_type = NULL){
   }
   if(model_type == "SD"){
     dataList$tprec <- x_dev$tprec
+    dataList$i_prec <- x_dev$i_prec
   }
   
   ##
@@ -125,8 +116,9 @@ addVariable_survDataCstExp <- function(x){
   
   x_dev <- x %>%
     # Add an indice of replicate:
-    dplyr::mutate(replicate_ID = group_indices_(., .dots = "replicate")) %>%
+    # dplyr::mutate(replicate_ID = group_indices(., .dots = "replicate")) %>%
     dplyr::group_by(replicate) %>%
+    dplyr::mutate(replicate_ID = cur_group_id()) %>%
     dplyr::arrange(replicate, time) %>%
     dplyr::mutate(tprec = ifelse(time == 0, time, dplyr::lag(time)),
                   Nprec = ifelse( time == 0, Nsurv, dplyr::lag(Nsurv) )) %>%

@@ -6,9 +6,9 @@
 #' concentration with a mechanistic description of the effects on survival over
 #' time.
 #' 
-#' The function \code{survFit} return the parameter estimates of Toxicokinetic-toxicodynamic (TK-TD) models
+#' The function \code{survFit} return the parameter estimates of Toxicokinetic-toxicodynamic (TKTD) models
 #' \code{SD} for 'Stochastic Death' or \code{IT} fo 'Individual Tolerance'.
-#' TK-TD models, and particularly the General Unified Threshold model of
+#' TKTD models, and particularly the General Unified Threshold model of
 #' Survival (GUTS), provide a consistent process-based
 #' framework to analyse both time and concentration dependent datasets.
 #' In GUTS-SD, all organisms are assumed to have the same internal concentration 
@@ -17,6 +17,7 @@
 #' In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
 #' exceeded in one individual, this individual dies immediately.
 #'
+#' @rdname survFit
 #'
 #' @param data An object of class \code{survDataCstExp}.
 #' @param model_type can be \code{"SD"} or \code{"IT"} to choose
@@ -36,6 +37,10 @@
 #' the Deviance Information Criterion (DIC) with the \code{rjags} package
 #' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
 #' (see function \code{\link[rjags]{dic.samples}})
+#' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
+#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param  hb_valueFIXED If \code{hb_value} is \code{FALSE}, then \code{hb_valueFiXED} is the value to fix \code{hb}.
+#'   If \code{hb_value} is \code{FALSE} and  \code{hb_valueFiXED} is \code{NA}, then \code{hb} is fixed to \code{0}.
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{survFitCstExp}, which is
@@ -52,7 +57,7 @@
 #' for the MCMC computation}
 #' \item{mcmcInfo}{a table with the number of iterations, chains, adaptation, warmup and the thinning interval.} 
 #' \item{jags.data}{a list of the data passed to the JAGS model}
-#' \item{model_type}{the type of TK-TD model used: \code{SD} or \code{IT}}
+#' \item{model_type}{the type of TKTD model used: \code{SD} or \code{IT}}
 #'
 #' @references Jager, T., Albert, C., Preuss, T. G. and Ashauer, R. (2011) 
 #' General unified threshold model of survival-a toxicokinetic-toxicodynamic
@@ -70,7 +75,7 @@
 #' dataset  <- survData(propiconazole)
 #'
 #' \dontrun{
-#' # (3) Run the survFit function with TK-TD model 'SD' or 'IT' 
+#' # (3) Run the survFit function with TKTD model 'SD' or 'IT' 
 #' out <- survFit(dataset , model_type = "SD")
 #'
 #' # (4) Summarize look the estimated parameters
@@ -83,10 +88,11 @@
 #' plot(out, spaghetti = TRUE , adddata = TRUE)
 #' }
 #'
-#' @export
 #' @import rjags
 #' @importFrom stats update
 #' @importFrom dplyr group_by summarise filter
+#'
+#' @export
 #'
 survFit.survDataCstExp <- function(data,
                                    model_type = NULL,
@@ -99,6 +105,8 @@ survFit.survDataCstExp <- function(data,
                                    limit.sampling = TRUE,
                                    dic.compute = FALSE,
                                    dic.type = "pD",
+                                   hb_value = TRUE,
+                                   hb_valueFIXED = NA,
                                    ...){
   
   ##
@@ -109,12 +117,19 @@ survFit.survDataCstExp <- function(data,
   if(is.null(model_type) || ! (model_type %in% c("SD","IT"))) {
     stop("You need to specify a 'model_type' among 'SD' or 'IT'")
   }
-
   ### check number of sample for the diagnostic procedure
   if (n.chains < 2) {
     stop('2 or more parallel chains required')
   }
-
+  ### warning message when hb_value = NULL
+  if(hb_value==FALSE){
+    warning("This is not an error message: the parameter 'hb' is fixed. This means that the correlation between
+            'hb' and other parameters is ignored.")
+    ## set default hb_valueFIXED
+    if(is.na(hb_valueFIXED)){
+      hb_valueFIXED = 0
+    }
+  }
   ##
   ## Data and Priors for model
   ##
@@ -131,19 +146,35 @@ survFit.survDataCstExp <- function(data,
   ## Define model
   ##
 
-  if(model_type == "SD"){
-    ### Determine sampling parameters
-    parameters_sampling <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
-    parameters <- c("kd_log10", "hb_log10", "kk_log10", "z_log10", "psurv")
 
+  if(model_type == "SD"){
+    if(hb_value == TRUE){
+      jags.data_fit$hb_value = 1
+      jags.data_fit$hb_valueFIXED = -1 # just to have it in JAGS
+      parameters_sampling <- c("kd_log10", "hb_log10", "kk_log10", "z_log10")
+      parameters <- c("kd_log10", "hb_log10", "kk_log10", "hb", "z_log10", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    } else{
+      jags.data_fit$hb_value = 0
+      jags.data_fit$hb_valueFIXED = hb_valueFIXED
+      parameters_sampling <- c("kd_log10", "kk_log10", "z_log10")
+      parameters <- c("kd_log10", "kk_log10", "z_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    }
     file_to_use <- jags_TKTD_cstSD
+    
 
   } else if(model_type == "IT"){
     ### Determine sampling parameters
-    parameters_sampling <- c("kd_log10", "hb_log10", "alpha_log10", "beta_log10")
-    
-    parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "psurv")
-
+    if(hb_value == TRUE){
+      jags.data_fit$hb_value = 1
+      jags.data_fit$hb_valueFIXED = -1 # just to have it in JAGS
+      parameters_sampling <- c("kd_log10", "hb_log10", "alpha_log10", "beta_log10")
+      parameters <- c("kd_log10", "hb_log10","alpha_log10", "beta_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    } else{
+      jags.data_fit$hb_value = 0
+      jags.data_fit$hb_valueFIXED = hb_valueFIXED
+      parameters_sampling <- c("kd_log10", "alpha_log10", "beta_log10")
+      parameters <- c("kd_log10","alpha_log10", "beta_log10", "hb", "psurv", "Nsurv_ppc", "Nsurv_sim")
+    }
     file_to_use <- jags_TKTD_cstIT
   }
 
@@ -199,7 +230,7 @@ survFit.survDataCstExp <- function(data,
 
   warnings <- msgTableCreate()
 
-  estim.par <- survFit_TKTD_params(mcmc, model_type = model_type)
+  estim.par <- survFit_TKTD_params(mcmc, model_type = model_type, hb_value = hb_value)
 
   if (filter(estim.par, parameters == "kd")$Q97.5 > priorsMinMax$kd_max){
     ##store warning in warnings table
@@ -210,15 +241,17 @@ survFit.survDataCstExp <- function(data,
     ## print the message
     warning(msg, call. = FALSE)
   }
-  if (filter(estim.par, parameters == "hb")$Q2.5 < priorsMinMax$hb_min){
-    ##store warning in warnings table
-    msg <- "The estimation of the natural instantaneous mortality rate
+  if(hb_value == TRUE){
+    if (filter(estim.par, parameters == "hb")$Q2.5 < priorsMinMax$hb_min){
+      ##store warning in warnings table
+      msg <- "The estimation of the natural instantaneous mortality rate
     (model parameter hb) lies outside the range used to define its prior
     distribution which indicates that this rate is very low and so difficult
     to estimate from this experiment !"
-    warnings <- msgTableAdd(warnings, "hb_outRange", msg)
-    ## print the message
-    warning(msg, call. = FALSE)
+      warnings <- msgTableAdd(warnings, "hb_outRange", msg)
+      ## print the message
+      warning(msg, call. = FALSE)
+    }
   }
 
   ### for SD model
@@ -296,7 +329,8 @@ survFit.survDataCstExp <- function(data,
               warnings = warnings,
               model_type = model_type,
               transformed.data = transformed.data,
-              original.data = data)
+              original.data = data,
+              hb_valueFIXED = hb_valueFIXED)
 
   class(OUT) <- c("survFitCstExp", "survFit")
   return(OUT)
