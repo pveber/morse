@@ -1,0 +1,210 @@
+---
+title: "How to generate a Minimal Working Example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to generate a Minimal Working Example}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Please report any issue
+
+We say (one more quote attributed to Albert E.) that a good question solve 80\% of the problem. But Don't wait to solve 80\% of your problem to ask your question.
+
+The only think that can help is to create a Minimal Working Example (MWE). And we provide here a set of MWE you can modify to obtain yours.
+
+Feel free to ask question here: [New Issue for morse R package](https://github.com/pveber/morse/issues)
+
+Here I report a set of minimal example were **each chunk** (piece of code in grey area) work for on its own.
+
+# Loading the R morse library and JAGS and C++
+
+Use the two classical `R` command:
+
+```{r setupMorse, eval=FALSE}
+# install.packages(morse) # install the package
+library(morse) # load the package
+```
+
+Recently, a lot of warning messages have appeared when downloading the `morse` package due to 
+an update in its dependency. We try to fix this warnings as soon as possible.
+
+Again, feel free to report such message if such it disturbs you data processing: [New Issue for morse R package](https://github.com/pveber/morse/issues)
+
+
+The `morse` package is linked to [JAGS](http://mcmc-jags.sourceforge.net/) and C++. These dependencies 
+
+## JAGS
+
+JAGS is the Bayesian sampler used to make inference in survival models.
+
+1. Download JAGS: https://sourceforge.net/projects/mcmc-jags/
+
+[morseDownload.png]!("img/morseDownload.png")
+
+2. Test and Find JAGS
+
+Once installed, JAGS can be lost in the PATH. To help solving this issue, you can use
+the excellent package `runjags` which is not within `morse` so you have to isntall it.
+
+```{r testJAGS, eval=FALSE}
+install.packages("runjags")
+library("runjags")
+testjags()
+```
+
+We assume hereafter that the morse package is always installed.
+
+
+The output should look like:
+
+```
+You are using R version 4.0.2 (2020-06-22) on a windows machine, with the RStudio GUI
+JAGS version 4.3.0 found successfully using the command 'C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-terminal.exe'
+The rjags package is installed
+```
+
+Otherwise, you can tell your system where is JAGS executable (somewhere in `'C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-terminal.exe'` on windows machines):
+
+```{r pathJAGS, eval=FALSE}
+testjags(jags=runjags.getOption('jagspath')) # replace jagspath by the PATH to JAGS
+# FOR INSTANCE, on the current machine I do:
+testjags(jags=runjags.getOption('C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-terminal.exe'))
+```
+
+## C++
+
+C++ is used for running simulations. In R, you should have issue with C++ requirement since it is very well integrated (many R functions are interface to C++ functions).
+
+For now, we do not have any trouble reported on this use. But feel free to report if there is one: [New Issue for morse R package](https://github.com/pveber/morse/issues)
+
+# Survival analysis
+
+## Fit
+
+```{r fitSurv, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+```
+
+### ... with plot
+
+```{r plotSurv, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+plot(fit_cstSD)
+```
+
+## LCx
+
+```{r LCxSurv, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+LCx(fit_cstSD, X = 50)
+```
+
+### ... with plot
+
+```{r plotLCxSurv, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+LCX_cstSD = LCx(fit_cstSD, X = 50)
+plot(LCX_cstSD)
+```
+
+### MFX
+
+```{r MFx, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+data_4MFx <- data.frame(time = 1:10,
+                        conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
+MFx_PRZ_cstSD <- MFx(object = fit_cstSD, data_predict = data_4MFx, ode = TRUE)
+```
+
+### ... with plot
+
+```{r plotMFx, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+data_4MFx <- data.frame(time = 1:10,
+                        conc = c(0,0.5,8,3,0,0,0.5,8,3.5,0))
+MFx_PRZ_cstSD <- MFx(object = fit_cstSD, data_predict = data_4MFx, ode = TRUE)
+plot(MFx_PRZ_cstSD)
+```
+
+### Predict survival probability
+
+```{r predictSurv, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+data_example <- data.frame(
+   time = c(1,1.9,2,15,15.1,20),
+   conc = c(0,0,20,20,0,0),
+   replicate = rep("example", 6)
+)
+predict_example_NULL = predict_ode(
+  object = fit_cstSD,
+  data_predict = data_example,
+  mcmc_size = 10,
+  interpolate_length = NULL)
+```
+
+### ... with plot
+
+with few exposure profile time points:
+
+```{r plot1predictSurv, eval=FALSE}
+plot(predict_example_NULL)
+```
+
+see effect of option `interpolate_length`
+
+```{r plot2predictSurv, eval=FALSE}
+predict_example_100 = predict_ode(
+  object = fit_cstSD,
+  data_predict = data_example,
+  mcmc_size = 10,
+  interpolate_length = 100)
+plot(predict_example_100)
+```
+
+and with a very details exposure profile
+
+```{r plotpredictSurv_FOCUS, eval=FALSE}
+data("FOCUSprofile")
+predict_FOCUS = predict_ode(
+  object = fit_cstSD,
+  data_predict = FOCUSprofile,
+  mcmc_size = 10,
+  interpolate_length = NULL)
+plot(predict_FOCUS)
+```
+
+### Predict number of survival
+
+
