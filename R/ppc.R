@@ -10,6 +10,8 @@
 #' for class \code{survFitCstExp}: \link[=ppc.survFitCstExp]{ppc.survFitCstExp} and
 #' for class \code{survFitVarExp}: \link[=ppc.survFitVarExp]{ppc.survFitVarExp}.
 #' 
+#' @rdname PPC
+#' 
 #' @param x an object used to select a method \code{ppc}
 #' @param \dots Further arguments to be passed to generic methods
 #' 

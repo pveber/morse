@@ -4,6 +4,8 @@
 #' 
 #' When class of \code{object} is \code{survFit}, see \link[=LCx.survFit]{LCx.survFit}.
 #' 
+#' @rdname LCX
+#' 
 #' @param object An object used to select a method
 #' @param \dots Further arguments to be passed to generic methods
 #' 

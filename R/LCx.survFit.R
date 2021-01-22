@@ -20,6 +20,8 @@
 #'   
 #'  In the function \code{LCx}, we use the median of \eqn{S(0,t)} to rescale the
 #'  \eqn{x}\% Lethal Concentration at time \eqn{t}.
+#'  
+#' @rdname LCX
 #' 
 #' @param object An object of class \code{survFit}
 #' @param X Percentage of individuals dying (e.g., \eqn{50} for \eqn{LC_{50}}, \eqn{10} for \eqn{LC_{10}}, ...)
@@ -62,6 +64,7 @@
 #' }
 #' 
 #' @import zoo
+#' @importFrom stats approx
 #' 
 #' @export
 #' 

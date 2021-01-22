@@ -46,6 +46,9 @@
 #' @param threshold_iter Threshold number of iteration.
 #' @param hb_valueFORCED If \code{hb_value} is \code{FALSE}, it fix \code{hb}.
 #' @param ode IF \code{ode} is \code{TRUE}, algo use predict_ode rather than predict. Default is \code{TRUE}.
+#' @param interpolate_length Length of the time sequence for which output is wanted.
+#' @param interpolate_method The interpolation method for concentration. See package \code{deSolve} for details.
+#' Default is \code{linear}.
 #' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{MFx}, which is a list

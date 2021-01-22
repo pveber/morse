@@ -21,6 +21,8 @@
 #' When class of \code{object} is \code{survDataCstExp}, see \link[=survFit.survDataCstExp]{survFit.survDataCstExp} ;
 #' and for a \code{survDataVarExp}, see \link[=survFit.survDataVarExp]{survFit.survDataVarExp}.
 #'
+#' @rdname survFit
+#'
 #' @param data an object used to select a method 'survFit'
 #' @param model_type can be \code{"SD"} or \code{"IT"} to choose
 #'   between "Stochastic Death" or "Individual Tolerance" models

@@ -12,6 +12,8 @@
 #' intervals, which are depicted in green when they contain the
 #' observed value and in red otherwise.
 #'
+#' @rdname PPC
+#'
 #' @param x An object of class \code{survFitPredict_Nsurv}
 #' @param xlab A label for the \eqn{X}-axis, by default \code{Observed nb of survivors}.
 #' @param ylab A label for the \eqn{Y}-axis, by default \code{Predicted nb of survivors}.

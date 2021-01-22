@@ -17,6 +17,7 @@
 #' In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
 #' exceeded in one individual, this individual dies immediately.
 #'
+#' @rdname survFit
 #'
 #' @param data An object of class \code{survDataCstExp}.
 #' @param model_type can be \code{"SD"} or \code{"IT"} to choose
