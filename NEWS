@@ -3,15 +3,26 @@
 Version 3.3.0
 =============
 
+IMPORTANT NOTE
+- This release should mainly work with all objects created with earlier version >3.0.0.
+- However, in version 3.2.7 we introduced 'hb_valueFIXED' (in survFit) and 'hb_valueFORCED' (in prediction) to play with
+background mortality (hb_value). You can still use the functions (as MFx) but make sure to provide good parameters to 
+'hb_valueFIXED' and 'hb_valueFORCED' (see package documentation for details).
+
 NEW SOLVER
-- a new ODE solver has been introduced reducing the time of computation in prediction function ('predict', 'predict_Nsurv' and 'MFx')
+- a new ODE solver has been introduced reducing the time of computation in prediction function ('predict', 'predict_Nsurv' and 'MFx').
 
 NEW NSURV SAMPLER
-- a new sampler of Nsurv is introduced for simulation which speed the functions 'predict_Nsurv' by 30 to 60 times faster!
+- a new sampler for prediction of Nsurv is introduced. The speed of the function 'predict_Nsurv' should be 30 to 60 times faster.
+
+FIX ISSUE 
+- add 'interpolate_length' option to MFx to release the constraint at 100 time points. 
 
 ADD DATA
 - add FOCUS profile to the data set for testing
 
+DOCUMENTATION
+- improve links between documentation of functions (i.e., join documentation of similar functions)
 
 Version 3.2.7
 =============
