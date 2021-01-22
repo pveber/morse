@@ -23,6 +23,7 @@ ADD DATA
 
 DOCUMENTATION
 - improve links between documentation of functions (i.e., join documentation of similar functions)
+- add vignette for a minimal working example
 
 Version 3.2.7
 =============
