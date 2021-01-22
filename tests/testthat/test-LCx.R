@@ -4,10 +4,15 @@ test_that("test LCx", {
   
   data("propiconazole")
   fit_cstSD <- survFit(survData(propiconazole), quiet = TRUE, model_type = "SD")
+  
+  expect_error(LCx(fit_cstSD, X = 50), NA)
+  
   LCx_cstSD <- LCx(fit_cstSD, X = 50)
-  plot(LCx_cstSD)
+  expect_is( plot(LCx_cstSD), "ggplot")
 
+  expect_error( LCx(fit_cstSD, X = 0.00001), NA)
+  
   LCx_cstSD <- LCx(fit_cstSD, X = 0.00001)
-  plot(LCx_cstSD)
+  expect_is( plot(LCx_cstSD), "ggplot")
 })
 
