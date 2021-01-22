@@ -27,17 +27,18 @@ Feel free to ask question here: [New Issue for morse R package](https://github.c
 
 Here I report a set of minimal example were **each chunk** (piece of code in grey area) work for on its own.
 
-# Loading the R morse library and JAGS and C++
+# Loading `morse` with dependencies JAGS and C++
 
-Use the two classical `R` command:
+Use the two classical `R` commands:
 
 ```{r setupMorse, eval=FALSE}
-# install.packages(morse) # install the package
+install.packages(morse) # install the package
 library(morse) # load the package
 ```
 
 Recently, a lot of warning messages have appeared when downloading the `morse` package due to 
-an update in its dependency. We try to fix this warnings as soon as possible.
+an update in its dependency. We fix this warnings and we'll try to do so as soon as possible
+when new ones will appear.
 
 Again, feel free to report such message if such it disturbs you data processing: [New Issue for morse R package](https://github.com/pveber/morse/issues)
 
@@ -50,7 +51,7 @@ JAGS is the Bayesian sampler used to make inference in survival models.
 
 1. Download JAGS: https://sourceforge.net/projects/mcmc-jags/
 
-[morseDownload.png]!("img/morseDownload.png")
+[morseDownload.png]!("vignettes/img/morseDownload.png")
 
 2. Test and Find JAGS
 
@@ -84,7 +85,7 @@ testjags(jags=runjags.getOption('C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-t
 
 ## C++
 
-C++ is used for running simulations. In R, you should have issue with C++ requirement since it is very well integrated (many R functions are interface to C++ functions).
+C++ is used for running simulations. In R, you should not have issue with C++ requirement since it is very well integrated (many R functions are simple interface to C++ functions).
 
 For now, we do not have any trouble reported on this use. But feel free to report if there is one: [New Issue for morse R package](https://github.com/pveber/morse/issues)
 
@@ -207,4 +208,29 @@ plot(predict_FOCUS)
 
 ### Predict number of survival
 
+```{r predictNsurv, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+data("propiconazole_pulse_exposure")
+predict_Nsurv = predict_Nsurv_ode(
+  object = fit_cstSD,
+  data_predict = propiconazole_pulse_exposure
+)
+```
 
+### ... with plot
+
+```{r plotPredictNsurv, eval=FALSE}
+library(morse)
+data("propiconazole")
+survData_PRZ = survData(propiconazole)
+fit_cstSD = survFit(survData_PRZ, model_type = "SD")
+data("propiconazole_pulse_exposure")
+predict_Nsurv = predict_Nsurv_ode(
+  object = fit_cstSD,
+  data_predict = propiconazole_pulse_exposure
+)
+plot(predict_Nsurv)
+```
