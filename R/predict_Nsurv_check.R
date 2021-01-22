@@ -3,6 +3,8 @@
 #' 
 #' It returns measures of goodness-of-fit for predictions.
 #' 
+#' @rdname predict_check
+#' 
 #' @param object an object used to select a method \code{predict_Nsurv_check}
 #' @param \dots Further arguments to be passed to generic methods
 #' 
@@ -20,6 +22,8 @@ predict_Nsurv_check <- function(object, ...){
 #' Square Error (NRMSE) and the Survival Probability Prediction Error (SPPE) as
 #' reccommended by the recent Scientific Opinion from EFSA (2018).
 #'
+#' @rdname predict_check
+#' 
 #' @param object an object of class \code{survFitPredict_Nsurv}
 #' @param \dots Further arguments to be passed to generic methods
 #' 

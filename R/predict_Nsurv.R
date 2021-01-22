@@ -3,6 +3,8 @@
 #' It provides the simulated number of survivors for "SD" or "IT" models under
 #' constant or time-variable exposure.
 #' 
+#' @rdname predict
+#' 
 #' @param object an object used to select a method
 #' @param \dots Further arguments to be passed to generic methods
 #' 
@@ -15,6 +17,8 @@ predict_Nsurv <- function(object, ...){
 #'
 #' It provides the simulated number of survivors for "SD" or "IT" models under constant or
 #' time-variable exposure.
+#' 
+#' @rdname predict
 #'
 #' @param object An object of class \code{survFit}
 #' @param data_predict A dataframe with four columns \code{time}, \code{conc}, \code{replicate},

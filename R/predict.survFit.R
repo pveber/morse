@@ -3,6 +3,8 @@
 #' This is the generic \code{predict} S3 method for the \code{survFit} class.
 #' It provides simulation for "SD" or "IT" models under constant or time-variable exposure.
 #'
+#' @rdname predict
+#' 
 #' @param object An object of class \code{survFit}
 #' @param data_predict A dataframe with three columns \code{time}, \code{conc} and \code{replicate}
 #'  used for prediction. If \code{NULL}, prediction is based on \code{x} object of 

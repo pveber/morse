@@ -4,6 +4,7 @@
 #' object when computing issues happen. \code{MFx_ode} uses the \code{deSolve}
 #' library to improve robustness. However, time to compute may be longer.
 #' 
+#' @rdname MFx
 #' 
 #' @param object an object used to select a method \code{ppc}
 #' @param \dots Further arguments to be passed to generic methods
@@ -35,6 +36,7 @@ MFx_ode <- function(object, ...){
 #'   is the survival probability after an exposure profile
 #'    \eqn{MF(x,t)* C_w(\tau \in T)} at time \eqn{t}.
 #'   
+#' @rdname MFx   
 #' 
 #' @param object An object of class \code{survFit}.
 #' @param data_predict A dataframe with two columns \code{time} and \code{conc}.

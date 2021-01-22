@@ -4,6 +4,7 @@
 #' object when computing issues happen. \code{predict_nsurv_ode} uses the \code{deSolve}
 #' library to improve robustness. However, time to compute may be longer.
 #' 
+#' @rdname predict
 #' 
 #' @param object An object of class \code{survFit}.
 #' @param data_predict A dataframe with three columns \code{time}, \code{conc} and \code{replicate}
