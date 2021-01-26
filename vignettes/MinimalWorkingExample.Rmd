@@ -19,15 +19,13 @@ knitr::opts_chunk$set(
 
 # Please report any issue
 
-We say (one more quote attributed to Albert E.) that a good question solve 80\% of the problem. But Don't wait to solve 80\% of your problem to ask your question.
-
 The only think that can help is to create a Minimal Working Example (MWE). And we provide here a set of MWE you can modify to obtain yours.
 
 Feel free to ask question here: [New Issue for morse R package](https://github.com/pveber/morse/issues)
 
-Here I report a set of minimal example were **each chunk** (piece of code in grey area) work for on its own.
+Below is reported a set of minimal examples where **each chunk** (piece of `R` code in grey area) work on its own.
 
-# Loading `morse` with dependencies JAGS and C++
+## Loading `morse` and its dependencies (JAGS, C++)
 
 Use the two classical `R` commands:
 
@@ -37,26 +35,24 @@ library(morse) # load the package
 ```
 
 Recently, a lot of warning messages have appeared when downloading the `morse` package due to 
-an update in its dependency. We fix this warnings and we'll try to do so as soon as possible
+an update in its dependencies. We fix these warnings and we'll try to do so as soon as possible
 when new ones will appear.
 
-Again, feel free to report such message if such it disturbs you data processing: [New Issue for morse R package](https://github.com/pveber/morse/issues)
+Again, feel free to report such messages if they disturb your data processing: [New Issue for morse R package](https://github.com/pveber/morse/issues)
 
 
-The `morse` package is linked to [JAGS](http://mcmc-jags.sourceforge.net/) and C++. These dependencies 
+The `morse` package is linked to [JAGS](http://mcmc-jags.sourceforge.net/) and C++.
 
 ## JAGS
 
-JAGS is the Bayesian sampler used to make inference in survival models.
+JAGS is the Bayesian sampler used to make inference with survival models.
 
 1. Download JAGS: https://sourceforge.net/projects/mcmc-jags/
 
-[morseDownload.png]!("vignettes/img/morseDownload.png")
 
-2. Test and Find JAGS
+2. Test and find JAGS
 
-Once installed, JAGS can be lost in the PATH. To help solving this issue, you can use
-the excellent package `runjags` which is not within `morse` so you have to isntall it.
+Once installed, JAGS can be lost in the PATH. To help solving this issue, you can use package `runjags` which is not within `morse` so you have to install it.
 
 ```{r testJAGS, eval=FALSE}
 install.packages("runjags")
@@ -64,10 +60,10 @@ library("runjags")
 testjags()
 ```
 
-We assume hereafter that the morse package is always installed.
+We assume hereafter that the `morse` package is already installed.
 
 
-The output should look like:
+The output should look like this:
 
 ```
 You are using R version 4.0.2 (2020-06-22) on a windows machine, with the RStudio GUI
@@ -75,7 +71,7 @@ JAGS version 4.3.0 found successfully using the command 'C:/Program Files/JAGS/J
 The rjags package is installed
 ```
 
-Otherwise, you can tell your system where is JAGS executable (somewhere in `'C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-terminal.exe'` on windows machines):
+Otherwise, you can tell your system where JAGS executable is (somewhere in `'C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-terminal.exe'` on windows machines):
 
 ```{r pathJAGS, eval=FALSE}
 testjags(jags=runjags.getOption('jagspath')) # replace jagspath by the PATH to JAGS
@@ -85,7 +81,7 @@ testjags(jags=runjags.getOption('C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-t
 
 ## C++
 
-C++ is used for running simulations. In R, you should not have issue with C++ requirement since it is very well integrated (many R functions are simple interface to C++ functions).
+C++ is used for running simulations. In R, you should not have issue with C++ requirement since it is very well integrated (many R functions are simple interfaces to C++ functions).
 
 For now, we do not have any trouble reported on this use. But feel free to report if there is one: [New Issue for morse R package](https://github.com/pveber/morse/issues)
 
@@ -183,7 +179,7 @@ with few exposure profile time points:
 plot(predict_example_NULL)
 ```
 
-see effect of option `interpolate_length`
+test option `interpolate_length`
 
 ```{r plot2predictSurv, eval=FALSE}
 predict_example_100 = predict_ode(
@@ -194,7 +190,7 @@ predict_example_100 = predict_ode(
 plot(predict_example_100)
 ```
 
-and with a very details exposure profile
+and with a very detailed exposure profile
 
 ```{r plotpredictSurv_FOCUS, eval=FALSE}
 data("FOCUSprofile")
