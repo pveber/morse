@@ -176,10 +176,11 @@ survTKTDPARAMS <- function(mcmc) {
 #' \item{jags.data}{a list of data passed to the JAGS model}
 #' 
 #' @references
+#' 
 #' Delignette-Muller ML, Ruiz P and Veber P (2017).
-#' \emph{Robust fit of toxicokinetic−toxicodynamic models using prior knowledge contained in the design of survival toxicity tests.}
+#' \emph{Robust fit of toxicokinetic-toxicodynamic models using prior knowledge contained in the design of survival toxicity tests.}
 #' \url{http://dx.doi.org/10.1021/acs.est.6b05326}
-#'
+#' 
 #' Bedaux, J., Kooijman, SALM (1994) Statistical analysis of toxicity tests,
 #' based on hazard modeling, \emph{Environmental and Ecological Statistics}, 1,
 #' 303-314.
