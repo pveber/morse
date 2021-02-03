@@ -77,18 +77,16 @@
 #' \code{\link[ggplot2]{ggplot2}}
 #' 
 #' @references
-#' Delignette-Muller ML, Ruiz P and Veber P (2017).
-#' \emph{Robust fit of toxicokinetic-toxicodynamic models using prior knowledge contained in the design of survival toxicity tests.}
+#' Delignette-Muller, M.L., Ruiz P. and Veber P. (2017)
+#' \emph{Robust fit of toxicokinetic-toxicodynamic models using prior knowledge contained in the design of survival toxicity tests}.
 #' \url{https://pubs.acs.org/doi/10.1021/acs.est.6b05326}
 #' 
 #' Delignette-Muller, M.L., Lopes, C., Veber, P. and Charles, S. (2014)
-#' \emph{Statistical handling of reproduction data for exposure-response
-#' modelling}.
+#' \emph{Statistical handling of reproduction data for exposure-response modelling}.
 #' \url{https://pubs.acs.org/doi/abs/10.1021/es502009r?journalCode=esthag}.
 #' 
 #' Forfait-Dubuc, C., Charles, S., Billoir, E. and Delignette-Muller, M.L. (2012)
 #' \emph{Survival data analyses in ecotoxicology: critical effect concentrations, methods and models. What should we use?}
-#' \url{https://link.springer.com/article/10.1007%2Fs10646-012-0860-0}.
 #'
 #' Plummer, M. (2013) \emph{JAGS Version 4.0.0 user manual}.
 #' \url{https://sourceforge.net/projects/mcmc-jags/files/Manuals/4.x/jags_user_manual.pdf/download}
