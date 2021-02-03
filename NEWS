@@ -1,5 +1,13 @@
 === morse : MOdelling tools for Reproduction and Survival data in Ecotoxicology ===
 
+
+Version 3.3.1
+=============
+
+FIX ISSUE Github #286 Accomodate new value for default.stringAsFactors()
+- replicate in survData are now only of class factor
+
+
 Version 3.3.0
 =============
 
