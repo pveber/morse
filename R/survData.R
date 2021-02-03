@@ -21,9 +21,11 @@
 #' expected requirements. Please run \code{\link{survDataCheck}} to ensure
 #' \code{x} is well-formed.
 #'
+#' @rdname survData
+#'
 #' @param x a \code{data.frame} containing the following four columns:
 #' \itemize{
-#' \item \code{replicate}: a vector of class \code{integer} or \code{factor} for replicate
+#' \item \code{replicate}: a vector of any class \code{numeric}, \code{character} or \code{factor} for replicate
 #' identification. A given replicate value should identify the same group of
 #' individuals followed in time
 #' \item \code{conc}: a vector of class \code{numeric} with tested concentrations
@@ -34,7 +36,7 @@
 #' (may contain NAs)
 #' }
 #'
-#' @return A dataframe of class \code{survData}.
+#' @return A dataframe of class \code{survData} and column \code{replicate} as \code{factor}.
 #'
 #' @seealso \code{\link{survDataCheck}}
 #'
@@ -64,10 +66,11 @@ survData <- function(x) {
     x$Ninit <- Ninit(x)
   }
   
-  child_class <-
-    if (is_exposure_constant(x)) "survDataCstExp"
-    else "survDataVarExp"
+  child_class <- if (is_exposure_constant(x)) "survDataCstExp" else "survDataVarExp"
 
+  # convert replicate column as factor
+  x$replicate = as.factor( x$replicate)
+  
   class(x) <- c(child_class, "survData", class(x))
 
   return(x)
