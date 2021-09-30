@@ -10,7 +10,7 @@ tags:
 - Bayesian inference
 - Survival
 - Reproduction
-date: "2021-04-07"
+date: "`r format(Sys.time(), '%Y-%m-%d')`"
 output:
   pdf_document:
     extra_dependencies: ["float"]
@@ -29,9 +29,9 @@ bibliography: paper.bib
 ---
 
 # Summary
-Package `morse` is devoted to the analysis of experimental data collected from standard toxicity tests. It provides ready-to-use functions to visualize a data set and to estimate several toxicity indices to be further used in support of environmental risk assessment in full compliance with regulatory requirements. Such toxicity indices are indeed classical requested by standardized regulatory guidelines on which national agencies base their evaluation of applications for marketing authorisation of chemical active substances.
+Package `morse` is devoted to the analysis of experimental data collected from standard toxicity tests. It provides ready-to-use functions to visualize a data set and to estimate several toxicity indices to be further used in support of environmental risk assessment, in full compliance with regulatory requirements. Such toxicity indices are indeed classically requested by standardized regulatory guidelines on which national agencies base their evaluation of applications for marketing authorisation of chemical active substances.
 
-Package `morse` can be used to get estimates of $LC_x$ ($x$\% Lethal Concentration) or $EC_x$ ($x$\% Effective Concentration) by fitting standard exposure-response models on toxicity test data. Risk indicator estimates as well as model parameters are provided along with the quantification of their uncertainty. Package `morse` can also be used to get estimates of the $NEC$ (No Effect Concentration) by fitting a Toxicokinetic-Toxicodynamic (TKTD) model (namely `GUTS` models, that is *General Unified Threshold models of Survival*). Using `GUTS` models also allow to get estimates of $LC_{(x,t)}$ (whatever $x$ and $t$) and $LP_{(x,t)}$, this later being defined by EFSA as the $x$\% multiplication factor leading to an additional reduction of $x$\% in survival at the end of the exposure profile. Above all, `GUTS` models can be used on data collected under time-variable exposure profiles.
+Package `morse` can be used to get estimates of $LC_x$ ($x$\% Lethal Concentration) or $EC_x$ ($x$\% Effective Concentration) by fitting standard exposure-response models on toxicity test data. Risk indicator estimates as well as model parameters are provided along with the quantification of their uncertainty. Package `morse` can also be used to get estimates of the $NEC$ (No Effect Concentration) by fitting a Toxicokinetic-Toxicodynamic (TKTD) model (namely `GUTS` models, that is *General Unified Threshold models of Survival*). Using `GUTS` models also allow to get estimates of $LC_{(x,t)}$ (whatever $x$ and $t$) and $LP_{(x,t)}$ ($x\%$ Lethal Profile, also whatever $x$ and $t$)), this later being defined by the European Food Safety Authority (EFSA) as the $x$\% multiplication factor leading to an additional reduction of $x$\% in survival at the end of the exposure profile. Above all, `GUTS` models can be used on data collected under time-variable exposure profiles.
 
 This paper illustrates a typical use of `morse` with survival data collected over time and at different increasing exposure concentrations, analysed with the reduced version of GUTS models based on the stochastic death hypothesis (namely, the `GUTS-RED-SD` model). This example can be followed step-by-step to analyse any new data set, as long as the data set format is respected.
 
@@ -60,7 +60,7 @@ The `morse` package currently handles binary and count data, as for example surv
 
 In addition, for binary data handled with `GUTS` models, package `morse` also allows to:
 
-1. calculate and plot $LC_{(x,t)}$ and $LP_{(x,t)}$;
+1. calculate and plot $LC_{(x,t)}$ and $LP_{(x,t)}$, whatever $x$ and $t$;
 2. compute goodness-of-fit criteria: the PPC percentage, the Normalized Root Mean Square Error (NRMSE) and the Survival probability prediction error at the end of the exposure profile (SPPE).
 
 See [@EFSA2018] for details.
