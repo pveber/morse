@@ -67,7 +67,7 @@ and/or other 'X'."))
   
   
   if(is.null(main)){
-    main <- paste("Concentation-response curve: LC", 100 - X_prop_provided*100, " at time", time_LCx)
+    main <- paste("Concentration-response curve: LC", 100 - X_prop_provided*100, " at time", time_LCx)
   } 
   
   LCx_plt <- ggplot() + theme_minimal() +
