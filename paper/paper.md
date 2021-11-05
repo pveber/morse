@@ -1,5 +1,5 @@
 ---
-title: "`morse`: an R-package in support of Environmental Risk Assessment"
+title: "`morse`: an R-package to analyse toxicity test data"
 tags:
 - R
 - ecotoxicology
@@ -10,7 +10,7 @@ tags:
 - Bayesian inference
 - Survival
 - Reproduction
-date: "`r format(Sys.time(), '%Y-%m-%d')`"
+date: "2021-11-05"
 output:
   pdf_document:
     extra_dependencies: ["float"]
@@ -29,18 +29,18 @@ bibliography: paper.bib
 ---
 
 # Summary
-Package `morse` is devoted to the analysis of experimental data collected from standard toxicity tests. It provides ready-to-use functions to visualize a data set and to estimate several toxicity indices to be further used in support of environmental risk assessment, in full compliance with regulatory requirements. Such toxicity indices are indeed classically requested by standardized regulatory guidelines on which national agencies base their evaluation of applications for marketing authorisation of chemical active substances.
+Package `morse` is devoted to the analysis of experimental data collected from standard toxicity tests. It provides ready-to-use functions to visualize a data set and to estimate several toxicity indices to be further used in support of environmental risk assessment in full compliance with regulatory requirements. Such toxicity indices are indeed typically requested by standardized regulatory guidelines on which national agencies base their evaluation of applications for regulatory approval of chemical substances. Tools gathered together within package `morse` involve the most advanced and innovative methods developed in research, making them available for ecotoxicologists and regulators who so not need to invest in the underlying technicalities in order to perform a valuable quantitative environmental risk assessment.
 
-Package `morse` can be used to get estimates of $LC_x$ ($x$\% Lethal Concentration) or $EC_x$ ($x$\% Effective Concentration) by fitting standard exposure-response models on toxicity test data. Risk indicator estimates as well as model parameters are provided along with the quantification of their uncertainty. Package `morse` can also be used to get estimates of the $NEC$ (No Effect Concentration) by fitting a Toxicokinetic-Toxicodynamic (TKTD) model (namely `GUTS` models, that is *General Unified Threshold models of Survival*). Using `GUTS` models also allow to get estimates of $LC_{(x,t)}$ (whatever $x$ and $t$) and $LP_{(x,t)}$ ($x\%$ Lethal Profile, also whatever $x$ and $t$)), this later being defined by the European Food Safety Authority (EFSA) as the $x$\% multiplication factor leading to an additional reduction of $x$\% in survival at the end of the exposure profile. Above all, `GUTS` models can be used on data collected under time-variable exposure profiles.
-
-This paper illustrates a typical use of `morse` with survival data collected over time and at different increasing exposure concentrations, analysed with the reduced version of GUTS models based on the stochastic death hypothesis (namely, the `GUTS-RED-SD` model). This example can be followed step-by-step to analyse any new data set, as long as the data set format is respected.
+This paper provides an overview of a typical use of package `morse` with survival data collected over time and at different increasing exposure concentrations. These data are analysed with the reduced version of GUTS models based on the stochastic death hypothesis (namely, the `GUTS-RED-SD` model). This example can be followed step-by-step to analyse any new data set, as long as the data set format is respected.
 
 # Statement of Need
-Package `morse` [@morse2021] has been tested using `R` (version 3.5 and later) on macOS, Linux and Windows machines. Regarding the particular case of toxicokinetic-toxicodynamic (TKTD) models for survival, namely GUTS models [@Jager2018], package `morse` was ring-tested together with nine other `GUTS` implementations under different software platforms. All participants to the ring-test received the same data sets and tasks, carried out their simulations independently from each other and sent the results back to the coordinator for analysis. Giving very similar results than the other implementations, package `morse` was thus confirmed as fit-for-purpose in fitting GUTS models on survival toxicity test data.
+Package `morse` can be used to get estimates of $LC_x$ ($x$\% Lethal Concentration) or $EC_x$ ($x$\% Effective Concentration) by fitting standard exposure-response or effect models on toxicity test data. Toxicity indicator estimates as well as model parameters are provided along with the quantification of their uncertainty. Package `morse` can also be used to get estimates of the $NEC$ (No Effect Concentration) by fitting a Toxicokinetic-Toxicodynamic (TKTD) model (namely `GUTS` models, that is *General Unified Threshold models of Survival*). Using `GUTS` models also allows to get estimates of $LC_{(x,t)}$ (whatever $x$ and $t$) and $LP_{(x,t)}$, the latter being defined by EFSA as the $x$\% multiplication factor leading to an additional reduction of $x$\% in survival at the end of the exposure profile. Above all, `GUTS` models can be used on data collected under time-variable exposure profiles.
 
-All functions in package `morse` can be used without a deep knowledge of their underlying probabilistic model or inference methods. Rather, they were designed to behave as well as possible, without requiring the user to provide values for some obscure parameters. Nevertheless, models implemented in `morse` can also be used as a first step to tailor new models for more specific situations.
+Package `morse` [@morse2021] has been tested using `R` (version 3.5 and later) on macOS, Linux and Windows machines. Regarding the particular case of toxicokinetic-toxicodynamic (TKTD) models for survival, namely GUTS models, package `morse` was ring-tested together with nine other `GUTS` implementations under different software platforms; see Appendix A in  [@Jager2018] for details. Note that we were the only team in performing the ring-test under a Bayesian framework. Other implementations were \texttt{BYOM}, \texttt{DEBTOX}, \texttt{DELPHI}, \texttt{EPYTOX}, \texttt{GUTS-3S}, \texttt{MATHEMATICA}, \texttt{MODELMAKER}, \texttt{OPENMODEL}, \texttt{EASYGUTS}, \texttt{GATEAUX}, all under a frequestist statistical framework. All participants to the ring-test received the same data sets and tasks, carried out their simulations independently from each other and sent the results back to the coordinator for analysis. Output estimation was similar to other implementations, therefore, package `morse` was confirmed as fit-for-purpose in fitting GUTS models on survival toxicity test data.
 
-Note that package `morse` benefits from a web interface, MOSAIC, from which the same analyses can be reproduced directly on-line without needs to invest in `R` programming. MOSAIC is freely available at [https://mosaic.univ-lyon1.fr/](https://mosaic.univ-lyon1.fr/) [@Charles2017] (Figure \ref{fig:mosaic}).
+All functions in package `morse` can be used without a deep knowledge of their underlying probabilistic model or inference methods. Rather, they were designed to behave as well as possible, without requiring the user to provide values for some parameters. Nevertheless, models implemented in `morse` can also be used as a first step to tailor new models for more specific situations.
+
+Note that package `morse` benefits from a web interface, MOSAIC, from which the same analyses can be reproduced directly on-line without having to implement in `R` programming. MOSAIC is freely available at [https://mosaic.univ-lyon1.fr/](https://mosaic.univ-lyon1.fr/) [@Charles2017] (Figure \ref{fig:mosaic}).
 
 ![Homepage of the MOSAIC web platform (https://mosaic.univ-lyon1.fr/)..\label{fig:mosaic}](figures/mosaic.png)
 
@@ -48,9 +48,9 @@ Note that package `morse` benefits from a web interface, MOSAIC, from which the 
 Package `morse` is available as an `R` package; it can be directly downloaded from CRAN [https://CRAN.R-project.org/package=morse](https://CRAN.R-project.org/package=morse), where package dependencies and system requirements are also documented. The development version can be found on GitHub [https://github.com/pveber/morse](https://github.com/pveber/morse), where code contributions, bug reports, fixes and feature requests are more than welcome by opening issues and pull requests.
 
 # Main features
-The main functions in package `morse` are `survData()`, `reproData()` and `plotDoseResponse()` to visualize raw data. Functions `survFitTT()`, `reproFitTT()`, `survFit()` allow to fit a model on data in order to estimate toxicity indicators, the choice depending on the type of data. Fitting outputs can be either displayed with `plot()` or synthesized with `summary()`. Functions are available to check the goodness-of-fit, namely `ppc()` and `plot_prior_post()`. Predictions can be performed with `predict()`, `predict_ode()`, `predict_Nsurv()` and `predict_Nsurv_ode()`. At last, function `LCx()`and `MFx()` allow to get $x$\% lethal concentrations or profiles, respectively.
+The main functions in package `morse` are `survData()`, `reproData()` and `plotDoseResponse()` to visualize raw data. Functions `survFitTT()`, `reproFitTT()`, `survFit()` allow to fit a model on data in order to estimate toxicity indicators, the choice depending on the type of data. Fitting outputs can be either displayed with `plot()` or synthesized with `summary()`. Functions are available to check the goodness-of-fit, namely `ppc()` and `plot_prior_post()`. Predictions can be performed with `predict()`, `predict_ode()`, `predict_Nsurv()` and `predict_Nsurv_ode()`. Finally, function `LCx()`and `MFx()` allow to get $x$\% lethal concentrations or profiles, respectively.
 
-The `morse` package currently handles binary and count data, as for example survival and reproduction data. Functions dedicated to binary (resp. count) data analysis start with a `surv` (resp. `repro`) prefix. `morse` provides a similar workflow in both cases:
+The `morse` package currently handles binary and count data, as for example survival and reproduction data. Functions dedicated to binary (respectively, count) data analysis start with a `surv` (respectively, `repro`) prefix. `morse` provides a similar workflow in both cases:
 
 1. create and validate a data set;
 2. explore a data set;
@@ -60,29 +60,19 @@ The `morse` package currently handles binary and count data, as for example surv
 
 In addition, for binary data handled with `GUTS` models, package `morse` also allows to:
 
-1. calculate and plot $LC_{(x,t)}$ and $LP_{(x,t)}$, whatever $x$ and $t$;
+1. calculate and plot $LC_{(x,t)}$ and $LP_{(x,t)}$;
 2. compute goodness-of-fit criteria: the PPC percentage, the Normalized Root Mean Square Error (NRMSE) and the Survival probability prediction error at the end of the exposure profile (SPPE).
 
 See [@EFSA2018] for details.
 
-Those steps are presented in depth in the `Tutorial` available at  [https://cran.r-project.org/web/packages/morse/vignettes/tutorial.html](https://cran.r-project.org/web/packages/morse/vignettes/tutorial.html), with all necessary details to plenty use all `morse` features. A more formal description of the models and the estimation procedures are provided in a document called "Models in morse package" available at [ https://cran.r-project.org/web/packages/morse/vignettes/modelling.pdf]( https://cran.r-project.org/web/packages/morse/vignettes/modelling.pdf). Please refer to this documentation for further introduction to the use of the `morse` package.
+Those steps are presented in depth in the `Tutorial` available at  [https://cran.r-project.org/web/packages/morse/vignettes/tutorial.html](https://cran.r-project.org/web/packages/morse/vignettes/tutorial.html), with all necessary details to implement all `morse` features. A more formal description of the models and the estimation procedures are provided in a document called "Models in morse package" available at [ https://cran.r-project.org/web/packages/morse/vignettes/modelling.pdf]( https://cran.r-project.org/web/packages/morse/vignettes/modelling.pdf). Please refer to this documentation for further introduction to the use of the `morse` package.
 
 # Minimal Working Example
 
-## Loading `morse` and its dependencies
-In order to use package `morse`, you need to install it with all its dependencies, including JAGS and C++ (see below), as well as other R-packages: mandatory ones (`coda`, `deSolve`, `dplyr`, `epitools`, `graphics`, `grDevices`, `ggplot2` ($\geqslant$ 2.1.0), `grid`, `gridExtra`, `magrittr`, `methods`, `reshape2`, `rjags` ($\geqslant$ 4.0), `stats`, `tibble`, `tidyr`, `zoo`) and suggested ones (`knitr`, `rmarkdown`, `testthat`). For this purpose, you can use the two classical `R` commands:
-
-```r
-### install the `morse` package, if needed
-if(is.element('morse', installed.packages()[,1]) == FALSE){
-  install.packages('morse')
-}
-### load the `morse` package
-library(morse)
-```
+## Installation
 
 ### JAGS
-The `morse` package is linked to JAGS [http://mcmc-jags.sourceforge.net/](http://mcmc-jags.sourceforge.net/) that is the Bayesian sampler used to perform inference with all implemented models. So, you need also to download and install JAGS at [https://sourceforge.net/projects/mcmc-jags/](https://sourceforge.net/projects/mcmc-jags/). Then you must test that your `R` graphical user interface has access to JAGS, and, if not, to specify where JAGS can be found on your computer. Indeed, once installed, JAGS can be lost in the PATH. To help solving this issue, you can use package `runjags` which is not within `morse` so that you have to install and load it too.
+The `morse` package is linked to JAGS [http://mcmc-jags.sourceforge.net/](http://mcmc-jags.sourceforge.net/), a Bayesian sampler used to perform inference with all implemented models. So, you need to download and install JAGS at [https://sourceforge.net/projects/mcmc-jags/](https://sourceforge.net/projects/mcmc-jags/). Then you must test that your `R` graphical user interface has access to JAGS, and, if not, to specify where JAGS can be found on your computer. Indeed, once installed, JAGS can be lost in the PATH. To help solve this issue, you can use package `runjags` which is installed and loaded as follows.
 
 ```r
 ### install the `runjags` package, if needed
@@ -113,8 +103,20 @@ testjags(jags=runjags.getOption('jagspath'))
 ### 'C:/Program Files/JAGS/JAGS-4.3.0/x64/bin/jags-terminal.exe'
 ```
 
+### Loading `morse` and its dependencies
+In order to use package `morse`, you need to install it with all its dependencies on other R-packages: mandatory ones (`coda`, `deSolve`, `dplyr`, `epitools`, `graphics`, `grDevices`, `ggplot2` ($\geqslant$ 2.1.0), `grid`, `gridExtra`, `magrittr`, `methods`, `reshape2`, `rjags` ($\geqslant$ 4.0), `stats`, `tibble`, `tidyr`, `zoo`) and suggested ones (`knitr`, `rmarkdown`, `testthat`). For this purpose, you can use the two classical `R` commands:
+
+```r
+### install the `morse` package, if needed
+if(is.element('morse', installed.packages()[,1]) == FALSE){
+  install.packages('morse')
+}
+### load the `morse` package
+library(morse)
+```
+
 ### C++
-The `morse` package is also linked to C++. C++ is used for running simulations leading to predictions. In `R`, you should not have issues with C++ requirements since it is very well integrated (many `R` functions are simple interfaces to C++ functions). Feel free to report any trouble at [https://github.com/pveber/morse/issues](https://github.com/pveber/morse/issues) by opening a new issue for the `morse` package.
+Note that the `morse` package is also linked to C++. C++ is used for running simulations leading to predictions. In `R`, you should not have issues with C++ requirements since it is very well integrated (many `R` functions are simple interfaces to C++ functions). Feel free to report any trouble at [https://github.com/pveber/morse/issues](https://github.com/pveber/morse/issues) by opening a new issue for the `morse` package.
 
 ## Survival analysis
 We assume hereafter that `morse` and all the above dependencies have been corrected installed. To illustrate the use of `morse`, we will use a standard survival data set coming from a chronic laboratory toxicity test with *Gammarus pulex*, a freshwater invertebrate, exposed to increasing concentrations of propiconazole (a fungicide) during four days. Eight concentrations were tested with two replicates of 10 organisms per concentration. Survival was monitored at five time points (at day 0, 1, 2, 3 and 4) [@Nyman2012].
@@ -143,7 +145,7 @@ Using a GUTS model with `morse` allows to get a probability distribution on the 
 
 ```r
 ### run function LCx()
-LCX_cstSD <- LCx(fit_cstSD)
+LCX_cstSD <- LCx(fit_cstSD, X = 50)
 ### plot the output as a concentration-response curve
 plot(LCX_cstSD)
 ```
@@ -209,7 +211,7 @@ plot(MFx_PRZ_cstSD, log_scale = TRUE)
 ![(left) Predicted survival probability according to a range of multiplication factors (log-scale) at the end of a theoretical exposure profile (right).\label{fig:mfx}](figures/mfx-new.png)
 
 ### Predict survival probability under any exposure profile
-Finally, it may be useful to predict the survival probability under any exposure profile (time-variable or not), for example when designing new experiments or to better understand what happens in field. Below are some examples from which you can inspire to perform your own simulations.
+Finally, it may be useful to predict the survival probability under any exposure profile (time-variable or not), for example when designing new experiments or to better understand what happens in field. Below are some examples that you can use to build your own simulations.
 
 ```r
 ### define an exposure profile (here a theoretical one)
@@ -260,7 +262,9 @@ plot(predict_FOCUS)
 ![(left) Predicted survival probability over time under the basic exposure profile without interpolation; (middle) Predicted survival probability over time under the basic exposure profile with interpolation; (right) Predicted survival probability over time under an environmentally realistic exposure profile.\label{fig:predict}](figures/predictions.png)
 
 # Research using `morse`
-Package `morse` was recently used to evaluate the added-value of using TKTD models in comparison with classical dose-response models, based on a case study with the snail *Limnaea stagnalis* when exposed to increasing concentrations of cadmium [@baudrot2018a]. Also based on `morse`, we proposed some recommendations to address TKTD assessment using uncertainties in environmental risk models [@Baudrot2019].
+Package `morse` was recently used to evaluate the added-value of using TKTD models in comparison with classical dose-response models, based on a case study with the snail *Limnaea stagnalis* when exposed to increasing concentrations of cadmium [@baudrot2018a]. Also based on package `morse`, we proposed some recommendations to address TKTD assessment using uncertainties in environmental risk models [@Baudrot2019].
+
+More recently, benefiting from our experience in developing package `morse` for ecotoxicology, we strongly contributed to the new package `rbioacc` [https://CRAN.R-project.org/package=rbioacc](https://CRAN.R-project.org/package=rbioacc), a turn-key package providing bioaccumulation metrics (BCF/BMF/BSAF) from a toxicokinetic (TK) model fitted to accumulation-depuration data. Package `rbioacc`also supports the MOSAIC$_{bioacc}$ web platform [https://mosaic.univ-lyon1.fr/bioacc](https://mosaic.univ-lyon1.fr/bioacc). Last but not least, package 'rDEBtktd' is currently under development [https://gitlab.in2p3.fr/sandrine.charles/rDEBtktd](https://gitlab.in2p3.fr/sandrine.charles/rDEBtktd) to complement package `morse` in order to fit, validate and predict with TKTD models simultaneously describing growth and reproduction dynamics of living organisms under chemical pressure.
 
 # Data availability
 A collection of eight data sets is made available directly in package `morse` (use function `data()`). These data sets can also be downloaded on-line from the MOSAIC web platform by visiting the different modules: [https://mosaic.univ-lyon1.fr](https://mosaic.univ-lyon1.fr).
