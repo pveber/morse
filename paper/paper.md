@@ -10,7 +10,7 @@ tags:
 - Bayesian inference
 - Survival
 - Reproduction
-date: "2021-11-05"
+date: "2021-04-07"
 output:
   pdf_document:
     extra_dependencies: ["float"]
@@ -29,7 +29,7 @@ bibliography: paper.bib
 ---
 
 # Summary
-Package `morse` is devoted to the analysis of experimental data collected from standard toxicity tests. It provides ready-to-use functions to visualize a data set and to estimate several toxicity indices to be further used in support of environmental risk assessment in full compliance with regulatory requirements. Such toxicity indices are indeed typically requested by standardized regulatory guidelines on which national agencies base their evaluation of applications for regulatory approval of chemical substances. Tools gathered together within package `morse` involve the most advanced and innovative methods developed in research, making them available for ecotoxicologists and regulators who so not need to invest in the underlying technicalities in order to perform a valuable quantitative environmental risk assessment.
+Package `morse` is devoted to the analysis of experimental data collected from standard toxicity tests. It provides ready-to-use functions to visualize a data set and to estimate several toxicity indices to be further used in support of environmental risk assessment in full compliance with regulatory requirements [@OECD2006]. Such toxicity indices are indeed typically requested by standardized regulatory guidelines on which national agencies base their evaluation of applications for regulatory approval of chemical substances; see  for example OECD toxicity testing guideline [@OECD2016; @OECD2018]. Tools gathered together within package `morse` involve the most advanced and innovative methods developed for ecotoxicology, such as appropriate stochastic parts in dose-response modelling [@MLDM2014], or the use of Bayesian statistics to get parameter estimates as posterior probability distribution [@Billoir2008]. Hence, these tools are easily accessible for ecotoxicologists and regulators who do not need to deeply invest in the underlying technicalities in order to perform a valuable quantitative environmental risk assessment.
 
 This paper provides an overview of a typical use of package `morse` with survival data collected over time and at different increasing exposure concentrations. These data are analysed with the reduced version of GUTS models based on the stochastic death hypothesis (namely, the `GUTS-RED-SD` model). This example can be followed step-by-step to analyse any new data set, as long as the data set format is respected.
 
@@ -40,7 +40,7 @@ Package `morse` [@morse2021] has been tested using `R` (version 3.5 and later) o
 
 All functions in package `morse` can be used without a deep knowledge of their underlying probabilistic model or inference methods. Rather, they were designed to behave as well as possible, without requiring the user to provide values for some parameters. Nevertheless, models implemented in `morse` can also be used as a first step to tailor new models for more specific situations.
 
-Note that package `morse` benefits from a web interface, MOSAIC, from which the same analyses can be reproduced directly on-line without having to implement in `R` programming. MOSAIC is freely available at [https://mosaic.univ-lyon1.fr/](https://mosaic.univ-lyon1.fr/) [@Charles2017] (Figure \ref{fig:mosaic}).
+Note that package `morse` benefits from a web interface, MOSAIC, from which the same analyses can be reproduced directly on-line without having to implement them directly in `R` programming. MOSAIC is freely available at [https://mosaic.univ-lyon1.fr/](https://mosaic.univ-lyon1.fr/) [@Charles2017] (Figure \ref{fig:mosaic}).
 
 ![Homepage of the MOSAIC web platform (https://mosaic.univ-lyon1.fr/)..\label{fig:mosaic}](figures/mosaic.png)
 
@@ -121,7 +121,7 @@ Note that the `morse` package is also linked to C++. C++ is used for running sim
 ## Survival analysis
 We assume hereafter that `morse` and all the above dependencies have been corrected installed. To illustrate the use of `morse`, we will use a standard survival data set coming from a chronic laboratory toxicity test with *Gammarus pulex*, a freshwater invertebrate, exposed to increasing concentrations of propiconazole (a fungicide) during four days. Eight concentrations were tested with two replicates of 10 organisms per concentration. Survival was monitored at five time points (at day 0, 1, 2, 3 and 4) [@Nyman2012].
 
-We will used the reduced version of the GUTS model based on the stochastic death hypothesis (namely, the `GUTS-RED-SD` model), as recommended by the *European Food Safety Authority* (EFSA) for the environmental risk assessment (ERA) of plant protection products potentially toxic for aquatic living organisms [@EFSA2018]. This model can also be fitted on-line with the MOSAIC web platform [@Baudrot2018b]. Below is the *modus operandi* with package `morse` to be followed step-by-step in order to be in full compliance with the EFSA workflow for ERA.
+We will used the reduced version of the GUTS model based on the stochastic death hypothesis (namely, the `GUTS-RED-SD` model), as recommended by the *European Food Safety Authority* (EFSA) for the environmental risk assessment (ERA) of plant protection products potentially toxic for aquatic living organisms [@EFSA2018]. This model can also be fitted on-line with the MOSAIC web platform [@Baudrot2018b]. Below is the *modus operandi* with package `morse` to be followed step-by-step in order to be in full compliance with the EFSA workflow for ERA [@EFSA2018].
 
 ### Calibration step
 
@@ -138,10 +138,10 @@ fit_cstSD <- survFit(survData_PRZ, model_type = "SD")
 plot(fit_cstSD)
 ```
 
-![Fitting result with a GUTS-RED-SD model. The median fitted curves are in orange and the uncertainty bands in gray. Black dots are observed data surrounded by their binomial confidence intervals.\label{fig:fit}](figures/fit.png)
+![Fitting result with a GUTS-RED-SD model. The median fitted curves are in orange and the 95% uncertainty bands in gray. Black dots are observed data surrounded by their binomial confidence intervals.\label{fig:fit}](figures/fit.png)
 
 ### Get the $x$\% lethal concentration
-Using a GUTS model with `morse` allows to get a probability distribution on the $x$\% lethal concentration whatever the exposure duration $t$, namely the $LC_{(x,t)}$. By default, $t$ corresponds to the last time point in the data set and $x = 50$\%.
+Using a GUTS model with `morse` allows the user to get a probability distribution on the $x$\% lethal concentration whatever the exposure duration $t$, namely the $LC_{(x,t)}$. By default, $t$ corresponds to the last time point in the data set and $x = 50$\%.
 
 ```r
 ### run function LCx()
@@ -167,10 +167,6 @@ predict_Nsurv <- predict_Nsurv_ode(
 plot(predict_Nsurv)
 ```
 
-```r
-predict_Nsurv_check(predict_Nsurv)
-```
-
 ![Visual check of adequacy between predictions based on the GUTS-RED-SD model with parameter values estimated in the calibration step (median prediction in orange, uncertainty band in gray), and observations (black dots).\label{fig:nsurv}](figures/predict-nsurv.png)
 
 Once the predictions are visually checked (Figure \ref{fig:nsurv}), quantitative validation criteria need to be calculated.
@@ -178,9 +174,7 @@ Once the predictions are visually checked (Figure \ref{fig:nsurv}), quantitative
 ```r
 ### check for adequacy between predictions and observations
 predict_Nsurv_check(predict_Nsurv)
-```
 
-```r
 check <- predict_Nsurv_check(predict_Nsurv)
 check$Percent_PPC_global
 check$Percent_NRMSE_global
@@ -273,7 +267,7 @@ A collection of eight data sets is made available directly in package `morse` (u
 V.B. (main developer of `morse`): conceptualization, methodology, formal analysis, data curation, visualization, writing manuscript. S.C.: supervision, funding acquisition, project administration, formal analysis, data curation, writing manuscript.
 
 # Acknowledgments
-Authors fully thank all contributors to the `morse` package: Marie Laure Delignette-Muller, Wandrille Duchemin, Benoît Goussen, Nils Kehrein, Guillaume Kon-Kam-King, Christelle Lopes, Philippe Ruiz, Alexander Singer and Philippe Veber. They also thank the French National Agency for Water and Aquatic Environments (ONEMA, now the French Agency for Biodiversity) for its financial support to the development of the `morse` package.
+We fully thank all contributors to the `morse` package: Marie Laure Delignette-Muller, Wandrille Duchemin, Benoît Goussen, Nils Kehrein, Guillaume Kon-Kam-King, Christelle Lopes, Philippe Ruiz, Alexander Singer and Philippe Veber. We also thank the French National Agency for Water and Aquatic Environments (ONEMA, now the French Agency for Biodiversity) for its financial support to the development of the `morse` package. Finally, we thank a lot our reviewers, Tom Purucker and Peter Vermeiren, for their helpful comments leading to improvements in the manuscript and directly in the `morse` package, as well as Kristina Riemer for the management of the review process and for being so patient in finalizing this manuscript.
 
 # References
 
