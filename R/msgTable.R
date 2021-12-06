@@ -25,7 +25,7 @@ msgTableIsEmpty <- function(x)
 #' @export
 print.msgTable <- function(x, ...) {
   if (msgTableIsEmpty(x)) {
-    cat("No message\n")
+    cat("Correct format\n")
   }
   else {
     cat("Message(s):\n")
