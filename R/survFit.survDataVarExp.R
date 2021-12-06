@@ -1,50 +1,4 @@
-#' Fits a TKTD model for survival analysis using Bayesian inference for \code{survDataVarExp} object
-#'
-#' This function estimates the parameters of a TKTD ('SD' or 'IT')
-#' model for survival analysis using Bayesian inference. In this model,
-#' the survival rate of individuals is modeled as a function of the chemical compound
-#' concentration with a mechanistic description of the effects on survival over
-#' time.
-#'
-#' The function \code{survFit} return the parameter estimates of Toxicokinetic-toxicodynamic (TKTD) models
-#' \code{SD} for 'Stochastic Death' or \code{IT} fo 'Individual Tolerance'.
-#' TKTD models, and particularly the General Unified Threshold model of
-#' Survival (GUTS), provide a consistent process-based
-#' framework to analyse both time and concentration dependent datasets.
-#' In GUTS-SD, all organisms are assumed to have the same internal concentration 
-#' threshold (denoted \eqn{z}), and, once exceeded, the instantaneous probability
-#' to die increases linearly with the internal concentration.
-#' In GUTS-IT, the threshold concentration is distributed among all the organisms, and once 
-#' exceeded in one individual, this individual dies immediately.
-#'
 #' @rdname survFit
-#' 
-#' @param data An object of class \code{survDataVarExp}.
-#' @param model_type can be \code{"SD"} or \code{"IT"} to choose
-#'   between "Stochastic Death" or "Individual Tolerance" models
-#'   (resp.). See the modeling vignette for details.
-#' @param quiet If \code{FALSE}, prints logs and progress bar from
-#'   JAGS.
-#' @param n.chains A positive integer specifying the number of MCMC chains. The minimum required number 
-#' of chains is 2.
-#' @param n.adapt A positive integer specifying the number of iterations for adaptation. If \code{n.adapt} = 0
-#'  then no adaptation takes place.
-#' @param n.iter A positive integer specifying the number of iterations to monitor for each chain.
-#' @param n.warmup A positive integer specifying the number of warmup (aka burnin) iterations per chain. 
-#' @param thin.interval A positive integer specifying the period to monitor.
-#' @param limit.sampling if \code{FALSE} (default is \code{TRUE}), there is no limit to the number of iterations
-#' in MCMC imposed by the \code{raftery.diag} test.
-#' @param dic.compute if \code{TRUE} (default is \code{FALSE}), it generates penalized deviance samples to compute
-#' the Deviance Information Criterion (DIC) with the \code{rjags} package
-#' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
-#'  (see function \code{\link[rjags]{dic.samples}})
-#' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
-#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
-#' @param  hb_valueFIXED If \code{hb_value} is \code{FALSE}, then \code{hb_valueFiXED} is the value to fix \code{hb}.
-#'   If \code{hb_value} is \code{FALSE} and  \code{hb_valueFiXED} is \code{NA}, then \code{hb} is fixed to \code{0}.
-#' @param extend_time Number of for each replicate used for linear 
-#' interpolation (comprise between time to compute and fitting accuracy)
-#' @param \dots Further arguments to be passed to generic methods
 #'
 #' @return The function returns an object of class \code{survFitVarExp}, which is
 #' a list with the following information:
@@ -61,33 +15,22 @@
 #' \item{mcmcInfo}{a table with the number of iterations, chains, adaptation, warmup and the thinning interval} 
 #' \item{jags.data}{a list of the data passed to the JAGS model}
 #' \item{model_type}{the type of TKTD model used: \code{SD} or \code{IT}}
-#'
-#' @references Jager, T., Albert, C., Preuss, T. G. and Ashauer, R. (2011) 
-#' General unified threshold model of survival-a toxicokinetic-toxicodynamic
-#'  framework for ecotoxicology, \emph{Environmental Science and Technology}, 45, 2529-2540.
-#' 303-314.
-#' 
-#' @keywords estimation
 #' 
 #' 
 #' @examples
 #'
+#' # Example with time-variable exposure profile
 #' # (1) Load the survival data
 #' data("propiconazole_pulse_exposure")
-#'
 #' # (2) Create an object of class "survData"
 #' dataset <- survData(propiconazole_pulse_exposure)
-#'
 #' \dontrun{
 #' # (3) Run the survFit function with TKTD model 'SD' or 'IT' 
 #' out <- survFit(dataset , model_type = "SD")
-#'
 #' # (4) Summarize look the estimated parameters
 #' summary(out)
-#'
 #' # (5) Plot the fitted curve
 #' plot(out, adddata = FALSE)
-#'
 #' # (6) Plot the fitted curve with ggplot style and CI as spaghetti
 #' plot(out, spaghetti = TRUE)
 #' }

@@ -6,7 +6,7 @@
 #' concentration with a mechanistic description of the effects on survival over
 #' time.
 #' 
-#' The function \code{survFit} return the parameter estimates of Toxicokinetic-toxicodynamic (TKTD) models
+#' The function \code{survFit} returns the parameter estimates of Toxicokinetic-toxicodynamic (TKTD) models
 #' \code{SD} for 'Stochastic Death' or \code{IT} fo 'Individual Tolerance'.
 #' TKTD models, and particularly the General Unified Threshold model of
 #' Survival (GUTS), provide a consistent process-based
@@ -23,8 +23,8 @@
 #'
 #' @rdname survFit
 #'
-#' @param data an object used to select a method 'survFit'
-#' @param model_type can be \code{"SD"} or \code{"IT"} to choose
+#' @param data An object of class \code{survDataCstExp} or \code{survDataVarExp}.
+#' @param model_type Can be \code{"SD"} or \code{"IT"} to choose
 #'   between "Stochastic Death" or "Individual Tolerance" models
 #'   (resp.). See the modeling vignette for details.
 #' @param quiet If \code{FALSE}, prints logs and progress bar from
@@ -43,55 +43,19 @@
 #' @param dic.type type of penalty to use. A string identifying the type of penalty: \code{pD} or \code{popt}
 #'  (see function \code{\link[rjags]{dic.samples}})
 #' @param hb_value If \code{TRUE}, the background mortality \code{hb} is taken into account.
-#' If \code{FALSE}, parameter \code{hb} is set to a fixed value defined by \code{hb_valueFIXED}. The default is \code{TRUE}. 
-#' @param hb_valueFIXED If \code{hb_value} is \code{FALSE}, the argument \code{hb_valueFIXED}
-#'  provides the values of parameter hb. Default is 0.
+#' If \code{FALSE}, parameter \code{hb} is set to 0. The default is \code{TRUE}.
+#' @param  hb_valueFIXED If \code{hb_value} is \code{FALSE}, then \code{hb_valueFiXED} is the value to fix \code{hb}.
+#'   If \code{hb_value} is \code{FALSE} and  \code{hb_valueFiXED} is \code{NA}, then \code{hb} is fixed to \code{0}.
+#' @param extend_time Number of for each replicate used for linear 
+#' interpolation (comprise between time to compute and fitting accuracy)
 #' @param \dots Further arguments to be passed to generic methods
 #' 
-#' @examples
-#'
-#' # (1) Load the survival data
-#' data(propiconazole)
-#'
-#' # (2) Create an object of class "survData"
-#' dataset  <- survData(propiconazole)
-#'
-#' \dontrun{
-#' # (3) Run the survFit function with TKTD model 'SD' or 'IT' 
-#' out <- survFit(dataset , model_type = "SD")
-#'
-#' # (4) Summarize look the estimated parameters
-#' summary(out)
-#'
-#' # (5) Plot the fitted curve
-#' plot(out, adddata = TRUE)
-#'
-#' # (6) Plot the fitted curve with ggplot style and CI as spaghetti
-#' plot(out, spaghetti = TRUE , adddata = TRUE)
-#' }
+#' @references Jager, T., Albert, C., Preuss, T. G. and Ashauer, R. (2011) 
+#' General unified threshold model of survival-a toxicokinetic-toxicodynamic
+#'  framework for ecotoxicology, \emph{Environmental Science and Technology}, 45, 2529-2540.
+#' 303-314.
 #' 
-#' # When the data set include variable exposure profile, time for inference is longer
-#' 
-#' # (1) Load the survival data with variable exposure profile
-#' data("propiconazole_pulse_exposure")
-#'
-#' # (2) Create an object of class "survData"
-#' dataset <- survData(propiconazole_pulse_exposure)
-#'
-#' \dontrun{
-#' # (3) Run the survFit function with TKTD model 'SD' or 'IT' 
-#' out <- survFit(dataset , model_type = "SD")
-#'
-#' # (4) Summarize look the estimated parameters
-#' summary(out)
-#'
-#' # (5) Plot the fitted curve
-#' plot(out, adddata = FALSE)
-#'
-#' # (6) Plot the fitted curve with ggplot style and CI as spaghetti
-#' plot(out, spaghetti = TRUE)
-#' }
-#' 
+#' @keywords estimation 
 #' 
 #' @export
 #' 
