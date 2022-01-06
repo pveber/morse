@@ -20,8 +20,8 @@ URL: https://cran.r-project.org/package=morse
 BugReports: https://github.com/pveber/morse
 Description: Tools for ecotoxicologists and regulators dedicated to the
     mathematical and statistical modelling of toxicity test data. They use advanced and
-    innovative methods for a valuable quantitative environmental risk assessment. See also
-    Delignette-Muller et al. (2017) <doi:10.1021/acs.est.6b05326>. and Baudrot et al. (2018) <doi:10.1021/acs.est.7b05464>.
+    innovative methods for a valuable quantitative environmental risk assessment. See our companion paper Baudrot and Charles (2021) <doi:10.21105/joss.03200>,
+    as well as complementary details in Baudrot et al. (2018) <doi:10.1021/acs.est.7b05464> and Delignette-Muller et al. (2017) <doi:10.1021/acs.est.6b05326>.
 Depends:
     R (>= 3.5.0)
 SystemRequirements: JAGS (>= 4.0.0) (see http://mcmc-jags.sourceforge.net)
